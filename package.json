@@ -2,7 +2,7 @@
   "name": "hitagi.js",
   "version": "0.1.0",
   "description": "Simple game development framework",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "grunt test"
   },
@@ -12,6 +12,7 @@
   },
   "keywords": [
     "game",
+    "gamedev",
     "framework",
     "hitagi",
     "ecs"
