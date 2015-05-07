@@ -18,7 +18,7 @@
     var world = new hitagi.World();
 
     // Register systems.
-    var renderSystem = new hitagi.systems.RenderSystem(stage, width, height);
+    var renderSystem = new hitagi.systems.PixiRenderSystem(stage, width, height);
     world.register(renderSystem);
 
     // Add entities.

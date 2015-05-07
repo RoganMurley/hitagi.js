@@ -19,7 +19,7 @@
     var world = new hitagi.World();
 
     // Register systems.
-    var renderSystem = new hitagi.systems.RenderSystem(stage, width, height);
+    var renderSystem = new hitagi.systems.PixiRenderSystem(stage, width, height);
     world.register(renderSystem);
 
     // Add entities.
@@ -40,7 +40,6 @@
     world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({x: 0, y: 0}))
-            .attach(new hitagi.components.Line({x: 100, y: 100}))
     );
 
     // Setup game loop.
@@ -46965,14 +46964,14 @@ module.exports = {
             'VelocitySystem': require('./systems/velocitySystem.js'),
             'CollisionSystem': require('./systems/collisionSystem.js'),
             'SoundSystem': require('./systems/soundSystem.js'),
-            'RenderSystem': require('./systems/renderSystem.js')
+            'PixiRenderSystem': require('./systems/pixiRenderSystem.js')
         }
     };
 
     module.exports = Hitagi;
 } ());
 
-},{"./components/collision.js":127,"./components/line.js":128,"./components/position.js":129,"./components/sprite.js":130,"./components/text.js":131,"./components/velocity.js":132,"./controls.js":133,"./entity.js":134,"./systems/collisionSystem.js":136,"./systems/renderSystem.js":137,"./systems/soundSystem.js":138,"./systems/velocitySystem.js":139,"./utils.js":140,"./world.js":141}],136:[function(require,module,exports){
+},{"./components/collision.js":127,"./components/line.js":128,"./components/position.js":129,"./components/sprite.js":130,"./components/text.js":131,"./components/velocity.js":132,"./controls.js":133,"./entity.js":134,"./systems/collisionSystem.js":136,"./systems/pixiRenderSystem.js":137,"./systems/soundSystem.js":138,"./systems/velocitySystem.js":139,"./utils.js":140,"./world.js":141}],136:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -47068,42 +47067,22 @@ module.exports = {
     var _ = require('lodash');
     var pixi = require('pixi.js');
 
-    var PixiSprite = pixi.Sprite;
-    var PixiTexture = pixi.Texture;
-    var PixiText = pixi.Text;
-    var PixiGraphics = pixi.Graphics;
-    var PixiAssetLoader = pixi.AssetLoader;
+    var PixiRenderSystem = function (stage, width, height) {
+        var that = this;
 
-    var RenderSystem = function (stage, width, height) {
-        var that = this,
-
-            x = 0,
-            newX = 0,
-            targetX = 0,
-
-            y = 0,
-            newY = 0,
-            targetY = 0,
-
-            cameraSpeed = 0.1,
-
-            xShake = 0,
-            yShake = 0,
-            shakeDecay = 0.9;
-
-        var sprites = {},
-            textures = {},
-            texts = {},
-            lines = {};
+        var sprites = {};
+        var textures = {};
+        var texts = {};
+        var lines = {};
 
         // Build the system, called by world on every entity.
         this.build = function (entity) {
             if (entity.has('sprite')) {
                 var path = entity.c.sprite.path,
-                    texture = PixiTexture.fromImage(path);
+                    texture = pixi.Texture.fromImage(path);
 
                 textures[entity.uid] = texture;
-                var sprite = sprites[entity.uid] = new PixiSprite(texture);
+                var sprite = sprites[entity.uid] = new pixi.Sprite(texture);
 
                 // Set anchor.
                 sprite.anchor.x = 0.5;
@@ -47119,7 +47098,7 @@ module.exports = {
                 stage.addChild(sprite);
             }
             if (entity.has('text')) {
-                texts[entity.uid] = new PixiText(
+                texts[entity.uid] = new pixi.Text(
                         entity.c.text.txt,
                         entity.c.text.options
                     );
@@ -47127,8 +47106,7 @@ module.exports = {
                 stage.addChild(texts[entity.uid]);
             }
             if (entity.has('line')) {
-                lines[entity.uid] = new PixiGraphics();
-                lines[entity.uid].lineColor = 'red';
+                lines[entity.uid] = new pixi.Graphics();
                 lines[entity.uid].moveTo(entity.c.position.x, entity.c.position.y);
                 lines[entity.uid].lineTo(entity.c.line.x, entity.c.line.y);
 
@@ -47163,83 +47141,20 @@ module.exports = {
         };
 
         this.update = function (entity) {
-            // Set a directional sprite to the right direction.
-            if (entity.has('xDirectionSprite')) {
-                var direction = entity.c.xMovement.direction;
-
-                if (direction === 'left') {
-                    that.setSprite(entity, entity.c.xDirectionSprite.left);
-                }
-                else if (direction === 'right') {
-                    that.setSprite(entity, entity.c.xDirectionSprite.right);
-                }
-            }
-
-            // Lock the camera to an entity with camera lock.
-            if (entity.has('cameraLock')) {
-                targetX = width/2 - entity.c.position.x;
-                targetY = height/2 - entity.c.position.y;
-
-                // Pan to camera lock position.
-                var xDiff = Math.abs(newX - targetX),
-                    yDiff = Math.abs(newY - targetY);
-
-                if (newX < targetX) {
-                    newX += xDiff * cameraSpeed;
-                }
-                else if (newX > targetX) {
-                    newX -= xDiff * cameraSpeed;
-                }
-
-                if (newY < targetY) {
-                    newY += yDiff * cameraSpeed;
-                }
-                else if (newY > targetY) {
-                    newY -= yDiff * cameraSpeed;
-                }
-
-                // Screen shake.
-                if (_.random(0, 1)) {
-                    newX += _.random(0, xShake);
-                } else {
-                    newX -= _.random(0, xShake);
-                }
-                if (_.random(0, 1)) {
-                    newY += _.random(0, yShake);
-                } else {
-                    newY -= _.random(0, yShake);
-                }
-
-                xShake *= 0.9;
-                yShake *= 0.9;
-            }
 
             // Update text positions.
-            // Don't update HUD positions.
-            if (entity.has('text') && !entity.has('hud')) {
-                texts[entity.uid].position.x = x + entity.c.position.x;
-                texts[entity.uid].position.y = y + entity.c.position.y;
+            if (entity.has('text')) {
+                texts[entity.uid].position.x = entity.c.position.x;
+                texts[entity.uid].position.y = entity.c.position.y;
             }
 
             // Update sprite positions.
             if (entity.has('sprite')) {
                 var sprite = sprites[entity.uid];
-                sprite.position.x = x + entity.c.position.x;
-                sprite.position.y = y + entity.c.position.y;
-
-                // Rotate.
-                if (entity.has('rotation')) {
-                    entity.c.rotation.angle += entity.c.rotation.speed;
-                    sprite.rotation = entity.c.rotation.angle;
-                }
+                sprite.position.x = entity.c.position.x;
+                sprite.position.y = entity.c.position.y;
             }
 
-        };
-
-        // Called at the end of every tick.
-        this.tickEnd = function () {
-            x = newX;
-            y = newY;
         };
 
         this.setText = function (entity, text) {
@@ -47261,43 +47176,24 @@ module.exports = {
             this.build(entity);
         };
 
+        // Show a display object.
         this.show = function (entity) {
             entity.c.sprite.visible = sprites[entity.uid].visible = true;
         };
 
+        // Hide a display object.
         this.hide = function (entity) {
             entity.c.sprite.visible = sprites[entity.uid].visible = false;
         };
 
-        this.shake = function (magnitude, decay) {
-            xShake = magnitude;
-            yShake = magnitude;
-            shakeDecay = decay;
-        };
-
         // Preload assets.
         this.load = function (assets) {
-            var loader = new PixiAssetLoader(assets);
+            var loader = new pixi.AssetLoader(assets);
             loader.load();
-        };
-
-        // Get offset from camera.
-        this.relativeMousePos = function (absoluteMousePos) {
-            return {
-                x: absoluteMousePos.x - x,
-                y: absoluteMousePos.y - y
-            };
-        };
-
-        this.getPos = function () {
-            return {
-                x: -x,
-                y: y
-            };
         };
     };
 
-    module.exports = RenderSystem;
+    module.exports = PixiRenderSystem;
 } ());
 
 },{"lodash":4,"pixi.js":107}],138:[function(require,module,exports){

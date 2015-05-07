@@ -18,7 +18,7 @@
             'VelocitySystem': require('./systems/velocitySystem.js'),
             'CollisionSystem': require('./systems/collisionSystem.js'),
             'SoundSystem': require('./systems/soundSystem.js'),
-            'RenderSystem': require('./systems/renderSystem.js')
+            'PixiRenderSystem': require('./systems/pixiRenderSystem.js')
         }
     };
 
