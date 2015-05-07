@@ -1,0 +1,4 @@
+test:
+    description: 'Run the test SUITE'
+    tasks:
+        - 'simplemocha'
