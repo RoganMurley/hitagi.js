@@ -1,24 +1,19 @@
 (function () {
     "use strict";
 
-    var hitagi = require('../../src/main.js');
+    var hitagi = require('hitagi.js');
     var pixi = require('pixi.js');
 
-    // Setup stage.
+    // Setup pixi.js.
     var stage = new pixi.Stage(0x141c22);
-
-    var width = window.innerWidth,
-        height = window.innerHeight;
-
-    // Setup renderer.
-    var renderer = pixi.autoDetectRenderer(width, height);
+    var renderer = pixi.autoDetectRenderer(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.view);
 
     // Setup world.
     var world = new hitagi.World();
 
     // Register systems.
-    var renderSystem = new hitagi.systems.PixiRenderSystem(stage, width, height);
+    var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
 
     // Add entities.
@@ -34,11 +29,6 @@
                     }
                 }
             ))
-    );
-
-    world.add(
-        new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 0, y: 0}))
     );
 
     // Setup game loop.
