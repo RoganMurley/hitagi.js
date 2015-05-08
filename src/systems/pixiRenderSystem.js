@@ -4,13 +4,18 @@
     var _ = require('lodash');
     var pixi = require('pixi.js');
 
-    var PixiRenderSystem = function (stage, width, height) {
+    var PixiRenderSystem = function (stage) {
         var that = this;
 
         var sprites = {};
         var textures = {};
         var texts = {};
         var lines = {};
+
+        var offset = {
+            x: 0,
+            y: 0
+        };
 
         // Build the system, called by world on every entity.
         this.build = function (entity) {
@@ -75,15 +80,15 @@
 
             // Update text positions.
             if (entity.has('text')) {
-                texts[entity.uid].position.x = entity.c.position.x;
-                texts[entity.uid].position.y = entity.c.position.y;
+                texts[entity.uid].position.x = entity.c.position.x + offset.x;
+                texts[entity.uid].position.y = entity.c.position.y + offset.y;
             }
 
             // Update sprite positions.
             if (entity.has('sprite')) {
                 var sprite = sprites[entity.uid];
-                sprite.position.x = entity.c.position.x;
-                sprite.position.y = entity.c.position.y;
+                sprite.position.x = entity.c.position.x + offset.x;
+                sprite.position.y = entity.c.position.y + offset.y;
             }
 
         };

@@ -46871,7 +46871,13 @@ module.exports = {
         };
 
         // Remove a binding.
-        this.unbind = function () {};
+        this.unbind = function () {
+            if (!_.has(bindings, name)) {
+                console.error(name + ' not bound.');
+                throw new Error('ControlNotBound');
+            }
+            delete bindings[name];
+        };
 
         // Check that a key binding has been pressed.
         // If hold is true, only check for it once.
@@ -47075,6 +47081,11 @@ module.exports = {
         var texts = {};
         var lines = {};
 
+        var offset = {
+            x: 0,
+            y: 0
+        };
+
         // Build the system, called by world on every entity.
         this.build = function (entity) {
             if (entity.has('sprite')) {
@@ -47112,12 +47123,6 @@ module.exports = {
 
                 stage.addChild(lines[entity.uid]);
             }
-            if (entity.has('xDirectionSprite')) {
-                that.load([
-                    entity.c.xDirectionSprite.left,
-                    entity.c.xDirectionSprite.right
-                ]);
-            }
         };
 
         // Remove an entity from the system.
@@ -47144,15 +47149,15 @@ module.exports = {
 
             // Update text positions.
             if (entity.has('text')) {
-                texts[entity.uid].position.x = entity.c.position.x;
-                texts[entity.uid].position.y = entity.c.position.y;
+                texts[entity.uid].position.x = entity.c.position.x + offset.x;
+                texts[entity.uid].position.y = entity.c.position.y + offset.y;
             }
 
             // Update sprite positions.
             if (entity.has('sprite')) {
                 var sprite = sprites[entity.uid];
-                sprite.position.x = entity.c.position.x;
-                sprite.position.y = entity.c.position.y;
+                sprite.position.x = entity.c.position.x + offset.x;
+                sprite.position.y = entity.c.position.y + offset.y;
             }
 
         };

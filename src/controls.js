@@ -77,7 +77,13 @@
         };
 
         // Remove a binding.
-        this.unbind = function () {};
+        this.unbind = function () {
+            if (!_.has(bindings, name)) {
+                console.error(name + ' not bound.');
+                throw new Error('ControlNotBound');
+            }
+            delete bindings[name];
+        };
 
         // Check that a key binding has been pressed.
         // If hold is true, only check for it once.

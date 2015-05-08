@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "grunt": "^0.4.5",
+    "grunt-browserify": "^3.8.0",
     "grunt-simple-mocha": "^0.4.0",
     "load-grunt-config": "^0.17.1",
     "simple-mock": "^0.2.14"
