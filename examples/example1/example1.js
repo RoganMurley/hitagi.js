@@ -1,12 +1,9 @@
 (function () {
     "use strict";
 
-    var hitagi = require('hitagi.js');
-    var pixi = require('pixi.js');
-
-    // Setup pixi.js.
-    var stage = new pixi.Stage(0x141c22);
-    var renderer = pixi.autoDetectRenderer(window.innerWidth, window.innerHeight);
+    // Setup pixi.
+    var stage = new PIXI.Stage(0x141c22);
+    var renderer = PIXI.autoDetectRenderer(600, 400);
     document.body.appendChild(renderer.view);
 
     // Setup world.
@@ -19,12 +16,12 @@
     // Add entities.
     world.add(
         new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 0, y: 0}))
+            .attach(new hitagi.components.Position({x: 20, y: 20}))
             .attach(new hitagi.components.Text(
                 {
                     txt: 'Hello, World!',
                     options: {
-                        font: '128px monospace',
+                        font: '32px monospace',
                         fill: 'white'
                     }
                 }

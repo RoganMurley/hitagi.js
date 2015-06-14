@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var Hitagi = {
+    var hitagi = {
         'Entity': require('./entity.js'),
         'World': require('./world.js'),
         'Controls': require('./controls.js'),
@@ -22,5 +22,5 @@
         }
     };
 
-    module.exports = Hitagi;
+    module.exports = hitagi;
 } ());

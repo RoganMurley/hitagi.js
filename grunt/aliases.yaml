@@ -1,4 +1,9 @@
 test:
-    description: 'Run the test SUITE'
+    description: 'Run the test suite'
     tasks:
         - 'simplemocha'
+
+build:
+    description: 'Build a JavaScript file for distribution.'
+    tasks:
+        - 'browserify:build'
