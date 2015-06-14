@@ -11,6 +11,7 @@
         var textures = {};
         var texts = {};
         var lines = {};
+        var rectangles = {};
 
         var offset = {
             x: 0,
@@ -54,6 +55,20 @@
 
                 stage.addChild(lines[entity.uid]);
             }
+            if (entity.has('rectangle')) {
+                rectangles[entity.uid] = new pixi.Graphics();
+                rectangles[entity.uid].position.x = entity.c.position.x;
+                rectangles[entity.uid].position.y = entity.c.position.y;
+                rectangles[entity.uid].beginFill(0xFFFF00);
+                rectangles[entity.uid].drawRect(
+                    entity.c.rectangle.x1,
+                    entity.c.rectangle.y1,
+                    entity.c.rectangle.x2,
+                    entity.c.rectangle.y2
+                );
+
+                stage.addChild(rectangles[entity.uid]);
+            }
         };
 
         // Remove an entity from the system.
@@ -69,11 +84,15 @@
             if (_.has(lines, id)) {
                 stage.removeChild(lines[id]);
             }
+            if (_.has(rectangles, id)) {
+                stage.removeChild(rectangles[id]);
+            }
 
             delete sprites[id];
             delete textures[id];
             delete texts[id];
             delete lines[id];
+            delete rectangles[id];
         };
 
         this.update = function (entity) {
@@ -89,6 +108,12 @@
                 var sprite = sprites[entity.uid];
                 sprite.position.x = entity.c.position.x + offset.x;
                 sprite.position.y = entity.c.position.y + offset.y;
+            }
+
+            if (entity.has('rectangle')) {
+                var rectangle = rectangles[entity.uid];
+                rectangle.position.x = entity.c.position.x;
+                rectangle.position.y = entity.c.position.y;
             }
 
         };

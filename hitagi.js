@@ -48422,6 +48422,29 @@ module.exports = {
 (function () {
     'use strict';
 
+    // Represents an entity's rectangle primitive.
+    // PARAMS:
+    //      x1 - top-left x co-ordinate relative to entity position.
+    //      y1 - top-left y co-ordinate relative to entity position.
+    //      x2 - bottom-right x co-ordinate relative to entity position.
+    //      y2 - bottom-right y co-ordinate relative to entity position.
+    var Rectangle = function (params) {
+        this.id = 'rectangle';
+        this.deps = ['position'];
+
+        this.x1 = params.x1;
+        this.y1 = params.y1;
+        this.x2 = params.x2;
+        this.y2 = params.y2;
+    };
+
+    module.exports = Rectangle;
+} ());
+
+},{}],137:[function(require,module,exports){
+(function () {
+    'use strict';
+
     // Represents an entity's sprite.
     // PARAMS:
     //      path - URL of raw sprite
@@ -48435,7 +48458,7 @@ module.exports = {
     module.exports = Sprite;
 } ());
 
-},{}],137:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48454,7 +48477,7 @@ module.exports = {
     module.exports = Text;
 } ());
 
-},{}],138:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48473,7 +48496,7 @@ module.exports = {
     module.exports = Velocity;
 } ());
 
-},{}],139:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48577,7 +48600,7 @@ module.exports = {
     module.exports = Controls;
 } ());
 
-},{"jquery":9,"lodash":10}],140:[function(require,module,exports){
+},{"jquery":9,"lodash":10}],141:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48631,7 +48654,7 @@ module.exports = {
     module.exports = Entity;
 } ());
 
-},{"lodash":10}],141:[function(require,module,exports){
+},{"lodash":10}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48641,30 +48664,32 @@ module.exports = {
         'Controls': require('./controls.js'),
         'Utils': require('./utils.js'),
         'components': {
-            'Position': require('./components/position.js'),
-            'Velocity': require('./components/velocity.js'),
             'Collision': require('./components/collision.js'),
+            'Line': require('./components/line.js'),
+            'Position': require('./components/position.js'),
+            'Rectangle': require('./components/rectangle.js'),
             'Sprite': require('./components/sprite.js'),
             'Text': require('./components/text.js'),
-            'Line': require('./components/line.js')
+            'Velocity': require('./components/velocity.js')
         },
         'systems': {
-            'VelocitySystem': require('./systems/velocitySystem.js'),
             'CollisionSystem': require('./systems/collisionSystem.js'),
+            'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
+
             'SoundSystem': require('./systems/soundSystem.js'),
-            'PixiRenderSystem': require('./systems/pixiRenderSystem.js')
+            'VelocitySystem': require('./systems/velocitySystem.js')
         }
     };
 
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/line.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/text.js":137,"./components/velocity.js":138,"./controls.js":139,"./entity.js":140,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],142:[function(require,module,exports){
+},{"./components/collision.js":133,"./components/line.js":134,"./components/position.js":135,"./components/rectangle.js":136,"./components/sprite.js":137,"./components/text.js":138,"./components/velocity.js":139,"./controls.js":140,"./entity.js":141,"./systems/collisionSystem.js":144,"./systems/pixiRenderSystem.js":145,"./systems/soundSystem.js":146,"./systems/velocitySystem.js":147,"./utils.js":148,"./world.js":149}],143:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":141}],143:[function(require,module,exports){
+},{"./main.js":142}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48753,7 +48778,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],144:[function(require,module,exports){
+},{"lodash":10}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48767,6 +48792,7 @@ global.hitagi = require('./main.js');
         var textures = {};
         var texts = {};
         var lines = {};
+        var rectangles = {};
 
         var offset = {
             x: 0,
@@ -48810,6 +48836,20 @@ global.hitagi = require('./main.js');
 
                 stage.addChild(lines[entity.uid]);
             }
+            if (entity.has('rectangle')) {
+                rectangles[entity.uid] = new pixi.Graphics();
+                rectangles[entity.uid].position.x = entity.c.position.x;
+                rectangles[entity.uid].position.y = entity.c.position.y;
+                rectangles[entity.uid].beginFill(0xFFFF00);
+                rectangles[entity.uid].drawRect(
+                    entity.c.rectangle.x1,
+                    entity.c.rectangle.y1,
+                    entity.c.rectangle.x2,
+                    entity.c.rectangle.y2
+                );
+
+                stage.addChild(rectangles[entity.uid]);
+            }
         };
 
         // Remove an entity from the system.
@@ -48825,11 +48865,15 @@ global.hitagi = require('./main.js');
             if (_.has(lines, id)) {
                 stage.removeChild(lines[id]);
             }
+            if (_.has(rectangles, id)) {
+                stage.removeChild(rectangles[id]);
+            }
 
             delete sprites[id];
             delete textures[id];
             delete texts[id];
             delete lines[id];
+            delete rectangles[id];
         };
 
         this.update = function (entity) {
@@ -48845,6 +48889,12 @@ global.hitagi = require('./main.js');
                 var sprite = sprites[entity.uid];
                 sprite.position.x = entity.c.position.x + offset.x;
                 sprite.position.y = entity.c.position.y + offset.y;
+            }
+
+            if (entity.has('rectangle')) {
+                var rectangle = rectangles[entity.uid];
+                rectangle.position.x = entity.c.position.x;
+                rectangle.position.y = entity.c.position.y;
             }
 
         };
@@ -48888,7 +48938,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"lodash":10,"pixi.js":113}],145:[function(require,module,exports){
+},{"lodash":10,"pixi.js":113}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48916,7 +48966,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],146:[function(require,module,exports){
+},{"howler":8,"lodash":10}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48935,7 +48985,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":147}],147:[function(require,module,exports){
+},{"../utils.js":148}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48950,7 +49000,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{}],148:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49125,4 +49175,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":140,"lodash":10}]},{},[142]);
+},{"./entity.js":141,"lodash":10}]},{},[143]);

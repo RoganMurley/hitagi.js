@@ -7,18 +7,20 @@
         'Controls': require('./controls.js'),
         'Utils': require('./utils.js'),
         'components': {
-            'Position': require('./components/position.js'),
-            'Velocity': require('./components/velocity.js'),
             'Collision': require('./components/collision.js'),
+            'Line': require('./components/line.js'),
+            'Position': require('./components/position.js'),
+            'Rectangle': require('./components/rectangle.js'),
             'Sprite': require('./components/sprite.js'),
             'Text': require('./components/text.js'),
-            'Line': require('./components/line.js')
+            'Velocity': require('./components/velocity.js')
         },
         'systems': {
-            'VelocitySystem': require('./systems/velocitySystem.js'),
             'CollisionSystem': require('./systems/collisionSystem.js'),
+            'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
+
             'SoundSystem': require('./systems/soundSystem.js'),
-            'PixiRenderSystem': require('./systems/pixiRenderSystem.js')
+            'VelocitySystem': require('./systems/velocitySystem.js')
         }
     };
 
