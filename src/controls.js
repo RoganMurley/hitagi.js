@@ -69,7 +69,7 @@
 
         // Add a binding.
         this.bind = function (code, name) {
-            if (!_.has(bindings, name)) {
+            if (_.has(bindings, name)) {
                 console.error(name + ' already bound.');
                 throw new Error('ControlAlreadyBound');
             }
