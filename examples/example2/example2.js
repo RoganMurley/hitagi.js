@@ -1,9 +1,13 @@
 (function () {
     "use strict";
 
+    // Setup dimensions.
+    var levelWidth = 600;
+    var levelHeight = 400;
+
     // Setup pixi.
     var stage = new PIXI.Stage(0x141c22);
-    var renderer = PIXI.autoDetectRenderer(600, 400);
+    var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
     document.body.appendChild(renderer.view);
 
     // Setup world.
@@ -19,22 +23,37 @@
     world.register(renderSystem);
     world.register(new hitagi.systems.VelocitySystem());
 
-    var PaddleSystem = function () {
+    var PlayerPaddleSystem = function () {
         var that = this;
 
+        var verticalBounce = function (entity) {
+            entity.c.velocity.yspeed *= -1.4;
+        };
+
         that.update = function (entity, dt) {
-            if (entity.has('paddle')) {
+            if (entity.has('player') && entity.has('paddle')) {
+                // Handle player input.
                 if (controls.check('up')) {
                     entity.c.velocity.yspeed -= entity.c.paddle.speed;
                 }
                 if (controls.check('down')) {
                     entity.c.velocity.yspeed += entity.c.paddle.speed;
                 }
+
+                // Add friction to paddle.
                 entity.c.velocity.yspeed *= entity.c.paddle.friction;
+
+                // Stop paddle from leaving screen.
+                if (entity.c.position.y < 0) {
+                    verticalBounce(entity);
+                }
+                if (entity.c.position.y + entity.c.paddle.height > levelHeight) {
+                    verticalBounce(entity);
+                }
             }
         };
     };
-    world.register(new PaddleSystem());
+    world.register(new PlayerPaddleSystem());
 
     // Add entities.
     world.add(
@@ -53,10 +72,13 @@
                 x2: 16,
                 y2: 128
             }))
+            .attach({'id': 'player'})
             .attach({
                 'id': 'paddle',
+                'friction': 0.9,
+                'height': 128,
                 'speed': 1,
-                'friction': 0.9
+                'width': 16
             })
     );
 
