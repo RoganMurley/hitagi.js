@@ -56,7 +56,7 @@
     world.register(new PlayerPaddleSystem());
 
     // Add entities.
-    world.add(
+    var player = world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({
                 x: 8,
@@ -73,6 +73,31 @@
                 y2: 128
             }))
             .attach({'id': 'player'})
+            .attach({
+                'id': 'paddle',
+                'friction': 0.9,
+                'height': 128,
+                'speed': 1,
+                'width': 16
+            })
+    );
+
+    var opponent = world.add(
+        new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: levelWidth - 24,
+                y: 0
+            }))
+            .attach(new hitagi.components.Velocity({
+                xspeed: 0,
+                yspeed: 0
+            }))
+            .attach(new hitagi.components.Rectangle({
+                x1: 0,
+                y1: 0,
+                x2: 16,
+                y2: 128
+            }))
             .attach({
                 'id': 'paddle',
                 'friction': 0.9,
