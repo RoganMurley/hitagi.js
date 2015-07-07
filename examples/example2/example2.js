@@ -21,7 +21,11 @@
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
+
     world.register(new hitagi.systems.VelocitySystem());
+
+    var collisionSystem = new hitagi.systems.CollisionSystem();
+    world.register(collisionSystem);
 
     var PlayerPaddleSystem = function () {
         var that = this;
@@ -44,16 +48,32 @@
                 entity.c.velocity.yspeed *= entity.c.paddle.friction;
 
                 // Stop paddle from leaving screen.
-                if (entity.c.position.y < 0) {
+                if (entity.c.position.y + entity.c.velocity.yspeed < 0) {
                     verticalBounce(entity);
                 }
-                if (entity.c.position.y + entity.c.paddle.height > levelHeight) {
+                if (entity.c.position.y + entity.c.velocity.yspeed + entity.c.paddle.height > levelHeight) {
                     verticalBounce(entity);
                 }
             }
         };
     };
     world.register(new PlayerPaddleSystem());
+
+    var BallSystem = function () {
+        var that = this;
+
+        that.update = function (entity, dt) {
+            if (entity.has('ball')) {
+                var x = entity.c.position.x;
+                var y = entity.c.position.y;
+
+                if (collisionSystem.collide(entity, 'paddle', x, y).hit) {
+                    entity.c.velocity.xspeed *= -1.1;
+                }
+            }
+        };
+    };
+    world.register(new BallSystem());
 
     // Add entities.
     var player = world.add(
@@ -67,6 +87,7 @@
                 yspeed: 0
             }))
             .attach(new hitagi.components.Rectangle({
+                color: 0xFFFF00,
                 x1: 0,
                 y1: 0,
                 x2: 16,
@@ -74,12 +95,17 @@
             }))
             .attach({'id': 'player'})
             .attach({
-                'id': 'paddle',
-                'friction': 0.9,
-                'height': 128,
-                'speed': 1,
-                'width': 16
+                id: 'paddle',
+                deps: ['velocity'],
+                friction: 0.9,
+                height: 128,
+                speed: 1,
+                width: 16
             })
+            .attach(new hitagi.components.Collision({
+                height: 128,
+                width: 16
+            }))
     );
 
     var opponent = world.add(
@@ -93,18 +119,48 @@
                 yspeed: 0
             }))
             .attach(new hitagi.components.Rectangle({
+                color: 0xFFFF00,
                 x1: 0,
                 y1: 0,
                 x2: 16,
                 y2: 128
             }))
             .attach({
-                'id': 'paddle',
-                'friction': 0.9,
-                'height': 128,
-                'speed': 1,
-                'width': 16
+                id: 'paddle',
+                deps: ['velocity'],
+                friction: 0.9,
+                height: 128,
+                speed: 1,
+                width: 16
             })
+            .attach(new hitagi.components.Collision({
+                height: 128,
+                width: 16
+            }))
+    );
+
+    var ball = world.add(
+        new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: levelWidth / 2,
+                y: levelHeight / 2
+            }))
+            .attach(new hitagi.components.Velocity({
+                xspeed: -5,
+                yspeed: 0
+            }))
+            .attach(new hitagi.components.Rectangle({
+                color: 0xFFFFFF,
+                x1: 0,
+                y1: 0,
+                x2: 16,
+                y2: 16
+            }))
+            .attach(new hitagi.components.Collision({
+                height: 16,
+                width: 16
+            }))
+            .attach({'id': 'ball'})
     );
 
     // Setup game loop.

@@ -59,7 +59,7 @@
                 rectangles[entity.uid] = new pixi.Graphics();
                 rectangles[entity.uid].position.x = entity.c.position.x;
                 rectangles[entity.uid].position.y = entity.c.position.y;
-                rectangles[entity.uid].beginFill(0xFFFF00);
+                rectangles[entity.uid].beginFill(entity.c.rectangle.color);
                 rectangles[entity.uid].drawRect(
                     entity.c.rectangle.x1,
                     entity.c.rectangle.y1,

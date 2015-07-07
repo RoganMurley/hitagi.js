@@ -11,6 +11,7 @@
         this.id = 'rectangle';
         this.deps = ['position'];
 
+        this.color = params.color;
         this.x1 = params.x1;
         this.y1 = params.y1;
         this.x2 = params.x2;
