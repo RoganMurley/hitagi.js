@@ -67,13 +67,45 @@
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 
-                if (collisionSystem.collide(entity, 'paddle', x, y).hit) {
-                    entity.c.velocity.xspeed *= -1.1;
+                var test = collisionSystem.collide(entity, 'paddle', x, y);
+                if (test.hit) {
+                    entity.c.velocity.xspeed *= -1.05;
+
+                    if (entity.c.position.y < test.entity.c.position.y) {
+                        entity.c.velocity.yspeed += (entity.c.position.y - test.entity.c.position.y) / 100;
+                    }
+                    if (entity.c.position.y > test.entity.c.position.y) {
+                        entity.c.velocity.yspeed -= (entity.c.position.y - test.entity.c.position.y) / 100;
+                    }
+                }
+
+                if ((entity.c.position.y < 0) || (entity.c.position.y > levelHeight)) {
+                    entity.c.velocity.yspeed *= -1;
                 }
             }
         };
     };
     world.register(new BallSystem());
+
+    var AISystem = function () {
+        var lastKnownY = 0;
+
+        this.update = function (entity) {
+            if (entity.has('ai')) {
+                if (entity.c.position.y + entity.c.paddle.height/2 < lastKnownY) {
+                    entity.c.velocity.yspeed += entity.c.paddle.speed;
+                } else {
+                    entity.c.velocity.yspeed -= entity.c.paddle.speed;
+                }
+
+                entity.c.velocity.yspeed *= entity.c.paddle.friction;
+            }
+            if (entity.has('ball')) {
+                lastKnownY = entity.c.position.y;
+            }
+        }
+    };
+    world.register(new AISystem());
 
     // Add entities.
     var player = world.add(
@@ -88,12 +120,11 @@
             }))
             .attach(new hitagi.components.Rectangle({
                 color: 0xFFFF00,
-                x1: 0,
-                y1: 0,
-                x2: 16,
-                y2: 128
+                x1: -4,
+                y1: -64,
+                x2: 4,
+                y2: 64
             }))
-            .attach({'id': 'player'})
             .attach({
                 id: 'paddle',
                 deps: ['velocity'],
@@ -106,6 +137,10 @@
                 height: 128,
                 width: 16
             }))
+            .attach({
+                id: 'player',
+                deps: ['paddle']
+            })
     );
 
     var opponent = world.add(
@@ -120,9 +155,9 @@
             }))
             .attach(new hitagi.components.Rectangle({
                 color: 0xFFFF00,
-                x1: 0,
-                y1: 0,
-                x2: 16,
+                x1: -8,
+                y1: -128,
+                x2: 8,
                 y2: 128
             }))
             .attach({
@@ -134,9 +169,13 @@
                 width: 16
             })
             .attach(new hitagi.components.Collision({
-                height: 128,
+                height: 2128,
                 width: 16
             }))
+            .attach({
+                id: 'ai',
+                deps: ['paddle']
+            })
     );
 
     var ball = world.add(
