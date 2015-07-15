@@ -82,12 +82,18 @@
     world.register(new BallSystem(collisionSystem));
 
     var AISystem = function () {
-        var lastKnownY = 0;
+        var ai = null;
+
+        this.build = function (entity) {
+            if (entity.has('ai')) {
+                ai = entity;
+            }
+        }
 
         this.update = function (entity) {
             if (entity.has('ai')) {
                 if (Math.random() > 0.8) {
-                    if (entity.c.position.y < lastKnownY) {
+                    if (entity.c.position.y < entity.c.ai.lastKnownY) {
                         entity.c.velocity.yspeed += entity.c.paddle.speed;
                     } else {
                         entity.c.velocity.yspeed -= entity.c.paddle.speed;
@@ -103,7 +109,7 @@
                 }
             }
             if (entity.has('ball')) {
-                lastKnownY = entity.c.position.y;
+                ai.c.ai.lastKnownY = entity.c.position.y;
             }
         }
     };
@@ -114,7 +120,8 @@
         var resetBall = function (ball) {
             ball.c.position.x = levelWidth/2;
             ball.c.position.y = levelHeight/2;
-            ball.c.velocity.yspeed = 0;
+            ball.c.velocity.yspeed *= 0.95;
+            ball.c.velocity.xspeed *= 0.95;
         };
 
         this.build = function (entity) {
@@ -220,7 +227,8 @@
             }))
             .attach({
                 id: 'ai',
-                deps: ['paddle']
+                deps: ['paddle'],
+                lastKnownY: levelHeight/2
             })
     );
 
