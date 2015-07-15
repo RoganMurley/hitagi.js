@@ -28,13 +28,7 @@
     world.register(collisionSystem);
 
     var PlayerPaddleSystem = function () {
-        var that = this;
-
-        var verticalBounce = function (entity) {
-            entity.c.velocity.yspeed *= -1.4;
-        };
-
-        that.update = function (entity, dt) {
+        this.update = function (entity, dt) {
             if (entity.has('player') && entity.has('paddle')) {
                 // Handle player input.
                 if (controls.check('up')) {
@@ -48,11 +42,11 @@
                 entity.c.velocity.yspeed *= entity.c.paddle.friction;
 
                 // Stop paddle from leaving screen.
-                if (entity.c.position.y + entity.c.velocity.yspeed < 0) {
-                    verticalBounce(entity);
+                if (entity.c.position.y - entity.c.paddle.height/2 + entity.c.velocity.yspeed < 0) {
+                    entity.c.velocity.yspeed *= -1.4;
                 }
-                if (entity.c.position.y + entity.c.velocity.yspeed + entity.c.paddle.height > levelHeight) {
-                    verticalBounce(entity);
+                if (entity.c.position.y + entity.c.velocity.yspeed + entity.c.paddle.height/2 > levelHeight) {
+                    entity.c.velocity.yspeed *= -1.4;
                 }
             }
         };
@@ -60,22 +54,22 @@
     world.register(new PlayerPaddleSystem());
 
     var BallSystem = function () {
-        var that = this;
-
-        that.update = function (entity, dt) {
+        this.update = function (entity, dt) {
             if (entity.has('ball')) {
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 
                 var test = collisionSystem.collide(entity, 'paddle', x, y);
                 if (test.hit) {
-                    entity.c.velocity.xspeed *= -1.05;
+                    entity.c.velocity.xspeed *= -1.01;
 
                     if (entity.c.position.y < test.entity.c.position.y) {
-                        entity.c.velocity.yspeed += (entity.c.position.y - test.entity.c.position.y) / 100;
+                        entity.c.velocity.yspeed +=
+                            (entity.c.position.y - test.entity.c.position.y) / 100;
                     }
                     if (entity.c.position.y > test.entity.c.position.y) {
-                        entity.c.velocity.yspeed -= (entity.c.position.y - test.entity.c.position.y) / 100;
+                        entity.c.velocity.yspeed -=
+                            (entity.c.position.y - test.entity.c.position.y) / 100;
                     }
                 }
 
@@ -92,13 +86,15 @@
 
         this.update = function (entity) {
             if (entity.has('ai')) {
-                if (entity.c.position.y + entity.c.paddle.height/2 < lastKnownY) {
-                    entity.c.velocity.yspeed += entity.c.paddle.speed;
-                } else {
-                    entity.c.velocity.yspeed -= entity.c.paddle.speed;
+                if (Math.random() > 0.9) {
+                    if (entity.c.position.y < lastKnownY) {
+                        entity.c.velocity.yspeed += entity.c.paddle.speed;
+                    } else {
+                        entity.c.velocity.yspeed -= entity.c.paddle.speed;
+                    }
                 }
 
-                entity.c.velocity.yspeed *= entity.c.paddle.friction;
+                //entity.c.velocity.yspeed *= entity.c.paddle.friction;
             }
             if (entity.has('ball')) {
                 lastKnownY = entity.c.position.y;
@@ -111,8 +107,8 @@
     var player = world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({
-                x: 8,
-                y: 0
+                x: 32,
+                y: levelHeight / 2
             }))
             .attach(new hitagi.components.Velocity({
                 xspeed: 0,
@@ -120,10 +116,12 @@
             }))
             .attach(new hitagi.components.Rectangle({
                 color: 0xFFFF00,
-                x1: -4,
-                y1: -64,
-                x2: 4,
-                y2: 64
+                x1: 0,
+                y1: 0,
+                x2: 8,
+                y2: 128,
+                offsetX: -4,
+                offsetY: -64
             }))
             .attach({
                 id: 'paddle',
@@ -131,7 +129,7 @@
                 friction: 0.9,
                 height: 128,
                 speed: 1,
-                width: 16
+                width: 8
             })
             .attach(new hitagi.components.Collision({
                 height: 128,
@@ -147,7 +145,7 @@
         new hitagi.Entity()
             .attach(new hitagi.components.Position({
                 x: levelWidth - 24,
-                y: 0
+                y: levelHeight / 2
             }))
             .attach(new hitagi.components.Velocity({
                 xspeed: 0,
@@ -155,10 +153,12 @@
             }))
             .attach(new hitagi.components.Rectangle({
                 color: 0xFFFF00,
-                x1: -8,
-                y1: -128,
+                x1: 0,
+                y1: 0,
                 x2: 8,
-                y2: 128
+                y2: 128,
+                offsetX: -4,
+                offsetY: -64
             }))
             .attach({
                 id: 'paddle',
@@ -166,11 +166,11 @@
                 friction: 0.9,
                 height: 128,
                 speed: 1,
-                width: 16
+                width: 8
             })
             .attach(new hitagi.components.Collision({
-                height: 2128,
-                width: 16
+                height: 128,
+                width: 8
             }))
             .attach({
                 id: 'ai',
@@ -193,7 +193,9 @@
                 x1: 0,
                 y1: 0,
                 x2: 16,
-                y2: 16
+                y2: 16,
+                offsetX: -8,
+                offsetY: -8
             }))
             .attach(new hitagi.components.Collision({
                 height: 16,

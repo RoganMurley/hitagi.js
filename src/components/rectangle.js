@@ -16,6 +16,8 @@
         this.y1 = params.y1;
         this.x2 = params.x2;
         this.y2 = params.y2;
+        this.offsetX = params.offsetX;
+        this.offsetY = params.offsetY;
     };
 
     module.exports = Rectangle;

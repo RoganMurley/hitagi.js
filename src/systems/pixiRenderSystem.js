@@ -57,8 +57,6 @@
             }
             if (entity.has('rectangle')) {
                 rectangles[entity.uid] = new pixi.Graphics();
-                rectangles[entity.uid].position.x = entity.c.position.x;
-                rectangles[entity.uid].position.y = entity.c.position.y;
                 rectangles[entity.uid].beginFill(entity.c.rectangle.color);
                 rectangles[entity.uid].drawRect(
                     entity.c.rectangle.x1,
@@ -112,8 +110,8 @@
 
             if (entity.has('rectangle')) {
                 var rectangle = rectangles[entity.uid];
-                rectangle.position.x = entity.c.position.x;
-                rectangle.position.y = entity.c.position.y;
+                rectangle.position.x = entity.c.position.x + entity.c.rectangle.offsetX;
+                rectangle.position.y = entity.c.position.y + entity.c.rectangle.offsetY;
             }
 
         };
