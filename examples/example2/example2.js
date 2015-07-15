@@ -53,7 +53,7 @@
     };
     world.register(new PlayerPaddleSystem());
 
-    var BallSystem = function () {
+    var BallSystem = function (collisionSystem) {
         this.update = function (entity, dt) {
             if (entity.has('ball')) {
                 var x = entity.c.position.x;
@@ -65,11 +65,11 @@
 
                     if (entity.c.position.y < test.entity.c.position.y) {
                         entity.c.velocity.yspeed +=
-                            (entity.c.position.y - test.entity.c.position.y) / 100;
+                            (entity.c.position.y - test.entity.c.position.y) / 50;
                     }
                     if (entity.c.position.y > test.entity.c.position.y) {
                         entity.c.velocity.yspeed -=
-                            (entity.c.position.y - test.entity.c.position.y) / 100;
+                            (entity.c.position.y - test.entity.c.position.y) / 50;
                     }
                 }
 
@@ -79,14 +79,14 @@
             }
         };
     };
-    world.register(new BallSystem());
+    world.register(new BallSystem(collisionSystem));
 
     var AISystem = function () {
         var lastKnownY = 0;
 
         this.update = function (entity) {
             if (entity.has('ai')) {
-                if (Math.random() > 0.9) {
+                if (Math.random() > 0.8) {
                     if (entity.c.position.y < lastKnownY) {
                         entity.c.velocity.yspeed += entity.c.paddle.speed;
                     } else {
@@ -94,7 +94,13 @@
                     }
                 }
 
-                //entity.c.velocity.yspeed *= entity.c.paddle.friction;
+                // Stop paddle from leaving screen.
+                if (entity.c.position.y - entity.c.paddle.height/2 + entity.c.velocity.yspeed < 0) {
+                    entity.c.velocity.yspeed = 0;
+                }
+                if (entity.c.position.y + entity.c.velocity.yspeed + entity.c.paddle.height/2 > levelHeight) {
+                    entity.c.velocity.yspeed = 0;
+                }
             }
             if (entity.has('ball')) {
                 lastKnownY = entity.c.position.y;
@@ -103,7 +109,47 @@
     };
     world.register(new AISystem());
 
+    var ScoreSystem = function (renderSystem) {
+        var scores = null;
+        var resetBall = function (ball) {
+            ball.c.position.x = levelWidth/2;
+            ball.c.position.y = levelHeight/2;
+            ball.c.velocity.yspeed = 0;
+        };
+
+        this.build = function (entity) {
+            if (entity.has('scorecard')) {
+                scores = entity;
+            }
+        }
+
+        this.update = function (entity, dt) {
+            if (entity.has('ball')) {
+                if (entity.c.position.x < 0) {
+                    resetBall(entity);
+                    scores.c.scorecard.score2++;
+                }
+
+                if (entity.c.position.x > levelWidth) {
+                    resetBall(entity);
+                    scores.c.scorecard.score1++;
+                }
+            }
+
+            if (entity.has('scorecard')) {
+                renderSystem.setText(
+                    entity,
+                    entity.c.scorecard.score1 + ' - ' + entity.c.scorecard.score2
+                );
+            }
+        };
+    };
+    world.register(new ScoreSystem(renderSystem));
+
     // Add entities.
+    var paddleHeight = 96;
+    var paddleWidth = 4;
+
     var player = world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -118,22 +164,22 @@
                 color: 0xFFFF00,
                 x1: 0,
                 y1: 0,
-                x2: 8,
-                y2: 128,
-                offsetX: -4,
-                offsetY: -64
+                x2: paddleWidth,
+                y2: paddleHeight,
+                offsetX: -paddleWidth/2,
+                offsetY: -paddleHeight/2
             }))
             .attach({
                 id: 'paddle',
                 deps: ['velocity'],
                 friction: 0.9,
-                height: 128,
+                height: paddleHeight,
                 speed: 1,
-                width: 8
+                width: paddleWidth
             })
             .attach(new hitagi.components.Collision({
-                height: 128,
-                width: 16
+                height: paddleHeight,
+                width: paddleWidth
             }))
             .attach({
                 id: 'player',
@@ -155,22 +201,22 @@
                 color: 0xFFFF00,
                 x1: 0,
                 y1: 0,
-                x2: 8,
-                y2: 128,
-                offsetX: -4,
-                offsetY: -64
+                x2: paddleWidth,
+                y2: paddleHeight,
+                offsetX: -paddleWidth/2,
+                offsetY: -paddleHeight/2
             }))
             .attach({
                 id: 'paddle',
                 deps: ['velocity'],
                 friction: 0.9,
-                height: 128,
-                speed: 1,
-                width: 8
+                height: paddleHeight,
+                speed: 0.5,
+                width: paddleWidth
             })
             .attach(new hitagi.components.Collision({
-                height: 128,
-                width: 8
+                height: paddleHeight,
+                width: paddleWidth
             }))
             .attach({
                 id: 'ai',
@@ -202,6 +248,26 @@
                 width: 16
             }))
             .attach({'id': 'ball'})
+    );
+
+    var scorecard = world.add(
+        new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: levelWidth/2 -16*2,
+                y: 16
+            }))
+            .attach(new hitagi.components.Text({
+                txt: '',
+                options: {
+                    font: '16px monospace',
+                    fill: 'white'
+                }
+            }))
+            .attach({
+                id: 'scorecard',
+                score1: 0,
+                score2: 0
+            })
     );
 
     // Setup game loop.
