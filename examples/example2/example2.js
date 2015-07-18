@@ -141,8 +141,13 @@
         this.resetBall = function (ball) {
             ball.c.position.x = levelWidth/2;
             ball.c.position.y = levelHeight/2;
-            ball.c.velocity.yspeed *= -0.95;
-            ball.c.velocity.xspeed *= -0.95;
+            ball.c.velocity.yspeed = Math.random()*4 - 2;
+
+            if (ball.c.velocity.xspeed > 0) {
+                ball.c.velocity.xspeed = 6;
+            } else {
+                ball.c.velocity.xspeed = -6;
+            }
         };
     };
     var ballSystem = world.register(new BallSystem(collisionSystem));
