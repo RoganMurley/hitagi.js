@@ -1,3 +1,16 @@
+default:
+    description: 'Run dev task then watch'
+    tasks:
+        - 'dev'
+        - 'watch'
+
+dev:
+    description: 'Task to assist with development'
+    tasks:
+        - 'jshint'
+        - 'test'
+        - 'browserify'
+
 test:
     description: 'Run the test suite'
     tasks:

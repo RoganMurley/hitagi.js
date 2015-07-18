@@ -17,7 +17,7 @@
         var world;
         var collisionSystem;
 
-        var collisionTestPrefab = function (params) {
+        var CollisionTestPrefab = function (params) {
             return new Entity()
                         .attach(new Position(params))
                         .attach(new Collision(params));
@@ -31,7 +31,7 @@
 
         it('two 1 unit entities both positioned at the origin should collide', function () {
             var entity1 = world.add(
-                new collisionTestPrefab(
+                new CollisionTestPrefab(
                     {
                         x: 0,
                         y: 0,
@@ -41,7 +41,7 @@
                 )
             );
             var entity2 = world.add(
-                new collisionTestPrefab(
+                new CollisionTestPrefab(
                     {
                         x: 0,
                         y: 0,
@@ -59,7 +59,7 @@
 
         it('two 1 unit entities both positioned adjacent at the origin should NOT collide', function () {
             var entity1 = world.add(
-                new collisionTestPrefab(
+                new CollisionTestPrefab(
                     {
                         x: 1,
                         y: 0,
@@ -69,7 +69,7 @@
                 )
             );
             var entity2 = world.add(
-                new collisionTestPrefab(
+                new CollisionTestPrefab(
                     {
                         x: 0,
                         y: 0,
@@ -87,7 +87,7 @@
 
         it('two 1000 unit entities at (-250, -100) and (9, 82) should collide', function () {
             var entity1 = world.add(
-                new collisionTestPrefab(
+                new CollisionTestPrefab(
                     {
                         x: -250,
                         y: -100,
@@ -97,7 +97,7 @@
                 )
             );
             var entity2 = world.add(
-                new collisionTestPrefab(
+                new CollisionTestPrefab(
                     {
                         x: 9,
                         y: 82,

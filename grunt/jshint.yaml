@@ -1,0 +1,3 @@
+files:
+    - '<%= root %>/**/*.js'
+    - 'examples/example*/example*.js'

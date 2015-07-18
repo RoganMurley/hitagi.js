@@ -152,7 +152,7 @@
                     },
                     priority: 1
                 }
-            ]
+            ];
 
             _.each(
                 mockSystems,
@@ -179,7 +179,7 @@
                         calls.push(2);
                     }
                 }
-            ]
+            ];
 
             _.each(
                 mockSystems,

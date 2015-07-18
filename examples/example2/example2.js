@@ -58,7 +58,6 @@
                         break;
                     default:
                         throw new Error('UnknownInput');
-                        break;
                 }
             }
         };
@@ -87,7 +86,7 @@
             if (entity.has('ai')) {
                 ai = entity;
             }
-        }
+        };
 
         this.update = function (entity) {
             if (!ai) {
@@ -166,7 +165,7 @@
             if (entity.has('scorecard')) {
                 scores = entity;
             }
-        }
+        };
 
         this.update = function (entity, dt) {
             if (!ball) {
@@ -249,7 +248,7 @@
             .attach({
                 'id': 'ball',
                 'cooldown': 0
-            })
+            });
     };
 
     // Params: color, font, score1, score2, x, y
@@ -270,7 +269,7 @@
                 id: 'scorecard',
                 score1: params.score1,
                 score2: params.score2
-            })
+            });
     };
 
     // Add entities.
