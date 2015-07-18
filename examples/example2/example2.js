@@ -18,7 +18,7 @@
     controls.bind(38, 'up');
     controls.bind(40, 'down');
 
-    // Register systems.
+    // Define and register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
 
@@ -78,8 +78,15 @@
                 }
             }
         };
+
+        this.resetBall = function (ball) {
+            ball.c.position.x = levelWidth/2;
+            ball.c.position.y = levelHeight/2;
+            ball.c.velocity.yspeed *= -0.95;
+            ball.c.velocity.xspeed *= -0.95;
+        };
     };
-    world.register(new BallSystem(collisionSystem));
+    var ballSystem = world.register(new BallSystem(collisionSystem));
 
     var AISystem = function () {
         var ai = null;
@@ -111,18 +118,12 @@
             if (entity.has('ball')) {
                 ai.c.ai.lastKnownY = entity.c.position.y;
             }
-        }
+        };
     };
     world.register(new AISystem());
 
-    var ScoreSystem = function (renderSystem) {
+    var ScoreSystem = function (ballSystem, renderSystem) {
         var scores = null;
-        var resetBall = function (ball) {
-            ball.c.position.x = levelWidth/2;
-            ball.c.position.y = levelHeight/2;
-            ball.c.velocity.yspeed *= 0.95;
-            ball.c.velocity.xspeed *= 0.95;
-        };
 
         this.build = function (entity) {
             if (entity.has('scorecard')) {
@@ -133,12 +134,12 @@
         this.update = function (entity, dt) {
             if (entity.has('ball')) {
                 if (entity.c.position.x < 0) {
-                    resetBall(entity);
+                    ballSystem.resetBall(entity);
                     scores.c.scorecard.score2++;
                 }
 
                 if (entity.c.position.x > levelWidth) {
-                    resetBall(entity);
+                    ballSystem.resetBall(entity);
                     scores.c.scorecard.score1++;
                 }
             }
@@ -151,17 +152,16 @@
             }
         };
     };
-    world.register(new ScoreSystem(renderSystem));
+    world.register(new ScoreSystem(ballSystem, renderSystem));
 
-    // Add entities.
-    var paddleHeight = 96;
-    var paddleWidth = 4;
+    // Define prefabs.
 
-    var player = world.add(
-        new hitagi.Entity()
+    // PARAMS: color, friction, height, width, speed, x, y
+    var Paddle = function (params) {
+        return new hitagi.Entity()
             .attach(new hitagi.components.Position({
-                x: 32,
-                y: levelHeight / 2
+                x: params.x,
+                y: params.y
             }))
             .attach(new hitagi.components.Velocity({
                 xspeed: 0,
@@ -171,111 +171,128 @@
                 color: 0xFFFF00,
                 x1: 0,
                 y1: 0,
-                x2: paddleWidth,
-                y2: paddleHeight,
-                offsetX: -paddleWidth/2,
-                offsetY: -paddleHeight/2
+                x2: params.width,
+                y2: params.height,
+                offsetX: -params.width/2,
+                offsetY: -params.height/2
             }))
             .attach({
                 id: 'paddle',
                 deps: ['velocity'],
-                friction: 0.9,
-                height: paddleHeight,
-                speed: 1,
-                width: paddleWidth
+                friction: params.friction,
+                height: params.height,
+                speed: params.speed,
+                width: params.width
             })
             .attach(new hitagi.components.Collision({
-                height: paddleHeight,
-                width: paddleWidth
-            }))
-            .attach({
-                id: 'player',
-                deps: ['paddle']
-            })
-    );
+                height: params.height,
+                width: params.width
+            }));
+    };
 
-    var opponent = world.add(
-        new hitagi.Entity()
+    // PARAMS: color, height, width, x, y, xspeed, yspeed
+    var Ball = function (params) {
+        return new hitagi.Entity()
             .attach(new hitagi.components.Position({
-                x: levelWidth - 24,
-                y: levelHeight / 2
+                x: params.x,
+                y: params.y
             }))
             .attach(new hitagi.components.Velocity({
-                xspeed: 0,
-                yspeed: 0
+                xspeed: params.xspeed,
+                yspeed: params.yspeed
             }))
             .attach(new hitagi.components.Rectangle({
-                color: 0xFFFF00,
+                color: params.color,
                 x1: 0,
                 y1: 0,
-                x2: paddleWidth,
-                y2: paddleHeight,
-                offsetX: -paddleWidth/2,
-                offsetY: -paddleHeight/2
-            }))
-            .attach({
-                id: 'paddle',
-                deps: ['velocity'],
-                friction: 0.9,
-                height: paddleHeight,
-                speed: 0.5,
-                width: paddleWidth
-            })
-            .attach(new hitagi.components.Collision({
-                height: paddleHeight,
-                width: paddleWidth
-            }))
-            .attach({
-                id: 'ai',
-                deps: ['paddle'],
-                lastKnownY: levelHeight/2
-            })
-    );
-
-    var ball = world.add(
-        new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: levelWidth / 2,
-                y: levelHeight / 2
-            }))
-            .attach(new hitagi.components.Velocity({
-                xspeed: -5,
-                yspeed: 0
-            }))
-            .attach(new hitagi.components.Rectangle({
-                color: 0xFFFFFF,
-                x1: 0,
-                y1: 0,
-                x2: 16,
-                y2: 16,
-                offsetX: -8,
-                offsetY: -8
+                x2: params.width/2,
+                y2: params.height/2,
+                offsetX: -params.width/2,
+                offsetY: -params.height/2
             }))
             .attach(new hitagi.components.Collision({
-                height: 16,
-                width: 16
+                height: params.width,
+                width: params.height
             }))
             .attach({'id': 'ball'})
-    );
+    };
 
-    var scorecard = world.add(
-        new hitagi.Entity()
+    // PARAMS: color, font, score1, score2, x, y
+    var Score = function (params) {
+        return new hitagi.Entity()
             .attach(new hitagi.components.Position({
-                x: levelWidth/2 -16*2,
-                y: 16
+                x: params.x,
+                y: params.y
             }))
             .attach(new hitagi.components.Text({
                 txt: '',
                 options: {
-                    font: '16px monospace',
-                    fill: 'white'
+                    font: params.font,
+                    fill: params.color
                 }
             }))
             .attach({
                 id: 'scorecard',
-                score1: 0,
-                score2: 0
+                score1: params.score1,
+                score2: params.score2
             })
+    };
+
+    // Add entities.
+    var player = world.add(
+        new Paddle({
+            color:  0xFFFF00,
+            friction: 0.9,
+            height: 96,
+            width: 4,
+            speed: 1,
+            x: 32,
+            y: levelHeight/2
+        })
+        .attach({
+            id: 'player',
+            deps: ['paddle']
+        })
+    );
+
+    var opponent = world.add(
+        new Paddle({
+            color:  0xFFFF00,
+            friction: 0.9,
+            height: 96,
+            width: 4,
+            speed: 0.5,
+            x: levelWidth - 24,
+            y: levelHeight/2
+        })
+        .attach({
+            id: 'ai',
+            deps: ['paddle'],
+            lastKnownY: levelHeight/2
+        })
+    );
+
+    var ball = world.add(
+        new Ball({
+            color: 0xFFFFFF,
+            height: 16,
+            width: 16,
+            x: levelWidth/2,
+            y: levelHeight/2,
+            xspeed: -5,
+            yspeed: 0
+        })
+    );
+
+    var score = world.add(
+        new Score({
+            color: 'white',
+            font: '16px monospace',
+            score1: 0,
+            score2: 0,
+            x: levelWidth/2 - 16/2,
+            y: 16
+        })
     );
 
     // Setup game loop.
