@@ -12,6 +12,7 @@
         var texts = {};
         var lines = {};
         var rectangles = {};
+        var circles = {};
 
         var offset = {
             x: 0,
@@ -67,6 +68,13 @@
 
                 stage.addChild(rectangles[entity.uid]);
             }
+            if (entity.has('circle')) {
+                circles[entity.uid] = new pixi.Graphics();
+                circles[entity.uid].beginFill(entity.c.circle.color);
+                circles[entity.uid].drawCircle(0, 0, entity.c.circle.radius);
+
+                stage.addChild(circles[entity.uid]);
+            }
         };
 
         // Remove an entity from the system.
@@ -85,12 +93,16 @@
             if (_.has(rectangles, id)) {
                 stage.removeChild(rectangles[id]);
             }
+            if (_.has(circles, id)) {
+                stage.removeChild(circles[id]);
+            }
 
             delete sprites[id];
             delete textures[id];
             delete texts[id];
             delete lines[id];
             delete rectangles[id];
+            delete circles[id];
         };
 
         this.update = function (entity) {
@@ -112,6 +124,12 @@
                 var rectangle = rectangles[entity.uid];
                 rectangle.position.x = entity.c.position.x + offset.x;
                 rectangle.position.y = entity.c.position.y + offset.y;
+            }
+
+            if (entity.has('circle')) {
+                var circle = circles[entity.uid];
+                circle.position.x = entity.c.position.x + offset.x;
+                circle.position.y = entity.c.position.y + offset.y;
             }
 
         };

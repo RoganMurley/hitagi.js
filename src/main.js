@@ -7,6 +7,7 @@
         'Controls': require('./controls.js'),
         'Utils': require('./utils.js'),
         'components': {
+            'Circle': require('./components/circle.js'),
             'Collision': require('./components/collision.js'),
             'Line': require('./components/line.js'),
             'Position': require('./components/position.js'),

@@ -49039,6 +49039,24 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    // Represents an entity's circle primitive.
+    // PARAMS:
+    //      radius - circle radius
+    var Circle = function (params) {
+        this.id = 'circle';
+        this.deps = ['position'];
+
+        this.color = params.color;
+        this.radius = params.radius;
+    };
+
+    module.exports = Circle;
+} ());
+
+},{}],134:[function(require,module,exports){
+(function () {
+    'use strict';
+
     // Represents the collision boundaries of an entity.
     // PARAMS:
     //      width - width of collision hitbox.
@@ -49054,7 +49072,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Collision;
 } ());
 
-},{}],134:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49074,7 +49092,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Line;
 } ());
 
-},{}],135:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49093,7 +49111,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Position;
 } ());
 
-},{}],136:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49113,7 +49131,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Rectangle;
 } ());
 
-},{}],137:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49130,7 +49148,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Sprite;
 } ());
 
-},{}],138:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49149,7 +49167,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Text;
 } ());
 
-},{}],139:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49168,7 +49186,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],140:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49272,7 +49290,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"jquery":9,"lodash":10}],141:[function(require,module,exports){
+},{"jquery":9,"lodash":10}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49326,7 +49344,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":10}],142:[function(require,module,exports){
+},{"lodash":10}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49336,6 +49354,7 @@ if (!global.cancelAnimationFrame) {
         'Controls': require('./controls.js'),
         'Utils': require('./utils.js'),
         'components': {
+            'Circle': require('./components/circle.js'),
             'Collision': require('./components/collision.js'),
             'Line': require('./components/line.js'),
             'Position': require('./components/position.js'),
@@ -49356,12 +49375,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/line.js":134,"./components/position.js":135,"./components/rectangle.js":136,"./components/sprite.js":137,"./components/text.js":138,"./components/velocity.js":139,"./controls.js":140,"./entity.js":141,"./systems/collisionSystem.js":144,"./systems/pixiRenderSystem.js":145,"./systems/soundSystem.js":146,"./systems/velocitySystem.js":147,"./utils.js":148,"./world.js":149}],143:[function(require,module,exports){
+},{"./components/circle.js":133,"./components/collision.js":134,"./components/line.js":135,"./components/position.js":136,"./components/rectangle.js":137,"./components/sprite.js":138,"./components/text.js":139,"./components/velocity.js":140,"./controls.js":141,"./entity.js":142,"./systems/collisionSystem.js":145,"./systems/pixiRenderSystem.js":146,"./systems/soundSystem.js":147,"./systems/velocitySystem.js":148,"./utils.js":149,"./world.js":150}],144:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":142}],144:[function(require,module,exports){
+},{"./main.js":143}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49450,7 +49469,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],145:[function(require,module,exports){
+},{"lodash":10}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49465,6 +49484,7 @@ global.hitagi = require('./main.js');
         var texts = {};
         var lines = {};
         var rectangles = {};
+        var circles = {};
 
         var offset = {
             x: 0,
@@ -49520,6 +49540,13 @@ global.hitagi = require('./main.js');
 
                 stage.addChild(rectangles[entity.uid]);
             }
+            if (entity.has('circle')) {
+                circles[entity.uid] = new pixi.Graphics();
+                circles[entity.uid].beginFill(entity.c.circle.color);
+                circles[entity.uid].drawCircle(0, 0, entity.c.circle.radius);
+
+                stage.addChild(circles[entity.uid]);
+            }
         };
 
         // Remove an entity from the system.
@@ -49538,12 +49565,16 @@ global.hitagi = require('./main.js');
             if (_.has(rectangles, id)) {
                 stage.removeChild(rectangles[id]);
             }
+            if (_.has(circles, id)) {
+                stage.removeChild(circles[id]);
+            }
 
             delete sprites[id];
             delete textures[id];
             delete texts[id];
             delete lines[id];
             delete rectangles[id];
+            delete circles[id];
         };
 
         this.update = function (entity) {
@@ -49565,6 +49596,12 @@ global.hitagi = require('./main.js');
                 var rectangle = rectangles[entity.uid];
                 rectangle.position.x = entity.c.position.x + offset.x;
                 rectangle.position.y = entity.c.position.y + offset.y;
+            }
+
+            if (entity.has('circle')) {
+                var circle = circles[entity.uid];
+                circle.position.x = entity.c.position.x + offset.x;
+                circle.position.y = entity.c.position.y + offset.y;
             }
 
         };
@@ -49608,7 +49645,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"lodash":10,"pixi.js":115}],146:[function(require,module,exports){
+},{"lodash":10,"pixi.js":115}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49636,7 +49673,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],147:[function(require,module,exports){
+},{"howler":8,"lodash":10}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49655,7 +49692,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":148}],148:[function(require,module,exports){
+},{"../utils.js":149}],149:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49670,7 +49707,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{}],149:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49845,4 +49882,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":141,"lodash":10}]},{},[143]);
+},{"./entity.js":142,"lodash":10}]},{},[144]);

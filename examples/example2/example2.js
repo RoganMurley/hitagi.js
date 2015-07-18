@@ -227,7 +227,7 @@
             }));
     };
 
-    // Params: color, height, width, x, y, xspeed, yspeed
+    // Params: color, radius, x, y, xspeed, yspeed
     var Ball = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -238,14 +238,13 @@
                 xspeed: params.xspeed,
                 yspeed: params.yspeed
             }))
-            .attach(new hitagi.components.Rectangle({
+            .attach(new hitagi.components.Circle({
                 color: params.color,
-                height: params.height,
-                width: params.width
+                radius: params.radius
             }))
             .attach(new hitagi.components.Collision({
-                height: params.width,
-                width: params.height
+                height: params.radius*2,
+                width: params.radius*2
             }))
             .attach({
                 'id': 'ball',
@@ -312,8 +311,7 @@
     var ball = world.add(
         new Ball({
             color: 0xFFFFFF,
-            height: 16,
-            width: 16,
+            radius: 8,
             x: levelWidth/2,
             y: levelHeight/2,
             xspeed: -5,
