@@ -27,7 +27,29 @@
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
 
-    var PlayerPaddleSystem = function () {
+    var PaddleSystem = function () {
+        this.update = function (entity, dt) {
+            if (entity.has('paddle')) {
+                // Slow down from friction.
+                entity.c.velocity.yspeed *= entity.c.paddle.friction;
+                if (Math.abs(entity.c.velocity.yspeed) < 0.01) {
+                    entity.c.velocity.yspeed = 0;
+                }
+
+                // Stop from leaving screen.
+                var projectedY = entity.c.position.y + entity.c.velocity.yspeed;
+                if (projectedY - entity.c.paddle.height/2 < 0) {
+                    entity.c.velocity.yspeed *= -1.4;
+                }
+                if (projectedY + entity.c.paddle.height/2 > levelHeight) {
+                    entity.c.velocity.yspeed *= -1.4;
+                }
+            }
+        };
+    };
+    world.register(new PaddleSystem());
+
+    var PlayerSystem = function () {
         this.update = function (entity, dt) {
             if (entity.has('player') && entity.has('paddle')) {
                 // Handle player input.
@@ -37,21 +59,36 @@
                 if (controls.check('down')) {
                     entity.c.velocity.yspeed += entity.c.paddle.speed;
                 }
-
-                // Add friction to paddle.
-                entity.c.velocity.yspeed *= entity.c.paddle.friction;
-
-                // Stop paddle from leaving screen.
-                if (entity.c.position.y - entity.c.paddle.height/2 + entity.c.velocity.yspeed < 0) {
-                    entity.c.velocity.yspeed *= -1.4;
-                }
-                if (entity.c.position.y + entity.c.velocity.yspeed + entity.c.paddle.height/2 > levelHeight) {
-                    entity.c.velocity.yspeed *= -1.4;
-                }
             }
         };
     };
-    world.register(new PlayerPaddleSystem());
+    world.register(new PlayerSystem());
+
+    var AISystem = function () {
+        var ai = null;
+
+        this.build = function (entity) {
+            if (entity.has('ai')) {
+                ai = entity;
+            }
+        }
+
+        this.update = function (entity) {
+            if (entity.has('ai')) {
+                if (Math.random() > 0.8) {
+                    if (entity.c.position.y < entity.c.ai.lastKnownY) {
+                        entity.c.velocity.yspeed += entity.c.paddle.speed;
+                    } else {
+                        entity.c.velocity.yspeed -= entity.c.paddle.speed;
+                    }
+                }
+            }
+            if (entity.has('ball')) {
+                ai.c.ai.lastKnownY = entity.c.position.y;
+            }
+        };
+    };
+    world.register(new AISystem());
 
     var BallSystem = function (collisionSystem) {
         this.update = function (entity, dt) {
@@ -88,40 +125,6 @@
     };
     var ballSystem = world.register(new BallSystem(collisionSystem));
 
-    var AISystem = function () {
-        var ai = null;
-
-        this.build = function (entity) {
-            if (entity.has('ai')) {
-                ai = entity;
-            }
-        }
-
-        this.update = function (entity) {
-            if (entity.has('ai')) {
-                if (Math.random() > 0.8) {
-                    if (entity.c.position.y < entity.c.ai.lastKnownY) {
-                        entity.c.velocity.yspeed += entity.c.paddle.speed;
-                    } else {
-                        entity.c.velocity.yspeed -= entity.c.paddle.speed;
-                    }
-                }
-
-                // Stop paddle from leaving screen.
-                if (entity.c.position.y - entity.c.paddle.height/2 + entity.c.velocity.yspeed < 0) {
-                    entity.c.velocity.yspeed = 0;
-                }
-                if (entity.c.position.y + entity.c.velocity.yspeed + entity.c.paddle.height/2 > levelHeight) {
-                    entity.c.velocity.yspeed = 0;
-                }
-            }
-            if (entity.has('ball')) {
-                ai.c.ai.lastKnownY = entity.c.position.y;
-            }
-        };
-    };
-    world.register(new AISystem());
-
     var ScoreSystem = function (ballSystem, renderSystem) {
         var scores = null;
 
@@ -156,7 +159,7 @@
 
     // Define prefabs.
 
-    // PARAMS: color, friction, height, width, speed, x, y
+    // Params: color, friction, height, width, speed, x, y
     var Paddle = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -190,7 +193,7 @@
             }));
     };
 
-    // PARAMS: color, height, width, x, y, xspeed, yspeed
+    // Params: color, height, width, x, y, xspeed, yspeed
     var Ball = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -217,7 +220,7 @@
             .attach({'id': 'ball'})
     };
 
-    // PARAMS: color, font, score1, score2, x, y
+    // Params: color, font, score1, score2, x, y
     var Score = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -261,7 +264,7 @@
             friction: 0.9,
             height: 96,
             width: 4,
-            speed: 0.5,
+            speed: 1,
             x: levelWidth - 24,
             y: levelHeight/2
         })
