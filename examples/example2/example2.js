@@ -115,6 +115,15 @@
     var BallSystem = function (collisionSystem) {
         this.update = function (entity, dt) {
             if (entity.has('ball')) {
+                if ((entity.c.position.y < 0) || (entity.c.position.y > levelHeight)) {
+                    entity.c.velocity.yspeed *= -1;
+                }
+
+                if (entity.c.ball.cooldown > 0) {
+                    entity.c.ball.cooldown--;
+                    return;
+                }
+
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 
@@ -125,15 +134,13 @@
                     if (entity.c.position.y < test.entity.c.position.y) {
                         entity.c.velocity.yspeed +=
                             (entity.c.position.y - test.entity.c.position.y) / 50;
+                        entity.c.ball.cooldown = 10;
                     }
                     if (entity.c.position.y > test.entity.c.position.y) {
                         entity.c.velocity.yspeed -=
                             (entity.c.position.y - test.entity.c.position.y) / 50;
+                        entity.c.ball.cooldown = 10;
                     }
-                }
-
-                if ((entity.c.position.y < 0) || (entity.c.position.y > levelHeight)) {
-                    entity.c.velocity.yspeed *= -1;
                 }
             }
         };
@@ -248,7 +255,10 @@
                 height: params.width,
                 width: params.height
             }))
-            .attach({'id': 'ball'})
+            .attach({
+                'id': 'ball',
+                'cooldown': 0
+            })
     };
 
     // Params: color, font, score1, score2, x, y
