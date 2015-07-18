@@ -49576,7 +49576,7 @@ global.hitagi = require('./main.js');
         };
 
         this.setText = function (entity, text) {
-            texts[entity.uid].setText(text);
+            texts[entity.uid].text = text;
         };
 
         this.setSprite = function (entity, path) {
