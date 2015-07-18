@@ -11,6 +11,7 @@
             'Collision': require('./components/collision.js'),
             'Line': require('./components/line.js'),
             'Position': require('./components/position.js'),
+            'Primitive': require('./components/primitive.js'),
             'Rectangle': require('./components/rectangle.js'),
             'Sprite': require('./components/sprite.js'),
             'Text': require('./components/text.js'),

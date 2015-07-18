@@ -207,9 +207,10 @@
                 xspeed: 0,
                 yspeed: 0
             }))
-            .attach(new hitagi.components.Rectangle({
+            .attach(new hitagi.components.Primitive({
                 color: params.color,
                 height: params.height,
+                type: 'rectangle',
                 width: params.width
             }))
             .attach({
@@ -237,9 +238,10 @@
                 xspeed: params.xspeed,
                 yspeed: params.yspeed
             }))
-            .attach(new hitagi.components.Circle({
+            .attach(new hitagi.components.Primitive({
                 color: params.color,
-                radius: params.radius
+                radius: params.radius,
+                type: 'circle'
             }))
             .attach(new hitagi.components.Collision({
                 height: params.radius*2,

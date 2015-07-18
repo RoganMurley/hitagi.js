@@ -11,8 +11,7 @@
         var textures = {};
         var texts = {};
         var lines = {};
-        var rectangles = {};
-        var circles = {};
+        var primitives = {};
 
         var offset = {
             x: 0,
@@ -56,24 +55,33 @@
 
                 stage.addChild(lines[entity.uid]);
             }
-            if (entity.has('rectangle')) {
-                rectangles[entity.uid] = new pixi.Graphics();
-                rectangles[entity.uid].beginFill(entity.c.rectangle.color);
-                rectangles[entity.uid].drawRect(
-                    -entity.c.rectangle.width/2,
-                    -entity.c.rectangle.height/2,
-                    entity.c.rectangle.width,
-                    entity.c.rectangle.height
-                );
 
-                stage.addChild(rectangles[entity.uid]);
-            }
-            if (entity.has('circle')) {
-                circles[entity.uid] = new pixi.Graphics();
-                circles[entity.uid].beginFill(entity.c.circle.color);
-                circles[entity.uid].drawCircle(0, 0, entity.c.circle.radius);
+            if (entity.has('primitive')) {
+                switch (entity.c.primitive.type) {
+                    case 'circle':
+                        primitives[entity.uid] = new pixi.Graphics();
+                        primitives[entity.uid].beginFill(entity.c.primitive.color);
+                        primitives[entity.uid].drawCircle(0, 0, entity.c.primitive.radius);
 
-                stage.addChild(circles[entity.uid]);
+                        stage.addChild(primitives[entity.uid]);
+                        break;
+
+                    case 'rectangle':
+                        primitives[entity.uid] = new pixi.Graphics();
+                        primitives[entity.uid].beginFill(entity.c.primitive.color);
+                        primitives[entity.uid].drawRect(
+                            -entity.c.primitive.width/2,
+                            -entity.c.primitive.height/2,
+                            entity.c.primitive.width,
+                            entity.c.primitive.height
+                        );
+
+                        stage.addChild(primitives[entity.uid]);
+                        break;
+
+                    default:
+                        throw new Error('NotAPGraphicsrimitiveType');
+                }
             }
         };
 
@@ -120,16 +128,10 @@
                 sprite.position.y = entity.c.position.y + offset.y;
             }
 
-            if (entity.has('rectangle')) {
-                var rectangle = rectangles[entity.uid];
-                rectangle.position.x = entity.c.position.x + offset.x;
-                rectangle.position.y = entity.c.position.y + offset.y;
-            }
-
-            if (entity.has('circle')) {
-                var circle = circles[entity.uid];
-                circle.position.x = entity.c.position.x + offset.x;
-                circle.position.y = entity.c.position.y + offset.y;
+            if (entity.has('primitive')) {
+                var primitive = primitives[entity.uid];
+                primitive.position.x = entity.c.position.x + offset.x;
+                primitive.position.y = entity.c.position.y + offset.y;
             }
 
         };

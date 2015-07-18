@@ -49115,6 +49115,42 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    // Represents a graphics primitive.
+    // PARAMS:
+    //      color - primitive color
+    //      type - type of primitive, can be 'circle' or 'rectangle'
+    // CIRCLE PARAMS:
+    //      radius
+    // RECTANGLE PARAMS:
+    //      width - rectangle width.
+    //      height - rectangle height;
+    var Primitive = function (params) {
+        this.id = 'primitive';
+        this.deps = ['position'];
+
+        this.color = params.color;
+        this.type = params.type;
+
+        switch (params.type) {
+            case 'circle':
+                this.radius = params.radius;
+                break;
+            case 'rectangle':
+                this.width = params.width;
+                this.height = params.height;
+                break;
+            default:
+                throw new Error('NotAPGraphicsrimitiveType');
+        }
+    };
+
+    module.exports = Primitive;
+} ());
+
+},{}],138:[function(require,module,exports){
+(function () {
+    'use strict';
+
     // Represents an entity's rectangle primitive.
     // PARAMS:
     //      width - rectangle width.
@@ -49131,7 +49167,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Rectangle;
 } ());
 
-},{}],138:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49148,7 +49184,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Sprite;
 } ());
 
-},{}],139:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49167,7 +49203,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Text;
 } ());
 
-},{}],140:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49186,7 +49222,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],141:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49290,7 +49326,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"jquery":9,"lodash":10}],142:[function(require,module,exports){
+},{"jquery":9,"lodash":10}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49344,7 +49380,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":10}],143:[function(require,module,exports){
+},{"lodash":10}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49358,6 +49394,7 @@ if (!global.cancelAnimationFrame) {
             'Collision': require('./components/collision.js'),
             'Line': require('./components/line.js'),
             'Position': require('./components/position.js'),
+            'Primitive': require('./components/primitive.js'),
             'Rectangle': require('./components/rectangle.js'),
             'Sprite': require('./components/sprite.js'),
             'Text': require('./components/text.js'),
@@ -49375,12 +49412,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/circle.js":133,"./components/collision.js":134,"./components/line.js":135,"./components/position.js":136,"./components/rectangle.js":137,"./components/sprite.js":138,"./components/text.js":139,"./components/velocity.js":140,"./controls.js":141,"./entity.js":142,"./systems/collisionSystem.js":145,"./systems/pixiRenderSystem.js":146,"./systems/soundSystem.js":147,"./systems/velocitySystem.js":148,"./utils.js":149,"./world.js":150}],144:[function(require,module,exports){
+},{"./components/circle.js":133,"./components/collision.js":134,"./components/line.js":135,"./components/position.js":136,"./components/primitive.js":137,"./components/rectangle.js":138,"./components/sprite.js":139,"./components/text.js":140,"./components/velocity.js":141,"./controls.js":142,"./entity.js":143,"./systems/collisionSystem.js":146,"./systems/pixiRenderSystem.js":147,"./systems/soundSystem.js":148,"./systems/velocitySystem.js":149,"./utils.js":150,"./world.js":151}],145:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":143}],145:[function(require,module,exports){
+},{"./main.js":144}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49469,7 +49506,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],146:[function(require,module,exports){
+},{"lodash":10}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49483,8 +49520,7 @@ global.hitagi = require('./main.js');
         var textures = {};
         var texts = {};
         var lines = {};
-        var rectangles = {};
-        var circles = {};
+        var primitives = {};
 
         var offset = {
             x: 0,
@@ -49528,24 +49564,33 @@ global.hitagi = require('./main.js');
 
                 stage.addChild(lines[entity.uid]);
             }
-            if (entity.has('rectangle')) {
-                rectangles[entity.uid] = new pixi.Graphics();
-                rectangles[entity.uid].beginFill(entity.c.rectangle.color);
-                rectangles[entity.uid].drawRect(
-                    -entity.c.rectangle.width/2,
-                    -entity.c.rectangle.height/2,
-                    entity.c.rectangle.width,
-                    entity.c.rectangle.height
-                );
 
-                stage.addChild(rectangles[entity.uid]);
-            }
-            if (entity.has('circle')) {
-                circles[entity.uid] = new pixi.Graphics();
-                circles[entity.uid].beginFill(entity.c.circle.color);
-                circles[entity.uid].drawCircle(0, 0, entity.c.circle.radius);
+            if (entity.has('primitive')) {
+                switch (entity.c.primitive.type) {
+                    case 'circle':
+                        primitives[entity.uid] = new pixi.Graphics();
+                        primitives[entity.uid].beginFill(entity.c.primitive.color);
+                        primitives[entity.uid].drawCircle(0, 0, entity.c.primitive.radius);
 
-                stage.addChild(circles[entity.uid]);
+                        stage.addChild(primitives[entity.uid]);
+                        break;
+
+                    case 'rectangle':
+                        primitives[entity.uid] = new pixi.Graphics();
+                        primitives[entity.uid].beginFill(entity.c.primitive.color);
+                        primitives[entity.uid].drawRect(
+                            -entity.c.primitive.width/2,
+                            -entity.c.primitive.height/2,
+                            entity.c.primitive.width,
+                            entity.c.primitive.height
+                        );
+
+                        stage.addChild(primitives[entity.uid]);
+                        break;
+
+                    default:
+                        throw new Error('NotAPGraphicsrimitiveType');
+                }
             }
         };
 
@@ -49592,16 +49637,10 @@ global.hitagi = require('./main.js');
                 sprite.position.y = entity.c.position.y + offset.y;
             }
 
-            if (entity.has('rectangle')) {
-                var rectangle = rectangles[entity.uid];
-                rectangle.position.x = entity.c.position.x + offset.x;
-                rectangle.position.y = entity.c.position.y + offset.y;
-            }
-
-            if (entity.has('circle')) {
-                var circle = circles[entity.uid];
-                circle.position.x = entity.c.position.x + offset.x;
-                circle.position.y = entity.c.position.y + offset.y;
+            if (entity.has('primitive')) {
+                var primitive = primitives[entity.uid];
+                primitive.position.x = entity.c.position.x + offset.x;
+                primitive.position.y = entity.c.position.y + offset.y;
             }
 
         };
@@ -49645,7 +49684,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"lodash":10,"pixi.js":115}],147:[function(require,module,exports){
+},{"lodash":10,"pixi.js":115}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49673,7 +49712,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],148:[function(require,module,exports){
+},{"howler":8,"lodash":10}],149:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49692,7 +49731,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":149}],149:[function(require,module,exports){
+},{"../utils.js":150}],150:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49707,7 +49746,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{}],150:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49882,4 +49921,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":142,"lodash":10}]},{},[144]);
+},{"./entity.js":143,"lodash":10}]},{},[145]);
