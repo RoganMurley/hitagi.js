@@ -168,7 +168,7 @@
                 yspeed: 0
             }))
             .attach(new hitagi.components.Rectangle({
-                color: 0xFFFF00,
+                color: params.color,
                 x1: 0,
                 y1: 0,
                 x2: params.width,
