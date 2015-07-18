@@ -49099,21 +49099,15 @@ if (!global.cancelAnimationFrame) {
 
     // Represents an entity's rectangle primitive.
     // PARAMS:
-    //      x1 - top-left x co-ordinate relative to entity position.
-    //      y1 - top-left y co-ordinate relative to entity position.
-    //      x2 - bottom-right x co-ordinate relative to entity position.
-    //      y2 - bottom-right y co-ordinate relative to entity position.
+    //      width - rectangle width.
+    //      height - rectangle height;
     var Rectangle = function (params) {
         this.id = 'rectangle';
         this.deps = ['position'];
 
         this.color = params.color;
-        this.x1 = params.x1;
-        this.y1 = params.y1;
-        this.x2 = params.x2;
-        this.y2 = params.y2;
-        this.offsetX = params.offsetX;
-        this.offsetY = params.offsetY;
+        this.width = params.width;
+        this.height = params.height;
     };
 
     module.exports = Rectangle;
@@ -49518,10 +49512,10 @@ global.hitagi = require('./main.js');
                 rectangles[entity.uid] = new pixi.Graphics();
                 rectangles[entity.uid].beginFill(entity.c.rectangle.color);
                 rectangles[entity.uid].drawRect(
-                    entity.c.rectangle.x1,
-                    entity.c.rectangle.y1,
-                    entity.c.rectangle.x2,
-                    entity.c.rectangle.y2
+                    -entity.c.rectangle.width/2,
+                    -entity.c.rectangle.height/2,
+                    entity.c.rectangle.width,
+                    entity.c.rectangle.height
                 );
 
                 stage.addChild(rectangles[entity.uid]);
@@ -49569,8 +49563,8 @@ global.hitagi = require('./main.js');
 
             if (entity.has('rectangle')) {
                 var rectangle = rectangles[entity.uid];
-                rectangle.position.x = entity.c.position.x + entity.c.rectangle.offsetX;
-                rectangle.position.y = entity.c.position.y + entity.c.rectangle.offsetY;
+                rectangle.position.x = entity.c.position.x + offset.x;
+                rectangle.position.y = entity.c.position.y + offset.y;
             }
 
         };

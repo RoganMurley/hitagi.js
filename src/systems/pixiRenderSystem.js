@@ -59,10 +59,10 @@
                 rectangles[entity.uid] = new pixi.Graphics();
                 rectangles[entity.uid].beginFill(entity.c.rectangle.color);
                 rectangles[entity.uid].drawRect(
-                    entity.c.rectangle.x1,
-                    entity.c.rectangle.y1,
-                    entity.c.rectangle.x2,
-                    entity.c.rectangle.y2
+                    -entity.c.rectangle.width/2,
+                    -entity.c.rectangle.height/2,
+                    entity.c.rectangle.width,
+                    entity.c.rectangle.height
                 );
 
                 stage.addChild(rectangles[entity.uid]);
@@ -110,8 +110,8 @@
 
             if (entity.has('rectangle')) {
                 var rectangle = rectangles[entity.uid];
-                rectangle.position.x = entity.c.position.x + entity.c.rectangle.offsetX;
-                rectangle.position.y = entity.c.position.y + entity.c.rectangle.offsetY;
+                rectangle.position.x = entity.c.position.x + offset.x;
+                rectangle.position.y = entity.c.position.y + offset.y;
             }
 
         };

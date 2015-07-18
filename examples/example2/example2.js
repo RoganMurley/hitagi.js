@@ -210,12 +210,8 @@
             }))
             .attach(new hitagi.components.Rectangle({
                 color: params.color,
-                x1: 0,
-                y1: 0,
-                x2: params.width,
-                y2: params.height,
-                offsetX: -params.width/2,
-                offsetY: -params.height/2
+                height: params.height,
+                width: params.width
             }))
             .attach({
                 id: 'paddle',
@@ -244,12 +240,8 @@
             }))
             .attach(new hitagi.components.Rectangle({
                 color: params.color,
-                x1: 0,
-                y1: 0,
-                x2: params.width/2,
-                y2: params.height/2,
-                offsetX: -params.width/2,
-                offsetY: -params.height/2
+                height: params.height,
+                width: params.width
             }))
             .attach(new hitagi.components.Collision({
                 height: params.width,
