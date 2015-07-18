@@ -46,23 +46,39 @@
                 }
             }
         };
-    };
-    world.register(new PaddleSystem());
 
-    var PlayerSystem = function () {
-        this.update = function (entity, dt) {
-            if (entity.has('player') && entity.has('paddle')) {
-                // Handle player input.
-                if (controls.check('up')) {
-                    entity.c.velocity.yspeed -= entity.c.paddle.speed;
-                }
-                if (controls.check('down')) {
-                    entity.c.velocity.yspeed += entity.c.paddle.speed;
+        this.input = function (entity, input) {
+            if (entity.has('paddle')) {
+                switch (input) {
+                    case 'down':
+                        entity.c.velocity.yspeed += entity.c.paddle.speed;
+                        break;
+                    case 'up':
+                        entity.c.velocity.yspeed -= entity.c.paddle.speed;
+                        break;
+                    default:
+                        throw new Error('UnknownInput');
+                        break;
                 }
             }
         };
     };
-    world.register(new PlayerSystem());
+    var paddleSystem = world.register(new PaddleSystem());
+
+    var PlayerSystem = function (paddleSystem) {
+        this.update = function (entity, dt) {
+            if (entity.has('player') && entity.has('paddle')) {
+                // Handle player input.
+                if (controls.check('up')) {
+                    paddleSystem.input(entity, 'up');
+                }
+                if (controls.check('down')) {
+                    paddleSystem.input(entity, 'down');
+                }
+            }
+        };
+    };
+    world.register(new PlayerSystem(paddleSystem));
 
     var AISystem = function () {
         var ai = null;
@@ -74,12 +90,18 @@
         }
 
         this.update = function (entity) {
+            if (!ai) {
+                return;
+            }
+
             if (entity.has('ai')) {
-                if (Math.random() > 0.8) {
-                    if (entity.c.position.y < entity.c.ai.lastKnownY) {
-                        entity.c.velocity.yspeed += entity.c.paddle.speed;
+                var distance = Math.abs(entity.c.position.y - entity.c.ai.lastKnownY);
+
+                if (distance > entity.c.ai.sensitivity + (Math.random()*20 - 10)) {
+                    if (entity.c.position.y > entity.c.ai.lastKnownY) {
+                        paddleSystem.input(entity, 'up');
                     } else {
-                        entity.c.velocity.yspeed -= entity.c.paddle.speed;
+                        paddleSystem.input(entity, 'down');
                     }
                 }
             }
@@ -135,6 +157,10 @@
         }
 
         this.update = function (entity, dt) {
+            if (!ball) {
+                return;
+            }
+
             if (entity.has('ball')) {
                 if (entity.c.position.x < 0) {
                     ballSystem.resetBall(entity);
@@ -271,7 +297,8 @@
         .attach({
             id: 'ai',
             deps: ['paddle'],
-            lastKnownY: levelHeight/2
+            lastKnownY: levelHeight/2,
+            sensitivity: 60
         })
     );
 
@@ -283,7 +310,7 @@
             x: levelWidth/2,
             y: levelHeight/2,
             xspeed: -5,
-            yspeed: 0
+            yspeed: Math.random()*4 - 2
         })
     );
 
