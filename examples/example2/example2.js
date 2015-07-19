@@ -260,12 +260,13 @@
                 x: params.x,
                 y: params.y
             }))
-            .attach(new hitagi.components.Text({
-                txt: '',
+            .attach(new hitagi.components.Graphic({
+                type: 'text',
                 options: {
                     font: params.font,
                     fill: params.color
-                }
+                },
+                txt: ''
             }))
             .attach({
                 id: 'scorecard',

@@ -9,7 +9,6 @@
 
         var sprites = {};
         var textures = {};
-        var texts = {};
         var graphics = {};
 
         var offset = {
@@ -39,23 +38,14 @@
 
                 stage.addChild(sprite);
             }
-            if (entity.has('text')) {
-                texts[entity.uid] = new pixi.Text(
-                        entity.c.text.txt,
-                        entity.c.text.options
-                    );
-
-                stage.addChild(texts[entity.uid]);
-            }
 
             if (entity.has('graphic')) {
                 switch (entity.c.graphic.type) {
+
                     case 'circle':
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
-
-                        stage.addChild(graphics[entity.uid]);
                         break;
 
                     case 'rectangle':
@@ -67,13 +57,20 @@
                             entity.c.graphic.width,
                             entity.c.graphic.height
                         );
+                        break;
 
-                        stage.addChild(graphics[entity.uid]);
+                    case 'text':
+                        graphics[entity.uid] = new pixi.Text(
+                            entity.c.graphic.txt,
+                            entity.c.graphic.options
+                        );
                         break;
 
                     default:
                         throw new Error('InvalidGraphicType');
                 }
+
+                stage.addChild(graphics[entity.uid]);
             }
         };
 
@@ -84,26 +81,16 @@
             if (_.has(sprites, id)) {
                 stage.removeChild(sprites[id]);
             }
-            if (_.has(texts, id)) {
-                stage.removeChild(texts[id]);
-            }
             if (_.has(graphics, id)) {
                 stage.removeChild(graphics[id]);
             }
 
             delete sprites[id];
             delete textures[id];
-            delete texts[id];
             delete graphics[id];
         };
 
         this.update = function (entity) {
-
-            // Update text positions.
-            if (entity.has('text')) {
-                texts[entity.uid].position.x = entity.c.position.x + offset.x;
-                texts[entity.uid].position.y = entity.c.position.y + offset.y;
-            }
 
             // Update sprite positions.
             if (entity.has('sprite')) {
@@ -121,7 +108,7 @@
         };
 
         this.setText = function (entity, text) {
-            texts[entity.uid].text = text;
+            graphics[entity.uid].text = text;
         };
 
         this.setSprite = function (entity, path) {

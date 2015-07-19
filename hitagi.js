@@ -49073,13 +49073,21 @@ if (!global.cancelAnimationFrame) {
         this.type = params.type;
 
         switch (params.type) {
+
             case 'circle':
                 this.radius = params.radius;
                 break;
+
             case 'rectangle':
                 this.width = params.width;
                 this.height = params.height;
                 break;
+
+            case 'text':
+                this.txt = params.txt;
+                this.options = params.options;
+                break;
+
             default:
                 throw new Error('InvalidGraphicType');
         }
@@ -49128,25 +49136,6 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
-    // Represents an entity's text copy and styling.
-    // PARAMS:
-    //      txt - copy of text.
-    //      options - styling options, taken from the Pixi.js text primitive.
-    var Text = function (params) {
-        this.id = 'text';
-        this.deps = ['position'];
-
-        this.txt = params.txt;
-        this.options = params.options;
-    };
-
-    module.exports = Text;
-} ());
-
-},{}],138:[function(require,module,exports){
-(function () {
-    'use strict';
-
     // Represents an entity's velocity in 2D space.
     // PARAMS:
     //      xspeed - delta in x direction.
@@ -49162,7 +49151,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],139:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49266,7 +49255,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"jquery":9,"lodash":10}],140:[function(require,module,exports){
+},{"jquery":9,"lodash":10}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49320,7 +49309,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":10}],141:[function(require,module,exports){
+},{"lodash":10}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49334,7 +49323,6 @@ if (!global.cancelAnimationFrame) {
             'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
             'Sprite': require('./components/sprite.js'),
-            'Text': require('./components/text.js'),
             'Velocity': require('./components/velocity.js')
         },
         'systems': {
@@ -49349,12 +49337,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/text.js":137,"./components/velocity.js":138,"./controls.js":139,"./entity.js":140,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],142:[function(require,module,exports){
+},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/velocity.js":137,"./controls.js":138,"./entity.js":139,"./systems/collisionSystem.js":142,"./systems/pixiRenderSystem.js":143,"./systems/soundSystem.js":144,"./systems/velocitySystem.js":145,"./utils.js":146,"./world.js":147}],141:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":141}],143:[function(require,module,exports){
+},{"./main.js":140}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49443,7 +49431,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],144:[function(require,module,exports){
+},{"lodash":10}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49455,7 +49443,6 @@ global.hitagi = require('./main.js');
 
         var sprites = {};
         var textures = {};
-        var texts = {};
         var graphics = {};
 
         var offset = {
@@ -49485,23 +49472,14 @@ global.hitagi = require('./main.js');
 
                 stage.addChild(sprite);
             }
-            if (entity.has('text')) {
-                texts[entity.uid] = new pixi.Text(
-                        entity.c.text.txt,
-                        entity.c.text.options
-                    );
-
-                stage.addChild(texts[entity.uid]);
-            }
 
             if (entity.has('graphic')) {
                 switch (entity.c.graphic.type) {
+
                     case 'circle':
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
-
-                        stage.addChild(graphics[entity.uid]);
                         break;
 
                     case 'rectangle':
@@ -49513,13 +49491,20 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.width,
                             entity.c.graphic.height
                         );
+                        break;
 
-                        stage.addChild(graphics[entity.uid]);
+                    case 'text':
+                        graphics[entity.uid] = new pixi.Text(
+                            entity.c.graphic.txt,
+                            entity.c.graphic.options
+                        );
                         break;
 
                     default:
                         throw new Error('InvalidGraphicType');
                 }
+
+                stage.addChild(graphics[entity.uid]);
             }
         };
 
@@ -49530,26 +49515,16 @@ global.hitagi = require('./main.js');
             if (_.has(sprites, id)) {
                 stage.removeChild(sprites[id]);
             }
-            if (_.has(texts, id)) {
-                stage.removeChild(texts[id]);
-            }
             if (_.has(graphics, id)) {
                 stage.removeChild(graphics[id]);
             }
 
             delete sprites[id];
             delete textures[id];
-            delete texts[id];
             delete graphics[id];
         };
 
         this.update = function (entity) {
-
-            // Update text positions.
-            if (entity.has('text')) {
-                texts[entity.uid].position.x = entity.c.position.x + offset.x;
-                texts[entity.uid].position.y = entity.c.position.y + offset.y;
-            }
 
             // Update sprite positions.
             if (entity.has('sprite')) {
@@ -49567,7 +49542,7 @@ global.hitagi = require('./main.js');
         };
 
         this.setText = function (entity, text) {
-            texts[entity.uid].text = text;
+            graphics[entity.uid].text = text;
         };
 
         this.setSprite = function (entity, path) {
@@ -49605,7 +49580,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"lodash":10,"pixi.js":115}],145:[function(require,module,exports){
+},{"lodash":10,"pixi.js":115}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49633,7 +49608,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],146:[function(require,module,exports){
+},{"howler":8,"lodash":10}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49652,7 +49627,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":147}],147:[function(require,module,exports){
+},{"../utils.js":146}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49667,7 +49642,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{}],148:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49842,4 +49817,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":140,"lodash":10}]},{},[142]);
+},{"./entity.js":139,"lodash":10}]},{},[141]);

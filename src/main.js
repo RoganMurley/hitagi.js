@@ -11,7 +11,6 @@
             'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
             'Sprite': require('./components/sprite.js'),
-            'Text': require('./components/text.js'),
             'Velocity': require('./components/velocity.js')
         },
         'systems': {
