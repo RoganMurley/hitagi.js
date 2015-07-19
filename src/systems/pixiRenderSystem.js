@@ -4,6 +4,8 @@
     var _ = require('lodash');
     var pixi = require('pixi.js');
 
+    var proxy = require('../proxy.js');
+
     var PixiRenderSystem = function (stage) {
         var that = this;
 
@@ -63,6 +65,7 @@
                             entity.c.graphic.copy,
                             entity.c.graphic.options
                         );
+                        proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
                         break;
 
                     default:
@@ -93,10 +96,6 @@
                 graphic.position.y = entity.c.position.y + offset.y;
             }
 
-        };
-
-        this.setText = function (entity, text) {
-            graphics[entity.uid].text = text;
         };
 
         this.setSprite = function (entity, path) {

@@ -158,7 +158,7 @@
     };
     var ballSystem = world.register(new BallSystem(collisionSystem));
 
-    var ScoreSystem = function (ballSystem, renderSystem) {
+    var ScoreSystem = function (ballSystem) {
         var scores = null;
 
         this.build = function (entity) {
@@ -185,14 +185,12 @@
             }
 
             if (entity.has('scorecard')) {
-                renderSystem.setText(
-                    entity,
-                    entity.c.scorecard.score1 + ' - ' + entity.c.scorecard.score2
-                );
+                entity.c.graphic.copy =
+                    entity.c.scorecard.score1 + ' - ' + entity.c.scorecard.score2;
             }
         };
     };
-    world.register(new ScoreSystem(ballSystem, renderSystem));
+    world.register(new ScoreSystem(ballSystem));
 
     // Define prefabs.
 
