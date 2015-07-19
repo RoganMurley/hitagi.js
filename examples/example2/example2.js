@@ -261,12 +261,12 @@
                 y: params.y
             }))
             .attach(new hitagi.components.Graphic({
-                type: 'text',
+                copy: '',
                 options: {
                     font: params.font,
                     fill: params.color
                 },
-                txt: ''
+                type: 'text'
             }))
             .attach({
                 id: 'scorecard',

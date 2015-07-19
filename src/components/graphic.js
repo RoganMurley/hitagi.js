@@ -27,7 +27,7 @@
                 break;
 
             case 'text':
-                this.txt = params.txt;
+                this.copy = params.copy;
                 this.options = params.options;
                 break;
 

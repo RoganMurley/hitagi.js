@@ -61,7 +61,7 @@
 
                     case 'text':
                         graphics[entity.uid] = new pixi.Text(
-                            entity.c.graphic.txt,
+                            entity.c.graphic.copy,
                             entity.c.graphic.options
                         );
                         break;

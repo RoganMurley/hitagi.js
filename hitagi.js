@@ -49084,7 +49084,7 @@ if (!global.cancelAnimationFrame) {
                 break;
 
             case 'text':
-                this.txt = params.txt;
+                this.copy = params.copy;
                 this.options = params.options;
                 break;
 
@@ -49495,7 +49495,7 @@ global.hitagi = require('./main.js');
 
                     case 'text':
                         graphics[entity.uid] = new pixi.Text(
-                            entity.c.graphic.txt,
+                            entity.c.graphic.copy,
                             entity.c.graphic.options
                         );
                         break;

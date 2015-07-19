@@ -17,15 +17,14 @@
     world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({x: 20, y: 20}))
-            .attach(new hitagi.components.Text(
-                {
-                    txt: 'Hello, World!',
-                    options: {
-                        font: '32px monospace',
-                        fill: 'white'
-                    }
-                }
-            ))
+            .attach(new hitagi.components.Graphic({
+                copy: 'Hello, World!',
+                options: {
+                    font: '32px monospace',
+                    fill: 'white'
+                },
+                type: 'text'
+            }))
     );
 
     // Setup game loop.
