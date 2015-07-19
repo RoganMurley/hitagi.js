@@ -49060,11 +49060,13 @@ if (!global.cancelAnimationFrame) {
 
     // Represents a graphic to draw.
     // PARAMS:
-    //      type: 'circle' or 'rectangle'
+    //      type: ['circle', 'rectangle', 'text']
     // CIRCLE PARAMS:
     //      color, radius
     // RECTANGLE PARAMS:
     //      height, width
+    // TEXT PARAMS:
+    //      copy, options
     var Graphic = function (params) {
         this.id = 'graphic';
         this.deps = ['position'];
