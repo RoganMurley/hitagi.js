@@ -10,7 +10,6 @@
         var sprites = {};
         var textures = {};
         var texts = {};
-        var lines = {};
         var primitives = {};
 
         var offset = {
@@ -47,13 +46,6 @@
                     );
 
                 stage.addChild(texts[entity.uid]);
-            }
-            if (entity.has('line')) {
-                lines[entity.uid] = new pixi.Graphics();
-                lines[entity.uid].moveTo(entity.c.position.x, entity.c.position.y);
-                lines[entity.uid].lineTo(entity.c.line.x, entity.c.line.y);
-
-                stage.addChild(lines[entity.uid]);
             }
 
             if (entity.has('primitive')) {
@@ -95,9 +87,6 @@
             if (_.has(texts, id)) {
                 stage.removeChild(texts[id]);
             }
-            if (_.has(lines, id)) {
-                stage.removeChild(lines[id]);
-            }
             if (_.has(rectangles, id)) {
                 stage.removeChild(rectangles[id]);
             }
@@ -108,9 +97,7 @@
             delete sprites[id];
             delete textures[id];
             delete texts[id];
-            delete lines[id];
-            delete rectangles[id];
-            delete circles[id];
+            delete primitives[id];
         };
 
         this.update = function (entity) {
