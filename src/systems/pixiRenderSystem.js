@@ -23,6 +23,15 @@
             if (entity.has('graphic')) {
                 switch (entity.c.graphic.type) {
 
+                    /*case 'animation':
+                        var paths = entity.c.graphic.paths;
+                        var frames = _.map(paths, function (path) {
+                            return pixi.Texture.fromImage(path);
+                        });
+                        graphics[entity.uid] = new pixi.extras.MovieClip(frames);
+                        graphics[entity.uid].gotoAndPlay(0);
+                        break;*/
+
                     case 'circle':
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
@@ -41,11 +50,20 @@
                         break;
 
                     case 'sprite':
-                        var path = entity.c.graphic.path,
-                            texture = pixi.Texture.fromImage(path);
+                        var path = entity.c.graphic.path;
 
-                        textures[entity.uid] = texture;
-                        graphics[entity.uid] = new pixi.Sprite(texture);
+                        if (_.isArray(path)) {
+                            // Animation.
+                            var frames = _.map(path, function (framePath) {
+                                return pixi.Texture.fromImage(framePath);
+                            });
+                            graphics[entity.uid] = new pixi.extras.MovieClip(frames);
+                            graphics[entity.uid].gotoAndPlay(0);
+                        } else {
+                            // Static sprite.
+                            textures[entity.uid] = pixi.Texture.fromImage(path);
+                            graphics[entity.uid] = new pixi.Sprite(textures[entity.uid]);
+                        }
 
                         // Set anchor.
                         graphics[entity.uid].anchor.x = 0.5;

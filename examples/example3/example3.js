@@ -58,7 +58,7 @@
                 yspeed: Math.random()*10 - 5
             }))
             .attach(new hitagi.components.Graphic({
-                path: 'ghost.png',
+                path: ['ghost.png', 'ghost2.png'],
                 type: 'sprite'
             }))
             .attach(new hitagi.components.Collision({

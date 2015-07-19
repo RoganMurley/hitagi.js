@@ -20,7 +20,6 @@
         this.type = params.type;
 
         switch (params.type) {
-
             case 'circle':
                 this.radius = params.radius;
                 break;
