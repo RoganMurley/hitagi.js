@@ -12,6 +12,10 @@
     // Setup world.
     var world = new hitagi.World();
 
+    // Setup controls.
+    var controls = new hitagi.Controls();
+    controls.bind(38, 'up');
+
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
@@ -32,6 +36,10 @@
                 if (test.hit) {
                     entity.c.velocity.xspeed = Math.random()*10 - 5;
                     entity.c.velocity.yspeed = Math.random()*10 - 5;
+                }
+
+                if (controls.check('up')) {
+                    entity.c.graphic.path = 'ghost2.png';
                 }
             }
         };

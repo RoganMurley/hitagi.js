@@ -49487,7 +49487,6 @@ global.hitagi = require('./main.js');
 
         // Build the system, called by world on every entity.
         this.build = function (entity) {
-
             if (entity.has('graphic')) {
                 switch (entity.c.graphic.type) {
 
@@ -49519,12 +49518,37 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid].anchor.x = 0.5;
                         graphics[entity.uid].anchor.y = 0.5;
 
-                        // Set visibility.
-                        if (entity.c.graphic.visible) {
-                            that.show(entity);
-                        } else {
-                            that.hide(entity);
-                        }
+                        // Set and proxy visibility.
+                        graphics[entity.uid].visible = entity.c.graphic.visible;
+                        proxy(
+                            entity.c.graphic,
+                            'visible',
+                            graphics[entity.uid],
+                            'visible'
+                        );
+
+                        // Custom proxy to make sure sprite changes properly occur.
+                        Object.defineProperty(
+                            entity.c.graphic,
+                            'path',
+                            {
+                                get: function () {
+                                    return path;
+                                },
+                                set: function (newValue) {
+                                    path = newValue;
+
+                                    // Remove old sprite.
+                                    stage.removeChild(graphics[entity.uid]);
+                                    delete graphics[entity.uid];
+                                    delete textures[entity.uid];
+
+                                    // Add new sprite.
+                                    that.build(entity);
+                                    that.update(entity);
+                                }
+                            }
+                        );
                         break;
 
                     case 'text':
@@ -49556,36 +49580,12 @@ global.hitagi = require('./main.js');
         };
 
         this.update = function (entity) {
-
             if (entity.has('graphic')) {
                 var graphic = graphics[entity.uid];
                 graphic.position.x = entity.c.position.x + offset.x;
                 graphic.position.y = entity.c.position.y + offset.y;
             }
 
-        };
-
-        this.setSprite = function (entity, path) {
-            var id = entity.uid;
-
-            // Remove old sprite.
-            stage.removeChild(graphics[id]);
-            delete graphics[id];
-            delete textures[id];
-
-            // Add new sprite.
-            entity.c.graphic.path = path;
-            this.build(entity);
-        };
-
-        // Show a graphic.
-        this.show = function (entity) {
-            entity.c.graphic.visible = graphics[entity.uid].visible = true;
-        };
-
-        // Hide a graphic.
-        this.hide = function (entity) {
-            entity.c.graphic.visible = graphics[entity.uid].visible = false;
         };
 
         // Preload assets.

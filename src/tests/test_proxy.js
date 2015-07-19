@@ -24,7 +24,7 @@
             proxy(person, 'name', robot, 'serialNumber');
             person.name = 'Araragi';
 
-            assert.equal(person.name, robot.name);
+            assert.equal(person.name, robot.serialNumber);
         });
     });
 
