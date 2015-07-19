@@ -105,6 +105,9 @@
             .attach({id: 'border'})
     );
 
+    // Load assets.
+    renderSystem.load(['ghost.png', 'ghost2.png']);
+
     // Setup game loop.
     requestAnimationFrame(animate);
 

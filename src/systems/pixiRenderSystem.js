@@ -123,7 +123,10 @@
 
         // Preload assets.
         this.load = function (assets) {
-            var loader = new pixi.AssetLoader(assets);
+            var loader = new pixi.loaders.Loader();
+            _.each(assets, function (asset) {
+                loader.add(asset, asset);
+            });
             loader.load();
         };
     };
