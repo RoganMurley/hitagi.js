@@ -3,13 +3,15 @@
 
     // Represents a graphic to draw.
     // PARAMS:
-    //      type: one of ['circle', 'rectangle', 'text']
+    //     type: one of ['circle', 'rectangle', 'text']
     // CIRCLE PARAMS:
-    //      color, radius
+    //     color, radius
     // RECTANGLE PARAMS:
-    //      height, width
+    //     height, width
+    // SPRITE PARAMS:
+    //     path
     // TEXT PARAMS:
-    //      copy, options
+    //     copy, options
     var Graphic = function (params) {
         this.id = 'graphic';
         this.deps = ['position'];
@@ -26,6 +28,11 @@
             case 'rectangle':
                 this.width = params.width;
                 this.height = params.height;
+                break;
+
+            case 'sprite':
+                this.path = params.path;
+                this.visible = true;
                 break;
 
             case 'text':
