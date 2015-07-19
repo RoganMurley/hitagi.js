@@ -207,7 +207,7 @@
                 xspeed: 0,
                 yspeed: 0
             }))
-            .attach(new hitagi.components.Primitive({
+            .attach(new hitagi.components.Graphic({
                 color: params.color,
                 height: params.height,
                 type: 'rectangle',
@@ -238,7 +238,7 @@
                 xspeed: params.xspeed,
                 yspeed: params.yspeed
             }))
-            .attach(new hitagi.components.Primitive({
+            .attach(new hitagi.components.Graphic({
                 color: params.color,
                 radius: params.radius,
                 type: 'circle'

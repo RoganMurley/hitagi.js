@@ -1,17 +1,15 @@
 (function () {
     'use strict';
 
-    // Represents a graphics primitive.
+    // Represents a graphic to draw.
     // PARAMS:
-    //      color - primitive color
-    //      type - type of primitive, can be 'circle' or 'rectangle'
+    //      type: 'circle' or 'rectangle'
     // CIRCLE PARAMS:
-    //      radius
+    //      color, radius
     // RECTANGLE PARAMS:
-    //      width - rectangle width.
-    //      height - rectangle height;
-    var Primitive = function (params) {
-        this.id = 'primitive';
+    //      height, width
+    var Graphic = function (params) {
+        this.id = 'graphic';
         this.deps = ['position'];
 
         this.color = params.color;
@@ -26,9 +24,9 @@
                 this.height = params.height;
                 break;
             default:
-                throw new Error('NotAPGraphicsrimitiveType');
+                throw new Error('InvalidGraphicType');
         }
     };
 
-    module.exports = Primitive;
+    module.exports = Graphic;
 } ());

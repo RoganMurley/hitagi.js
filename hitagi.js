@@ -49058,36 +49058,15 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
-    // Represents an entity's position in 2D space.
+    // Represents a graphic to draw.
     // PARAMS:
-    //      x - x Cartesian coordinate.
-    //      y - y Cartesian coordinate.
-    var Position = function (params) {
-        this.id = 'position';
-        this.deps = [];
-
-        this.x = params.x;
-        this.y = params.y;
-    };
-
-    module.exports = Position;
-} ());
-
-},{}],135:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    // Represents a graphics primitive.
-    // PARAMS:
-    //      color - primitive color
-    //      type - type of primitive, can be 'circle' or 'rectangle'
+    //      type: 'circle' or 'rectangle'
     // CIRCLE PARAMS:
-    //      radius
+    //      color, radius
     // RECTANGLE PARAMS:
-    //      width - rectangle width.
-    //      height - rectangle height;
-    var Primitive = function (params) {
-        this.id = 'primitive';
+    //      height, width
+    var Graphic = function (params) {
+        this.id = 'graphic';
         this.deps = ['position'];
 
         this.color = params.color;
@@ -49102,11 +49081,30 @@ if (!global.cancelAnimationFrame) {
                 this.height = params.height;
                 break;
             default:
-                throw new Error('NotAPGraphicsrimitiveType');
+                throw new Error('InvalidGraphicType');
         }
     };
 
-    module.exports = Primitive;
+    module.exports = Graphic;
+} ());
+
+},{}],135:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    // Represents an entity's position in 2D space.
+    // PARAMS:
+    //      x - x Cartesian coordinate.
+    //      y - y Cartesian coordinate.
+    var Position = function (params) {
+        this.id = 'position';
+        this.deps = [];
+
+        this.x = params.x;
+        this.y = params.y;
+    };
+
+    module.exports = Position;
 } ());
 
 },{}],136:[function(require,module,exports){
@@ -49333,8 +49331,8 @@ if (!global.cancelAnimationFrame) {
         'Utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
+            'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
-            'Primitive': require('./components/primitive.js'),
             'Sprite': require('./components/sprite.js'),
             'Text': require('./components/text.js'),
             'Velocity': require('./components/velocity.js')
@@ -49351,7 +49349,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/position.js":134,"./components/primitive.js":135,"./components/sprite.js":136,"./components/text.js":137,"./components/velocity.js":138,"./controls.js":139,"./entity.js":140,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],142:[function(require,module,exports){
+},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/text.js":137,"./components/velocity.js":138,"./controls.js":139,"./entity.js":140,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],142:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
@@ -49458,7 +49456,7 @@ global.hitagi = require('./main.js');
         var sprites = {};
         var textures = {};
         var texts = {};
-        var primitives = {};
+        var graphics = {};
 
         var offset = {
             x: 0,
@@ -49496,31 +49494,31 @@ global.hitagi = require('./main.js');
                 stage.addChild(texts[entity.uid]);
             }
 
-            if (entity.has('primitive')) {
-                switch (entity.c.primitive.type) {
+            if (entity.has('graphic')) {
+                switch (entity.c.graphic.type) {
                     case 'circle':
-                        primitives[entity.uid] = new pixi.Graphics();
-                        primitives[entity.uid].beginFill(entity.c.primitive.color);
-                        primitives[entity.uid].drawCircle(0, 0, entity.c.primitive.radius);
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
 
-                        stage.addChild(primitives[entity.uid]);
+                        stage.addChild(graphics[entity.uid]);
                         break;
 
                     case 'rectangle':
-                        primitives[entity.uid] = new pixi.Graphics();
-                        primitives[entity.uid].beginFill(entity.c.primitive.color);
-                        primitives[entity.uid].drawRect(
-                            -entity.c.primitive.width/2,
-                            -entity.c.primitive.height/2,
-                            entity.c.primitive.width,
-                            entity.c.primitive.height
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawRect(
+                            -entity.c.graphic.width/2,
+                            -entity.c.graphic.height/2,
+                            entity.c.graphic.width,
+                            entity.c.graphic.height
                         );
 
-                        stage.addChild(primitives[entity.uid]);
+                        stage.addChild(graphics[entity.uid]);
                         break;
 
                     default:
-                        throw new Error('NotAPGraphicsrimitiveType');
+                        throw new Error('InvalidGraphicType');
                 }
             }
         };
@@ -49535,17 +49533,14 @@ global.hitagi = require('./main.js');
             if (_.has(texts, id)) {
                 stage.removeChild(texts[id]);
             }
-            if (_.has(rectangles, id)) {
-                stage.removeChild(rectangles[id]);
-            }
-            if (_.has(circles, id)) {
-                stage.removeChild(circles[id]);
+            if (_.has(graphics, id)) {
+                stage.removeChild(graphics[id]);
             }
 
             delete sprites[id];
             delete textures[id];
             delete texts[id];
-            delete primitives[id];
+            delete graphics[id];
         };
 
         this.update = function (entity) {
@@ -49563,10 +49558,10 @@ global.hitagi = require('./main.js');
                 sprite.position.y = entity.c.position.y + offset.y;
             }
 
-            if (entity.has('primitive')) {
-                var primitive = primitives[entity.uid];
-                primitive.position.x = entity.c.position.x + offset.x;
-                primitive.position.y = entity.c.position.y + offset.y;
+            if (entity.has('graphic')) {
+                var graphic = graphics[entity.uid];
+                graphic.position.x = entity.c.position.x + offset.x;
+                graphic.position.y = entity.c.position.y + offset.y;
             }
 
         };

@@ -8,8 +8,8 @@
         'Utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
+            'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
-            'Primitive': require('./components/primitive.js'),
             'Sprite': require('./components/sprite.js'),
             'Text': require('./components/text.js'),
             'Velocity': require('./components/velocity.js')

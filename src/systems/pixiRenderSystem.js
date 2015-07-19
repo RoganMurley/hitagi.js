@@ -10,7 +10,7 @@
         var sprites = {};
         var textures = {};
         var texts = {};
-        var primitives = {};
+        var graphics = {};
 
         var offset = {
             x: 0,
@@ -48,31 +48,31 @@
                 stage.addChild(texts[entity.uid]);
             }
 
-            if (entity.has('primitive')) {
-                switch (entity.c.primitive.type) {
+            if (entity.has('graphic')) {
+                switch (entity.c.graphic.type) {
                     case 'circle':
-                        primitives[entity.uid] = new pixi.Graphics();
-                        primitives[entity.uid].beginFill(entity.c.primitive.color);
-                        primitives[entity.uid].drawCircle(0, 0, entity.c.primitive.radius);
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
 
-                        stage.addChild(primitives[entity.uid]);
+                        stage.addChild(graphics[entity.uid]);
                         break;
 
                     case 'rectangle':
-                        primitives[entity.uid] = new pixi.Graphics();
-                        primitives[entity.uid].beginFill(entity.c.primitive.color);
-                        primitives[entity.uid].drawRect(
-                            -entity.c.primitive.width/2,
-                            -entity.c.primitive.height/2,
-                            entity.c.primitive.width,
-                            entity.c.primitive.height
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawRect(
+                            -entity.c.graphic.width/2,
+                            -entity.c.graphic.height/2,
+                            entity.c.graphic.width,
+                            entity.c.graphic.height
                         );
 
-                        stage.addChild(primitives[entity.uid]);
+                        stage.addChild(graphics[entity.uid]);
                         break;
 
                     default:
-                        throw new Error('NotAPGraphicsrimitiveType');
+                        throw new Error('InvalidGraphicType');
                 }
             }
         };
@@ -87,17 +87,14 @@
             if (_.has(texts, id)) {
                 stage.removeChild(texts[id]);
             }
-            if (_.has(rectangles, id)) {
-                stage.removeChild(rectangles[id]);
-            }
-            if (_.has(circles, id)) {
-                stage.removeChild(circles[id]);
+            if (_.has(graphics, id)) {
+                stage.removeChild(graphics[id]);
             }
 
             delete sprites[id];
             delete textures[id];
             delete texts[id];
-            delete primitives[id];
+            delete graphics[id];
         };
 
         this.update = function (entity) {
@@ -115,10 +112,10 @@
                 sprite.position.y = entity.c.position.y + offset.y;
             }
 
-            if (entity.has('primitive')) {
-                var primitive = primitives[entity.uid];
-                primitive.position.x = entity.c.position.x + offset.x;
-                primitive.position.y = entity.c.position.y + offset.y;
+            if (entity.has('graphic')) {
+                var graphic = graphics[entity.uid];
+                graphic.position.x = entity.c.position.x + offset.x;
+                graphic.position.y = entity.c.position.y + offset.y;
             }
 
         };
