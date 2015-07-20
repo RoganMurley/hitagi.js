@@ -49495,7 +49495,6 @@ global.hitagi = require('./main.js');
         var that = this;
 
         var sprites = {};
-        var textures = {};
         var graphics = {};
 
         var offset = {
@@ -49546,8 +49545,8 @@ global.hitagi = require('./main.js');
                             graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
                             // Static sprite.
-                            textures[entity.uid] = pixi.Texture.fromImage(path);
-                            graphics[entity.uid] = new pixi.Sprite(textures[entity.uid]);
+                            var texture = pixi.Texture.fromImage(path);
+                            graphics[entity.uid] = new pixi.Sprite(texture);
                         }
 
                         // Set anchor.
@@ -49577,7 +49576,6 @@ global.hitagi = require('./main.js');
                                     // Remove old sprite.
                                     stage.removeChild(graphics[entity.uid]);
                                     delete graphics[entity.uid];
-                                    delete textures[entity.uid];
 
                                     // Add new sprite.
                                     that.build(entity);
@@ -49626,7 +49624,6 @@ global.hitagi = require('./main.js');
             }
 
             delete graphics[id];
-            delete textures[id];
         };
 
         this.update = function (entity) {

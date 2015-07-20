@@ -1,0 +1,30 @@
+{"frames": {
+
+"ghost.png":
+{
+	"frame": {"x":2,"y":2,"w":51,"h":73},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":73},
+	"sourceSize": {"w":51,"h":73},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"ghost2.png":
+{
+	"frame": {"x":2,"y":77,"w":51,"h":73},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":73},
+	"sourceSize": {"w":51,"h":73},
+	"pivot": {"x":0.5,"y":0.5}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "ghostSheet.png",
+	"format": "RGBA8888",
+	"size": {"w":55,"h":152},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:b31b64e7748e295f6bea7df68b2dbae1:e17bdcf33f63fd13f0d7de9622e756f2:4bb95ada2bed508ad05616679cb65fd3$"
+}
+}

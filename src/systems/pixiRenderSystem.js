@@ -10,7 +10,6 @@
         var that = this;
 
         var sprites = {};
-        var textures = {};
         var graphics = {};
 
         var offset = {
@@ -61,8 +60,8 @@
                             graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
                             // Static sprite.
-                            textures[entity.uid] = pixi.Texture.fromImage(path);
-                            graphics[entity.uid] = new pixi.Sprite(textures[entity.uid]);
+                            var texture = pixi.Texture.fromImage(path);
+                            graphics[entity.uid] = new pixi.Sprite(texture);
                         }
 
                         // Set anchor.
@@ -92,7 +91,6 @@
                                     // Remove old sprite.
                                     stage.removeChild(graphics[entity.uid]);
                                     delete graphics[entity.uid];
-                                    delete textures[entity.uid];
 
                                     // Add new sprite.
                                     that.build(entity);
@@ -141,7 +139,6 @@
             }
 
             delete graphics[id];
-            delete textures[id];
         };
 
         this.update = function (entity) {
