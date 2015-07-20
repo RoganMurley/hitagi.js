@@ -1,15 +1,17 @@
 (function () {
     'use strict';
 
+    var _ = require('lodash');
+
     // Represents a graphic to draw.
     // PARAMS:
-    //     type: one of ['circle', 'rectangle', 'text']
+    //     type: one of ['circle', 'rectangle', 'sprite' 'text']
     // CIRCLE PARAMS:
     //     color, radius
     // RECTANGLE PARAMS:
     //     height, width
     // SPRITE PARAMS:
-    //     path
+    //     path (string for static or array of strings for animated)
     // TEXT PARAMS:
     //     copy, options
     var Graphic = function (params) {
@@ -31,7 +33,19 @@
 
             case 'sprite':
                 this.path = params.path;
-                this.visible = true;
+
+                if (_.isUndefined(params.visible)) {
+                    params.visible = true;
+                }
+                this.visible = params.visible;
+
+                // Animation.
+                if (_.isArray(params.path)) {
+                    if (_.isUndefined(params.animationSpeed)) {
+                        params.animationSpeed = 1;
+                    }
+                    this.animationSpeed = params.animationSpeed;
+                }
                 break;
 
             case 'text':

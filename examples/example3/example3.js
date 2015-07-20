@@ -15,6 +15,7 @@
     // Setup controls.
     var controls = new hitagi.Controls();
     controls.bind(38, 'up');
+    controls.bind(40, 'down');
 
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
@@ -39,7 +40,12 @@
                 }
 
                 if (controls.check('up')) {
-                    entity.c.graphic.path = 'ghost2.png';
+                    //entity.c.graphic.path = 'ghost2.png';
+                    entity.c.graphic.animationSpeed += 0.02;
+                }
+                if (controls.check('down')) {
+                    //entity.c.graphic.path = 'ghost2.png';
+                    entity.c.graphic.animationSpeed -= 0.02;
                 }
             }
         };
@@ -58,6 +64,7 @@
                 yspeed: Math.random()*10 - 5
             }))
             .attach(new hitagi.components.Graphic({
+                animationSpeed: 1,
                 path: ['ghost.png', 'ghost2.png'],
                 type: 'sprite'
             }))

@@ -58,6 +58,15 @@
                                 return pixi.Texture.fromImage(framePath);
                             });
                             graphics[entity.uid] = new pixi.extras.MovieClip(frames);
+
+                            // Set and proxy framespeed.
+                            graphics[entity.uid].animationSpeed = entity.c.graphic.animationSpeed;
+                            proxy(
+                                entity.c.graphic,
+                                'animationSpeed',
+                                graphics[entity.uid],
+                                'animationSpeed'
+                            );
                             graphics[entity.uid].gotoAndPlay(0);
                         } else {
                             // Static sprite.

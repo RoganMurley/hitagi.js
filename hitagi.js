@@ -49058,15 +49058,17 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    var _ = require('lodash');
+
     // Represents a graphic to draw.
     // PARAMS:
-    //     type: one of ['circle', 'rectangle', 'text']
+    //     type: one of ['circle', 'rectangle', 'sprite' 'text']
     // CIRCLE PARAMS:
     //     color, radius
     // RECTANGLE PARAMS:
     //     height, width
     // SPRITE PARAMS:
-    //     path
+    //     path (string for static or array of strings for animated)
     // TEXT PARAMS:
     //     copy, options
     var Graphic = function (params) {
@@ -49088,7 +49090,19 @@ if (!global.cancelAnimationFrame) {
 
             case 'sprite':
                 this.path = params.path;
-                this.visible = true;
+
+                if (_.isUndefined(params.visible)) {
+                    params.visible = true;
+                }
+                this.visible = params.visible;
+
+                // Animation.
+                if (_.isArray(params.path)) {
+                    if (_.isUndefined(params.animationSpeed)) {
+                        params.animationSpeed = 1;
+                    }
+                    this.animationSpeed = params.animationSpeed;
+                }
                 break;
 
             case 'text':
@@ -49104,7 +49118,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Graphic;
 } ());
 
-},{}],135:[function(require,module,exports){
+},{"lodash":10}],135:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49524,6 +49538,15 @@ global.hitagi = require('./main.js');
                                 return pixi.Texture.fromImage(framePath);
                             });
                             graphics[entity.uid] = new pixi.extras.MovieClip(frames);
+
+                            // Set and proxy framespeed.
+                            graphics[entity.uid].animationSpeed = entity.c.graphic.animationSpeed;
+                            proxy(
+                                entity.c.graphic,
+                                'animationSpeed',
+                                graphics[entity.uid],
+                                'animationSpeed'
+                            );
                             graphics[entity.uid].gotoAndPlay(0);
                         } else {
                             // Static sprite.
