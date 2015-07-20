@@ -41,11 +41,13 @@
 
                 if (controls.check('up')) {
                     //entity.c.graphic.path = 'ghost2.png';
-                    entity.c.graphic.animationSpeed += 0.02;
+                    //entity.c.graphic.animationSpeed = 1;
+                    entity.c.graphic.currentFrame = 0;
                 }
                 if (controls.check('down')) {
                     //entity.c.graphic.path = 'ghost2.png';
-                    entity.c.graphic.animationSpeed -= 0.02;
+                    //entity.c.graphic.animationSpeed = 0.05;
+                    entity.c.graphic.currentFrame = 1;
                 }
             }
         };
@@ -64,7 +66,7 @@
                 yspeed: Math.random()*10 - 5
             }))
             .attach(new hitagi.components.Graphic({
-                animationSpeed: 1,
+                animationSpeed: 0.01,
                 path: ['ghost.png', 'ghost2.png'],
                 type: 'sprite'
             }))

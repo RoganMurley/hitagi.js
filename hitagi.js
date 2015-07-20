@@ -49102,6 +49102,11 @@ if (!global.cancelAnimationFrame) {
                         params.animationSpeed = 1;
                     }
                     this.animationSpeed = params.animationSpeed;
+
+                    if (_.isUndefined(params.currentFrame)) {
+                        params.currentFrame = 0;
+                    }
+                    this.currentFrame = params.currentFrame;
                 }
                 break;
 
@@ -49503,15 +49508,6 @@ global.hitagi = require('./main.js');
             if (entity.has('graphic')) {
                 switch (entity.c.graphic.type) {
 
-                    /*case 'animation':
-                        var paths = entity.c.graphic.paths;
-                        var frames = _.map(paths, function (path) {
-                            return pixi.Texture.fromImage(path);
-                        });
-                        graphics[entity.uid] = new pixi.extras.MovieClip(frames);
-                        graphics[entity.uid].gotoAndPlay(0);
-                        break;*/
-
                     case 'circle':
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
@@ -49547,7 +49543,7 @@ global.hitagi = require('./main.js');
                                 graphics[entity.uid],
                                 'animationSpeed'
                             );
-                            graphics[entity.uid].gotoAndPlay(0);
+                            graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
                             // Static sprite.
                             textures[entity.uid] = pixi.Texture.fromImage(path);
@@ -49586,6 +49582,20 @@ global.hitagi = require('./main.js');
                                     // Add new sprite.
                                     that.build(entity);
                                     that.update(entity);
+                                }
+                            }
+                        );
+
+                        // Custom proxy to make sure frame changes properly occur.
+                        Object.defineProperty(
+                            entity.c.graphic,
+                            'currentFrame',
+                            {
+                                get: function () {
+                                    return graphics[entity.uid].currentFrame;
+                                },
+                                set: function (newValue) {
+                                    graphics[entity.uid].gotoAndPlay(newValue);
                                 }
                             }
                         );

@@ -45,6 +45,11 @@
                         params.animationSpeed = 1;
                     }
                     this.animationSpeed = params.animationSpeed;
+
+                    if (_.isUndefined(params.currentFrame)) {
+                        params.currentFrame = 0;
+                    }
+                    this.currentFrame = params.currentFrame;
                 }
                 break;
 
