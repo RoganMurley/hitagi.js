@@ -42,11 +42,20 @@
                     case 'sprite':
                         var path = entity.c.graphic.path;
 
-                        if (_.isArray(path)) {
+                        if (_.isArray(path) || entity.c.graphic.sheet) {
                             // Animation.
-                            var frames = _.map(path, function (framePath) {
-                                return pixi.Texture.fromImage(framePath);
-                            });
+                            var frames;
+
+                            if (entity.c.graphic.sheet) {
+                                frames = _.map(path, function (framePath) {
+                                    return pixi.Texture.fromFrame(framePath);
+                                });
+                            } else {
+                                frames = _.map(path, function (framePath) {
+                                    return pixi.Texture.fromImage(framePath);
+                                });
+                            }
+
                             graphics[entity.uid] = new pixi.extras.MovieClip(frames);
 
                             // Set and proxy framespeed.
@@ -150,12 +159,20 @@
 
         };
 
-        // Preload assets.
-        this.load = function (assets) {
+         // Preload assets.
+        this.load = function (assets, callback) {
             var loader = new pixi.loaders.Loader();
+
+            if (!_.isArray(assets)) {
+                assets = [assets];
+            }
             _.each(assets, function (asset) {
                 loader.add(asset, asset);
             });
+
+            if (callback) {
+                loader.once('complete', callback);
+            }
             loader.load();
         };
     };

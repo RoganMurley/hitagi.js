@@ -20,6 +20,7 @@
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
+    renderSystem.load('ghostSheet.json', function () {
 
     var velocitySystem = new hitagi.systems.VelocitySystem();
     world.register(velocitySystem);
@@ -68,6 +69,7 @@
             .attach(new hitagi.components.Graphic({
                 animationSpeed: 0.01,
                 path: ['ghost.png', 'ghost2.png'],
+                sheet: true,
                 type: 'sprite'
             }))
             .attach(new hitagi.components.Collision({
@@ -130,5 +132,6 @@
         // Next frame.
         requestAnimationFrame(animate);
     }
+});
 
 } ());

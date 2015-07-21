@@ -39,8 +39,10 @@
                 }
                 this.visible = params.visible;
 
+                this.sheet = params.sheet ? true : false;
+
                 // Animation.
-                if (_.isArray(params.path)) {
+                if (_.isArray(params.path) || params.sheet) {
                     if (_.isUndefined(params.animationSpeed)) {
                         params.animationSpeed = 1;
                     }
