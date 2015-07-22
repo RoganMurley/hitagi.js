@@ -86,6 +86,15 @@
                             'visible'
                         );
 
+                        // Set and proxy rotation.
+                        graphics[entity.uid].rotation = entity.c.graphic.rotation;
+                        proxy(
+                            entity.c.graphic,
+                            'rotation',
+                            graphics[entity.uid],
+                            'rotation'
+                        );
+
                         // Custom proxy to make sure sprite changes properly occur.
                         Object.defineProperty(
                             entity.c.graphic,
@@ -136,6 +145,7 @@
                 }
 
                 stage.addChild(graphics[entity.uid]);
+                //console.log(graphics[entity.uid]);
             }
         };
 

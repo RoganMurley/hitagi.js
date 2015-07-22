@@ -34,11 +34,19 @@
             case 'sprite':
                 this.path = params.path;
 
+                //  Is the sprite visible.
                 if (_.isUndefined(params.visible)) {
                     params.visible = true;
                 }
                 this.visible = params.visible;
 
+                // Rotation is in radians.
+                if (_.isUndefined(params.rotation)) {
+                    params.rotation = true;
+                }
+                this.rotation = params.rotation;
+
+                // Is the animation being loaded is a spritesheet.
                 this.sheet = params.sheet ? true : false;
 
                 // Animation.

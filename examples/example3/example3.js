@@ -50,6 +50,8 @@
                     //entity.c.graphic.animationSpeed = 0.05;
                     entity.c.graphic.currentFrame = 1;
                 }
+
+                entity.c.graphic.rotation += 0.01;
             }
         };
     };
