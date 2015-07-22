@@ -21,6 +21,11 @@
         this.color = params.color;
         this.type = params.type;
 
+        if (_.isUndefined(params.alpha)) {
+            params.alpha = 1;
+        }
+        this.alpha = params.alpha;
+
         switch (params.type) {
             case 'circle':
                 this.radius = params.radius;

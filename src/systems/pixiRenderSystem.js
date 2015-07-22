@@ -144,8 +144,17 @@
                         throw new Error('InvalidGraphicType');
                 }
 
+                // Set and proxy alpha.
+                graphics[entity.uid].alpha = entity.c.graphic.alpha;
+                proxy(
+                    entity.c.graphic,
+                    'alpha',
+                    graphics[entity.uid],
+                    'alpha'
+                );
+
                 stage.addChild(graphics[entity.uid]);
-                //console.log(graphics[entity.uid]);
+                console.log(graphics[entity.uid]);
             }
         };
 

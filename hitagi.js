@@ -48403,6 +48403,11 @@ module.exports = {
         this.color = params.color;
         this.type = params.type;
 
+        if (_.isUndefined(params.alpha)) {
+            params.alpha = 1;
+        }
+        this.alpha = params.alpha;
+
         switch (params.type) {
             case 'circle':
                 this.radius = params.radius;
@@ -48964,8 +48969,17 @@ global.hitagi = require('./main.js');
                         throw new Error('InvalidGraphicType');
                 }
 
+                // Set and proxy alpha.
+                graphics[entity.uid].alpha = entity.c.graphic.alpha;
+                proxy(
+                    entity.c.graphic,
+                    'alpha',
+                    graphics[entity.uid],
+                    'alpha'
+                );
+
                 stage.addChild(graphics[entity.uid]);
-                //console.log(graphics[entity.uid]);
+                console.log(graphics[entity.uid]);
             }
         };
 
