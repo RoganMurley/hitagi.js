@@ -10,7 +10,6 @@
             'Collision': require('./components/collision.js'),
             'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
-            'Sprite': require('./components/sprite.js'),
             'Velocity': require('./components/velocity.js')
         },
         'systems': {

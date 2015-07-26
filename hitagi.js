@@ -48456,7 +48456,7 @@ module.exports = {
     module.exports = Graphic;
 } ());
 
-},{"../utils":146,"lodash":10}],135:[function(require,module,exports){
+},{"../utils":145,"lodash":10}],135:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48479,23 +48479,6 @@ module.exports = {
 (function () {
     'use strict';
 
-    // Represents an entity's sprite.
-    // PARAMS:
-    //      path - URL of raw sprite
-    var Sprite = function (params) {
-        this.id = 'sprite';
-        this.deps = ['position'];
-        this.path = params.path;
-        this.visible = true;
-    };
-
-    module.exports = Sprite;
-} ());
-
-},{}],137:[function(require,module,exports){
-(function () {
-    'use strict';
-
     // Represents an entity's velocity in 2D space.
     // PARAMS:
     //      xspeed - delta in x direction.
@@ -48511,7 +48494,7 @@ module.exports = {
     module.exports = Velocity;
 } ());
 
-},{}],138:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48615,7 +48598,7 @@ module.exports = {
     module.exports = Controls;
 } ());
 
-},{"jquery":9,"lodash":10}],139:[function(require,module,exports){
+},{"jquery":9,"lodash":10}],138:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48669,7 +48652,7 @@ module.exports = {
     module.exports = Entity;
 } ());
 
-},{"lodash":10}],140:[function(require,module,exports){
+},{"lodash":10}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48682,7 +48665,6 @@ module.exports = {
             'Collision': require('./components/collision.js'),
             'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
-            'Sprite': require('./components/sprite.js'),
             'Velocity': require('./components/velocity.js')
         },
         'systems': {
@@ -48697,12 +48679,12 @@ module.exports = {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/velocity.js":137,"./controls.js":138,"./entity.js":139,"./systems/collisionSystem.js":142,"./systems/pixiRenderSystem.js":143,"./systems/soundSystem.js":144,"./systems/velocitySystem.js":145,"./utils.js":146,"./world.js":147}],141:[function(require,module,exports){
+},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/velocity.js":136,"./controls.js":137,"./entity.js":138,"./systems/collisionSystem.js":141,"./systems/pixiRenderSystem.js":142,"./systems/soundSystem.js":143,"./systems/velocitySystem.js":144,"./utils.js":145,"./world.js":146}],140:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":140}],142:[function(require,module,exports){
+},{"./main.js":139}],141:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48791,7 +48773,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],143:[function(require,module,exports){
+},{"lodash":10}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48993,7 +48975,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":146,"lodash":10,"pixi.js":113}],144:[function(require,module,exports){
+},{"../utils.js":145,"lodash":10,"pixi.js":113}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49021,7 +49003,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],145:[function(require,module,exports){
+},{"howler":8,"lodash":10}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49040,7 +49022,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":146}],146:[function(require,module,exports){
+},{"../utils.js":145}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49091,7 +49073,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{"lodash":10}],147:[function(require,module,exports){
+},{"lodash":10}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49266,4 +49248,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":139,"lodash":10}]},{},[141]);
+},{"./entity.js":138,"lodash":10}]},{},[140]);
