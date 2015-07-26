@@ -173,8 +173,17 @@
         this.update = function (entity) {
             if (entity.has('graphic')) {
                 var graphic = graphics[entity.uid];
-                graphic.position.x = entity.c.position.x + offset.x;
-                graphic.position.y = entity.c.position.y + offset.y;
+
+                var x = 0;
+                var y = 0;
+
+                if (entity.c.graphic.relative) {
+                    x = entity.c.position.x + offset.x;
+                    y = entity.c.position.y + offset.y;
+                }
+
+                graphic.position.x = x;
+                graphic.position.y = y;
             }
 
         };

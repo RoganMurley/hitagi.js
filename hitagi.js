@@ -48399,13 +48399,17 @@ module.exports = {
     // TEXT PARAMS:
     //     copy, options
     var Graphic = function (params) {
-        params = defaultParams({alpha: 1}, params);
+        params = defaultParams({
+            alpha: 1,
+            relative: true
+        }, params);
 
         this.id = 'graphic';
         this.deps = ['position'];
 
         this.alpha = params.alpha;
         this.color = params.color;
+        this.relative = params.relative;
         this.type = params.type;
 
         switch (params.type) {
@@ -48949,8 +48953,17 @@ global.hitagi = require('./main.js');
         this.update = function (entity) {
             if (entity.has('graphic')) {
                 var graphic = graphics[entity.uid];
-                graphic.position.x = entity.c.position.x + offset.x;
-                graphic.position.y = entity.c.position.y + offset.y;
+
+                var x = 0;
+                var y = 0;
+
+                if (entity.c.graphic.relative) {
+                    x = entity.c.position.x + offset.x;
+                    y = entity.c.position.y + offset.y;
+                }
+
+                graphic.position.x = x;
+                graphic.position.y = y;
             }
 
         };

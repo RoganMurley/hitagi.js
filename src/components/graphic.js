@@ -17,13 +17,17 @@
     // TEXT PARAMS:
     //     copy, options
     var Graphic = function (params) {
-        params = defaultParams({alpha: 1}, params);
+        params = defaultParams({
+            alpha: 1,
+            relative: true
+        }, params);
 
         this.id = 'graphic';
         this.deps = ['position'];
 
         this.alpha = params.alpha;
         this.color = params.color;
+        this.relative = params.relative;
         this.type = params.type;
 
         switch (params.type) {
