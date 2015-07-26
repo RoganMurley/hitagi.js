@@ -48385,6 +48385,8 @@ module.exports = {
 
     var _ = require('lodash');
 
+    var defaultParams = require('../utils').defaultParams;
+
     // Represents a graphic to draw.
     // PARAMS:
     //     type: one of ['circle', 'rectangle', 'sprite' 'text']
@@ -48397,16 +48399,14 @@ module.exports = {
     // TEXT PARAMS:
     //     copy, options
     var Graphic = function (params) {
+        params = defaultParams({alpha: 1}, params);
+
         this.id = 'graphic';
         this.deps = ['position'];
 
+        this.alpha = params.alpha;
         this.color = params.color;
         this.type = params.type;
-
-        if (_.isUndefined(params.alpha)) {
-            params.alpha = 1;
-        }
-        this.alpha = params.alpha;
 
         switch (params.type) {
             case 'circle':
@@ -48419,33 +48419,26 @@ module.exports = {
                 break;
 
             case 'sprite':
-                this.path = params.path;
+                params = defaultParams({
+                    visible: true,
+                    rotation: 0,
+                    sheet: true
+                }, params);
 
-                //  Is the sprite visible.
-                if (_.isUndefined(params.visible)) {
-                    params.visible = true;
-                }
+                this.path = params.path; // Can be an array of paths to make an animation.
+
                 this.visible = params.visible;
-
-                // Rotation is in radians.
-                if (_.isUndefined(params.rotation)) {
-                    params.rotation = true;
-                }
-                this.rotation = params.rotation;
-
-                // Is the animation being loaded is a spritesheet.
-                this.sheet = params.sheet ? true : false;
+                this.rotation = params.rotation; // In radians
+                this.sheet = params.sheet; // Set to true if we're loading a spritesheet.
 
                 // Animation.
                 if (_.isArray(params.path) || params.sheet) {
-                    if (_.isUndefined(params.animationSpeed)) {
-                        params.animationSpeed = 1;
-                    }
-                    this.animationSpeed = params.animationSpeed;
+                    params = defaultParams({
+                        animationSpeed: 1,
+                        currentFrame: 0
+                    }, params);
 
-                    if (_.isUndefined(params.currentFrame)) {
-                        params.currentFrame = 0;
-                    }
+                    this.animationSpeed = params.animationSpeed;
                     this.currentFrame = params.currentFrame;
                 }
                 break;
@@ -48463,7 +48456,7 @@ module.exports = {
     module.exports = Graphic;
 } ());
 
-},{"lodash":10}],135:[function(require,module,exports){
+},{"../utils":146,"lodash":10}],135:[function(require,module,exports){
 (function () {
     'use strict';
 
