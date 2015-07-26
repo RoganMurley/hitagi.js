@@ -30,7 +30,11 @@
                 systems,
                 function (system) {
                     if (_.has(system, 'remove')) {
-                        system.remove(entity);
+                        _.each(system.remove, function (func, id) {
+                            if (entity.has(id)){
+                                func(entity);
+                            }
+                        });
                     }
                 }
             );
@@ -105,7 +109,11 @@
                 systems,
                 function (system) {
                     if (_.has(system, 'build')) {
-                        system.build(entity);
+                        _.each(system.build, function (func, id) {
+                            if (entity.has(id)){
+                                func(entity);
+                            }
+                        });
                     }
                 }
             );

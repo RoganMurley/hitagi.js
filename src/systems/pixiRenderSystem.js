@@ -18,8 +18,8 @@
         };
 
         // Build the system, called by world on every entity.
-        this.build = function (entity) {
-            if (entity.has('graphic')) {
+        this.build = {
+            graphic: function (entity) {
                 switch (entity.c.graphic.type) {
 
                     case 'circle':
@@ -164,14 +164,16 @@
         };
 
         // Remove an entity from the system.
-        this.remove = function (entity) {
-            var id = entity.uid;
+        this.remove = {
+            graphic: function (entity) {
+                var id = entity.uid;
 
-            if (_.has(graphics, id)) {
-                stage.removeChild(graphics[id]);
+                if (_.has(graphics, id)) {
+                    stage.removeChild(graphics[id]);
+                }
+
+                delete graphics[id];
             }
-
-            delete graphics[id];
         };
 
         this.update = {

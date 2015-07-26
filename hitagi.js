@@ -49385,17 +49385,18 @@ global.hitagi = require('./main.js');
         };
 
         // Build the system, called by world on every entity.
-        this.build = function (entity) {
-            if (entity.has('collision')) {
+        this.build = {
+            collision: function (entity) {
                 that.add(entity);
             }
         };
 
         // Remove an entity from the system.
-        this.remove = function (entity) {
-            var id = entity.uid;
-
-            delete entities[id];
+        this.remove = {
+            collision: function (entity) {
+                var id = entity.uid;
+                delete entities[id];
+            }
         };
 
         var hitTestRectangle = function (entity, other, x1, y1) {
@@ -49478,8 +49479,8 @@ global.hitagi = require('./main.js');
         };
 
         // Build the system, called by world on every entity.
-        this.build = function (entity) {
-            if (entity.has('graphic')) {
+        this.build = {
+            graphic: function (entity) {
                 switch (entity.c.graphic.type) {
 
                     case 'circle':
@@ -49624,14 +49625,16 @@ global.hitagi = require('./main.js');
         };
 
         // Remove an entity from the system.
-        this.remove = function (entity) {
-            var id = entity.uid;
+        this.remove = {
+            graphic: function (entity) {
+                var id = entity.uid;
 
-            if (_.has(graphics, id)) {
-                stage.removeChild(graphics[id]);
+                if (_.has(graphics, id)) {
+                    stage.removeChild(graphics[id]);
+                }
+
+                delete graphics[id];
             }
-
-            delete graphics[id];
         };
 
         this.update = {
@@ -49804,7 +49807,11 @@ global.hitagi = require('./main.js');
                 systems,
                 function (system) {
                     if (_.has(system, 'remove')) {
-                        system.remove(entity);
+                        _.each(system.remove, function (func, id) {
+                            if (entity.has(id)){
+                                func(entity);
+                            }
+                        });
                     }
                 }
             );
@@ -49879,7 +49886,11 @@ global.hitagi = require('./main.js');
                 systems,
                 function (system) {
                     if (_.has(system, 'build')) {
-                        system.build(entity);
+                        _.each(system.build, function (func, id) {
+                            if (entity.has(id)){
+                                func(entity);
+                            }
+                        });
                     }
                 }
             );

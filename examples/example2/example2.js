@@ -82,9 +82,15 @@
     var AISystem = function () {
         var ai = null;
 
-        this.build = function (entity) {
-            if (entity.has('ai')) {
+        this.build = {
+            ai: function (entity) {
                 ai = entity;
+            }
+        };
+
+        this.remove = {
+            ai: function () {
+                ai = null;
             }
         };
 
@@ -166,9 +172,15 @@
     var ScoreSystem = function (ballSystem) {
         var scores = null;
 
-        this.build = function (entity) {
-            if (entity.has('scorecard')) {
+        this.build = {
+            scorecard: function (entity)  {
                 scores = entity;
+            }
+        };
+
+        this.remove = {
+            scorecard: function (entity)  {
+                scores = null;
             }
         };
 

@@ -14,17 +14,18 @@
         };
 
         // Build the system, called by world on every entity.
-        this.build = function (entity) {
-            if (entity.has('collision')) {
+        this.build = {
+            collision: function (entity) {
                 that.add(entity);
             }
         };
 
         // Remove an entity from the system.
-        this.remove = function (entity) {
-            var id = entity.uid;
-
-            delete entities[id];
+        this.remove = {
+            collision: function (entity) {
+                var id = entity.uid;
+                delete entities[id];
+            }
         };
 
         var hitTestRectangle = function (entity, other, x1, y1) {
