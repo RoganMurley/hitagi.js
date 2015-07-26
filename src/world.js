@@ -59,8 +59,12 @@
                         _.each(
                             entities,
                             function (entity) {
-                                if (typeof entity !== 'undefined') {
-                                    system.update(entity, dt);
+                                if (!_.isUndefined(entity)) {
+                                    _.each(system.update, function (func, id) {
+                                        if (entity.has(id)){
+                                            func(entity, dt);
+                                        }
+                                    });
                                 }
                             }
                         );

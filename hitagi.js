@@ -49634,8 +49634,8 @@ global.hitagi = require('./main.js');
             delete graphics[id];
         };
 
-        this.update = function (entity) {
-            if (entity.has('graphic')) {
+        this.update = {
+            graphic: function (entity)  {
                 var graphic = graphics[entity.uid];
 
                 var x = 0;
@@ -49709,8 +49709,8 @@ global.hitagi = require('./main.js');
 
     var VelocitySystem = function () {
 
-        this.update = function (entity, dt) {
-            if (entity.has('velocity')) {
+        this.update = {
+            velocity: function (entity, dt) {
                 entity.c.position.x += utils.delta(entity.c.velocity.xspeed, dt);
                 entity.c.position.y += utils.delta(entity.c.velocity.yspeed, dt);
             }
@@ -49833,8 +49833,12 @@ global.hitagi = require('./main.js');
                         _.each(
                             entities,
                             function (entity) {
-                                if (typeof entity !== 'undefined') {
-                                    system.update(entity, dt);
+                                if (!_.isUndefined(entity)) {
+                                    _.each(system.update, function (func, id) {
+                                        if (entity.has(id)){
+                                            func(entity, dt);
+                                        }
+                                    });
                                 }
                             }
                         );

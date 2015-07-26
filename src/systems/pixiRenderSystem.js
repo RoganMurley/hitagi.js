@@ -174,8 +174,8 @@
             delete graphics[id];
         };
 
-        this.update = function (entity) {
-            if (entity.has('graphic')) {
+        this.update = {
+            graphic: function (entity)  {
                 var graphic = graphics[entity.uid];
 
                 var x = 0;

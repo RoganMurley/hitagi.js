@@ -28,8 +28,8 @@
     world.register(collisionSystem);
 
     var PaddleSystem = function () {
-        this.update = function (entity, dt) {
-            if (entity.has('paddle')) {
+        this.update = {
+            paddle: function (entity, dt) {
                 // Slow down from friction.
                 entity.c.velocity.yspeed *= entity.c.paddle.friction;
                 if (Math.abs(entity.c.velocity.yspeed) < 0.01) {
@@ -65,8 +65,8 @@
     var paddleSystem = world.register(new PaddleSystem());
 
     var PlayerSystem = function (paddleSystem) {
-        this.update = function (entity, dt) {
-            if (entity.has('player') && entity.has('paddle')) {
+        this.update = {
+            player: function (entity, dt) {
                 // Handle player input.
                 if (controls.check('up')) {
                     paddleSystem.input(entity, 'up');
@@ -88,12 +88,12 @@
             }
         };
 
-        this.update = function (entity) {
-            if (!ai) {
-                return;
-            }
+        this.update = {
+            ai: function (entity) {
+                if (!ai) {
+                    return;
+                }
 
-            if (entity.has('ai')) {
                 var distance = Math.abs(entity.c.position.y - entity.c.ai.lastKnownY);
 
                 if (distance > entity.c.ai.sensitivity + (Math.random()*20 - 10)) {
@@ -103,8 +103,13 @@
                         paddleSystem.input(entity, 'down');
                     }
                 }
-            }
-            if (entity.has('ball')) {
+            },
+
+            ball: function (entity) {
+                if (!ai) {
+                    return;
+                }
+
                 ai.c.ai.lastKnownY = entity.c.position.y;
             }
         };
@@ -112,8 +117,8 @@
     world.register(new AISystem());
 
     var BallSystem = function (collisionSystem) {
-        this.update = function (entity, dt) {
-            if (entity.has('ball')) {
+        this.update = {
+            ball: function (entity, dt) {
                 if ((entity.c.position.y < 0) || (entity.c.position.y > levelHeight)) {
                     entity.c.velocity.yspeed *= -1;
                 }
@@ -167,12 +172,12 @@
             }
         };
 
-        this.update = function (entity, dt) {
-            if (!ball) {
-                return;
-            }
+        this.update = {
+            ball: function (entity) {
+                if (!ball) {
+                    return;
+                }
 
-            if (entity.has('ball')) {
                 if (entity.c.position.x < 0) {
                     ballSystem.resetBall(entity);
                     scores.c.scorecard.score2++;
@@ -182,9 +187,9 @@
                     ballSystem.resetBall(entity);
                     scores.c.scorecard.score1++;
                 }
-            }
+            },
 
-            if (entity.has('scorecard')) {
+            scorecard: function (entity) {
                 entity.c.graphic.copy =
                     entity.c.scorecard.score1 + ' - ' + entity.c.scorecard.score2;
             }
