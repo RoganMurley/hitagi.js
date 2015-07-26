@@ -48401,6 +48401,10 @@ module.exports = {
     var Graphic = function (params) {
         params = defaultParams({
             alpha: 1,
+            anchor: {
+                x: 0.5,
+                y: 0.5
+            },
             relative: true
         }, params);
 
@@ -48408,6 +48412,7 @@ module.exports = {
         this.deps = ['position'];
 
         this.alpha = params.alpha;
+        this.anchor = params.anchor;
         this.color = params.color;
         this.relative = params.relative;
         this.type = params.type;
@@ -48854,8 +48859,8 @@ global.hitagi = require('./main.js');
                         }
 
                         // Set anchor.
-                        graphics[entity.uid].anchor.x = 0.5;
-                        graphics[entity.uid].anchor.y = 0.5;
+                        graphics[entity.uid].anchor.x = entity.c.graphic.anchor.x;
+                        graphics[entity.uid].anchor.y = entity.c.graphic.anchor.y;
 
                         // Set and proxy visibility.
                         graphics[entity.uid].visible = entity.c.graphic.visible;

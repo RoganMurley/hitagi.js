@@ -74,8 +74,8 @@
                         }
 
                         // Set anchor.
-                        graphics[entity.uid].anchor.x = 0.5;
-                        graphics[entity.uid].anchor.y = 0.5;
+                        graphics[entity.uid].anchor.x = entity.c.graphic.anchor.x;
+                        graphics[entity.uid].anchor.y = entity.c.graphic.anchor.y;
 
                         // Set and proxy visibility.
                         graphics[entity.uid].visible = entity.c.graphic.visible;
@@ -155,7 +155,6 @@
                 );
 
                 stage.addChild(graphics[entity.uid]);
-                console.log(graphics[entity.uid]);
             }
         };
 
