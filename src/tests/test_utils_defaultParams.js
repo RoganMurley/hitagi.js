@@ -3,9 +3,9 @@
 
     var assert = require('assert');
 
-    var defaultor = require('../defaultor.js');
+    var defaultParams = require('../utils.js').defaultParams;
 
-    describe('defaultor', function () {
+    describe('defaultParams', function () {
 
         it('should not change params with no defaults set', function () {
             var params = {
@@ -15,7 +15,7 @@
             };
             var defaults = {};
 
-            var actual = defaultor(defaults, params);
+            var actual = defaultParams(defaults, params);
 
             var expected = {
                 'one': 1,
@@ -32,7 +32,7 @@
                 'one': 1
             };
 
-            var actual = defaultor(defaults, params);
+            var actual = defaultParams(defaults, params);
 
             var expected = {
                 'one': 1
@@ -49,7 +49,7 @@
                 'three': 3
             };
 
-            var actual = defaultor(defaults, params);
+            var actual = defaultParams(defaults, params);
 
             var expected = {
                 'one': 1,
@@ -70,7 +70,7 @@
                 'one': 2
             };
 
-            var actual = defaultor(defaults, params);
+            var actual = defaultParams(defaults, params);
 
             var expected = {
                 'one': 1

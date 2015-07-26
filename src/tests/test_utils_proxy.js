@@ -3,7 +3,7 @@
 
     var assert = require('assert');
 
-    var proxy = require('../proxy.js');
+    var proxy = require('../utils.js').proxy;
 
     describe('proxy', function () {
 

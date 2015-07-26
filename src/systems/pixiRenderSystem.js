@@ -4,7 +4,7 @@
     var _ = require('lodash');
     var pixi = require('pixi.js');
 
-    var proxy = require('../proxy.js');
+    var proxy = require('../utils.js').proxy;
 
     var PixiRenderSystem = function (stage) {
         var that = this;

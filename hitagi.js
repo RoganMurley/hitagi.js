@@ -48704,36 +48704,12 @@ module.exports = {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/velocity.js":137,"./controls.js":138,"./entity.js":139,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],141:[function(require,module,exports){
+},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/sprite.js":136,"./components/velocity.js":137,"./controls.js":138,"./entity.js":139,"./systems/collisionSystem.js":142,"./systems/pixiRenderSystem.js":143,"./systems/soundSystem.js":144,"./systems/velocitySystem.js":145,"./utils.js":146,"./world.js":147}],141:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./main.js":140}],142:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    // Proxy a property, simillar to the proxy in ES6.
-    // Allows us to propagate changes to the target property.
-    var proxy = function (originalObj, originalProp, targetObj, targetProp) {
-        Object.defineProperty(
-            originalObj,
-            originalProp,
-            {
-                get: function () {
-                    return targetObj[targetProp];
-                },
-                set: function (newValue) {
-                    targetObj[targetProp] = newValue;
-                }
-            }
-        );
-    };
-
-    module.exports = proxy;
-} ());
-
-},{}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -48822,14 +48798,14 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],144:[function(require,module,exports){
+},{"lodash":10}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
     var _ = require('lodash');
     var pixi = require('pixi.js');
 
-    var proxy = require('../proxy.js');
+    var proxy = require('../utils.js').proxy;
 
     var PixiRenderSystem = function (stage) {
         var that = this;
@@ -49024,7 +49000,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../proxy.js":142,"lodash":10,"pixi.js":113}],145:[function(require,module,exports){
+},{"../utils.js":146,"lodash":10,"pixi.js":113}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49052,7 +49028,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],146:[function(require,module,exports){
+},{"howler":8,"lodash":10}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49071,22 +49047,58 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":147}],147:[function(require,module,exports){
+},{"../utils.js":146}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
+    var _ = require('lodash');
+
     var Utils = {
+
+        // Assign default params.
+        defaultParams:
+            function (defaultParams, inputParams) {
+                var outputParams = inputParams;
+
+                _.each(defaultParams, function (value, key) {
+                    if (!_.has(outputParams, key)) {
+                        outputParams[key] = value;
+                    }
+                });
+
+                return outputParams;
+            },
+
         // Transform a speed by our delta time.
         delta:
             function (speed, dt) {
                 return speed * (dt / 1000);
-            }
+            },
+
+        // Proxy a property, simillar to the proxy in ES6.
+        // Allows us to propagate changes to the target property.
+        proxy:
+            function (originalObj, originalProp, targetObj, targetProp) {
+                Object.defineProperty(
+                    originalObj,
+                    originalProp,
+                    {
+                        get: function () {
+                            return targetObj[targetProp];
+                        },
+                        set: function (newValue) {
+                            targetObj[targetProp] = newValue;
+                        }
+                    }
+                );
+            },
+
     };
 
     module.exports = Utils;
 } ());
 
-},{}],148:[function(require,module,exports){
+},{"lodash":10}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
