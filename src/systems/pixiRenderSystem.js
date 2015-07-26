@@ -74,8 +74,13 @@
                         }
 
                         // Set anchor.
-                        graphics[entity.uid].anchor.x = entity.c.graphic.anchor.x;
-                        graphics[entity.uid].anchor.y = entity.c.graphic.anchor.y;
+                        graphics[entity.uid].anchor = entity.c.graphic.anchor;
+                        proxy(
+                            entity.c.graphic,
+                            'anchor',
+                            graphics[entity.uid],
+                            'anchor'
+                        );
 
                         // Set and proxy visibility.
                         graphics[entity.uid].visible = entity.c.graphic.visible;
