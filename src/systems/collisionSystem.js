@@ -6,10 +6,10 @@
     var CollisionSystem = function () {
         var that = this;
 
-        this.entities = {};
+        var entities = {};
 
         this.add = function (entity) {
-            that.entities[entity.uid] = entity;
+            entities[entity.uid] = entity;
             return entity;
         };
 
@@ -24,7 +24,7 @@
         this.remove = function (entity) {
             var id = entity.uid;
 
-            delete this.entities[id];
+            delete entities[id];
         };
 
         var hitTestRectangle = function (entity, other, x1, y1) {
@@ -58,7 +58,7 @@
         // If x and y is given, we pretend our entity is at that pos
         // Returns {hit: bool, entity: object}
         this.collide = function (entity, otherComponent, x, y) {
-            var others = this.entities,
+            var others = entities,
                 hitEntity = null;
 
             var hit = _.some(

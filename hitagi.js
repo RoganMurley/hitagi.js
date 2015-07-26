@@ -48693,10 +48693,10 @@ global.hitagi = require('./main.js');
     var CollisionSystem = function () {
         var that = this;
 
-        this.entities = {};
+        var entities = {};
 
         this.add = function (entity) {
-            that.entities[entity.uid] = entity;
+            entities[entity.uid] = entity;
             return entity;
         };
 
@@ -48711,7 +48711,7 @@ global.hitagi = require('./main.js');
         this.remove = function (entity) {
             var id = entity.uid;
 
-            delete this.entities[id];
+            delete entities[id];
         };
 
         var hitTestRectangle = function (entity, other, x1, y1) {
@@ -48745,7 +48745,7 @@ global.hitagi = require('./main.js');
         // If x and y is given, we pretend our entity is at that pos
         // Returns {hit: bool, entity: object}
         this.collide = function (entity, otherComponent, x, y) {
-            var others = this.entities,
+            var others = entities,
                 hitEntity = null;
 
             var hit = _.some(
@@ -48909,6 +48909,7 @@ global.hitagi = require('./main.js');
                         break;
 
                     case 'text':
+                        // Set and proxy copy.
                         graphics[entity.uid] = new pixi.Text(
                             entity.c.graphic.copy,
                             entity.c.graphic.options
@@ -49182,6 +49183,8 @@ global.hitagi = require('./main.js');
                 }
             );
         };
+
+        // Rebuild an entity with all registered systems.
 
         // Clear all entities from the world and systems.
         this.clear = function () {

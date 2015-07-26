@@ -107,6 +107,8 @@
             );
         };
 
+        // Rebuild an entity with all registered systems.
+
         // Clear all entities from the world and systems.
         this.clear = function () {
             _.each(

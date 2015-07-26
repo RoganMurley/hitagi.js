@@ -133,6 +133,7 @@
                         break;
 
                     case 'text':
+                        // Set and proxy copy.
                         graphics[entity.uid] = new pixi.Text(
                             entity.c.graphic.copy,
                             entity.c.graphic.options
