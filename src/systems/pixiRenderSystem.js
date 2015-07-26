@@ -155,7 +155,6 @@
                 );
 
                 stage.addChild(graphics[entity.uid]);
-                console.log(graphics[entity.uid]);
             }
         };
 

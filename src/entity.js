@@ -33,6 +33,11 @@
             // Attach component.
             this.c[component.id] = component;
 
+            // If the entity has already been added to a world, rebuild it.
+            if (this.world) {
+                this.world.rebuild(this);
+            }
+
             return this;
         };
 
@@ -45,7 +50,6 @@
         this.has = function (componentID) {
             return _.has(this.c, componentID);
         };
-
     };
 
     module.exports = Entity;

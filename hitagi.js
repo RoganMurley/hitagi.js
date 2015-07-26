@@ -48634,6 +48634,11 @@ module.exports = {
             // Attach component.
             this.c[component.id] = component;
 
+            // If the entity has already been added to a world, rebuild it.
+            if (this.world) {
+                this.world.rebuild(this);
+            }
+
             return this;
         };
 
@@ -48646,7 +48651,6 @@ module.exports = {
         this.has = function (componentID) {
             return _.has(this.c, componentID);
         };
-
     };
 
     module.exports = Entity;
@@ -48931,7 +48935,6 @@ global.hitagi = require('./main.js');
                 );
 
                 stage.addChild(graphics[entity.uid]);
-                console.log(graphics[entity.uid]);
             }
         };
 
@@ -49096,6 +49099,7 @@ global.hitagi = require('./main.js');
 
         // Add an entity to the world.
         this.add = function (entity) {
+            entity.world = this;
             entities[entity.uid] = entity;
             this.build(entity);
             return entity;
@@ -49185,6 +49189,10 @@ global.hitagi = require('./main.js');
         };
 
         // Rebuild an entity with all registered systems.
+        this.rebuild = function (entity) {
+            that.remove(entity);
+            that.add(entity);
+        };
 
         // Clear all entities from the world and systems.
         this.clear = function () {

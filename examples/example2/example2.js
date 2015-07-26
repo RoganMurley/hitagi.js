@@ -70,6 +70,10 @@
                 // Handle player input.
                 if (controls.check('up')) {
                     paddleSystem.input(entity, 'up');
+
+                    if (!entity.has('collision')) {
+                        entity.attach({id: 'collision', width: 4, height: 96});
+                    }
                 }
                 if (controls.check('down')) {
                     paddleSystem.input(entity, 'down');
@@ -219,10 +223,10 @@
                 speed: params.speed,
                 width: params.width
             })
-            .attach(new hitagi.components.Collision({
+            /*.attach(new hitagi.components.Collision({
                 height: params.height,
                 width: params.width
-            }));
+            }))*/;
     };
 
     // Params: color, radius, x, y, xspeed, yspeed

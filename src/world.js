@@ -19,6 +19,7 @@
 
         // Add an entity to the world.
         this.add = function (entity) {
+            entity.world = this;
             entities[entity.uid] = entity;
             this.build(entity);
             return entity;
@@ -108,6 +109,10 @@
         };
 
         // Rebuild an entity with all registered systems.
+        this.rebuild = function (entity) {
+            that.remove(entity);
+            that.add(entity);
+        };
 
         // Clear all entities from the world and systems.
         this.clear = function () {
