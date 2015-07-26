@@ -26,6 +26,38 @@
 
             assert.equal(person.name, robot.serialNumber);
         });
+
+        it('should proxy POJOs', function () {
+            var myPoint = {
+                position: {
+                    x: 0,
+                    y: 0
+                }
+            };
+            var yourPoint = {
+                position: {
+                    x: 0,
+                    y: 0
+                }
+            };
+
+            proxy(myPoint, 'position', yourPoint, 'position');
+
+            myPoint.position.x = 1;
+            assert.equal(myPoint.position.x, 1);
+            assert.equal(myPoint.position.y, 0);
+
+            myPoint.position.y = 1;
+            assert.equal(myPoint.position.x, 1);
+            assert.equal(myPoint.position.y, 1);
+
+            myPoint.position = {
+                x: 10,
+                y: 11
+            };
+            assert.equal(myPoint.position.x, 10);
+            assert.equal(myPoint.position.y, 11);
+        });
     });
 
 } ());
