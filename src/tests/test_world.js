@@ -11,6 +11,8 @@
     describe('World', function () {
         var world;
         var mockSystem = {
+            build: simple.mock(),
+            remove: simple.mock(),
             tickStart: simple.mock(),
             tickEnd: simple.mock(),
             update: simple.mock()
@@ -205,6 +207,23 @@
             assert.equal(world.tickStart.callCount, 1);
             assert.equal(world.update.callCount, 1);
             assert.equal(world.tickEnd.callCount, 1);
+        });
+
+        it('if an entity has been added to a world, attaching a component to the entity should rebuild the entity.', function () {
+            mockSystem.build.reset();
+            mockSystem.remove.reset();
+            world.register(mockSystem);
+            assert.equal(mockSystem.build.callCount, 0);
+            assert.equal(mockSystem.remove.callCount, 0);
+
+            var entity = new Entity();
+            world.add(entity);
+            assert.equal(mockSystem.build.callCount, 1);
+
+            entity.attach({id: 'testComponent'});
+            assert.equal(mockSystem.build.callCount, 2);
+            assert.equal(mockSystem.remove.callCount, 1);
+
         });
 
     });
