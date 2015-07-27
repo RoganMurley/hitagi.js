@@ -179,8 +179,6 @@
                 look(entity.c.graphic, 'type', redraw, entity);
 
                 stage.addChild(graphics[entity.uid]);
-
-                console.log(graphics[entity.uid]);
             }
         };
 
