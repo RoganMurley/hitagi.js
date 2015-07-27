@@ -170,11 +170,17 @@
                 graphics[entity.uid].alpha = entity.c.graphic.alpha;
                 proxy(entity.c.graphic, 'alpha', graphics[entity.uid], 'alpha');
 
+                // Set and proxy scale.
+                graphics[entity.uid].scale = entity.c.graphic.scale;
+                proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
                 // Look for changes, redrawing if necessary.
                 look(entity.c.graphic, 'color', redraw, entity);
                 look(entity.c.graphic, 'type', redraw, entity);
 
                 stage.addChild(graphics[entity.uid]);
+
+                console.log(graphics[entity.uid]);
             }
         };
 

@@ -81,6 +81,10 @@
             .attach(new hitagi.components.Graphic({
                 animationSpeed: 0.01,
                 path: ['ghost.png', 'ghost2.png'],
+                scale: {
+                    x: 0.6,
+                    y: 0.6
+                },
                 sheet: true,
                 type: 'sprite'
             }))

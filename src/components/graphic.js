@@ -14,7 +14,11 @@
                 y: 0.5
             },
             color: 0xFFFFFF,
-            relative: true
+            relative: true,
+            scale: {
+                x: 1,
+                y: 1
+            }
         }, params);
 
         this.id = 'graphic';
@@ -24,6 +28,7 @@
         this.anchor = params.anchor;
         this.color = params.color;
         this.relative = params.relative;
+        this.scale = params.scale;
         this.type = params.type;
 
         switch (params.type) {
@@ -33,6 +38,7 @@
 
             case 'line':
                 params = defaultParams({thickness: 1}, params);
+
                 this.thickness = params.thickness;
                 this.x1 = params.x1;
                 this.y1 = params.y1;

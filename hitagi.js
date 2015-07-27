@@ -49071,7 +49071,11 @@ if (!global.cancelAnimationFrame) {
                 y: 0.5
             },
             color: 0xFFFFFF,
-            relative: true
+            relative: true,
+            scale: {
+                x: 1,
+                y: 1
+            }
         }, params);
 
         this.id = 'graphic';
@@ -49081,6 +49085,7 @@ if (!global.cancelAnimationFrame) {
         this.anchor = params.anchor;
         this.color = params.color;
         this.relative = params.relative;
+        this.scale = params.scale;
         this.type = params.type;
 
         switch (params.type) {
@@ -49090,6 +49095,7 @@ if (!global.cancelAnimationFrame) {
 
             case 'line':
                 params = defaultParams({thickness: 1}, params);
+
                 this.thickness = params.thickness;
                 this.x1 = params.x1;
                 this.y1 = params.y1;
@@ -49642,11 +49648,17 @@ global.hitagi = require('./main.js');
                 graphics[entity.uid].alpha = entity.c.graphic.alpha;
                 proxy(entity.c.graphic, 'alpha', graphics[entity.uid], 'alpha');
 
+                // Set and proxy scale.
+                graphics[entity.uid].scale = entity.c.graphic.scale;
+                proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
                 // Look for changes, redrawing if necessary.
                 look(entity.c.graphic, 'color', redraw, entity);
                 look(entity.c.graphic, 'type', redraw, entity);
 
                 stage.addChild(graphics[entity.uid]);
+
+                console.log(graphics[entity.uid]);
             }
         };
 
