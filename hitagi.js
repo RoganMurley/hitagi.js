@@ -49089,7 +49089,7 @@ if (!global.cancelAnimationFrame) {
                 break;
 
             case 'line':
-                params = defaultParams({thickness:1}, params);
+                params = defaultParams({thickness: 1}, params);
                 this.thickness = params.thickness;
                 this.x1 = params.x1;
                 this.y1 = params.y1;
@@ -49491,7 +49491,7 @@ global.hitagi = require('./main.js');
             y: 0
         };
 
-        var rebuild = function (newValue, entity) {
+        var redraw = function (newValue, entity) {
             // Remove old sprite.
             stage.removeChild(graphics[entity.uid]);
             delete graphics[entity.uid];
@@ -49510,6 +49510,10 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
+
+                        // Look for changes to redrawing if necessary.
+                        look(entity.c.graphic, 'radius', redraw, entity);
+
                         break;
 
                     case 'line':
@@ -49527,6 +49531,14 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.x2,
                             entity.c.graphic.y2
                         );
+
+                        // Look for changes to line params, redrawing if necessary.
+                        look(entity.c.graphic, 'thickness', redraw, entity);
+                        look(entity.c.graphic, 'x1', redraw, entity);
+                        look(entity.c.graphic, 'y1', redraw, entity);
+                        look(entity.c.graphic, 'x2', redraw, entity);
+                        look(entity.c.graphic, 'y2', redraw, entity);
+
                         break;
 
                     case 'polygon':
@@ -49534,6 +49546,10 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawPolygon(entity.c.graphic.points);
                         graphics[entity.uid].endFill();
+
+                        // Look for changes to line params, redrawing if necessary.
+                        look(entity.c.graphic, 'points', redraw, entity);
+
                         break;
 
                     case 'rectangle':
@@ -49545,6 +49561,11 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.width,
                             entity.c.graphic.height
                         );
+
+                        // Look for changes to line params, redrawing if necessary.
+                        look(entity.c.graphic, 'width', redraw, entity);
+                        look(entity.c.graphic, 'height', redraw, entity);
+
                         break;
 
                     case 'sprite':
@@ -49567,10 +49588,8 @@ global.hitagi = require('./main.js');
                             // Set and proxy framespeed.
                             graphics[entity.uid].animationSpeed = entity.c.graphic.animationSpeed;
                             proxy(
-                                entity.c.graphic,
-                                'animationSpeed',
-                                graphics[entity.uid],
-                                'animationSpeed'
+                                entity.c.graphic, 'animationSpeed',
+                                graphics[entity.uid], 'animationSpeed'
                             );
                             graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
@@ -49581,35 +49600,20 @@ global.hitagi = require('./main.js');
 
                         // Set anchor.
                         graphics[entity.uid].anchor = entity.c.graphic.anchor;
-                        proxy(
-                            entity.c.graphic,
-                            'anchor',
-                            graphics[entity.uid],
-                            'anchor'
-                        );
+                        proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
 
                         // Set and proxy visibility.
                         graphics[entity.uid].visible = entity.c.graphic.visible;
-                        proxy(
-                            entity.c.graphic,
-                            'visible',
-                            graphics[entity.uid],
-                            'visible'
-                        );
+                        proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');
 
                         // Set and proxy rotation.
                         graphics[entity.uid].rotation = entity.c.graphic.rotation;
-                        proxy(
-                            entity.c.graphic,
-                            'rotation',
-                            graphics[entity.uid],
-                            'rotation'
-                        );
+                        proxy( entity.c.graphic, 'rotation', graphics[entity.uid], 'rotation');
 
-                        // Look for sprite changes, rebuilding if so..
-                        look(entity.c.graphic, 'path', rebuild, entity);
+                        // redraw on path change.
+                        look(entity.c.graphic, 'path', redraw, entity);
 
-                        // Look for currentFrame changes, changing animation to frame if so.
+                        // Change animation frame on frame change.
                         look(
                             entity.c.graphic,
                             'currentFrame',
@@ -49618,21 +49622,6 @@ global.hitagi = require('./main.js');
                             },
                             entity
                         );
-
-                        /*
-                        Object.defineProperty(
-                            entity.c.graphic,
-                            'currentFrame',
-                            {
-                                get: function () {
-                                    return graphics[entity.uid].currentFrame;
-                                },
-                                set: function (newValue) {
-                                    graphics[entity.uid].gotoAndPlay(newValue);
-                                }
-                            }
-                        );
-                        */
                         break;
 
                     case 'text':
@@ -49642,6 +49631,7 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.options
                         );
                         proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
+                        proxy(entity.c.graphic, 'options', graphics[entity.uid], 'options');
                         break;
 
                     default:
@@ -49656,6 +49646,10 @@ global.hitagi = require('./main.js');
                     graphics[entity.uid],
                     'alpha'
                 );
+
+                // Look for changes, redrawing if necessary.
+                look(entity.c.graphic, 'color', redraw, entity);
+                look(entity.c.graphic, 'type', redraw, entity);
 
                 stage.addChild(graphics[entity.uid]);
             }

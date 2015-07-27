@@ -124,12 +124,13 @@
             .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
             .attach(new hitagi.components.Graphic({
                 alpha: 0.2,
+                relative: false,
                 thickness: 5,
                 type: 'line',
                 x1: 0,
                 y1: 0,
-                x2: 320,
-                y2: 320
+                x2: levelWidth,
+                y2: levelHeight
             }))
     );
 

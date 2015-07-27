@@ -32,7 +32,7 @@
                 break;
 
             case 'line':
-                params = defaultParams({thickness:1}, params);
+                params = defaultParams({thickness: 1}, params);
                 this.thickness = params.thickness;
                 this.x1 = params.x1;
                 this.y1 = params.y1;
