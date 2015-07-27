@@ -45,6 +45,13 @@
                         );
                         break;
 
+                    case 'polygon':
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawPolygon(entity.c.graphic.points);
+                        graphics[entity.uid].endFill();
+                        break;
+
                     case 'rectangle':
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);

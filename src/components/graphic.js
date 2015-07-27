@@ -40,6 +40,10 @@
                 this.y2 = params.y2;
                 break;
 
+            case 'polygon':
+                this.points = params.points;
+                break;
+
             case 'rectangle':
                 this.width = params.width;
                 this.height = params.height;

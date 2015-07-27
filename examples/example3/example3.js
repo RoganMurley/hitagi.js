@@ -132,8 +132,21 @@
             }))
     );
 
+    world.add(
+        new hitagi.Entity()
+            .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
+            .attach(new hitagi.components.Graphic({
+                points: [
+                    0, 0,
+                    100, 100,
+                    150, 100
+                ],
+                type: 'polygon'
+            }))
+    );
+
     // Load assets.
-    renderSystem.load(['ghost.png', 'ghost2.png']);
+    //renderSystem.load(['ghost.png', 'ghost2.png']);
 
     // Setup game loop.
     requestAnimationFrame(animate);

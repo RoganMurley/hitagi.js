@@ -49097,6 +49097,10 @@ if (!global.cancelAnimationFrame) {
                 this.y2 = params.y2;
                 break;
 
+            case 'polygon':
+                this.points = params.points;
+                break;
+
             case 'rectangle':
                 this.width = params.width;
                 this.height = params.height;
@@ -49511,6 +49515,13 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.x2,
                             entity.c.graphic.y2
                         );
+                        break;
+
+                    case 'polygon':
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawPolygon(entity.c.graphic.points);
+                        graphics[entity.uid].endFill();
                         break;
 
                     case 'rectangle':
