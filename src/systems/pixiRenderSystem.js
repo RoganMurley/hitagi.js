@@ -28,6 +28,19 @@
                         graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
                         break;
 
+                    case 'line':
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].lineStyle(entity.c.graphic.thickness, entity.c.graphic.color, 1);
+                        graphics[entity.uid].moveTo(
+                            entity.c.graphic.x1,
+                            entity.c.graphic.y1
+                        );
+                        graphics[entity.uid].lineTo(
+                            entity.c.graphic.x2,
+                            entity.c.graphic.y2
+                        );
+                        break;
+
                     case 'rectangle':
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);

@@ -6,16 +6,6 @@
     var defaultParams = require('../utils').defaultParams;
 
     // Represents a graphic to draw.
-    // PARAMS:
-    //     type: one of ['circle', 'rectangle', 'sprite' 'text']
-    // CIRCLE PARAMS:
-    //     color, radius
-    // RECTANGLE PARAMS:
-    //     height, width
-    // SPRITE PARAMS:
-    //     path (string for static or array of strings for animated)
-    // TEXT PARAMS:
-    //     copy, options
     var Graphic = function (params) {
         params = defaultParams({
             alpha: 1,
@@ -23,6 +13,7 @@
                 x: 0.5,
                 y: 0.5
             },
+            color: 0xFFFFFF,
             relative: true
         }, params);
 
@@ -38,6 +29,15 @@
         switch (params.type) {
             case 'circle':
                 this.radius = params.radius;
+                break;
+
+            case 'line':
+                params = defaultParams({thickness:1}, params);
+                this.thickness = params.thickness;
+                this.x1 = params.x1;
+                this.y1 = params.y1;
+                this.x2 = params.x2;
+                this.y2 = params.y2;
                 break;
 
             case 'rectangle':

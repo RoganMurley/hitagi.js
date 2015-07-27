@@ -118,6 +118,18 @@
             .attach({id: 'border'})
     );
 
+    world.add(
+        new hitagi.Entity()
+            .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
+            .attach(new hitagi.components.Graphic({
+                type: 'line',
+                x1: 0,
+                y1: 0,
+                x2: 320,
+                y2: 320
+            }))
+    );
+
     // Load assets.
     renderSystem.load(['ghost.png', 'ghost2.png']);
 

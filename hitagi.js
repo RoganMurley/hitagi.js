@@ -49063,16 +49063,6 @@ if (!global.cancelAnimationFrame) {
     var defaultParams = require('../utils').defaultParams;
 
     // Represents a graphic to draw.
-    // PARAMS:
-    //     type: one of ['circle', 'rectangle', 'sprite' 'text']
-    // CIRCLE PARAMS:
-    //     color, radius
-    // RECTANGLE PARAMS:
-    //     height, width
-    // SPRITE PARAMS:
-    //     path (string for static or array of strings for animated)
-    // TEXT PARAMS:
-    //     copy, options
     var Graphic = function (params) {
         params = defaultParams({
             alpha: 1,
@@ -49080,6 +49070,7 @@ if (!global.cancelAnimationFrame) {
                 x: 0.5,
                 y: 0.5
             },
+            color: 0xFFFFFF,
             relative: true
         }, params);
 
@@ -49095,6 +49086,15 @@ if (!global.cancelAnimationFrame) {
         switch (params.type) {
             case 'circle':
                 this.radius = params.radius;
+                break;
+
+            case 'line':
+                params = defaultParams({thickness:1}, params);
+                this.thickness = params.thickness;
+                this.x1 = params.x1;
+                this.y1 = params.y1;
+                this.x2 = params.x2;
+                this.y2 = params.y2;
                 break;
 
             case 'rectangle':
@@ -49494,6 +49494,19 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
+                        break;
+
+                    case 'line':
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].lineStyle(entity.c.graphic.thickness, entity.c.graphic.color, 1);
+                        graphics[entity.uid].moveTo(
+                            entity.c.graphic.x1,
+                            entity.c.graphic.y1
+                        );
+                        graphics[entity.uid].lineTo(
+                            entity.c.graphic.x2,
+                            entity.c.graphic.y2
+                        );
                         break;
 
                     case 'rectangle':
