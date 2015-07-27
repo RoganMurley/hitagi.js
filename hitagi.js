@@ -49498,7 +49498,11 @@ global.hitagi = require('./main.js');
 
                     case 'line':
                         graphics[entity.uid] = new pixi.Graphics();
-                        graphics[entity.uid].lineStyle(entity.c.graphic.thickness, entity.c.graphic.color, 1);
+                        graphics[entity.uid].lineStyle(
+                            entity.c.graphic.thickness,
+                            entity.c.graphic.color,
+                            1
+                        );
                         graphics[entity.uid].moveTo(
                             entity.c.graphic.x1,
                             entity.c.graphic.y1
