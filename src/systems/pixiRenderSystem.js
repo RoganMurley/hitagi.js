@@ -4,7 +4,9 @@
     var _ = require('lodash');
     var pixi = require('pixi.js');
 
-    var proxy = require('../utils.js').proxy;
+    var utils = require('../utils.js'),
+        look = utils.look,
+        proxy = utils.proxy;
 
     var PixiRenderSystem = function (stage) {
         var that = this;
@@ -15,6 +17,16 @@
         var offset = {
             x: 0,
             y: 0
+        };
+
+        var rebuild = function (newValue, entity) {
+            // Remove old sprite.
+            stage.removeChild(graphics[entity.uid]);
+            delete graphics[entity.uid];
+
+            // Add new sprite.
+            that.build.graphic(entity);
+            that.update.graphic(entity);
         };
 
         // Build the system, called by world on every entity.
@@ -64,18 +76,16 @@
                         break;
 
                     case 'sprite':
-                        var path = entity.c.graphic.path;
-
-                        if (_.isArray(path) || entity.c.graphic.sheet) {
+                        if (_.isArray(entity.c.graphic.path) || entity.c.graphic.sheet) {
                             // Animation.
                             var frames;
 
                             if (entity.c.graphic.sheet) {
-                                frames = _.map(path, function (framePath) {
+                                frames = _.map(entity.c.graphic.path, function (framePath) {
                                     return pixi.Texture.fromFrame(framePath);
                                 });
                             } else {
-                                frames = _.map(path, function (framePath) {
+                                frames = _.map(entity.c.graphic.path, function (framePath) {
                                     return pixi.Texture.fromImage(framePath);
                                 });
                             }
@@ -93,7 +103,7 @@
                             graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
                             // Static sprite.
-                            var texture = pixi.Texture.fromImage(path);
+                            var texture = pixi.Texture.fromImage(entity.c.graphic.path);
                             graphics[entity.uid] = new pixi.Sprite(texture);
                         }
 
@@ -124,29 +134,20 @@
                             'rotation'
                         );
 
-                        // Custom proxy to make sure sprite changes properly occur.
-                        Object.defineProperty(
+                        // Look for sprite changes, rebuilding if so..
+                        look(entity.c.graphic, 'path', rebuild, entity);
+
+                        // Look for currentFrame changes, changing animation to frame if so.
+                        look(
                             entity.c.graphic,
-                            'path',
-                            {
-                                get: function () {
-                                    return path;
-                                },
-                                set: function (newValue) {
-                                    path = newValue;
-
-                                    // Remove old sprite.
-                                    stage.removeChild(graphics[entity.uid]);
-                                    delete graphics[entity.uid];
-
-                                    // Add new sprite.
-                                    that.build(entity);
-                                    that.update(entity);
-                                }
-                            }
+                            'currentFrame',
+                            function (currentFrame, entity) {
+                                graphics[entity.uid].gotoAndPlay(currentFrame);
+                            },
+                            entity
                         );
 
-                        // Custom proxy to make sure frame changes properly occur.
+                        /*
                         Object.defineProperty(
                             entity.c.graphic,
                             'currentFrame',
@@ -159,6 +160,7 @@
                                 }
                             }
                         );
+                        */
                         break;
 
                     case 'text':

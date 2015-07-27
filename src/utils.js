@@ -43,6 +43,26 @@
                 );
             },
 
+        // Watches a property, executing a callback when the property changes.
+        look:
+            function (obj, prop, callback, callbackParams) {
+                var value = obj[prop];
+
+                Object.defineProperty(
+                    obj,
+                    prop,
+                    {
+                        get: function () {
+                            return value;
+                        },
+                        set: function (newValue) {
+                            value = newValue;
+                            callback(newValue, callbackParams);
+                        }
+                    }
+                );
+            }
+
     };
 
     module.exports = Utils;

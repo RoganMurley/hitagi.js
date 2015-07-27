@@ -41,7 +41,8 @@
                 }
 
                 if (controls.check('up')) {
-                    //entity.c.graphic.path = 'ghost2.png';
+                    //entity.c.graphic.sheet = false;
+                    //entity.c.graphic.path = 'g2.png';
                     //entity.c.graphic.animationSpeed = 1;
                     entity.c.graphic.currentFrame = 0;
                 }
@@ -146,7 +147,7 @@
     );
 
     // Load assets.
-    //renderSystem.load(['ghost.png', 'ghost2.png']);
+    renderSystem.load(['g.png', 'g2.png']);
 
     // Setup game loop.
     requestAnimationFrame(animate);
