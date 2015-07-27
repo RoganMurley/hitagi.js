@@ -5,7 +5,7 @@
     var levelHeight = 400;
 
     // Setup pixi.
-    var stage = new PIXI.Stage(0x141c22);
+    var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
     document.body.appendChild(renderer.view);
 
@@ -122,6 +122,8 @@
         new hitagi.Entity()
             .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
             .attach(new hitagi.components.Graphic({
+                alpha: 0.2,
+                thickness: 5,
                 type: 'line',
                 x1: 0,
                 y1: 0,

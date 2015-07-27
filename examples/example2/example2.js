@@ -6,7 +6,7 @@
     var levelHeight = 400;
 
     // Setup pixi.
-    var stage = new PIXI.Stage(0x141c22);
+    var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
     document.body.appendChild(renderer.view);
 

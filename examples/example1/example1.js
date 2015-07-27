@@ -2,7 +2,7 @@
     "use strict";
 
     // Setup pixi.
-    var stage = new PIXI.Stage(0x141c22);
+    var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(600, 400);
     document.body.appendChild(renderer.view);
 
