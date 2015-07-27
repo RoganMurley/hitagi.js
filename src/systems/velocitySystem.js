@@ -5,8 +5,8 @@
 
     var VelocitySystem = function () {
 
-        this.update = function (entity, dt) {
-            if (entity.has('velocity')) {
+        this.update = {
+            velocity: function (entity, dt) {
                 entity.c.position.x += utils.delta(entity.c.velocity.xspeed, dt);
                 entity.c.position.y += utils.delta(entity.c.velocity.yspeed, dt);
             }

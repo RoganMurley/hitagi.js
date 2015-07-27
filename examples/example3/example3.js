@@ -29,8 +29,8 @@
     world.register(collisionSystem);
 
     var BorderSystem = function (collisionSystem) {
-        this.update = function (entity) {
-            if (entity.has('ghost')) {
+        this.update = {
+            ghost: function (entity) {
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 

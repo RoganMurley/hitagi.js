@@ -18,8 +18,8 @@
         };
 
         // Build the system, called by world on every entity.
-        this.build = function (entity) {
-            if (entity.has('graphic')) {
+        this.build = {
+            graphic: function (entity) {
                 switch (entity.c.graphic.type) {
 
                     case 'circle':
@@ -74,8 +74,13 @@
                         }
 
                         // Set anchor.
-                        graphics[entity.uid].anchor.x = 0.5;
-                        graphics[entity.uid].anchor.y = 0.5;
+                        graphics[entity.uid].anchor = entity.c.graphic.anchor;
+                        proxy(
+                            entity.c.graphic,
+                            'anchor',
+                            graphics[entity.uid],
+                            'anchor'
+                        );
 
                         // Set and proxy visibility.
                         graphics[entity.uid].visible = entity.c.graphic.visible;
@@ -159,21 +164,32 @@
         };
 
         // Remove an entity from the system.
-        this.remove = function (entity) {
-            var id = entity.uid;
+        this.remove = {
+            graphic: function (entity) {
+                var id = entity.uid;
 
-            if (_.has(graphics, id)) {
-                stage.removeChild(graphics[id]);
+                if (_.has(graphics, id)) {
+                    stage.removeChild(graphics[id]);
+                }
+
+                delete graphics[id];
             }
-
-            delete graphics[id];
         };
 
-        this.update = function (entity) {
-            if (entity.has('graphic')) {
+        this.update = {
+            graphic: function (entity)  {
                 var graphic = graphics[entity.uid];
-                graphic.position.x = entity.c.position.x + offset.x;
-                graphic.position.y = entity.c.position.y + offset.y;
+
+                var x = 0;
+                var y = 0;
+
+                if (entity.c.graphic.relative) {
+                    x = entity.c.position.x + offset.x;
+                    y = entity.c.position.y + offset.y;
+                }
+
+                graphic.position.x = x;
+                graphic.position.y = y;
             }
 
         };

@@ -1,4 +1,5 @@
 options:
+    force: true
     timeout: 3000
     ignoreLeaks: false
     ui: 'bdd'

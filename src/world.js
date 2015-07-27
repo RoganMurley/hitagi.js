@@ -31,7 +31,11 @@
                 systems,
                 function (system) {
                     if (_.has(system, 'remove')) {
-                        system.remove(entity);
+                        _.each(system.remove, function (func, id) {
+                            if (entity.has(id)){
+                                func(entity);
+                            }
+                        });
                     }
                 }
             );
@@ -60,8 +64,12 @@
                         _.each(
                             entities,
                             function (entity) {
-                                if (typeof entity !== 'undefined') {
-                                    system.update(entity, dt);
+                                if (!_.isUndefined(entity)) {
+                                    _.each(system.update, function (func, id) {
+                                        if (entity.has(id)){
+                                            func(entity, dt);
+                                        }
+                                    });
                                 }
                             }
                         );
@@ -102,7 +110,11 @@
                 systems,
                 function (system) {
                     if (_.has(system, 'build')) {
-                        system.build(entity);
+                        _.each(system.build, function (func, id) {
+                            if (entity.has(id)){
+                                func(entity);
+                            }
+                        });
                     }
                 }
             );
