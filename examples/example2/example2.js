@@ -92,7 +92,7 @@
             }
         };
 
-        this.remove = {
+        this.destroy = {
             ai: function () {
                 ai = null;
             }
@@ -182,7 +182,7 @@
             }
         };
 
-        this.remove = {
+        this.destroy = {
             scorecard: function (entity)  {
                 scores = null;
             }

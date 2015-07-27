@@ -12,6 +12,9 @@
         // Each entity has a number of components.
         this.c = {};
 
+        // World this entity has been added to.
+        this.world = null;
+
         // Attach a component to the entity.
         this.attach = function (component) {
             // Check component's dependencies are met.
@@ -35,7 +38,7 @@
 
             // If the entity has already been added to a world, rebuild it.
             if (this.world) {
-                this.world.rebuild(this);
+                this.world.rebuild(this, component.id);
             }
 
             return this;

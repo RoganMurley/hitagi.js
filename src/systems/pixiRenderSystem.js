@@ -163,8 +163,8 @@
             }
         };
 
-        // Remove an entity from the system.
-        this.remove = {
+        // Destroy an entity from the system.
+        this.destroy = {
             graphic: function (entity) {
                 var id = entity.uid;
 

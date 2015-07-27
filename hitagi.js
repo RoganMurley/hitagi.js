@@ -49297,6 +49297,9 @@ if (!global.cancelAnimationFrame) {
         // Each entity has a number of components.
         this.c = {};
 
+        // World this entity has been added to.
+        this.world = null;
+
         // Attach a component to the entity.
         this.attach = function (component) {
             // Check component's dependencies are met.
@@ -49320,7 +49323,7 @@ if (!global.cancelAnimationFrame) {
 
             // If the entity has already been added to a world, rebuild it.
             if (this.world) {
-                this.world.rebuild(this);
+                this.world.rebuild(this, component.id);
             }
 
             return this;
@@ -49395,8 +49398,8 @@ global.hitagi = require('./main.js');
             }
         };
 
-        // Remove an entity from the system.
-        this.remove = {
+        // Destroy an entity from the system.
+        this.destroy = {
             collision: function (entity) {
                 var id = entity.uid;
                 delete entities[id];
@@ -49628,8 +49631,8 @@ global.hitagi = require('./main.js');
             }
         };
 
-        // Remove an entity from the system.
-        this.remove = {
+        // Destroy an entity from the system.
+        this.destroy = {
             graphic: function (entity) {
                 var id = entity.uid;
 
@@ -49808,19 +49811,7 @@ global.hitagi = require('./main.js');
 
         // Remove an entity from the world.
         this.remove = function (entity) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'remove')) {
-                        _.each(system.remove, function (func, id) {
-                            if (entity.has(id)){
-                                func(entity);
-                            }
-                        });
-                    }
-                }
-            );
-
+            this.destroy(entity);
             delete entities[entity.uid];
         };
 
@@ -49885,14 +49876,48 @@ global.hitagi = require('./main.js');
             return system;
         };
 
-        // Build an entity into all registered systems.
-        this.build = function (entity) {
+        // Build an entity into systems.
+        // If trackID is given, only systems tracking
+        // that ID build the entity, otherwise all systems do.
+        this.build = function (entity, trackID) {
             _.each(
                 systems,
                 function (system) {
                     if (_.has(system, 'build')) {
                         _.each(system.build, function (func, id) {
                             if (entity.has(id)){
+                                // Only build in tracking systems.
+                                if (trackID) {
+                                    if (id !== trackID) {
+                                        return;
+                                    }
+                                }
+                                // Perform build.
+                                func(entity);
+                            }
+                        });
+                    }
+                }
+            );
+        };
+
+        // Destroy an entity in systems.
+        // If trackID is given, only systems tracking
+        // that ID destroy the entity, otherwise all systems do.
+        this.destroy = function (entity, trackID) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'destroy')) {
+                        _.each(system.destroy, function (func, id) {
+                            if (entity.has(id)){
+                                // Only remove from tracking systems.
+                                if (trackID) {
+                                    if (id !== trackID) {
+                                        return;
+                                    }
+                                }
+                                // Perform the remove.
                                 func(entity);
                             }
                         });
@@ -49902,9 +49927,9 @@ global.hitagi = require('./main.js');
         };
 
         // Rebuild an entity with all registered systems.
-        this.rebuild = function (entity) {
-            that.remove(entity);
-            that.add(entity);
+        this.rebuild = function (entity, trackID) {
+            that.destroy(entity, trackID);
+            that.build(entity, trackID);
         };
 
         // Clear all entities from the world and systems.
