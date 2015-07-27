@@ -13,7 +13,9 @@
         var mockSystem = {
             tickStart: simple.mock(),
             tickEnd: simple.mock(),
-            update: simple.mock()
+            update: {
+                testing: simple.mock()
+            }
         };
 
         beforeEach(function () {
@@ -22,27 +24,38 @@
 
         it('registered systems should call their update methods once for each added entity per world update', function () {
             world.register(mockSystem);
-            world.add(new Entity());
+            world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
 
-            assert.equal(mockSystem.update.callCount, 0);
-
-            world.update();
-            assert.equal(mockSystem.update.callCount, 1);
-
-            mockSystem.update.reset();
-
-            world.add(new Entity());
-            world.add(new Entity());
-            world.add(new Entity());
-            world.add(new Entity());
+            assert.equal(mockSystem.update.testing.callCount, 0);
 
             world.update();
-            assert.equal(mockSystem.update.callCount, 5);
+            assert.equal(mockSystem.update.testing.callCount, 1);
+
+            mockSystem.update.testing.reset();
+
+            _.times(4, function () {
+                world.add(
+                    new Entity().attach({
+                        id: 'testing'
+                    })
+                );
+            });
+
+            world.update();
+            assert.equal(mockSystem.update.testing.callCount, 5);
         });
 
         it('registered systems should call their tickStart and tickEnd methods once regardless of how many entities there are', function () {
             world.register(mockSystem);
-            world.add(new Entity());
+            world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
 
             assert.equal(mockSystem.tickStart.callCount, 0);
             assert.equal(mockSystem.tickEnd.callCount, 0);
@@ -56,10 +69,13 @@
             mockSystem.tickStart.reset();
             mockSystem.tickEnd.reset();
 
-            world.add(new Entity());
-            world.add(new Entity());
-            world.add(new Entity());
-            world.add(new Entity());
+            _.times(4, function () {
+                world.add(
+                    new Entity().attach({
+                        id: 'testing'
+                    })
+                );
+            });
 
             world.tickStart();
             assert.equal(mockSystem.tickStart.callCount, 1);
@@ -73,14 +89,18 @@
 
             var mockSystems = [
                 {
-                    update: function () {
-                        calls.push(1);
+                    update: {
+                        testing: function () {
+                            calls.push(1);
+                        }
                     },
                     priority: 1
                 },
                 {
-                    update: function () {
-                        calls.push(2);
+                    update: {
+                        testing: function () {
+                            calls.push(2);
+                        }
                     },
                     priority: 0
                 }
@@ -90,7 +110,11 @@
                 mockSystems,
                 world.register
             );
-            world.add(new Entity());
+            world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
 
             world.update();
             assert.deepEqual(calls, [1, 2]);
@@ -101,14 +125,18 @@
 
             var mockSystems = [
                 {
-                    update: function () {
-                        calls.push(1);
+                    update: {
+                        testing: function () {
+                            calls.push(1);
+                        }
                     },
                     priority: 0
                 },
                 {
-                    update: function () {
-                        calls.push(2);
+                    update: {
+                        testing: function () {
+                            calls.push(2);
+                        }
                     },
                     priority: 1
                 }
@@ -118,7 +146,11 @@
                 mockSystems,
                 world.register
             );
-            world.add(new Entity());
+            world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
 
             world.update();
             assert.deepEqual(calls, [2, 1]);
@@ -129,26 +161,34 @@
 
             var mockSystems = [
                 {
-                    update: function () {
-                        calls.push(1);
+                    update: {
+                        testing: function () {
+                            calls.push(1);
+                        }
                     },
                     priority: 0
                 },
                 {
-                    update: function () {
-                        calls.push(2);
+                    update: {
+                        testing: function () {
+                            calls.push(2);
+                        }
                     },
                     priority: 0
                 },
                 {
-                    update: function () {
-                        calls.push(3);
+                    update: {
+                        testing: function () {
+                            calls.push(3);
+                        }
                     },
                     priority: 1
                 },
                 {
-                    update: function () {
-                        calls.push(4);
+                    update: {
+                        testing: function () {
+                            calls.push(4);
+                        }
                     },
                     priority: 1
                 }
@@ -158,7 +198,11 @@
                 mockSystems,
                 world.register
             );
-            world.add(new Entity());
+            world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
 
             world.update();
             assert.deepEqual(calls, [3, 4, 1, 2]);
@@ -169,15 +213,19 @@
 
             var mockSystems = [
                 {
-                    update: function () {
-                        calls.push(1);
+                    update: {
+                        testing: function () {
+                            calls.push(1);
+                        }
                     },
                     priority: -999999
                 },
                 {
-                    update: function () {
-                        calls.push(2);
-                    }
+                    update: {
+                        testing: function () {
+                            calls.push(2);
+                        }
+                    },
                 }
             ];
 
@@ -185,7 +233,11 @@
                 mockSystems,
                 world.register
             );
-            world.add(new Entity());
+            world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
 
             world.update();
             assert.deepEqual(calls, [1, 2]);
