@@ -49610,7 +49610,7 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid].rotation = entity.c.graphic.rotation;
                         proxy( entity.c.graphic, 'rotation', graphics[entity.uid], 'rotation');
 
-                        // redraw on path change.
+                        // Redraw on path change.
                         look(entity.c.graphic, 'path', redraw, entity);
 
                         // Change animation frame on frame change.
@@ -49640,12 +49640,7 @@ global.hitagi = require('./main.js');
 
                 // Set and proxy alpha.
                 graphics[entity.uid].alpha = entity.c.graphic.alpha;
-                proxy(
-                    entity.c.graphic,
-                    'alpha',
-                    graphics[entity.uid],
-                    'alpha'
-                );
+                proxy(entity.c.graphic, 'alpha', graphics[entity.uid], 'alpha');
 
                 // Look for changes, redrawing if necessary.
                 look(entity.c.graphic, 'color', redraw, entity);

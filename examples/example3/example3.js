@@ -53,6 +53,15 @@
                 }
 
                 entity.c.graphic.rotation += 0.01;
+            },
+            rose: function (entity) {
+                if (Math.random() < entity.c.rose.activity) {
+                    entity.c.graphic.points = entity.c.graphic.points.concat([
+                        Math.random() * levelWidth,
+                        Math.random() * levelHeight
+                    ]);
+                    entity.c.rose.activity *= 1.01;
+                }
             }
         };
     };
@@ -143,8 +152,13 @@
                     100, 100,
                     150, 100
                 ],
+                relative: false,
                 type: 'polygon'
             }))
+            .attach({
+                id: 'rose',
+                activity: 0.01
+            })
     );
 
     // Load assets.
