@@ -49727,8 +49727,8 @@ global.hitagi = require('./main.js');
                     y = entity.c.position.y + offset.y;
                 }
 
-                graphic.position.x = x;
-                graphic.position.y = y;
+                graphic.position.x = Math.floor(x);
+                graphic.position.y = Math.floor(y);
             }
 
         };
@@ -50026,19 +50026,11 @@ global.hitagi = require('./main.js');
         // Clear all entities from the world and systems.
         this.clear = function () {
             _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'remove')) {
-                        _.each(
-                            entities,
-                            function (entity) {
-                                system.remove(entity);
-                            }
-                        );
-                    }
+                entities,
+                function (entity) {
+                    that.destroy(entity);
                 }
             );
-
             entities = {};
         };
 

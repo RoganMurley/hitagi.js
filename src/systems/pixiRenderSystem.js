@@ -238,8 +238,8 @@
                     y = entity.c.position.y + offset.y;
                 }
 
-                graphic.position.x = x;
-                graphic.position.y = y;
+                graphic.position.x = Math.floor(x);
+                graphic.position.y = Math.floor(y);
             }
 
         };

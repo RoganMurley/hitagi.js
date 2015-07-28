@@ -151,19 +151,11 @@
         // Clear all entities from the world and systems.
         this.clear = function () {
             _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'remove')) {
-                        _.each(
-                            entities,
-                            function (entity) {
-                                system.remove(entity);
-                            }
-                        );
-                    }
+                entities,
+                function (entity) {
+                    that.destroy(entity);
                 }
             );
-
             entities = {};
         };
 

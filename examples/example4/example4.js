@@ -19,7 +19,7 @@
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
-    renderSystem.load(['flappybird.png', 'pipe.png'], function () {
+    renderSystem.load(['flappybird.png', 'pipe.png', 'floor.png'], function () {
 
     var velocitySystem = new hitagi.systems.VelocitySystem();
     world.register(velocitySystem);
@@ -38,7 +38,19 @@
     };
     world.register(new GravitySystem());
 
-    var BirdSystem = function (controls, collisionSystem) {
+    var BirdSystem = function (world, controls, collisionSystem) {
+        var that = this;
+        var savedState;
+
+        this.saveState = function () {
+            savedState = world.save();
+        };
+
+        this.loadState = function () {
+            world.clear();
+            world.load(savedState);
+        };
+
         this.update = {
             bird: function (entity, dt) {
                 if (controls.check('flap', true)) {
@@ -47,9 +59,10 @@
 
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
-                var test = collisionSystem.collide(entity, 'pipe', x, y);
+                var test = collisionSystem.collide(entity, 'kill', x, y);
                 if (test.hit) {
-                    console.log('hitting');
+                    that.loadState();
+                    return;
                 }
 
                 entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
@@ -58,10 +71,15 @@
                     entity.c.position.y = 0;
                     entity.c.velocity.yspeed = 0;
                 }
+
+                if (entity.c.position.y > levelHeight) {
+                    that.loadState();
+                }
             }
         };
     };
-    world.register(new BirdSystem(controls, collisionSystem));
+    var birdSystem = new BirdSystem(world, controls, collisionSystem);
+    world.register(birdSystem);
 
     // Pipe stuff.
     var Pipe = function (params) {
@@ -81,7 +99,8 @@
                 height: 793,
                 width: 138
             }))
-            .attach({id: 'pipe'});
+            .attach({id: 'pipe'})
+            .attach({id: 'kill'});
 
         return pipe;
     };
@@ -103,7 +122,7 @@
                     entity.c.score.pipeTimer = entity.c.score.pipeTimerMax;
 
                     var pipeHeight = 793;
-                    var pipeGap = 180;
+                    var pipeGap = 120;
                     var minimumTopDistance = 200;
                     var offset = Math.random() * (pipeHeight/2) - minimumTopDistance;
 
@@ -124,6 +143,17 @@
         };
     };
     world.register(new PipeSystem(world));
+
+    var FloorSystem = function () {
+        this.update = {
+            floor: function (entity) {
+                if (entity.c.position.x <= -154) {
+                    entity.c.position.x = 308 * 11;
+                }
+            }
+        };
+    };
+    world.register(new FloorSystem(world));
 
     // Add entities.
     var player = world.add(
@@ -169,6 +199,33 @@
                 pipeTimerMax: 85
             })
     );
+
+    for (var i = 0; i < 12; i++) {
+        world.add(
+            new hitagi.Entity()
+                .attach(new hitagi.components.Position({
+                    x: 308 * i,
+                    y: levelHeight - 108/2
+                }))
+                .attach(new hitagi.components.Velocity({
+                    xspeed: -5,
+                    yspeed: 0
+                }))
+                .attach(new hitagi.components.Graphic({
+                    type: 'sprite',
+                    path: 'floor.png',
+                    z: 1000
+                }))
+                .attach(new hitagi.components.Collision({
+                    height: 108,
+                    width: 308
+                }))
+                .attach({id: 'floor'})
+                .attach({id: 'kill'})
+        );
+    }
+    // Save a clean state for reloading the game.
+    birdSystem.saveState();
 
     // Setup game loop.
     requestAnimationFrame(animate);
