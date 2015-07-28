@@ -1,0 +1,106 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@2.13.1
+3 info using node@v0.10.25
+4 verbose node symlink /usr/bin/node
+5 verbose publish [ '.' ]
+6 silly cache add args [ '.', null ]
+7 verbose cache add spec .
+8 silly cache add parsed spec { raw: '.',
+8 silly cache add   scope: null,
+8 silly cache add   name: null,
+8 silly cache add   rawSpec: '.',
+8 silly cache add   spec: '/media/rogan/51CFBD3E0A60A48C/workspace/hitagi.js',
+8 silly cache add   type: 'directory' }
+9 verbose addLocalDirectory /home/rogan/.npm/hitagi.js/0.4.2/package.tgz not in flight; packing
+10 verbose tar pack [ '/home/rogan/.npm/hitagi.js/0.4.2/package.tgz',
+10 verbose tar pack   '/media/rogan/51CFBD3E0A60A48C/workspace/hitagi.js' ]
+11 verbose tarball /home/rogan/.npm/hitagi.js/0.4.2/package.tgz
+12 verbose folder /media/rogan/51CFBD3E0A60A48C/workspace/hitagi.js
+13 info prepublish hitagi.js@0.4.2
+14 verbose addLocalTarball adding from inside cache /home/rogan/.npm/hitagi.js/0.4.2/package.tgz
+15 silly cache afterAdd hitagi.js@0.4.2
+16 verbose afterAdd /home/rogan/.npm/hitagi.js/0.4.2/package/package.json not in flight; writing
+17 verbose afterAdd /home/rogan/.npm/hitagi.js/0.4.2/package/package.json written
+18 silly publish { name: 'hitagi.js',
+18 silly publish   version: '0.4.2',
+18 silly publish   description: 'Simple game development framework',
+18 silly publish   main: 'src/main.js',
+18 silly publish   scripts: { test: 'grunt test' },
+18 silly publish   repository:
+18 silly publish    { type: 'git',
+18 silly publish      url: 'git+https://github.com/Purpwood/hitagi.js.git' },
+18 silly publish   keywords: [ 'game', 'gamedev', 'framework', 'hitagi', 'ecs' ],
+18 silly publish   author: { name: 'Rogan Murley' },
+18 silly publish   license: 'MIT',
+18 silly publish   bugs: { url: 'https://github.com/Purpwood/hitagi.js/issues' },
+18 silly publish   homepage: 'https://github.com/Purpwood/hitagi.js',
+18 silly publish   dependencies:
+18 silly publish    { howler: '^1.1.26',
+18 silly publish      jquery: '^2.1.4',
+18 silly publish      lodash: '^3.8.0',
+18 silly publish      'pixi.js': '^3.0.2' },
+18 silly publish   devDependencies:
+18 silly publish    { grunt: '^0.4.5',
+18 silly publish      'grunt-browserify': '^3.8.0',
+18 silly publish      'grunt-contrib-jshint': '^0.11.2',
+18 silly publish      'grunt-contrib-watch': '^0.6.1',
+18 silly publish      'grunt-simple-mocha': '^0.4.0',
+18 silly publish      'load-grunt-config': '^0.17.1',
+18 silly publish      'simple-mock': '^0.2.14' },
+18 silly publish   readme: '# About\nHitagi is a JavaScript game development framework that loves to keep your code and data separate. It uses an [Entity Component System](http://en.wikipedia.org/wiki/Entity_component_system) architecture.\n\n# How does it work?\n* The **World** contains **Entities** and **Systems**.\n* **Entities** are our data, made of \'building blocks\' called **Components**.\n* **Systems** are our code, processing our **Entities** and performing I/O.\n\n# Examples\n* [Hello, world!](http://codepen.io/Purpwood/pen/dozPJw?editors=001)\n* [Pong](http://codepen.io/Purpwood/pen/LVBdod)\n\n# Contributing\nWe\'re currently early in development, so any issues or pull requests are welcome!\n',
+18 silly publish   readmeFilename: 'README.md',
+18 silly publish   gitHead: '82c7ab8a74cf69dff206caeee7fd19b3f8467c7b',
+18 silly publish   _id: 'hitagi.js@0.4.2',
+18 silly publish   _shasum: '5a2abcce62b2132f4edefb5afe84e6a4595605de',
+18 silly publish   _from: '.' }
+19 verbose getPublishConfig undefined
+20 silly mapToRegistry name hitagi.js
+21 silly mapToRegistry using default registry
+22 silly mapToRegistry registry https://registry.npmjs.org/
+23 silly mapToRegistry uri https://registry.npmjs.org/hitagi.js
+24 verbose publish registryBase https://registry.npmjs.org/
+25 silly publish uploading /home/rogan/.npm/hitagi.js/0.4.2/package.tgz
+26 verbose request uri https://registry.npmjs.org/hitagi.js
+27 verbose request sending authorization for write operation
+28 info attempt registry request try #1 at 01:13:14
+29 verbose request using bearer token for auth
+30 verbose request id 89fd149b9a894382
+31 http request PUT https://registry.npmjs.org/hitagi.js
+32 http 403 https://registry.npmjs.org/hitagi.js
+33 verbose headers { 'content-type': 'application/json',
+33 verbose headers   'cache-control': 'max-age=60',
+33 verbose headers   'content-length': '95',
+33 verbose headers   'accept-ranges': 'bytes',
+33 verbose headers   date: 'Tue, 28 Jul 2015 00:13:16 GMT',
+33 verbose headers   via: '1.1 varnish',
+33 verbose headers   connection: 'keep-alive',
+33 verbose headers   'x-served-by': 'cache-lcy1121-LCY',
+33 verbose headers   'x-cache': 'MISS',
+33 verbose headers   'x-cache-hits': '0',
+33 verbose headers   'x-timer': 'S1438042394.531932,VS0,VE1593' }
+34 verbose request invalidating /home/rogan/.npm/registry.npmjs.org/hitagi.js on PUT
+35 error publish Failed PUT 403
+36 verbose stack Error: "You cannot publish over the previously published version 0.4.2." : hitagi.js
+36 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:247:14)
+36 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:170:14)
+36 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:197:22)
+36 verbose stack     at Request.EventEmitter.emit (events.js:98:17)
+36 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1050:14)
+36 verbose stack     at Request.EventEmitter.emit (events.js:117:20)
+36 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:996:12)
+36 verbose stack     at IncomingMessage.EventEmitter.emit (events.js:117:20)
+36 verbose stack     at _stream_readable.js:920:16
+36 verbose stack     at process._tickCallback (node.js:415:13)
+37 verbose statusCode 403
+38 verbose pkgid hitagi.js
+39 verbose cwd /media/rogan/51CFBD3E0A60A48C/workspace/hitagi.js
+40 error Linux 3.13.0-57-generic
+41 error argv "node" "/usr/local/bin/npm" "publish"
+42 error node v0.10.25
+43 error npm  v2.13.1
+44 error code E403
+45 error "You cannot publish over the previously published version 0.4.2." : hitagi.js
+46 error If you need help, you may report this error at:
+46 error     <https://github.com/npm/npm/issues>
+47 verbose exit [ 1, true ]

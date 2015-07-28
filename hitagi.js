@@ -49099,6 +49099,11 @@ if (!global.cancelAnimationFrame) {
                 this.radius = params.radius;
                 break;
 
+            case 'ellipse':
+                this.width = params.width;
+                this.height = params.height;
+                break;
+
             case 'line':
                 params = defaultParams({thickness: 1}, params);
 
@@ -49525,6 +49530,22 @@ global.hitagi = require('./main.js');
 
                         // Look for changes to redrawing if necessary.
                         look(entity.c.graphic, 'radius', redraw, entity);
+
+                        break;
+
+                    case 'ellipse':
+                        graphics[entity.uid] = new pixi.Graphics();
+                        graphics[entity.uid].beginFill(entity.c.graphic.color);
+                        graphics[entity.uid].drawEllipse(
+                            0,
+                            0,
+                            entity.c.graphic.width,
+                            entity.c.graphic.height
+                        );
+
+                        // Look for changes to line params, redrawing if necessary.
+                        look(entity.c.graphic, 'width', redraw, entity);
+                        look(entity.c.graphic, 'height', redraw, entity);
 
                         break;
 

@@ -170,10 +170,10 @@
         new hitagi.Entity()
             .attach(new hitagi.components.Graphic({
                 color: 0X910E2F,
-                height: levelHeight*2,
-                width: levelWidth*2,
+                height: levelHeight,
+                width: levelWidth,
                 relative: false,
-                type: 'rectangle',
+                type: 'ellipse',
                 z: -Infinity
             }))
     );

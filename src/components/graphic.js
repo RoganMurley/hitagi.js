@@ -42,6 +42,11 @@
                 this.radius = params.radius;
                 break;
 
+            case 'ellipse':
+                this.width = params.width;
+                this.height = params.height;
+                break;
+
             case 'line':
                 params = defaultParams({thickness: 1}, params);
 
