@@ -49372,7 +49372,7 @@ if (!global.cancelAnimationFrame) {
         'Entity': require('./entity.js'),
         'World': require('./world.js'),
         'Controls': require('./controls.js'),
-        'Utils': require('./utils.js'),
+        'utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
             'Graphic': require('./components/graphic.js'),

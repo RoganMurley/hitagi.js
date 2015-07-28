@@ -61,6 +61,7 @@
                         Math.random() * levelHeight
                     ]);
                     entity.c.rose.activity *= 1.01;
+                    entity.c.graphic.color = 0XFFFFFF * Math.random();
                 }
             }
         };
