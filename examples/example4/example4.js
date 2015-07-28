@@ -160,9 +160,6 @@
                 // Update timer.
                 entity.c.score.pipeTimer--;
 
-                // Update pipes made count.
-                entity.c.score.pipesMade++;
-
                 // Generate pipes if they're ready.
                 if (entity.c.score.pipeTimer <= 0) {
                     entity.c.score.pipeTimer = entity.c.score.pipeTimerMax;
@@ -171,6 +168,9 @@
                     var pipeGap = 120;
                     var minimumTopDistance = 200;
                     var offset = Math.random() * (pipeHeight/2) - minimumTopDistance;
+
+                    // Update pipes made count.
+                    entity.c.score.pipesMade++;
 
                     world.add(
                         new Pipe({
