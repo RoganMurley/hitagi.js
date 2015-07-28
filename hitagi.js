@@ -49127,7 +49127,7 @@ if (!global.cancelAnimationFrame) {
                 params = defaultParams({
                     visible: true,
                     rotation: 0,
-                    sheet: true
+                    sheet: false
                 }, params);
 
                 this.path = params.path; // Can be an array of paths to make an animation.
@@ -49515,7 +49515,6 @@ global.hitagi = require('./main.js');
 
             // Add new sprite.
             that.build.graphic(entity);
-            that.update.graphic(entity);
         };
 
         // Build the system, called by world on every entity.
@@ -49697,6 +49696,9 @@ global.hitagi = require('./main.js');
                     }
                     return 0;
                 });
+
+                // Move to correct position.
+                that.update.graphic(entity);
             }
         };
 

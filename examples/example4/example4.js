@@ -14,12 +14,12 @@
 
     // Setup controls.
     var controls = new hitagi.Controls();
-    controls.bind(32, 'flap');
+    controls.bind('m1', 'flap');
 
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
-    renderSystem.load('ghostSheet.json', function () {
+    renderSystem.load(['flappybird.png', 'pipe.png'], function () {
 
     var velocitySystem = new hitagi.systems.VelocitySystem();
     world.register(velocitySystem);
@@ -51,6 +51,13 @@
                 if (test.hit) {
                     console.log('hitting');
                 }
+
+                entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
+
+                if (entity.c.position.y < 0) {
+                    entity.c.position.y = 0;
+                    entity.c.velocity.yspeed = 0;
+                }
             }
         };
     };
@@ -59,50 +66,59 @@
     // Pipe stuff.
     var Pipe = function (params) {
         var pipe = new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: levelWidth, y: 0}))
-            .attach(new hitagi.components.Velocity({xspeed: -20, yspeed: 0}))
+            .attach(new hitagi.components.Position({x: levelWidth + 200, y: params.y}))
+            .attach(new hitagi.components.Velocity({xspeed: -5, yspeed: 0}))
             .attach(new hitagi.components.Graphic({
-                type:'rectangle',
-                alpha: 0.4,
-                color: 0XDE2B58,
-                width: 64,
-                height: params.height
+                type:'sprite',
+                path: 'pipe.png',
+                scale: {
+                    x: 1,
+                    y: params.yscale
+                },
+                z: 10
             }))
             .attach(new hitagi.components.Collision({
-                height: params.height,
-                width: 64
+                height: 793,
+                width: 138
             }))
             .attach({id: 'pipe'});
-
-        if (params.top) {
-            pipe.c.position.y = 0;
-        } else if (params.bottom) {
-            pipe.c.position.y = levelHeight;
-        }
 
         return pipe;
     };
 
     var PipeSystem = function (world) {
-        this.tickStart = function () {
-            world.add(
-                new Pipe({
-                    height: Math.random() * levelHeight*0.6,
-                    top: true
-                })
-            );
-            world.add(
-                new Pipe({
-                    height: Math.random() * levelHeight*0.6,
-                    bottom: true
-                })
-            );
-        };
-
         this.update = {
             pipe: function (entity) {
                 if (entity.c.position.x < -100) {
                     world.remove(entity);
+                }
+            },
+
+            score: function (entity) {
+                // Update timer.
+                entity.c.score.pipeTimer--;
+
+                // Generate pipes if they're ready.
+                if (entity.c.score.pipeTimer <= 0) {
+                    entity.c.score.pipeTimer = entity.c.score.pipeTimerMax;
+
+                    var pipeHeight = 793;
+                    var pipeGap = 180;
+                    var minimumTopDistance = 200;
+                    var offset = Math.random() * (pipeHeight/2) - minimumTopDistance;
+
+                    world.add(
+                        new Pipe({
+                            y: -offset,
+                            yscale: -1
+                        })
+                    );
+                    world.add(
+                        new Pipe({
+                            y: pipeHeight + pipeGap - offset,
+                            yscale: 1
+                        })
+                    );
                 }
             }
         };
@@ -112,22 +128,20 @@
     // Add entities.
     var player = world.add(
         new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 128, y: levelHeight/2}))
+            .attach(new hitagi.components.Position({x: 320, y: levelHeight/2}))
             .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
             .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
-                color: 0XE3D943,
-                height: 18,
-                width: 32
+                type: 'sprite',
+                path: 'flappybird.png'
             }))
             .attach({
                 id: 'gravity',
-                magnitude: 0.45,
+                magnitude: 0.6,
                 terminal: 12
             })
             .attach({
                 id: 'bird',
-                flapSpeed: 8
+                flapSpeed: 10
             })
             .attach(new hitagi.components.Collision({
                 height: 18,
@@ -142,8 +156,18 @@
                 type: 'rectangle',
                 color: 0X139BC9,
                 height: levelHeight,
-                width: levelWidth
+                width: levelWidth,
+                z: -100
             }))
+    );
+
+    var score = world.add(
+        new hitagi.Entity()
+            .attach({
+                id: 'score',
+                pipeTimer: 0,
+                pipeTimerMax: 85
+            })
     );
 
     // Setup game loop.

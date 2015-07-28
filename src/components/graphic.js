@@ -70,7 +70,7 @@
                 params = defaultParams({
                     visible: true,
                     rotation: 0,
-                    sheet: true
+                    sheet: false
                 }, params);
 
                 this.path = params.path; // Can be an array of paths to make an animation.

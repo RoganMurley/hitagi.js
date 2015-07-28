@@ -26,7 +26,6 @@
 
             // Add new sprite.
             that.build.graphic(entity);
-            that.update.graphic(entity);
         };
 
         // Build the system, called by world on every entity.
@@ -208,6 +207,9 @@
                     }
                     return 0;
                 });
+
+                // Move to correct position.
+                that.update.graphic(entity);
             }
         };
 
