@@ -51,6 +51,14 @@
             world.load(savedState);
         };
 
+        var score = null;
+
+        this.build = {
+            score: function (entity) {
+                score = entity;
+            }
+        };
+
         this.update = {
             bird: function (entity, dt) {
                 if (controls.check('flap', true)) {
@@ -59,10 +67,24 @@
 
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
-                var test = collisionSystem.collide(entity, 'kill', x, y);
+                var test;
+
+                test = collisionSystem.collide(entity, 'kill', x, y);
                 if (test.hit) {
                     that.loadState();
                     return;
+                }
+
+                if (score) {
+                    test = collisionSystem.collide(entity, 'goal', x, y);
+                    if (test.hit) {
+                        if (!test.entity.c.goal.done) {
+                            test.entity.c.goal.done = true;
+                            console.log('goal ' + test.entity.c.goal.n + ' reached!');
+                            score.c.cleared = test.entity.c.goal.n;
+                            score.c.graphic.copy = test.entity.c.goal.n;
+                        }
+                    }
                 }
 
                 entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
@@ -105,6 +127,27 @@
         return pipe;
     };
 
+    var Goal = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: levelWidth + 200,
+                y: params.y
+            }))
+            .attach(new hitagi.components.Velocity({
+                xspeed: -5,
+                yspeed: 0
+            }))
+            .attach(new hitagi.components.Collision({
+                width: params.width,
+                height: params.height
+            }))
+            .attach({
+                id: 'goal',
+                n: params.n,
+                done: false
+            });
+    };
+
     var PipeSystem = function (world) {
         this.update = {
             pipe: function (entity) {
@@ -116,6 +159,9 @@
             score: function (entity) {
                 // Update timer.
                 entity.c.score.pipeTimer--;
+
+                // Update pipes made count.
+                entity.c.score.pipesMade++;
 
                 // Generate pipes if they're ready.
                 if (entity.c.score.pipeTimer <= 0) {
@@ -138,6 +184,12 @@
                             yscale: 1
                         })
                     );
+                    world.add(new Goal({
+                        width: 60,
+                        height: pipeGap,
+                        y: pipeHeight/2 + pipeGap/2 - offset,
+                        n: entity.c.score.pipesMade
+                    }));
                 }
             }
         };
@@ -193,10 +245,22 @@
 
     var score = world.add(
         new hitagi.Entity()
+            .attach(new hitagi.components.Position({x: 25, y: 10}))
+            .attach(new hitagi.components.Graphic({
+                type: 'text',
+                copy: '0',
+                options: {
+                    font: '128px Arial',
+                    fill: 'white'
+                },
+                z: Infinity
+            }))
             .attach({
                 id: 'score',
                 pipeTimer: 0,
-                pipeTimerMax: 85
+                pipeTimerMax: 85,
+                pipesMade: 0,
+                cleared: 0
             })
     );
 

@@ -49663,7 +49663,7 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.options
                         );
                         proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
-                        proxy(entity.c.graphic, 'options', graphics[entity.uid], 'options');
+                        proxy(entity.c.graphic, 'options', graphics[entity.uid], 'style');
                         break;
 
                     default:
