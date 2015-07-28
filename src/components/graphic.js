@@ -18,11 +18,16 @@
             scale: {
                 x: 1,
                 y: 1
-            }
+            },
+            z: 0
         }, params);
 
         this.id = 'graphic';
-        this.deps = ['position'];
+
+        this.deps = [];
+        if (params.relative) {
+            this.deps.push('position');
+        }
 
         this.alpha = params.alpha;
         this.anchor = params.anchor;
@@ -30,6 +35,7 @@
         this.relative = params.relative;
         this.scale = params.scale;
         this.type = params.type;
+        this.z = params.z;
 
         switch (params.type) {
             case 'circle':

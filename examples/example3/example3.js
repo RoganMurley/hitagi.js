@@ -86,7 +86,8 @@
                     y: 0.6
                 },
                 sheet: true,
-                type: 'sprite'
+                type: 'sprite',
+                z: 1000
             }))
             .attach(new hitagi.components.Collision({
                 height: 73,
@@ -163,6 +164,18 @@
                 id: 'rose',
                 activity: 0.01
             })
+    );
+
+    world.add(
+        new hitagi.Entity()
+            .attach(new hitagi.components.Graphic({
+                color: 0X910E2F,
+                height: levelHeight*2,
+                width: levelWidth*2,
+                relative: false,
+                type: 'rectangle',
+                z: -Infinity
+            }))
     );
 
     // Load assets.

@@ -166,19 +166,32 @@
                         throw new Error('InvalidGraphicType');
                 }
 
-                // Set and proxy alpha.
+                // Set and proxy stuff.
                 graphics[entity.uid].alpha = entity.c.graphic.alpha;
                 proxy(entity.c.graphic, 'alpha', graphics[entity.uid], 'alpha');
 
-                // Set and proxy scale.
                 graphics[entity.uid].scale = entity.c.graphic.scale;
                 proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
+                graphics[entity.uid].z = entity.c.graphic.z;
+                proxy(entity.c.graphic, 'z', graphics[entity.uid], 'z');
 
                 // Look for changes, redrawing if necessary.
                 look(entity.c.graphic, 'color', redraw, entity);
                 look(entity.c.graphic, 'type', redraw, entity);
 
                 stage.addChild(graphics[entity.uid]);
+
+                // Sort by depth.
+                stage.children.sort(function (a,b) {
+                    if (a.z < b.z) {
+                        return -1;
+                    }
+                    if (a.z > b.z) {
+                        return 1;
+                    }
+                    return 0;
+                });
             }
         };
 

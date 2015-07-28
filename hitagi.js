@@ -49075,11 +49075,16 @@ if (!global.cancelAnimationFrame) {
             scale: {
                 x: 1,
                 y: 1
-            }
+            },
+            z: 0
         }, params);
 
         this.id = 'graphic';
-        this.deps = ['position'];
+
+        this.deps = [];
+        if (params.relative) {
+            this.deps.push('position');
+        }
 
         this.alpha = params.alpha;
         this.anchor = params.anchor;
@@ -49087,6 +49092,7 @@ if (!global.cancelAnimationFrame) {
         this.relative = params.relative;
         this.scale = params.scale;
         this.type = params.type;
+        this.z = params.z;
 
         switch (params.type) {
             case 'circle':
@@ -49644,13 +49650,15 @@ global.hitagi = require('./main.js');
                         throw new Error('InvalidGraphicType');
                 }
 
-                // Set and proxy alpha.
+                // Set and proxy stuff.
                 graphics[entity.uid].alpha = entity.c.graphic.alpha;
                 proxy(entity.c.graphic, 'alpha', graphics[entity.uid], 'alpha');
 
-                // Set and proxy scale.
                 graphics[entity.uid].scale = entity.c.graphic.scale;
                 proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
+                graphics[entity.uid].z = entity.c.graphic.z;
+                proxy(entity.c.graphic, 'z', graphics[entity.uid], 'z');
 
                 // Look for changes, redrawing if necessary.
                 look(entity.c.graphic, 'color', redraw, entity);
@@ -49658,7 +49666,16 @@ global.hitagi = require('./main.js');
 
                 stage.addChild(graphics[entity.uid]);
 
-                console.log(graphics[entity.uid]);
+                // Sort by depth.
+                stage.children.sort(function (a,b) {
+                    if (a.z < b.z) {
+                        return -1;
+                    }
+                    if (a.z > b.z) {
+                        return 1;
+                    }
+                    return 0;
+                });
             }
         };
 
