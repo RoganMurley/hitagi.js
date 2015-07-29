@@ -12,6 +12,9 @@
     // Setup world.
     var world = new hitagi.World();
 
+    // Setup rooms.
+    var rooms = new hitagi.Rooms(world);
+
     // Setup controls.
     var controls = new hitagi.Controls();
     controls.bind('m1', 'flap');
@@ -27,6 +30,9 @@
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
 
+    var soundSystem = new hitagi.systems.SoundSystem();
+    world.register(soundSystem);
+
     var GravitySystem = function () {
         this.update = {
             gravity: function (entity, dt) {
@@ -38,19 +44,8 @@
     };
     world.register(new GravitySystem());
 
-    var BirdSystem = function (world, controls, collisionSystem) {
+    var BirdSystem = function (world, rooms, controls, collisionSystem, soundSystem) {
         var that = this;
-        var savedState;
-
-        this.saveState = function () {
-            savedState = world.save();
-        };
-
-        this.loadState = function () {
-            world.clear();
-            world.load(savedState);
-        };
-
         var score = null;
 
         this.build = {
@@ -63,6 +58,7 @@
             bird: function (entity, dt) {
                 if (controls.check('flap', true)) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
+                    soundSystem.play('flap.ogg');
                 }
 
                 var x = entity.c.position.x;
@@ -71,7 +67,8 @@
 
                 test = collisionSystem.collide(entity, 'kill', x, y);
                 if (test.hit) {
-                    that.loadState();
+                    rooms.loadRoom('start');
+                    soundSystem.play('die.ogg');
                     return;
                 }
 
@@ -80,9 +77,10 @@
                     if (test.hit) {
                         if (!test.entity.c.goal.done) {
                             test.entity.c.goal.done = true;
-                            console.log('goal ' + test.entity.c.goal.n + ' reached!');
                             score.c.cleared = test.entity.c.goal.n;
                             score.c.graphic.copy = test.entity.c.goal.n;
+
+                            soundSystem.play('clear.ogg');
                         }
                     }
                 }
@@ -93,18 +91,126 @@
                     entity.c.position.y = 0;
                     entity.c.velocity.yspeed = 0;
                 }
+            }
+        };
+    };
 
-                if (entity.c.position.y > levelHeight) {
-                    that.loadState();
+    var birdSystem = new BirdSystem(
+        world,
+        rooms,
+        controls,
+        collisionSystem,
+        soundSystem
+    );
+    world.register(birdSystem);
+
+    var Goal, Pipe; // PipeSystem needs these entities defined.
+    var PipeSystem = function (world) {
+
+        this.update = {
+            pipe: function (entity) {
+                if (entity.c.position.x < -100) {
+                    world.remove(entity);
+                }
+            },
+
+            pipeGenerator: function (entity, dt) {
+                entity.c.pipeGenerator.timer -= hitagi.utils.delta(1, dt);
+
+                if (entity.c.pipeGenerator.timer <= 0) {
+
+                    entity.c.pipeGenerator.timer = entity.c.pipeGenerator.period;
+                    entity.c.pipeGenerator.created++;
+
+                    var pipeHeight = 793;
+                    var pipeGap = 145;
+                    var minimumTopDistance = 200;
+                    var pipePosition = minimumTopDistance - (Math.random() * pipeHeight/2);
+
+                    world.add(
+                        new Pipe({
+                            y: pipePosition,
+                            yscale: -1
+                        })
+                    );
+                    world.add(
+                        new Pipe({
+                            y: pipePosition + pipeGap + pipeHeight,
+                            yscale: 1
+                        })
+                    );
+                    world.add(new Goal({
+                        width: 60,
+                        height: pipeGap,
+                        y: pipePosition + pipeHeight/2 + pipeGap/2,
+                        n: entity.c.pipeGenerator.created
+                    }));
                 }
             }
         };
     };
-    var birdSystem = new BirdSystem(world, controls, collisionSystem);
-    world.register(birdSystem);
+    world.register(new PipeSystem(world));
 
-    // Pipe stuff.
-    var Pipe = function (params) {
+    var FloorSystem = function () {
+        this.update = {
+            floor: function (entity) {
+                if (entity.c.position.x <= -154) {
+                    entity.c.position.x = 308 * 11;
+                }
+            }
+        };
+    };
+    world.register(new FloorSystem(world));
+
+    // Define entities.
+    var Player = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: params.x,
+                y: params.y
+            }))
+            .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
+            .attach(new hitagi.components.Graphic({
+                type: 'sprite',
+                path: 'flappybird.png'
+            }))
+            .attach({
+                id: 'gravity',
+                magnitude: 0.6,
+                terminal: 12
+            })
+            .attach({
+                id: 'bird',
+                flapSpeed: 10
+            })
+            .attach(new hitagi.components.Collision({
+                height: 18,
+                width: 32
+            }));
+    };
+
+    Goal = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: levelWidth + 200,
+                y: params.y
+            }))
+            .attach(new hitagi.components.Velocity({
+                xspeed: -5,
+                yspeed: 0
+            }))
+            .attach(new hitagi.components.Collision({
+                width: params.width,
+                height: params.height
+            }))
+            .attach({
+                id: 'goal',
+                n: params.n,
+                done: false
+            });
+    };
+
+    Pipe = function (params) {
         var pipe = new hitagi.Entity()
             .attach(new hitagi.components.Position({x: levelWidth + 200, y: params.y}))
             .attach(new hitagi.components.Velocity({xspeed: -5, yspeed: 0}))
@@ -127,148 +233,22 @@
         return pipe;
     };
 
-    var Goal = function (params) {
+    var Background = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: levelWidth + 200,
-                y: params.y
-            }))
-            .attach(new hitagi.components.Velocity({
-                xspeed: -5,
-                yspeed: 0
-            }))
-            .attach(new hitagi.components.Collision({
-                width: params.width,
-                height: params.height
-            }))
-            .attach({
-                id: 'goal',
-                n: params.n,
-                done: false
-            });
-    };
-
-    var PipeSystem = function (world) {
-        this.update = {
-            pipe: function (entity) {
-                if (entity.c.position.x < -100) {
-                    world.remove(entity);
-                }
-            },
-
-            score: function (entity) {
-                // Update timer.
-                entity.c.score.pipeTimer--;
-
-                // Generate pipes if they're ready.
-                if (entity.c.score.pipeTimer <= 0) {
-                    entity.c.score.pipeTimer = entity.c.score.pipeTimerMax;
-
-                    var pipeHeight = 793;
-                    var pipeGap = 120;
-                    var minimumTopDistance = 200;
-                    var offset = Math.random() * (pipeHeight/2) - minimumTopDistance;
-
-                    // Update pipes made count.
-                    entity.c.score.pipesMade++;
-
-                    world.add(
-                        new Pipe({
-                            y: -offset,
-                            yscale: -1
-                        })
-                    );
-                    world.add(
-                        new Pipe({
-                            y: pipeHeight + pipeGap - offset,
-                            yscale: 1
-                        })
-                    );
-                    world.add(new Goal({
-                        width: 60,
-                        height: pipeGap,
-                        y: pipeHeight/2 + pipeGap/2 - offset,
-                        n: entity.c.score.pipesMade
-                    }));
-                }
-            }
-        };
-    };
-    world.register(new PipeSystem(world));
-
-    var FloorSystem = function () {
-        this.update = {
-            floor: function (entity) {
-                if (entity.c.position.x <= -154) {
-                    entity.c.position.x = 308 * 11;
-                }
-            }
-        };
-    };
-    world.register(new FloorSystem(world));
-
-    // Add entities.
-    var player = world.add(
-        new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 320, y: levelHeight/2}))
-            .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
-            .attach(new hitagi.components.Graphic({
-                type: 'sprite',
-                path: 'flappybird.png'
-            }))
-            .attach({
-                id: 'gravity',
-                magnitude: 0.6,
-                terminal: 12
-            })
-            .attach({
-                id: 'bird',
-                flapSpeed: 10
-            })
-            .attach(new hitagi.components.Collision({
-                height: 18,
-                width: 32
-            }))
-    );
-
-    var background = world.add(
-        new hitagi.Entity()
             .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
-                color: 0X139BC9,
+                color: params.color,
                 height: levelHeight,
                 width: levelWidth,
                 z: -100
-            }))
-    );
+            }));
+    };
 
-    var score = world.add(
-        new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 25, y: 10}))
-            .attach(new hitagi.components.Graphic({
-                type: 'text',
-                copy: '0',
-                options: {
-                    font: '128px Arial',
-                    fill: 'white'
-                },
-                z: Infinity
-            }))
-            .attach({
-                id: 'score',
-                pipeTimer: 0,
-                pipeTimerMax: 85,
-                pipesMade: 0,
-                cleared: 0
-            })
-    );
-
-    for (var i = 0; i < 12; i++) {
-        world.add(
-            new hitagi.Entity()
+    var Floor = function (params) {
+        return new hitagi.Entity()
                 .attach(new hitagi.components.Position({
-                    x: 308 * i,
+                    x: params.x,
                     y: levelHeight - 108/2
                 }))
                 .attach(new hitagi.components.Velocity({
@@ -285,11 +265,58 @@
                     width: 308
                 }))
                 .attach({id: 'floor'})
-                .attach({id: 'kill'})
-        );
+                .attach({id: 'kill'});
+    };
+
+    var Score = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({x: 25, y: 10}))
+            .attach(new hitagi.components.Graphic({
+                type: 'text',
+                copy: '0',
+                options: {
+                    font: '128px Arial',
+                    fill: 'white'
+                },
+                z: Infinity
+            }))
+            .attach({
+                id: 'score',
+                cleared: 0
+            });
+    };
+
+    var PipeGenerator = function (params) {
+        return new hitagi.Entity()
+            .attach({
+                id: 'pipeGenerator',
+                created: 0,
+                period: params.period,
+                timer: 0
+            });
+    };
+
+    var startRoomEntities = [
+        new Score(),
+        new Background({
+            color: 0X139BC9
+        }),
+        new Player({
+            x: 320,
+            y: levelHeight/2
+        }),
+        new PipeGenerator({
+            period: 85
+        })
+    ];
+
+    for (var i = 0; i < 12; i++) {
+        startRoomEntities.push(new Floor({x: i * 308}));
     }
-    // Save a clean state for reloading the game.
-    birdSystem.saveState();
+
+    // Create starting room.
+    rooms.saveRoom('start', startRoomEntities);
+    rooms.loadRoom('start');
 
     // Setup game loop.
     requestAnimationFrame(animate);

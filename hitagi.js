@@ -49161,7 +49161,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Graphic;
 } ());
 
-},{"../utils":145,"lodash":10}],135:[function(require,module,exports){
+},{"../utils":146,"lodash":10}],135:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49372,6 +49372,7 @@ if (!global.cancelAnimationFrame) {
         'Entity': require('./entity.js'),
         'World': require('./world.js'),
         'Controls': require('./controls.js'),
+        'Rooms': require('./rooms.js'),
         'utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
@@ -49391,12 +49392,35 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/velocity.js":136,"./controls.js":137,"./entity.js":138,"./systems/collisionSystem.js":141,"./systems/pixiRenderSystem.js":142,"./systems/soundSystem.js":143,"./systems/velocitySystem.js":144,"./utils.js":145,"./world.js":146}],140:[function(require,module,exports){
+},{"./components/collision.js":133,"./components/graphic.js":134,"./components/position.js":135,"./components/velocity.js":136,"./controls.js":137,"./entity.js":138,"./rooms.js":141,"./systems/collisionSystem.js":142,"./systems/pixiRenderSystem.js":143,"./systems/soundSystem.js":144,"./systems/velocitySystem.js":145,"./utils.js":146,"./world.js":147}],140:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./main.js":139}],141:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var _ = require('lodash');
+
+    var Rooms = function (world) {
+        var rooms = {};
+
+        this.saveRoom = function (roomName, entities) {
+            var componentBatches = _.pluck(entities, 'c');
+            rooms[roomName] = componentBatches;
+        };
+
+        this.loadRoom = function (roomName) {
+            world.clear();
+            world.load(rooms[roomName]);
+        };
+    };
+
+    module.exports = Rooms;
+} ());
+
+},{"lodash":10}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49486,7 +49510,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":10}],142:[function(require,module,exports){
+},{"lodash":10}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49754,7 +49778,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":145,"lodash":10,"pixi.js":115}],143:[function(require,module,exports){
+},{"../utils.js":146,"lodash":10,"pixi.js":115}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49782,7 +49806,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":10}],144:[function(require,module,exports){
+},{"howler":8,"lodash":10}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49801,7 +49825,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":145}],145:[function(require,module,exports){
+},{"../utils.js":146}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -49872,7 +49896,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{"lodash":10}],146:[function(require,module,exports){
+},{"lodash":10}],147:[function(require,module,exports){
 (function () {
     'use strict';
 

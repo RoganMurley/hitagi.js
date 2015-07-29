@@ -5,6 +5,7 @@
         'Entity': require('./entity.js'),
         'World': require('./world.js'),
         'Controls': require('./controls.js'),
+        'Rooms': require('./rooms.js'),
         'utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
