@@ -4,6 +4,11 @@
     var levelWidth = window.innerWidth;
     var levelHeight = window.innerHeight;
 
+    // Keep the game window sensible dimensions.
+    if (levelHeight < 800) {
+        levelHeight = 800;
+    }
+
     // Setup pixi.
     var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
@@ -124,8 +129,8 @@
 
                     var pipeHeight = 793;
                     var pipeGap = 145;
-                    var minimumTopDistance = 200;
-                    var pipePosition = minimumTopDistance - (Math.random() * pipeHeight/2);
+                    var minimumEdgeDistance = levelHeight * 0.2;
+                    var pipePosition = minimumEdgeDistance - (Math.random() * pipeHeight/2);
 
                     world.add(
                         new Pipe({
@@ -302,14 +307,13 @@
             color: 0X139BC9
         }),
         new Player({
-            x: 320,
-            y: levelHeight/2
+            x: levelWidth * 0.15,
+            y: levelHeight / 2
         }),
         new PipeGenerator({
             period: 85
         })
     ];
-
     for (var i = 0; i < 12; i++) {
         startRoomEntities.push(new Floor({x: i * 308}));
     }
