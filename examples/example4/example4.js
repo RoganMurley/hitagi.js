@@ -38,7 +38,7 @@
 
     var soundSystem = new hitagi.systems.SoundSystem();
     world.register(soundSystem);
-    soundSystem.volume = 0;
+    soundSystem.volume = 1;
 
     var GravitySystem = function () {
         this.update = {
@@ -358,6 +358,26 @@
             });
     };
 
+    var Start = function (params) {
+        return new hitagi.Entity()
+            .attach({
+                id: 'start',
+                started: false
+            })
+            .attach(new hitagi.components.Position({
+                x: params.x,
+                y: params.y
+            }))
+            .attach(new hitagi.components.Graphic({
+                type: 'text',
+                copy: params.copy,
+                options: {
+                    font: '24px Monospace',
+                    fill: 'white'
+                },
+            }));
+    };
+
     // Create starting room.
     var startRoomEntities = [
         new Score(),
@@ -371,19 +391,11 @@
         new PipeGenerator({
             period: Infinity
         }),
-        new hitagi.Entity()
-            .attach({
-                id: 'start',
-                started: false
-            })
-            .attach(new hitagi.components.Position({
-                x: levelWidth / 2,
-                y: levelHeight / 2
-            }))
-            .attach(new hitagi.components.Graphic({
-                type: 'text',
-                copy: 'Click to flap!'
-            }))
+        new Start({
+            copy: 'CLICK TO FLAP',
+            x: levelWidth * 0.15 - 82,
+            y: levelHeight / 2 + 64
+        })
     ];
     for (var i = 0; i < 12; i++) {
         startRoomEntities.push(new Floor({x: i * 308}));
