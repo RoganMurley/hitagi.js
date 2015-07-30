@@ -62,40 +62,44 @@
 
         this.update = {
             bird: function (entity, dt) {
+                // Flap wings if clicking,
                 if (controls.check('flap', true)) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
                     soundSystem.play('flap.ogg');
                 }
 
-                var x = entity.c.position.x;
-                var y = entity.c.position.y;
-                var test;
-
-                test = collisionSystem.collide(entity, 'kill', x, y);
-                if (test.hit) {
-                    rooms.loadRoom('start');
-                    soundSystem.play('die.ogg');
-                    return;
-                }
-
+                // Score if we hit a goal.
                 if (score) {
                     test = collisionSystem.collide(entity, 'goal', x, y);
+
                     if (test.hit) {
                         if (!test.entity.c.goal.done) {
                             test.entity.c.goal.done = true;
                             score.c.cleared = test.entity.c.goal.n;
                             score.c.graphic.copy = test.entity.c.goal.n;
-
                             soundSystem.play('clear.ogg');
                         }
                     }
                 }
 
+                // Rotate bird depending on velocity.
                 entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
 
+                // Stop bird from leaving the top of the screen.
                 if (entity.c.position.y < 0) {
                     entity.c.position.y = 0;
                     entity.c.velocity.yspeed = 0;
+                }
+
+                // Test for hitting something which kills you.
+                var x = entity.c.position.x;
+                var y = entity.c.position.y;
+
+                var test = collisionSystem.collide(entity, 'kill', x, y);
+                if (test.hit) {
+                    rooms.loadRoom('start');
+                    soundSystem.play('die.ogg');
+                    return;
                 }
             }
         };
@@ -112,7 +116,6 @@
 
     var Goal, Pipe; // PipeSystem needs these entities defined.
     var PipeSystem = function (world) {
-
         this.update = {
             pipe: function (entity) {
                 if (entity.c.position.x < -100) {
@@ -160,6 +163,7 @@
     var FloorSystem = function () {
         this.update = {
             floor: function (entity) {
+                // Wrap the floor horizontally.
                 if (entity.c.position.x <= -154) {
                     entity.c.position.x = 308 * 11;
                 }
@@ -302,6 +306,7 @@
             });
     };
 
+    // Create starting room.
     var startRoomEntities = [
         new Score(),
         new Background({
@@ -319,7 +324,6 @@
         startRoomEntities.push(new Floor({x: i * 308}));
     }
 
-    // Create starting room.
     rooms.saveRoom('start', startRoomEntities);
     rooms.loadRoom('start');
 
