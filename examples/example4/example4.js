@@ -37,6 +37,7 @@
 
     var soundSystem = new hitagi.systems.SoundSystem();
     world.register(soundSystem);
+    soundSystem.volume = 0;
 
     var GravitySystem = function () {
         this.update = {
