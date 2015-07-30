@@ -52,7 +52,7 @@
     };
     world.register(new GravitySystem());
 
-    var BirdSystem = function (world, rooms, controls, collisionSystem, soundSystem) {
+    var BirdSystem = function (controls, collisionSystem, soundSystem) {
         var that = this;
         var score = null;
 
@@ -70,9 +70,21 @@
                     soundSystem.play('flap.ogg');
                 }
 
+                // Stop bird from leaving the top of the screen.
+                if (entity.c.position.y < 0) {
+                    entity.c.position.y = 0;
+                    entity.c.velocity.yspeed = 0;
+                }
+
+                // Rotate bird sprite depending on velocity.
+                entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
+
                 // Score if we hit a goal.
                 if (score) {
-                    test = collisionSystem.collide(entity, 'goal', x, y);
+                    var x = entity.c.position.x;
+                    var y = entity.c.position.y;
+
+                    var test = collisionSystem.collide(entity, 'goal', x, y);
 
                     if (test.hit) {
                         if (!test.entity.c.goal.done) {
@@ -83,16 +95,14 @@
                         }
                     }
                 }
+            }
+        };
+    };
+    world.register(new BirdSystem(controls, collisionSystem, soundSystem));
 
-                // Rotate bird depending on velocity.
-                entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
-
-                // Stop bird from leaving the top of the screen.
-                if (entity.c.position.y < 0) {
-                    entity.c.position.y = 0;
-                    entity.c.velocity.yspeed = 0;
-                }
-
+    var DeathSystem = function (rooms, collisionSystem, soundSystem) {
+        this.update = {
+            bird: function (entity, dt) {
                 // Test for hitting something which kills you.
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
@@ -106,15 +116,7 @@
             }
         };
     };
-
-    var birdSystem = new BirdSystem(
-        world,
-        rooms,
-        controls,
-        collisionSystem,
-        soundSystem
-    );
-    world.register(birdSystem);
+    world.register(new DeathSystem(rooms, collisionSystem, soundSystem));
 
     var Goal, Pipe; // PipeSystem needs these entities defined.
     var PipeSystem = function (world) {
