@@ -23,6 +23,7 @@
     // Setup controls.
     var controls = new hitagi.Controls();
     controls.bind('m1', 'flap');
+    controls.bind('m1', 'start');
 
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
@@ -42,6 +43,7 @@
     var GravitySystem = function () {
         this.update = {
             gravity: function (entity, dt) {
+                // Accelerate entity until it reaches terminal velocity.
                 if (entity.c.velocity.yspeed < entity.c.gravity.terminal) {
                     entity.c.velocity.yspeed += hitagi.utils.delta(entity.c.gravity.magnitude, dt);
                 }
@@ -172,6 +174,53 @@
     };
     world.register(new FloorSystem(world));
 
+    var StartSystem = function (controls) {
+        var bird = null,
+            generator = null,
+            start = null;
+
+        this.build = {
+            bird: function (entity) {
+                bird = entity;
+            },
+            pipeGenerator: function (entity) {
+                generator = entity;
+            },
+            start: function (entity) {
+                start = entity;
+            }
+        };
+
+        this.destroy = {
+            bird: function () {
+                bird = null;
+            },
+            pipeGenerator: function () {
+                generator = null;
+            },
+            start: function () {
+                start = null;
+            }
+        };
+
+        this.tickStart = function () {
+            if (!start.c.started) {
+                if (controls.check('start')) {
+                    // Start pipe generator.
+                    generator.c.pipeGenerator.timer = 85;
+                    generator.c.pipeGenerator.period = 85;
+
+                    // Start gravity.
+                    bird.c.gravity.magnitude = 0.6;
+
+                    start.c.started = true;
+                }
+            }
+        };
+    };
+    world.register(new StartSystem(controls));
+
+
     // Define entities.
     var Player = function (params) {
         return new hitagi.Entity()
@@ -186,7 +235,7 @@
             }))
             .attach({
                 id: 'gravity',
-                magnitude: 0.6,
+                magnitude: 0,
                 terminal: 12
             })
             .attach({
@@ -302,7 +351,7 @@
                 id: 'pipeGenerator',
                 created: 0,
                 period: params.period,
-                timer: 0
+                timer: params.period
             });
     };
 
@@ -317,8 +366,13 @@
             y: levelHeight / 2
         }),
         new PipeGenerator({
-            period: 85
-        })
+            period: Infinity
+        }),
+        new hitagi.Entity()
+            .attach({
+                id: 'start',
+                started: false
+            })
     ];
     for (var i = 0; i < 12; i++) {
         startRoomEntities.push(new Floor({x: i * 308}));
