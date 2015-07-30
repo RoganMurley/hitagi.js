@@ -100,6 +100,7 @@
     };
     world.register(new BirdSystem(controls, collisionSystem, soundSystem));
 
+    var Corpse; // Entity defined later.
     var DeathSystem = function (world, rooms, collisionSystem, soundSystem) {
         var scrollers = {};
         var generator = null;
@@ -112,6 +113,10 @@
             // Stop generating pipes.
             generator.c.pipeGenerator.period = Infinity;
             generator.c.pipeGenerator.timer = Infinity;
+        };
+
+        var restartGame = function () {
+            rooms.loadRoom('start');
         };
 
         this.build = {
@@ -133,7 +138,7 @@
         };
 
         this.update = {
-            bird: function (entity, dt) {
+            bird: function (entity) {
                 // Test for hitting something which kills you.
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
@@ -141,10 +146,30 @@
                 var test = collisionSystem.collide(entity, 'kill', x, y);
                 if (test.hit) {
                     stopGame();
+
                     soundSystem.play('die.ogg');
-                    //rooms.loadRoom('start');
+                    setTimeout(function () {
+                        soundSystem.play('fail.ogg');
+                    }, 500);
+
+                    // Add corpse.
                     world.remove(entity);
+                    world.add(new Corpse({
+                        x: x,
+                        y: y,
+                        xspeed: 2,
+                        yspeed: -10
+                    }));
                     return;
+                }
+            },
+            corpse: function (entity) {
+                // Rotate corpse.
+                entity.c.graphic.rotation += 0.1;
+
+                // When the corpse leaves the screen, restart.
+                if (entity.c.position.y > levelHeight) {
+                    restartGame();
                 }
             }
         };
@@ -286,6 +311,30 @@
                 height: 18,
                 width: 32
             }));
+    };
+
+    Corpse = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: params.x,
+                y: params.y
+            }))
+            .attach(new hitagi.components.Velocity({
+                xspeed: params.xspeed,
+                yspeed: params.yspeed
+            }))
+            .attach(new hitagi.components.Graphic({
+                type: 'sprite',
+                path: 'flappybird.png',
+                z: 10000
+            }))
+            .attach({
+                id: 'gravity',
+                magnitude: 1,
+                terminal: Infinity
+            }).attach({
+                id: 'corpse'
+            });
     };
 
     Goal = function (params) {
