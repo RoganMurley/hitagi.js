@@ -206,6 +206,9 @@
         this.tickStart = function () {
             if (!start.c.started) {
                 if (controls.check('start')) {
+                    // Hide text.
+                    start.c.graphic.visible = false;
+
                     // Start pipe generator.
                     generator.c.pipeGenerator.timer = 85;
                     generator.c.pipeGenerator.period = 85;
@@ -373,6 +376,14 @@
                 id: 'start',
                 started: false
             })
+            .attach(new hitagi.components.Position({
+                x: levelWidth / 2,
+                y: levelHeight / 2
+            }))
+            .attach(new hitagi.components.Graphic({
+                type: 'text',
+                copy: 'Click to flap!'
+            }))
     ];
     for (var i = 0; i < 12; i++) {
         startRoomEntities.push(new Floor({x: i * 308}));

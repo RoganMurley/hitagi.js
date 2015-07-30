@@ -19,6 +19,7 @@
                 x: 1,
                 y: 1
             },
+            visible: true,
             z: 0
         }, params);
 
@@ -35,6 +36,7 @@
         this.relative = params.relative;
         this.scale = params.scale;
         this.type = params.type;
+        this.visible = params.visible;
         this.z = params.z;
 
         switch (params.type) {
@@ -68,14 +70,12 @@
 
             case 'sprite':
                 params = defaultParams({
-                    visible: true,
                     rotation: 0,
                     sheet: false
                 }, params);
 
                 this.path = params.path; // Can be an array of paths to make an animation.
 
-                this.visible = params.visible;
                 this.rotation = params.rotation; // In radians
                 this.sheet = params.sheet; // Set to true if we're loading a spritesheet.
 

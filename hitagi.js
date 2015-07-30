@@ -49076,6 +49076,7 @@ if (!global.cancelAnimationFrame) {
                 x: 1,
                 y: 1
             },
+            visible: true,
             z: 0
         }, params);
 
@@ -49092,6 +49093,7 @@ if (!global.cancelAnimationFrame) {
         this.relative = params.relative;
         this.scale = params.scale;
         this.type = params.type;
+        this.visible = params.visible;
         this.z = params.z;
 
         switch (params.type) {
@@ -49125,14 +49127,12 @@ if (!global.cancelAnimationFrame) {
 
             case 'sprite':
                 params = defaultParams({
-                    visible: true,
                     rotation: 0,
                     sheet: false
                 }, params);
 
                 this.path = params.path; // Can be an array of paths to make an animation.
 
-                this.visible = params.visible;
                 this.rotation = params.rotation; // In radians
                 this.sheet = params.sheet; // Set to true if we're loading a spritesheet.
 
@@ -49658,10 +49658,6 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid].anchor = entity.c.graphic.anchor;
                         proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
 
-                        // Set and proxy visibility.
-                        graphics[entity.uid].visible = entity.c.graphic.visible;
-                        proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');
-
                         // Set and proxy rotation.
                         graphics[entity.uid].rotation = entity.c.graphic.rotation;
                         proxy( entity.c.graphic, 'rotation', graphics[entity.uid], 'rotation');
@@ -49700,6 +49696,9 @@ global.hitagi = require('./main.js');
 
                 graphics[entity.uid].scale = entity.c.graphic.scale;
                 proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
+                graphics[entity.uid].visible = entity.c.graphic.visible;
+                proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');
 
                 graphics[entity.uid].z = entity.c.graphic.z;
                 proxy(entity.c.graphic, 'z', graphics[entity.uid], 'z');

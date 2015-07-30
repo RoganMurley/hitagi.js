@@ -145,10 +145,6 @@
                         graphics[entity.uid].anchor = entity.c.graphic.anchor;
                         proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
 
-                        // Set and proxy visibility.
-                        graphics[entity.uid].visible = entity.c.graphic.visible;
-                        proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');
-
                         // Set and proxy rotation.
                         graphics[entity.uid].rotation = entity.c.graphic.rotation;
                         proxy( entity.c.graphic, 'rotation', graphics[entity.uid], 'rotation');
@@ -187,6 +183,9 @@
 
                 graphics[entity.uid].scale = entity.c.graphic.scale;
                 proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
+                graphics[entity.uid].visible = entity.c.graphic.visible;
+                proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');
 
                 graphics[entity.uid].z = entity.c.graphic.z;
                 proxy(entity.c.graphic, 'z', graphics[entity.uid], 'z');
