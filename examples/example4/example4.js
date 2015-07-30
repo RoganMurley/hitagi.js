@@ -100,7 +100,38 @@
     };
     world.register(new BirdSystem(controls, collisionSystem, soundSystem));
 
-    var DeathSystem = function (rooms, collisionSystem, soundSystem) {
+    var DeathSystem = function (world, rooms, collisionSystem, soundSystem) {
+        var scrollers = {};
+        var generator = null;
+
+        var stopGame = function () {
+            // Stop screen scroll.
+            _.each(scrollers, function (scroller) {
+                scroller.c.scroll.speed = 0;
+            });
+            // Stop generating pipes.
+            generator.c.pipeGenerator.period = Infinity;
+            generator.c.pipeGenerator.timer = Infinity;
+        };
+
+        this.build = {
+            pipeGenerator: function (entity) {
+                generator = entity;
+            },
+            scroll: function (entity) {
+                scrollers[entity.uid] = entity;
+            }
+        };
+
+        this.destroy = {
+            pipeGenerator: function (entity) {
+                generator = null;
+            },
+            scroll: function (entity) {
+                delete scrollers[entity.uid];
+            }
+        };
+
         this.update = {
             bird: function (entity, dt) {
                 // Test for hitting something which kills you.
@@ -109,14 +140,16 @@
 
                 var test = collisionSystem.collide(entity, 'kill', x, y);
                 if (test.hit) {
-                    rooms.loadRoom('start');
+                    stopGame();
                     soundSystem.play('die.ogg');
+                    //rooms.loadRoom('start');
+                    world.remove(entity);
                     return;
                 }
             }
         };
     };
-    world.register(new DeathSystem(rooms, collisionSystem, soundSystem));
+    world.register(new DeathSystem(world, rooms, collisionSystem, soundSystem));
 
     var Goal, Pipe; // PipeSystem needs these entities defined.
     var PipeSystem = function (world) {
@@ -164,17 +197,20 @@
     };
     world.register(new PipeSystem(world));
 
-    var FloorSystem = function () {
+    var ScrollSystem = function () {
         this.update = {
             floor: function (entity) {
                 // Wrap the floor horizontally.
                 if (entity.c.position.x <= -154) {
                     entity.c.position.x = 308 * 11;
                 }
+            },
+            scroll: function (entity) {
+                entity.c.velocity.xspeed = entity.c.scroll.speed;
             }
         };
     };
-    world.register(new FloorSystem(world));
+    world.register(new ScrollSystem(world));
 
     var StartSystem = function (controls) {
         var bird = null,
@@ -225,7 +261,6 @@
     };
     world.register(new StartSystem(controls));
 
-
     // Define entities.
     var Player = function (params) {
         return new hitagi.Entity()
@@ -260,9 +295,13 @@
                 y: params.y
             }))
             .attach(new hitagi.components.Velocity({
-                xspeed: -5,
+                xspeed: 0,
                 yspeed: 0
             }))
+            .attach({
+                id: 'scroll',
+                speed: -5
+            })
             .attach(new hitagi.components.Collision({
                 width: params.width,
                 height: params.height
@@ -277,7 +316,11 @@
     Pipe = function (params) {
         var pipe = new hitagi.Entity()
             .attach(new hitagi.components.Position({x: levelWidth + 200, y: params.y}))
-            .attach(new hitagi.components.Velocity({xspeed: -5, yspeed: 0}))
+            .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
+            .attach({
+                id: 'scroll',
+                speed: -5
+            })
             .attach(new hitagi.components.Graphic({
                 type:'sprite',
                 path: 'pipe.png',
@@ -316,9 +359,13 @@
                     y: levelHeight - 108/2
                 }))
                 .attach(new hitagi.components.Velocity({
-                    xspeed: -5,
+                    xspeed: 0,
                     yspeed: 0
                 }))
+                .attach({
+                    id: 'scroll',
+                    speed: -5
+                })
                 .attach(new hitagi.components.Graphic({
                     type: 'sprite',
                     path: 'floor.png',
