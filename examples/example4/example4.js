@@ -28,7 +28,14 @@
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
-    renderSystem.load(['flappybird.png', 'pipe.png', 'floor.png', 'FlappyFont.xml'], function () {
+    renderSystem.load([
+        'bird_0.png',
+        'bird_1.png',
+        'bird_2.png',
+        'pipe.png',
+        'floor.png',
+        'FlappyFont.xml'
+    ], function () {
 
     var velocitySystem = new hitagi.systems.VelocitySystem();
     world.register(velocitySystem);
@@ -71,6 +78,7 @@
                 // Flap wings if clicking,
                 if (controls.check('flap', true)) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
+                    entity.c.graphic.currentFrame = 0;
                     soundSystem.play('flap.ogg');
                 }
 
@@ -302,6 +310,9 @@
                     // Start gravity.
                     bird.c.gravity.magnitude = 0.6;
 
+                    // Start flapping.
+                    bird.c.graphic.loop = false;
+
                     start.c.started = true;
                 }
             }
@@ -319,7 +330,16 @@
             .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
             .attach(new hitagi.components.Graphic({
                 type: 'sprite',
-                path: 'flappybird.png'
+                animationSpeed: 0.12,
+                path: [
+                    'bird_0.png',
+                    'bird_1.png',
+                    'bird_2.png'
+                ],
+                scale: {
+                    x: 0.45,
+                    y: 0.45
+                }
             }))
             .attach({
                 id: 'gravity',
@@ -348,7 +368,11 @@
             }))
             .attach(new hitagi.components.Graphic({
                 type: 'sprite',
-                path: 'flappybird.png',
+                path: 'bird_0.png',
+                scale: {
+                    x: 0.45,
+                    y: 0.45
+                },
                 z: 10000
             }))
             .attach({
@@ -478,6 +502,7 @@
                 bitmapFont: true,
                 copy: 'BEST: ' + params.cleared,
                 style: {
+                    align: 'right',
                     font: '64px VT323',
                     fill: 'white'
                 },
@@ -539,9 +564,9 @@
             y: levelHeight / 2 + 64
         })
     ];
-    for (var i = 0; i < 12; i++) {
+    _.times(12, function (i) {
         startRoomEntities.push(new Floor({x: i * 308}));
-    }
+    });
 
     rooms.saveRoom('start', startRoomEntities);
     rooms.loadRoom('start');
