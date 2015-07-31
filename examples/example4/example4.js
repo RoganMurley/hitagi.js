@@ -25,28 +25,7 @@
     controls.bind('m1', 'flap');
     controls.bind('m1', 'start');
 
-    // Register systems.
-    var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
-    world.register(renderSystem);
-    renderSystem.load([
-        'bird_0.png',
-        'bird_1.png',
-        'bird_2.png',
-        'pipe.png',
-        'floor.png',
-        'FlappyFont.xml'
-    ], function () {
-
-    var velocitySystem = new hitagi.systems.VelocitySystem();
-    world.register(velocitySystem);
-
-    var collisionSystem = new hitagi.systems.CollisionSystem();
-    world.register(collisionSystem);
-
-    var soundSystem = new hitagi.systems.SoundSystem();
-    world.register(soundSystem);
-    soundSystem.volume = 1;
-
+    // Define systems.
     var GravitySystem = function () {
         this.update = {
             gravity: function (entity, dt) {
@@ -59,8 +38,6 @@
     };
 
     var BirdSystem = function (controls, collisionSystem, soundSystem, scoreSystem) {
-        var that = this;
-
         this.update = {
             bird: function (entity, dt) {
                 // Flap wings if clicking,
@@ -98,6 +75,7 @@
 
         var best = null,
             score = null;
+
         var BEST_SCORE_KEY = 'hitagiFlappyBirdExampleBestScore';
 
         this.build = {
@@ -153,7 +131,6 @@
         };
     };
 
-    var Corpse; // Entity defined later.
     var DeathSystem = function (world, rooms, collisionSystem, soundSystem, scoreSystem) {
         var scrollers = {};
         var generator = null;
@@ -172,7 +149,7 @@
             scoreSystem.saveBestScore();
             rooms.loadRoom('start');
             world.add(
-                Best({cleared: scoreSystem.loadBestScore()})
+                new Best({cleared: scoreSystem.loadBestScore()})
             );
         };
 
@@ -220,9 +197,9 @@
                     return;
                 }
             },
-            corpse: function (entity) {
+            corpse: function (entity, dt) {
                 // Rotate corpse.
-                entity.c.graphic.rotation += 0.1;
+                entity.c.graphic.rotation += hitagi.utils.delta(0.1, dt);
 
                 // When the corpse leaves the screen, restart.
                 if (entity.c.position.y > levelHeight) {
@@ -232,7 +209,6 @@
         };
     };
 
-    var Goal, Pipe; // PipeSystem needs these entities defined.
     var PipeGeneratorSystem = function (world) {
         this.update = {
             pipeGenerator: function (entity, dt) {
@@ -341,12 +317,22 @@
         };
     };
 
+    // Register systems.
+    var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
+    world.register(renderSystem);
+
+    world.register(new hitagi.systems.VelocitySystem());
+
+    var collisionSystem = new hitagi.systems.CollisionSystem();
+    world.register(collisionSystem);
+
+    var soundSystem = new hitagi.systems.SoundSystem();
+    world.register(soundSystem);
+
     var scoreSystem = new ScoreSystem(soundSystem);
     world.register(scoreSystem);
 
     world.register(new BirdSystem(controls, collisionSystem, soundSystem, scoreSystem));
-
-
     world.register(new GravitySystem());
     world.register(new DeathSystem(world, rooms, collisionSystem, soundSystem, scoreSystem));
     world.register(new PipeGeneratorSystem(world));
@@ -389,7 +375,7 @@
             }));
     };
 
-    Corpse = function (params) {
+    var Corpse = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({
                 x: params.x,
@@ -417,7 +403,7 @@
             });
     };
 
-    Goal = function (params) {
+    var Goal = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({
                 x: levelWidth + 200,
@@ -442,7 +428,7 @@
             });
     };
 
-    Pipe = function (params) {
+    var Pipe = function (params) {
         var pipe = new hitagi.Entity()
             .attach(new hitagi.components.Position({x: levelWidth + 200, y: params.y}))
             .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
@@ -578,49 +564,60 @@
             }));
     };
 
-    // Create starting room.
-    var startRoomEntities = [
-        new Score(),
-        new Background({
-            color: 0X139BC9
-        }),
-        new Player({
-            x: levelWidth * 0.15,
-            y: levelHeight / 2
-        }),
-        new PipeGenerator({
-            period: Infinity
-        }),
-        new Start({
-            copy: 'CLICK TO FLAP',
-            x: levelWidth * 0.15 - 118,
-            y: levelHeight / 2 + 64
-        })
-    ];
-    _.times(12, function (i) {
-        startRoomEntities.push(new Floor({x: i * 308}));
-    });
+    // Load assets, then run game.
+    renderSystem.load([
+        'bird_0.png',
+        'bird_1.png',
+        'bird_2.png',
+        'pipe.png',
+        'floor.png',
+        'FlappyFont.xml'
+    ], main);
 
-    rooms.saveRoom('start', startRoomEntities);
-    rooms.loadRoom('start');
+    function main () {
+        // Create starting room.
+        var startRoomEntities = [
+            new Score(),
+            new Background({
+                color: 0X139BC9
+            }),
+            new Player({
+                x: levelWidth * 0.15,
+                y: levelHeight / 2
+            }),
+            new PipeGenerator({
+                period: Infinity
+            }),
+            new Start({
+                copy: 'CLICK TO FLAP',
+                x: levelWidth * 0.15 - 118,
+                y: levelHeight / 2 + 64
+            })
+        ];
+        _.times(12, function (i) {
+            startRoomEntities.push(new Floor({x: i * 308}));
+        });
 
-    // Load best score.
-    var bestScore = scoreSystem.loadBestScore();
-    world.add(new Best({cleared: bestScore}));
+        rooms.saveRoom('start', startRoomEntities);
+        rooms.loadRoom('start');
 
-    // Setup game loop.
-    requestAnimationFrame(animate);
+        // Load best score.
+        var bestScore = scoreSystem.loadBestScore();
+        world.add(new Best({cleared: bestScore}));
 
-    function animate() {
-        // Update the world.
-        world.tick(1000);
-
-        // Render the world.
-        renderer.render(stage);
-
-        // Next frame.
+        // Setup game loop.
         requestAnimationFrame(animate);
-    }
-});
+
+        function animate() {
+            // Update the world.
+            world.tick(1000);
+
+            // Render the world.
+            renderer.render(stage);
+
+            // Next frame.
+            requestAnimationFrame(animate);
+        }
+}
 
 } ());
