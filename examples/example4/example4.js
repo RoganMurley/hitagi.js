@@ -28,7 +28,7 @@
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
-    renderSystem.load(['flappybird.png', 'pipe.png', 'floor.png'], function () {
+    renderSystem.load(['flappybird.png', 'pipe.png', 'floor.png', 'FlappyFont.xml'], function () {
 
     var velocitySystem = new hitagi.systems.VelocitySystem();
     world.register(velocitySystem);
@@ -90,7 +90,7 @@
                         if (!test.entity.c.goal.done) {
                             test.entity.c.goal.done = true;
                             score.c.cleared = test.entity.c.goal.n;
-                            score.c.graphic.copy = test.entity.c.goal.n;
+                            score.c.graphic.copy = 'SCORE: ' + test.entity.c.goal.n;
                             soundSystem.play('clear.ogg');
                         }
                     }
@@ -429,12 +429,13 @@
 
     var Score = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 25, y: 10}))
+            .attach(new hitagi.components.Position({x: 25, y: 0}))
             .attach(new hitagi.components.Graphic({
                 type: 'text',
-                copy: '0',
+                bitmapFont: true,
+                copy: 'SCORE: 0',
                 style: {
-                    font: '128px Arial',
+                    font: '64px VT323',
                     fill: 'white'
                 },
                 z: Infinity
@@ -467,9 +468,10 @@
             }))
             .attach(new hitagi.components.Graphic({
                 type: 'text',
+                bitmapFont: true,
                 copy: params.copy,
                 style: {
-                    font: '24px Monospace',
+                    font: '48px VT323',
                     fill: 'white'
                 },
             }));
@@ -490,7 +492,7 @@
         }),
         new Start({
             copy: 'CLICK TO FLAP',
-            x: levelWidth * 0.15 - 82,
+            x: levelWidth * 0.15 - 118,
             y: levelHeight / 2 + 64
         })
     ];

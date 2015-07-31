@@ -49151,6 +49151,10 @@ if (!global.cancelAnimationFrame) {
                 break;
 
             case 'text':
+                params = defaultParams({
+                    bitmapFont: false
+                }, params);
+                this.bitmapFont = params.bitmapFont;
                 this.copy = params.copy;
                 this.style = params.style;
                 break;
@@ -49687,10 +49691,17 @@ global.hitagi = require('./main.js');
                         break;
 
                     case 'text':
-                        graphics[entity.uid] = new pixi.Text(
-                            entity.c.graphic.copy,
-                            entity.c.graphic.style
-                        );
+                        if (entity.c.graphic.bitmapFont) {
+                            graphics[entity.uid] = new pixi.extras.BitmapText(
+                                entity.c.graphic.copy,
+                                entity.c.graphic.style
+                            );
+                        } else {
+                            graphics[entity.uid] = new pixi.Text(
+                                entity.c.graphic.copy,
+                                entity.c.graphic.style
+                            );
+                        }
                         proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
                         proxy(entity.c.graphic, 'style', graphics[entity.uid], 'style');
                         break;

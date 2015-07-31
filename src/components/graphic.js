@@ -94,6 +94,10 @@
                 break;
 
             case 'text':
+                params = defaultParams({
+                    bitmapFont: false
+                }, params);
+                this.bitmapFont = params.bitmapFont;
                 this.copy = params.copy;
                 this.style = params.style;
                 break;
