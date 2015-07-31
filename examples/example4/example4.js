@@ -54,9 +54,13 @@
 
     var BirdSystem = function (controls, collisionSystem, soundSystem) {
         var that = this;
-        var score = null;
+        var best = null,
+            score = null;
 
         this.build = {
+            best: function (entity) {
+                best = entity;
+            },
             score: function (entity) {
                 score = entity;
             }
@@ -80,7 +84,7 @@
                 entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
 
                 // Score if we hit a goal.
-                if (score) {
+                if (score && best) {
                     var x = entity.c.position.x;
                     var y = entity.c.position.y;
 
@@ -89,9 +93,15 @@
                     if (test.hit) {
                         if (!test.entity.c.goal.done) {
                             test.entity.c.goal.done = true;
-                            score.c.cleared = test.entity.c.goal.n;
-                            score.c.graphic.copy = 'SCORE: ' + test.entity.c.goal.n;
+                            score.c.score.cleared = test.entity.c.goal.n;
+                            score.c.graphic.copy = 'SCORE: ' + score.c.score.cleared;
                             soundSystem.play('clear.ogg');
+
+                            // Update best score.
+                            if (score.c.score.cleared > best.c.best.cleared) {
+                                best.c.best.cleared = score.c.score.cleared;
+                                best.c.graphic.copy = 'BEST: ' + best.c.best.cleared;
+                            }
                         }
                     }
                 }
@@ -103,7 +113,8 @@
     var Corpse; // Entity defined later.
     var DeathSystem = function (world, rooms, collisionSystem, soundSystem) {
         var scrollers = {};
-        var generator = null;
+        var best = null,
+            generator = null;
 
         var stopGame = function () {
             // Stop screen scroll.
@@ -116,10 +127,20 @@
         };
 
         var restartGame = function () {
+            var savedBest = best.c.best.cleared;
+            localStorage.setItem(
+                'hitagiFlappyBirdExampleBestScore',
+                savedBest
+            );
+
             rooms.loadRoom('start');
+            world.add(Best({cleared: savedBest}));
         };
 
         this.build = {
+            best: function (entity) {
+                best = entity;
+            },
             pipeGenerator: function (entity) {
                 generator = entity;
             },
@@ -129,6 +150,9 @@
         };
 
         this.destroy = {
+            best: function (entity) {
+                best = null;
+            },
             pipeGenerator: function (entity) {
                 generator = null;
             },
@@ -446,6 +470,25 @@
             });
     };
 
+    var Best = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({x: 25, y: 84}))
+            .attach(new hitagi.components.Graphic({
+                type: 'text',
+                bitmapFont: true,
+                copy: 'BEST: ' + params.cleared,
+                style: {
+                    font: '64px VT323',
+                    fill: 'white'
+                },
+                z: Infinity
+            }))
+            .attach({
+                id: 'best',
+                cleared: params.cleared
+            });
+    };
+
     var PipeGenerator = function (params) {
         return new hitagi.Entity()
             .attach({
@@ -502,6 +545,16 @@
 
     rooms.saveRoom('start', startRoomEntities);
     rooms.loadRoom('start');
+
+    // Load best score.
+    var bestScore = 0;
+    if (localStorage) {
+        var savedScore = localStorage.hitagiFlappyBirdExampleBestScore;
+        if (savedScore) {
+            bestScore = savedScore;
+        }
+    }
+    world.add(new Best({cleared: bestScore}));
 
     // Setup game loop.
     requestAnimationFrame(animate);
