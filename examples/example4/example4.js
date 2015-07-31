@@ -251,8 +251,11 @@
         this.update = {
             floor: function (entity) {
                 // Wrap the floor horizontally.
-                if (entity.c.position.x <= -154) {
-                    entity.c.position.x = 308 * 11;
+                var floorWidth = 308;
+                var floorCount = Math.floor(levelWidth/floorWidth) + 2;
+                if (entity.c.position.x <= -floorWidth/2) {
+                    var diff = floorWidth/2 + entity.c.position.x;
+                    entity.c.position.x = (floorCount * floorWidth) - floorWidth/2 + diff;
                 }
             },
             pipe: function (entity) {
@@ -594,8 +597,12 @@
                 y: levelHeight / 2 + 64
             })
         ];
-        _.times(12, function (i) {
-            startRoomEntities.push(new Floor({x: i * 308}));
+
+        // Add floor to starting room.
+        var floorWidth = 308;
+        var floorCount = Math.floor(levelWidth/floorWidth) + 2;
+        _.times(floorCount, function (i) {
+            startRoomEntities.push(new Floor({x: (floorWidth/2) + i * floorWidth}));
         });
 
         rooms.saveRoom('start', startRoomEntities);
