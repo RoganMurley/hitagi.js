@@ -277,7 +277,7 @@
             }))
             .attach(new hitagi.components.Graphic({
                 copy: '',
-                options: {
+                style: {
                     font: params.font,
                     fill: params.color
                 },

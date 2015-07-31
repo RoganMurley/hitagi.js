@@ -49140,17 +49140,19 @@ if (!global.cancelAnimationFrame) {
                 if (_.isArray(params.path) || params.sheet) {
                     params = defaultParams({
                         animationSpeed: 1,
-                        currentFrame: 0
+                        currentFrame: 0,
+                        loop: true
                     }, params);
 
                     this.animationSpeed = params.animationSpeed;
                     this.currentFrame = params.currentFrame;
+                    this.loop = params.loop;
                 }
                 break;
 
             case 'text':
                 this.copy = params.copy;
-                this.options = params.options;
+                this.style = params.style;
                 break;
 
             default:
@@ -49647,6 +49649,14 @@ global.hitagi = require('./main.js');
                                 entity.c.graphic, 'animationSpeed',
                                 graphics[entity.uid], 'animationSpeed'
                             );
+
+                            // Set and proxy loop.
+                            graphics[entity.uid].loop = entity.c.graphic.loop;
+                            proxy(
+                                entity.c.graphic, 'loop',
+                                graphics[entity.uid], 'loop'
+                            );
+
                             graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
                             // Static sprite.
@@ -49677,13 +49687,12 @@ global.hitagi = require('./main.js');
                         break;
 
                     case 'text':
-                        // Set and proxy copy.
                         graphics[entity.uid] = new pixi.Text(
                             entity.c.graphic.copy,
-                            entity.c.graphic.options
+                            entity.c.graphic.style
                         );
                         proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
-                        proxy(entity.c.graphic, 'options', graphics[entity.uid], 'style');
+                        proxy(entity.c.graphic, 'style', graphics[entity.uid], 'style');
                         break;
 
                     default:

@@ -177,14 +177,8 @@
     world.register(new DeathSystem(world, rooms, collisionSystem, soundSystem));
 
     var Goal, Pipe; // PipeSystem needs these entities defined.
-    var PipeSystem = function (world) {
+    var PipeGeneratorSystem = function (world) {
         this.update = {
-            pipe: function (entity) {
-                if (entity.c.position.x < -100) {
-                    world.remove(entity);
-                }
-            },
-
             pipeGenerator: function (entity, dt) {
                 entity.c.pipeGenerator.timer -= hitagi.utils.delta(1, dt);
 
@@ -220,14 +214,19 @@
             }
         };
     };
-    world.register(new PipeSystem(world));
+    world.register(new PipeGeneratorSystem(world));
 
-    var ScrollSystem = function () {
+    var ScrollSystem = function (world) {
         this.update = {
             floor: function (entity) {
                 // Wrap the floor horizontally.
                 if (entity.c.position.x <= -154) {
                     entity.c.position.x = 308 * 11;
+                }
+            },
+            pipe: function (entity) {
+                if (entity.c.position.x < -100) {
+                    world.remove(entity);
                 }
             },
             scroll: function (entity) {
@@ -434,7 +433,7 @@
             .attach(new hitagi.components.Graphic({
                 type: 'text',
                 copy: '0',
-                options: {
+                style: {
                     font: '128px Arial',
                     fill: 'white'
                 },
@@ -469,7 +468,7 @@
             .attach(new hitagi.components.Graphic({
                 type: 'text',
                 copy: params.copy,
-                options: {
+                style: {
                     font: '24px Monospace',
                     fill: 'white'
                 },

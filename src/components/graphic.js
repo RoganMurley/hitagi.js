@@ -83,17 +83,19 @@
                 if (_.isArray(params.path) || params.sheet) {
                     params = defaultParams({
                         animationSpeed: 1,
-                        currentFrame: 0
+                        currentFrame: 0,
+                        loop: true
                     }, params);
 
                     this.animationSpeed = params.animationSpeed;
                     this.currentFrame = params.currentFrame;
+                    this.loop = params.loop;
                 }
                 break;
 
             case 'text':
                 this.copy = params.copy;
-                this.options = params.options;
+                this.style = params.style;
                 break;
 
             default:

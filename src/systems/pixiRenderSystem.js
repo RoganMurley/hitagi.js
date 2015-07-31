@@ -134,6 +134,14 @@
                                 entity.c.graphic, 'animationSpeed',
                                 graphics[entity.uid], 'animationSpeed'
                             );
+
+                            // Set and proxy loop.
+                            graphics[entity.uid].loop = entity.c.graphic.loop;
+                            proxy(
+                                entity.c.graphic, 'loop',
+                                graphics[entity.uid], 'loop'
+                            );
+
                             graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
                         } else {
                             // Static sprite.
@@ -164,13 +172,12 @@
                         break;
 
                     case 'text':
-                        // Set and proxy copy.
                         graphics[entity.uid] = new pixi.Text(
                             entity.c.graphic.copy,
-                            entity.c.graphic.options
+                            entity.c.graphic.style
                         );
                         proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
-                        proxy(entity.c.graphic, 'options', graphics[entity.uid], 'style');
+                        proxy(entity.c.graphic, 'style', graphics[entity.uid], 'style');
                         break;
 
                     default:
