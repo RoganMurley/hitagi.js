@@ -354,9 +354,9 @@
                 type: 'sprite',
                 animationSpeed: 0.12,
                 path: [
-                    'bird_0.png',
-                    'bird_1.png',
-                    'bird_2.png'
+                    'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png',
+                    'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_1.png',
+                    'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_2.png'
                 ],
                 scale: {
                     x: 0.45,
@@ -390,7 +390,7 @@
             }))
             .attach(new hitagi.components.Graphic({
                 type: 'sprite',
-                path: 'bird_0.png',
+                path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png',
                 scale: {
                     x: 0.45,
                     y: 0.45
@@ -441,7 +441,7 @@
             })
             .attach(new hitagi.components.Graphic({
                 type:'sprite',
-                path: 'pipe.png',
+                path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/pipe.png',
                 scale: {
                     x: 1,
                     y: params.yscale
@@ -486,7 +486,7 @@
                 })
                 .attach(new hitagi.components.Graphic({
                     type: 'sprite',
-                    path: 'floor.png',
+                    path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/floor.png',
                     z: 1000
                 }))
                 .attach(new hitagi.components.Collision({
@@ -569,12 +569,12 @@
 
     // Load assets, then run game.
     renderSystem.load([
-        'bird_0.png',
-        'bird_1.png',
-        'bird_2.png',
-        'pipe.png',
-        'floor.png',
-        'FlappyFont.xml'
+        'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png',
+        'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_1.png',
+        'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_2.png',
+        'http://hitagi.s3-website-eu-west-1.amazonaws.com/pipe.png',
+        'http://hitagi.s3-website-eu-west-1.amazonaws.com/floor.png',
+        'http://hitagi.s3-website-eu-west-1.amazonaws.com/FlappyFont.xml'
     ], main);
 
     function main () {
