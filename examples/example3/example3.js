@@ -1,3 +1,4 @@
+// Powered by https://github.com/RoganMurley/hitagi.js
 (function () {
     "use strict";
 
