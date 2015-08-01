@@ -44,7 +44,7 @@
                 if (controls.check('flap', true)) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
                     entity.c.graphic.currentFrame = 0;
-                    soundSystem.play('flap.ogg');
+                    soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/flap.ogg');
                 }
 
                 // Stop bird from leaving the top of the screen.
@@ -107,7 +107,7 @@
                 best.c.graphic.copy = 'BEST: ' + best.c.best.cleared;
             }
 
-            soundSystem.play('clear.ogg');
+            soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/clear.ogg');
         };
 
         this.loadBestScore = function () {
@@ -181,9 +181,9 @@
                 if (test.hit) {
                     stopGame();
 
-                    soundSystem.play('die.ogg');
+                    soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/die.ogg');
                     setTimeout(function () {
-                        soundSystem.play('fail.ogg');
+                        soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/fail.ogg');
                     }, 500);
 
                     // Add corpse.
