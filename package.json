@@ -27,6 +27,7 @@
     "howler": "^1.1.26",
     "jquery": "^2.1.4",
     "lodash": "^3.8.0",
+    "matter-js": "^0.8.0",
     "pixi.js": "^3.0.2"
   },
   "devDependencies": {
