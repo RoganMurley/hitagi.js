@@ -55404,13 +55404,15 @@ if (!global.cancelAnimationFrame) {
 
     var Body = function (params) {
         params = defaultParams({
+            angle: 0,
             static: false
         }, params);
 
 
         this.id = 'body';
-        this.deps = ['position'];
+        this.deps = ['velocity'];
 
+        this.angle = params.angle;
         this.height = params.height;
         this.width = params.width;
         this.static = params.static;
@@ -55908,12 +55910,15 @@ global.hitagi = require('./main.js');
     var _ = require('lodash');
     var Matter = require('matter-js');
 
-    var MatterPhysicsSystem = function (levelWidth, levelHeight) {
+
+
+    var utils = require('../utils.js'),
+        look = utils.look,
+        proxy = utils.proxy;
+
+    var MatterPhysicsSystem = function (bounds) {
         var engine = Matter.Engine.create();
-        engine.world.bounds.max = {
-            x: levelWidth,
-            y: levelHeight
-        };
+        engine.world.bounds.max = bounds;
 
         var bodies = {};
 
@@ -55925,12 +55930,30 @@ global.hitagi = require('./main.js');
                     entity.c.body.width,
                     entity.c.body.height,
                     {
+                        angle: entity.c.body.angle,
                         isStatic: entity.c.body.static
                     }
                 );
-                Matter.World.add(engine.world, body);
 
+                // Set and proxy stuff.
+                body.angle = entity.c.body.angle;
+                proxy(entity.c.body, 'angle', body, 'angle');
+
+                proxy(entity.c.body, 'width', body, 'width');
+                proxy(entity.c.body, 'height', body, 'height');
+
+                proxy(entity.c, 'position', body, 'position');
+                proxy(entity.c, 'velocity', body, 'velocity');
+
+                Matter.World.add(engine.world, body);
                 bodies[entity.uid] = body;
+            }
+        };
+
+        this.destroy = {
+            body: function (entity) {
+                Matter.World.remove(engine.world, bodies[entity.uid]);
+                delete bodies[entity.uid];
             }
         };
 
@@ -55940,6 +55963,16 @@ global.hitagi = require('./main.js');
 
                 entity.c.position.x = body.position.x;
                 entity.c.position.y = body.position.y;
+
+                entity.c.velocity.x = body.velocity.x;
+                entity.c.velocity.y = body.velocity.y;
+
+                entity.c.body.angle = body.angle;
+            },
+            graphic: function (entity) {
+                if (entity.has('body')) {
+                    entity.c.graphic.rotation = entity.c.body.angle;
+                }
             }
         };
 
@@ -55962,7 +55995,7 @@ global.hitagi = require('./main.js');
     module.exports = MatterPhysicsSystem;
 } ());
 
-},{"lodash":10,"matter-js":11}],146:[function(require,module,exports){
+},{"../utils.js":149,"lodash":10,"matter-js":11}],146:[function(require,module,exports){
 (function () {
     'use strict';
 

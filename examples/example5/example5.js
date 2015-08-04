@@ -18,9 +18,35 @@
 
     // Setup controls.
     var controls = new hitagi.Controls();
+    controls.bind('m1', 'spawn');
+    controls.bind(82, 'reload');
+
 
     // Define systems.
-    'systems';
+    var SpawnSystem = function (world, controls) {
+        this.tickStart = function () {
+            if (controls.check('spawn', true)) {
+                var mousePos = controls.getMousePos();
+                world.add(
+                    new Block({
+                        angle: 2*Math.PI*Math.random(),
+                        height: 32,
+                        width: 32,
+                        x: mousePos.x,
+                        y: mousePos.y
+                    })
+                );
+            }
+        };
+    };
+
+    var ReloadSystem = function (rooms, controls) {
+        this.tickStart = function () {
+            if (controls.check('reload', true)) {
+                rooms.loadRoom('start');
+            }
+        };
+    };
 
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
@@ -29,11 +55,17 @@
     var soundSystem = new hitagi.systems.SoundSystem();
     world.register(soundSystem);
 
-    var physicsSystem = new hitagi.systems.MatterPhysicsSystem(
-        levelWidth,
-        levelHeight
-    );
+    var physicsSystem = new hitagi.systems.MatterPhysicsSystem({
+        x: levelWidth,
+        y: levelHeight
+    });
     world.register(physicsSystem);
+
+    var spawnSystem = new SpawnSystem(world, controls);
+    world.register(spawnSystem);
+
+    var reloadSystem = new ReloadSystem(rooms, controls);
+    world.register(reloadSystem);
 
     // Define components.
     'components';
@@ -60,18 +92,45 @@
                 x: params.x,
                 y: params.y
             }))
+            .attach(new hitagi.components.Velocity({
+                x: 0,
+                y: 0
+            }))
             .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
-                color: 0X910E2F,
+                type: 'sprite',
+                path: 'block.png',
                 width: params.width,
                 height: params.height
             }))
             .attach(new hitagi.components.Body({
+                angle: params.angle,
                 width: params.width,
-                height: params.height,
-                static: params.static
+                height: params.height
             }));
     };
+
+    var Floor = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: params.x,
+                y: params.y
+            }))
+            .attach(new hitagi.components.Velocity({
+                x: 0,
+                y: 0
+            }))
+            .attach(new hitagi.components.Graphic({
+                type: 'rectangle',
+                width: params.width,
+                height: params.height
+            }))
+            .attach(new hitagi.components.Body({
+                angle: 0,
+                width: params.width,
+                height: params.height,
+                static: true
+            }));
+    }
 
     // Load assets, then run game.
     //renderSystem.load([], main);
@@ -83,21 +142,13 @@
             new Background({
                 color:0X139BC9
             }),
-            new Block({
-                height: 32,
-                width: 32,
-                x: levelWidth/2,
-                y: levelHeight/2
-            }),
-            new Block({
+            new Floor({
                 height: 32,
                 width: levelWidth,
                 x: levelWidth/2,
-                y: levelHeight - 16,
-                static: true
+                y: levelHeight - 16
             })
         ];
-
 
         // Load starting room.
         rooms.saveRoom('start', startRoomEntities);
