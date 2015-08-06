@@ -286,9 +286,11 @@
 
         });
 
-        it('if an entity has been added to a world, systems which track the entity should have it added to their tracked object.', function () {
+        it('tracking should function as expected.', function () {
             mockSystem.tracking = ['testing'];
             world.register(mockSystem);
+
+            // Test tracking.
             var testEntity = world.add(
                 new Entity().attach({
                     id: 'testing'
@@ -299,6 +301,7 @@
                 testEntity
             );
 
+            // Test for false positives.
             var testEntity2 = world.add(
                 new Entity().attach({
                     id: 'testing2'
@@ -306,6 +309,13 @@
             );
             assert.equal(
                 _.isUndefined(mockSystem.tracked.testing[testEntity2.uid]),
+                true
+            );
+
+            // Test untracking.
+            world.remove(testEntity);
+            assert.equal(
+                _.isUndefined(mockSystem.tracked.testing[testEntity.uid]),
                 true
             );
         });

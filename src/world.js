@@ -29,6 +29,7 @@
         // Remove an entity from the world.
         this.remove = function (entity) {
             this.destroy(entity);
+            this.untrack(entity);
             delete entities[entity.uid];
         };
 
@@ -160,7 +161,7 @@
             that.build(entity, trackID);
         };
 
-        // Add entities to systems that want to track them.
+        // Track entities that systems want to.
         this.track = function (entity) {
             _.each(
                 systems,
@@ -169,6 +170,22 @@
                         _.each(system.tracking, function (id) {
                             if (entity.has(id)){
                                 system.tracked[id][entity.uid] = entity;
+                            }
+                        });
+                    }
+                }
+            );
+        };
+
+        // Stop tracking entities that systems want to.
+        this.untrack = function (entity) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'tracking')) {
+                        _.each(system.tracking, function (id) {
+                            if (entity.has(id)){
+                                delete system.tracked[id][entity.uid];
                             }
                         });
                     }
