@@ -27,7 +27,8 @@
 
         this.deps = [];
         if (params.relative) {
-            this.deps.push('position');
+            // BODY V POSITION THING FIX ME.
+            //this.deps.push('position');
         }
 
         this.alpha = params.alpha;

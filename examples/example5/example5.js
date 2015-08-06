@@ -20,6 +20,7 @@
     var controls = new hitagi.Controls();
     controls.bind('m1', 'spawn');
     controls.bind(82, 'reload');
+    controls.bind('m2', 'spin');
 
 
     // Define systems.
@@ -44,6 +45,14 @@
         this.tickStart = function () {
             if (controls.check('reload', true)) {
                 rooms.loadRoom('start');
+            }
+        };
+
+        this.update = {
+            spinner: function (entity) {
+                if (controls.check('spin')) {
+                    entity.c.body.angle += 0.1;
+                }
             }
         };
     };
@@ -88,14 +97,6 @@
 
     var Block = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: params.x,
-                y: params.y
-            }))
-            .attach(new hitagi.components.Velocity({
-                x: 0,
-                y: 0
-            }))
             .attach(new hitagi.components.Graphic({
                 type: 'sprite',
                 path: 'block.png',
@@ -105,20 +106,15 @@
             .attach(new hitagi.components.Body({
                 angle: params.angle,
                 width: params.width,
-                height: params.height
-            }));
+                height: params.height,
+                x: params.x,
+                y: params.y
+            }))
+            .attach({id: 'spinner'});
     };
 
     var Floor = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: params.x,
-                y: params.y
-            }))
-            .attach(new hitagi.components.Velocity({
-                x: 0,
-                y: 0
-            }))
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
                 width: params.width,
@@ -128,9 +124,11 @@
                 angle: 0,
                 width: params.width,
                 height: params.height,
-                static: true
+                static: true,
+                x: params.x,
+                y: params.y
             }));
-    }
+    };
 
     // Load assets, then run game.
     //renderSystem.load([], main);

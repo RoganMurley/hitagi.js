@@ -19,8 +19,8 @@
         this.build = {
             body: function (entity) {
                 var body = Matter.Bodies.rectangle(
-                    entity.c.position.x,
-                    entity.c.position.y,
+                    entity.c.body.x,
+                    entity.c.body.y,
                     entity.c.body.width,
                     entity.c.body.height,
                     {
@@ -36,8 +36,14 @@
                 proxy(entity.c.body, 'width', body, 'width');
                 proxy(entity.c.body, 'height', body, 'height');
 
-                proxy(entity.c, 'position', body, 'position');
-                proxy(entity.c, 'velocity', body, 'velocity');
+
+                body.position.x = entity.c.body.x;
+                proxy(entity.c.body, 'x', body.position, 'x');
+
+                body.position.y = entity.c.body.y;
+                proxy(entity.c.body, 'y', body.position, 'y');
+
+                //proxy(entity.c, 'velocity', body, 'velocity');
 
                 Matter.World.add(engine.world, body);
                 bodies[entity.uid] = body;
@@ -55,11 +61,10 @@
             body: function (entity) {
                 var body = bodies[entity.uid];
 
-                entity.c.position.x = body.position.x;
-                entity.c.position.y = body.position.y;
+                entity.c.body.x = body.position.x;
+                entity.c.body.y = body.position.y;
 
-                entity.c.velocity.x = body.velocity.x;
-                entity.c.velocity.y = body.velocity.y;
+                entity.c.body.velocity = body.velocity;
 
                 entity.c.body.angle = body.angle;
             },

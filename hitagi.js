@@ -55405,17 +55405,24 @@ if (!global.cancelAnimationFrame) {
     var Body = function (params) {
         params = defaultParams({
             angle: 0,
-            static: false
+            static: false,
+            velocity: {
+                xspeed: 0,
+                yspeed: 0
+            }
         }, params);
 
 
         this.id = 'body';
-        this.deps = ['velocity'];
+        this.deps = [];
 
         this.angle = params.angle;
         this.height = params.height;
         this.width = params.width;
         this.static = params.static;
+        this.velocity = params.velocity;
+        this.x = params.x;
+        this.y = params.y;
     };
 
     module.exports = Body;
@@ -55470,7 +55477,8 @@ if (!global.cancelAnimationFrame) {
 
         this.deps = [];
         if (params.relative) {
-            this.deps.push('position');
+            // BODY V POSITION THING FIX ME.
+            //this.deps.push('position');
         }
 
         this.alpha = params.alpha;
@@ -55925,8 +55933,8 @@ global.hitagi = require('./main.js');
         this.build = {
             body: function (entity) {
                 var body = Matter.Bodies.rectangle(
-                    entity.c.position.x,
-                    entity.c.position.y,
+                    entity.c.body.x,
+                    entity.c.body.y,
                     entity.c.body.width,
                     entity.c.body.height,
                     {
@@ -55942,8 +55950,14 @@ global.hitagi = require('./main.js');
                 proxy(entity.c.body, 'width', body, 'width');
                 proxy(entity.c.body, 'height', body, 'height');
 
-                proxy(entity.c, 'position', body, 'position');
-                proxy(entity.c, 'velocity', body, 'velocity');
+
+                body.position.x = entity.c.body.x;
+                proxy(entity.c.body, 'x', body.position, 'x');
+
+                body.position.y = entity.c.body.y;
+                proxy(entity.c.body, 'y', body.position, 'y');
+
+                //proxy(entity.c, 'velocity', body, 'velocity');
 
                 Matter.World.add(engine.world, body);
                 bodies[entity.uid] = body;
@@ -55961,11 +55975,10 @@ global.hitagi = require('./main.js');
             body: function (entity) {
                 var body = bodies[entity.uid];
 
-                entity.c.position.x = body.position.x;
-                entity.c.position.y = body.position.y;
+                entity.c.body.x = body.position.x;
+                entity.c.body.y = body.position.y;
 
-                entity.c.velocity.x = body.velocity.x;
-                entity.c.velocity.y = body.velocity.y;
+                entity.c.body.velocity = body.velocity;
 
                 entity.c.body.angle = body.angle;
             },
@@ -56245,8 +56258,17 @@ global.hitagi = require('./main.js');
                 var y = 0;
 
                 if (entity.c.graphic.relative) {
-                    x = entity.c.position.x + offset.x;
-                    y = entity.c.position.y + offset.y;
+                    if (entity.has('position')) {
+                        x = entity.c.position.x;
+                        y = entity.c.position.y;
+                    }
+                    if (entity.has('body')) {
+                        x = entity.c.body.x;
+                        y = entity.c.body.y;
+                    }
+
+                    x += offset.x;
+                    y += offset.y;
                 }
 
                 graphic.position.x = Math.floor(x);

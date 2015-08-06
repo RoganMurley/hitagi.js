@@ -247,8 +247,17 @@
                 var y = 0;
 
                 if (entity.c.graphic.relative) {
-                    x = entity.c.position.x + offset.x;
-                    y = entity.c.position.y + offset.y;
+                    if (entity.has('position')) {
+                        x = entity.c.position.x;
+                        y = entity.c.position.y;
+                    }
+                    if (entity.has('body')) {
+                        x = entity.c.body.x;
+                        y = entity.c.body.y;
+                    }
+
+                    x += offset.x;
+                    y += offset.y;
                 }
 
                 graphic.position.x = Math.floor(x);
