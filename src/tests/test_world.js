@@ -286,6 +286,30 @@
 
         });
 
+        it('if an entity has been added to a world, systems which track the entity should have it added to their tracked object.', function () {
+            mockSystem.tracking = ['testing'];
+            world.register(mockSystem);
+            var testEntity = world.add(
+                new Entity().attach({
+                    id: 'testing'
+                })
+            );
+            assert.deepEqual(
+                mockSystem.tracked.testing[testEntity.uid],
+                testEntity
+            );
+
+            var testEntity2 = world.add(
+                new Entity().attach({
+                    id: 'testing2'
+                })
+            );
+            assert.equal(
+                _.isUndefined(mockSystem.tracked.testing[testEntity2.uid]),
+                true
+            );
+        });
+
     });
 
 } ());

@@ -277,7 +277,7 @@ process.nextTick = function (fun) {
         }
     }
     queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
+    if (!draining) {
         setTimeout(drainQueue, 0);
     }
 };
@@ -12311,7 +12311,7 @@ return jQuery;
 (function (global){
 /**
  * @license
- * lodash 3.9.3 (Custom Build) <https://lodash.com/>
+ * lodash 3.8.0 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern -d -o ./index.js`
  * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -12324,7 +12324,7 @@ return jQuery;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '3.9.3';
+  var VERSION = '3.8.0';
 
   /** Used to compose bitmasks for wrapper metadata. */
   var BIND_FLAG = 1,
@@ -12429,9 +12429,6 @@ return jQuery;
   /** Used to detect host constructors (Safari > 5). */
   var reIsHostCtor = /^\[object .+?Constructor\]$/;
 
-  /** Used to detect unsigned integer values. */
-  var reIsUint = /^\d+$/;
-
   /** Used to match latin-1 supplementary letters (excluding mathematical operators). */
   var reLatin1 = /[\xc0-\xd6\xd8-\xde\xdf-\xf6\xf8-\xff]/g;
 
@@ -12466,8 +12463,9 @@ return jQuery;
     'Array', 'ArrayBuffer', 'Date', 'Error', 'Float32Array', 'Float64Array',
     'Function', 'Int8Array', 'Int16Array', 'Int32Array', 'Math', 'Number',
     'Object', 'RegExp', 'Set', 'String', '_', 'clearTimeout', 'document',
-    'isFinite', 'parseFloat', 'parseInt', 'setTimeout', 'TypeError', 'Uint8Array',
-    'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'WeakMap', 'window'
+    'isFinite', 'parseInt', 'setTimeout', 'TypeError', 'Uint8Array',
+    'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'WeakMap',
+    'window'
   ];
 
   /** Used to make template sourceURLs easier to identify. */
@@ -12588,40 +12586,29 @@ return jQuery;
   /**
    * Used as a reference to the global object.
    *
-   * The `this` value is used if it's the global object to avoid Greasemonkey's
+   * The `this` value is used if it is the global object to avoid Greasemonkey's
    * restricted `window` object, otherwise the `window` object is used.
    */
   var root = freeGlobal || ((freeWindow !== (this && this.window)) && freeWindow) || freeSelf || this;
-
-  /*--------------------------------------------------------------------------*/
 
   /**
    * The base implementation of `compareAscending` which compares values and
    * sorts them in ascending order without guaranteeing a stable sort.
    *
    * @private
-   * @param {*} value The value to compare.
-   * @param {*} other The other value to compare.
+   * @param {*} value The value to compare to `other`.
+   * @param {*} other The value to compare to `value`.
    * @returns {number} Returns the sort order indicator for `value`.
    */
   function baseCompareAscending(value, other) {
     if (value !== other) {
-      var valIsNull = value === null,
-          valIsUndef = value === undefined,
-          valIsReflexive = value === value;
-
-      var othIsNull = other === null,
-          othIsUndef = other === undefined,
+      var valIsReflexive = value === value,
           othIsReflexive = other === other;
 
-      if ((value > other && !othIsNull) || !valIsReflexive ||
-          (valIsNull && !othIsUndef && othIsReflexive) ||
-          (valIsUndef && othIsReflexive)) {
+      if (value > other || !valIsReflexive || (value === undefined && othIsReflexive)) {
         return 1;
       }
-      if ((value < other && !valIsNull) || !othIsReflexive ||
-          (othIsNull && !valIsUndef && valIsReflexive) ||
-          (othIsUndef && valIsReflexive)) {
+      if (value < other || !othIsReflexive || (other === undefined && valIsReflexive)) {
         return -1;
       }
     }
@@ -12689,7 +12676,7 @@ return jQuery;
   }
 
   /**
-   * Converts `value` to a string if it's not one. An empty string is returned
+   * Converts `value` to a string if it is not one. An empty string is returned
    * for `null` or `undefined` values.
    *
    * @private
@@ -12701,6 +12688,17 @@ return jQuery;
       return value;
     }
     return value == null ? '' : (value + '');
+  }
+
+  /**
+   * Used by `_.max` and `_.min` as the default callback for string values.
+   *
+   * @private
+   * @param {string} string The string to inspect.
+   * @returns {number} Returns the code unit of the first character of the string.
+   */
+  function charAtCallback(string) {
+    return string.charCodeAt(0);
   }
 
   /**
@@ -12963,8 +12961,6 @@ return jQuery;
     return htmlUnescapes[chr];
   }
 
-  /*--------------------------------------------------------------------------*/
-
   /**
    * Create a new pristine `lodash` function using the given `context` object.
    *
@@ -13025,7 +13021,7 @@ return jQuery;
         stringProto = String.prototype;
 
     /** Used to detect DOM support. */
-    var document = (document = context.window) ? document.document : null;
+    var document = (document = context.window) && document.document;
 
     /** Used to resolve the decompiled source of functions. */
     var fnToString = Function.prototype.toString;
@@ -13047,24 +13043,26 @@ return jQuery;
 
     /** Used to detect if a method is native. */
     var reIsNative = RegExp('^' +
-      escapeRegExp(fnToString.call(hasOwnProperty))
-      .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+      escapeRegExp(objToString)
+      .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
     );
 
     /** Native method references. */
-    var ArrayBuffer = getNative(context, 'ArrayBuffer'),
-        bufferSlice = getNative(ArrayBuffer && new ArrayBuffer(0), 'slice'),
+    var ArrayBuffer = isNative(ArrayBuffer = context.ArrayBuffer) && ArrayBuffer,
+        bufferSlice = isNative(bufferSlice = ArrayBuffer && new ArrayBuffer(0).slice) && bufferSlice,
         ceil = Math.ceil,
         clearTimeout = context.clearTimeout,
         floor = Math.floor,
-        getPrototypeOf = getNative(Object, 'getPrototypeOf'),
-        parseFloat = context.parseFloat,
+        getOwnPropertySymbols = isNative(getOwnPropertySymbols = Object.getOwnPropertySymbols) && getOwnPropertySymbols,
+        getPrototypeOf = isNative(getPrototypeOf = Object.getPrototypeOf) && getPrototypeOf,
         push = arrayProto.push,
-        Set = getNative(context, 'Set'),
+        preventExtensions = isNative(preventExtensions = Object.preventExtensions) && preventExtensions,
+        propertyIsEnumerable = objectProto.propertyIsEnumerable,
+        Set = isNative(Set = context.Set) && Set,
         setTimeout = context.setTimeout,
         splice = arrayProto.splice,
-        Uint8Array = getNative(context, 'Uint8Array'),
-        WeakMap = getNative(context, 'WeakMap');
+        Uint8Array = isNative(Uint8Array = context.Uint8Array) && Uint8Array,
+        WeakMap = isNative(WeakMap = context.WeakMap) && WeakMap;
 
     /** Used to clone array buffers. */
     var Float64Array = (function() {
@@ -13072,21 +13070,44 @@ return jQuery;
       // where the array buffer's `byteLength` is not a multiple of the typed
       // array's `BYTES_PER_ELEMENT`.
       try {
-        var func = getNative(context, 'Float64Array'),
+        var func = isNative(func = context.Float64Array) && func,
             result = new func(new ArrayBuffer(10), 0, 1) && func;
       } catch(e) {}
-      return result || null;
+      return result;
+    }());
+
+    /** Used as `baseAssign`. */
+    var nativeAssign = (function() {
+      // Avoid `Object.assign` in Firefox 34-37 which have an early implementation
+      // with a now defunct try/catch behavior. See https://bugzilla.mozilla.org/show_bug.cgi?id=1103344
+      // for more details.
+      //
+      // Use `Object.preventExtensions` on a plain object instead of simply using
+      // `Object('x')` because Chrome and IE fail to throw an error when attempting
+      // to assign values to readonly indexes of strings.
+      var func = preventExtensions && isNative(func = Object.assign) && func;
+      try {
+        if (func) {
+          var object = preventExtensions({ '1': 0 });
+          object[0] = 1;
+        }
+      } catch(e) {
+        // Only attempt in strict mode.
+        try { func(object, 'xo'); } catch(e) {}
+        return !object[1] && func;
+      }
+      return false;
     }());
 
     /* Native method references for those with the same name as other `lodash` methods. */
-    var nativeCreate = getNative(Object, 'create'),
-        nativeIsArray = getNative(Array, 'isArray'),
+    var nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray,
+        nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate,
         nativeIsFinite = context.isFinite,
-        nativeKeys = getNative(Object, 'keys'),
+        nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys,
         nativeMax = Math.max,
         nativeMin = Math.min,
-        nativeNow = getNative(Date, 'now'),
-        nativeNumIsFinite = getNative(Number, 'isFinite'),
+        nativeNow = isNative(nativeNow = Date.now) && nativeNow,
+        nativeNumIsFinite = isNative(nativeNumIsFinite = Number.isFinite) && nativeNumIsFinite,
         nativeParseInt = context.parseInt,
         nativeRandom = Math.random;
 
@@ -13095,7 +13116,7 @@ return jQuery;
         POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
 
     /** Used as references for the maximum length and index of an array. */
-    var MAX_ARRAY_LENGTH = 4294967295,
+    var MAX_ARRAY_LENGTH = Math.pow(2, 32) - 1,
         MAX_ARRAY_INDEX = MAX_ARRAY_LENGTH - 1,
         HALF_MAX_ARRAY_LENGTH = MAX_ARRAY_LENGTH >>> 1;
 
@@ -13106,15 +13127,13 @@ return jQuery;
      * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
      * of an array-like value.
      */
-    var MAX_SAFE_INTEGER = 9007199254740991;
+    var MAX_SAFE_INTEGER = Math.pow(2, 53) - 1;
 
     /** Used to store function metadata. */
     var metaMap = WeakMap && new WeakMap;
 
     /** Used to lookup unminified function names. */
     var realNames = {};
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Creates a `lodash` object which wraps `value` to enable implicit chaining.
@@ -13155,31 +13174,30 @@ return jQuery;
      * `filter`, `flatten`, `flattenDeep`, `flow`, `flowRight`, `forEach`,
      * `forEachRight`, `forIn`, `forInRight`, `forOwn`, `forOwnRight`, `functions`,
      * `groupBy`, `indexBy`, `initial`, `intersection`, `invert`, `invoke`, `keys`,
-     * `keysIn`, `map`, `mapKeys`, `mapValues`, `matches`, `matchesProperty`,
-     * `memoize`, `merge`, `method`, `methodOf`, `mixin`, `negate`, `omit`, `once`,
-     * `pairs`, `partial`, `partialRight`, `partition`, `pick`, `plant`, `pluck`,
-     * `property`, `propertyOf`, `pull`, `pullAt`, `push`, `range`, `rearg`,
-     * `reject`, `remove`, `rest`, `restParam`, `reverse`, `set`, `shuffle`,
-     * `slice`, `sort`, `sortBy`, `sortByAll`, `sortByOrder`, `splice`, `spread`,
-     * `take`, `takeRight`, `takeRightWhile`, `takeWhile`, `tap`, `throttle`,
-     * `thru`, `times`, `toArray`, `toPlainObject`, `transform`, `union`, `uniq`,
-     * `unshift`, `unzip`, `unzipWith`, `values`, `valuesIn`, `where`, `without`,
-     * `wrap`, `xor`, `zip`, `zipObject`, `zipWith`
+     * `keysIn`, `map`, `mapValues`, `matches`, `matchesProperty`, `memoize`,
+     * `merge`, `mixin`, `negate`, `omit`, `once`, `pairs`, `partial`, `partialRight`,
+     * `partition`, `pick`, `plant`, `pluck`, `property`, `propertyOf`, `pull`,
+     * `pullAt`, `push`, `range`, `rearg`, `reject`, `remove`, `rest`, `reverse`,
+     * `shuffle`, `slice`, `sort`, `sortBy`, `sortByAll`, `sortByOrder`, `splice`,
+     * `spread`, `take`, `takeRight`, `takeRightWhile`, `takeWhile`, `tap`,
+     * `throttle`, `thru`, `times`, `toArray`, `toPlainObject`, `transform`,
+     * `union`, `uniq`, `unshift`, `unzip`, `values`, `valuesIn`, `where`,
+     * `without`, `wrap`, `xor`, `zip`, and `zipObject`
      *
      * The wrapper methods that are **not** chainable by default are:
      * `add`, `attempt`, `camelCase`, `capitalize`, `clone`, `cloneDeep`, `deburr`,
      * `endsWith`, `escape`, `escapeRegExp`, `every`, `find`, `findIndex`, `findKey`,
-     * `findLast`, `findLastIndex`, `findLastKey`, `findWhere`, `first`, `get`,
-     * `gt`, `gte`, `has`, `identity`, `includes`, `indexOf`, `inRange`, `isArguments`,
-     * `isArray`, `isBoolean`, `isDate`, `isElement`, `isEmpty`, `isEqual`, `isError`,
-     * `isFinite` `isFunction`, `isMatch`, `isNative`, `isNaN`, `isNull`, `isNumber`,
-     * `isObject`, `isPlainObject`, `isRegExp`, `isString`, `isUndefined`,
-     * `isTypedArray`, `join`, `kebabCase`, `last`, `lastIndexOf`, `lt`, `lte`,
-     * `max`, `min`, `noConflict`, `noop`, `now`, `pad`, `padLeft`, `padRight`,
-     * `parseInt`, `pop`, `random`, `reduce`, `reduceRight`, `repeat`, `result`,
-     * `runInContext`, `shift`, `size`, `snakeCase`, `some`, `sortedIndex`,
-     * `sortedLastIndex`, `startCase`, `startsWith`, `sum`, `template`, `trim`,
-     * `trimLeft`, `trimRight`, `trunc`, `unescape`, `uniqueId`, `value`, and `words`
+     * `findLast`, `findLastIndex`, `findLastKey`, `findWhere`, `first`, `has`,
+     * `identity`, `includes`, `indexOf`, `inRange`, `isArguments`, `isArray`,
+     * `isBoolean`, `isDate`, `isElement`, `isEmpty`, `isEqual`, `isError`, `isFinite`
+     * `isFunction`, `isMatch`, `isNative`, `isNaN`, `isNull`, `isNumber`, `isObject`,
+     * `isPlainObject`, `isRegExp`, `isString`, `isUndefined`, `isTypedArray`,
+     * `join`, `kebabCase`, `last`, `lastIndexOf`, `max`, `min`, `noConflict`,
+     * `noop`, `now`, `pad`, `padLeft`, `padRight`, `parseInt`, `pop`, `random`,
+     * `reduce`, `reduceRight`, `repeat`, `result`, `runInContext`, `shift`, `size`,
+     * `snakeCase`, `some`, `sortedIndex`, `sortedLastIndex`, `startCase`, `startsWith`,
+     * `sum`, `template`, `trim`, `trimLeft`, `trimRight`, `trunc`, `unescape`,
+     * `uniqueId`, `value`, and `words`
      *
      * The wrapper method `sample` will return a wrapped value when `n` is provided,
      * otherwise an unwrapped value is returned.
@@ -13256,11 +13274,30 @@ return jQuery;
 
     (function(x) {
       var Ctor = function() { this.x = x; },
+          args = arguments,
           object = { '0': x, 'length': x },
           props = [];
 
       Ctor.prototype = { 'valueOf': x, 'y': x };
       for (var key in new Ctor) { props.push(key); }
+
+      /**
+       * Detect if functions can be decompiled by `Function#toString`
+       * (all but Firefox OS certified apps, older Opera mobile browsers, and
+       * the PlayStation 3; forced `false` for Windows 8 apps).
+       *
+       * @memberOf _.support
+       * @type boolean
+       */
+      support.funcDecomp = /\bthis\b/.test(function() { return this; });
+
+      /**
+       * Detect if `Function#name` is supported (all but IE).
+       *
+       * @memberOf _.support
+       * @type boolean
+       */
+      support.funcNames = typeof Function.name == 'string';
 
       /**
        * Detect if the DOM is supported.
@@ -13272,6 +13309,24 @@ return jQuery;
         support.dom = document.createDocumentFragment().nodeType === 11;
       } catch(e) {
         support.dom = false;
+      }
+
+      /**
+       * Detect if `arguments` object indexes are non-enumerable.
+       *
+       * In Firefox < 4, IE < 9, PhantomJS, and Safari < 5.1 `arguments` object
+       * indexes are non-enumerable. Chrome < 25 and Node.js < 0.11.0 treat
+       * `arguments` object indexes as non-enumerable and fail `hasOwnProperty`
+       * checks for indexes that exceed the number of function parameters and
+       * whose associated argument values are `0`.
+       *
+       * @memberOf _.support
+       * @type boolean
+       */
+      try {
+        support.nonEnumArgs = !propertyIsEnumerable.call(args, 1);
+      } catch(e) {
+        support.nonEnumArgs = true;
       }
     }(1, 0));
 
@@ -13335,8 +13390,6 @@ return jQuery;
         '_': lodash
       }
     };
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Creates a lazy wrapper object which wraps `value` to enable lazy evaluation.
@@ -13466,8 +13519,6 @@ return jQuery;
       return result;
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      * Creates a cache object to store key/value pairs.
      *
@@ -13536,8 +13587,6 @@ return jQuery;
       return this;
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      *
      * Creates a cache object to store unique values.
@@ -13586,8 +13635,6 @@ return jQuery;
         data.hash[value] = true;
       }
     }
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Copies the values of `source` to `array`.
@@ -13672,35 +13719,6 @@ return jQuery;
     }
 
     /**
-     * A specialized version of `baseExtremum` for arrays which invokes `iteratee`
-     * with one argument: (value).
-     *
-     * @private
-     * @param {Array} array The array to iterate over.
-     * @param {Function} iteratee The function invoked per iteration.
-     * @param {Function} comparator The function used to compare values.
-     * @param {*} exValue The initial extremum value.
-     * @returns {*} Returns the extremum value.
-     */
-    function arrayExtremum(array, iteratee, comparator, exValue) {
-      var index = -1,
-          length = array.length,
-          computed = exValue,
-          result = computed;
-
-      while (++index < length) {
-        var value = array[index],
-            current = +iteratee(value);
-
-        if (comparator(current, computed)) {
-          computed = current;
-          result = value;
-        }
-      }
-      return result;
-    }
-
-    /**
      * A specialized version of `_.filter` for arrays without support for callback
      * shorthands and `this` binding.
      *
@@ -13740,6 +13758,48 @@ return jQuery;
 
       while (++index < length) {
         result[index] = iteratee(array[index], index, array);
+      }
+      return result;
+    }
+
+    /**
+     * A specialized version of `_.max` for arrays without support for iteratees.
+     *
+     * @private
+     * @param {Array} array The array to iterate over.
+     * @returns {*} Returns the maximum value.
+     */
+    function arrayMax(array) {
+      var index = -1,
+          length = array.length,
+          result = NEGATIVE_INFINITY;
+
+      while (++index < length) {
+        var value = array[index];
+        if (value > result) {
+          result = value;
+        }
+      }
+      return result;
+    }
+
+    /**
+     * A specialized version of `_.min` for arrays without support for iteratees.
+     *
+     * @private
+     * @param {Array} array The array to iterate over.
+     * @returns {*} Returns the minimum value.
+     */
+    function arrayMin(array) {
+      var index = -1,
+          length = array.length,
+          result = POSITIVE_INFINITY;
+
+      while (++index < length) {
+        var value = array[index];
+        if (value < result) {
+          result = value;
+        }
       }
       return result;
     }
@@ -13874,8 +13934,10 @@ return jQuery;
      * @returns {Object} Returns `object`.
      */
     function assignWith(object, source, customizer) {
+      var props = keys(source);
+      push.apply(props, getSymbols(source));
+
       var index = -1,
-          props = keys(source),
           length = props.length;
 
       while (++index < length) {
@@ -13900,11 +13962,11 @@ return jQuery;
      * @param {Object} source The source object.
      * @returns {Object} Returns `object`.
      */
-    function baseAssign(object, source) {
+    var baseAssign = nativeAssign || function(object, source) {
       return source == null
         ? object
-        : baseCopy(source, keys(source), object);
-    }
+        : baseCopy(source, getSymbols(source), baseCopy(source, keys(source), object));
+    };
 
     /**
      * The base implementation of `_.at` without support for string collections
@@ -13919,7 +13981,7 @@ return jQuery;
       var index = -1,
           isNil = collection == null,
           isArr = !isNil && isArrayLike(collection),
-          length = isArr ? collection.length : 0,
+          length = isArr && collection.length,
           propsLength = props.length,
           result = Array(propsLength);
 
@@ -14060,14 +14122,14 @@ return jQuery;
      * @returns {Object} Returns the new object.
      */
     var baseCreate = (function() {
-      function object() {}
+      function Object() {}
       return function(prototype) {
         if (isObject(prototype)) {
-          object.prototype = prototype;
-          var result = new object;
-          object.prototype = null;
+          Object.prototype = prototype;
+          var result = new Object;
+          Object.prototype = null;
         }
-        return result || {};
+        return result || context.Object();
       };
     }());
 
@@ -14172,32 +14234,6 @@ return jQuery;
       baseEach(collection, function(value, index, collection) {
         result = !!predicate(value, index, collection);
         return result;
-      });
-      return result;
-    }
-
-    /**
-     * Gets the extremum value of `collection` invoking `iteratee` for each value
-     * in `collection` to generate the criterion by which the value is ranked.
-     * The `iteratee` is invoked with three arguments: (value, index|key, collection).
-     *
-     * @private
-     * @param {Array|Object|string} collection The collection to iterate over.
-     * @param {Function} iteratee The function invoked per iteration.
-     * @param {Function} comparator The function used to compare values.
-     * @param {*} exValue The initial extremum value.
-     * @returns {*} Returns the extremum value.
-     */
-    function baseExtremum(collection, iteratee, comparator, exValue) {
-      var computed = exValue,
-          result = computed;
-
-      baseEach(collection, function(value, index, collection) {
-        var current = +iteratee(value, index, collection);
-        if (comparator(current, computed) || (current === exValue && current === result)) {
-          computed = current;
-          result = value;
-        }
       });
       return result;
     }
@@ -14418,11 +14454,11 @@ return jQuery;
       if (pathKey !== undefined && pathKey in toObject(object)) {
         path = [pathKey];
       }
-      var index = 0,
+      var index = -1,
           length = path.length;
 
-      while (object != null && index < length) {
-        object = object[path[index++]];
+      while (object != null && ++index < length) {
+        object = object[path[index]];
       }
       return (index && index == length) ? object : undefined;
     }
@@ -14441,10 +14477,17 @@ return jQuery;
      * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
      */
     function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
+      // Exit early for identical values.
       if (value === other) {
         return true;
       }
-      if (value == null || other == null || (!isObject(value) && !isObjectLike(other))) {
+      var valType = typeof value,
+          othType = typeof other;
+
+      // Exit early for unlike primitive values.
+      if ((valType != 'function' && valType != 'object' && othType != 'function' && othType != 'object') ||
+          value == null || other == null) {
+        // Return `false` unless both values are `NaN`.
         return value !== value && other !== other;
       }
       return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
@@ -14495,11 +14538,11 @@ return jQuery;
         return equalByTag(object, other, objTag);
       }
       if (!isLoose) {
-        var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
-            othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+        var valWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
+            othWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
 
-        if (objIsWrapped || othIsWrapped) {
-          return equalFunc(objIsWrapped ? object.value() : object, othIsWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
+        if (valWrapped || othWrapped) {
+          return equalFunc(valWrapped ? object.value() : object, othWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
         }
       }
       if (!isSameTag) {
@@ -14534,43 +14577,41 @@ return jQuery;
      *
      * @private
      * @param {Object} object The object to inspect.
-     * @param {Array} matchData The propery names, values, and compare flags to match.
+     * @param {Array} props The source property names to match.
+     * @param {Array} values The source values to match.
+     * @param {Array} strictCompareFlags Strict comparison flags for source values.
      * @param {Function} [customizer] The function to customize comparing objects.
      * @returns {boolean} Returns `true` if `object` is a match, else `false`.
      */
-    function baseIsMatch(object, matchData, customizer) {
-      var index = matchData.length,
-          length = index,
+    function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
+      var index = -1,
+          length = props.length,
           noCustomizer = !customizer;
 
-      if (object == null) {
-        return !length;
-      }
-      object = toObject(object);
-      while (index--) {
-        var data = matchData[index];
-        if ((noCustomizer && data[2])
-              ? data[1] !== object[data[0]]
-              : !(data[0] in object)
+      while (++index < length) {
+        if ((noCustomizer && strictCompareFlags[index])
+              ? values[index] !== object[props[index]]
+              : !(props[index] in object)
             ) {
           return false;
         }
       }
+      index = -1;
       while (++index < length) {
-        data = matchData[index];
-        var key = data[0],
+        var key = props[index],
             objValue = object[key],
-            srcValue = data[1];
+            srcValue = values[index];
 
-        if (noCustomizer && data[2]) {
-          if (objValue === undefined && !(key in object)) {
-            return false;
-          }
+        if (noCustomizer && strictCompareFlags[index]) {
+          var result = objValue !== undefined || (key in object);
         } else {
-          var result = customizer ? customizer(objValue, srcValue, key) : undefined;
-          if (!(result === undefined ? baseIsEqual(srcValue, objValue, customizer, true) : result)) {
-            return false;
+          result = customizer ? customizer(objValue, srcValue, key) : undefined;
+          if (result === undefined) {
+            result = baseIsEqual(srcValue, objValue, customizer, true);
           }
+        }
+        if (!result) {
+          return false;
         }
       }
       return true;
@@ -14603,34 +14644,50 @@ return jQuery;
      * @returns {Function} Returns the new function.
      */
     function baseMatches(source) {
-      var matchData = getMatchData(source);
-      if (matchData.length == 1 && matchData[0][2]) {
-        var key = matchData[0][0],
-            value = matchData[0][1];
+      var props = keys(source),
+          length = props.length;
 
-        return function(object) {
-          if (object == null) {
-            return false;
-          }
-          return object[key] === value && (value !== undefined || (key in toObject(object)));
-        };
+      if (!length) {
+        return constant(true);
+      }
+      if (length == 1) {
+        var key = props[0],
+            value = source[key];
+
+        if (isStrictComparable(value)) {
+          return function(object) {
+            if (object == null) {
+              return false;
+            }
+            return object[key] === value && (value !== undefined || (key in toObject(object)));
+          };
+        }
+      }
+      var values = Array(length),
+          strictCompareFlags = Array(length);
+
+      while (length--) {
+        value = source[props[length]];
+        values[length] = value;
+        strictCompareFlags[length] = isStrictComparable(value);
       }
       return function(object) {
-        return baseIsMatch(object, matchData);
+        return object != null && baseIsMatch(toObject(object), props, values, strictCompareFlags);
       };
     }
 
     /**
-     * The base implementation of `_.matchesProperty` which does not clone `srcValue`.
+     * The base implementation of `_.matchesProperty` which does not which does
+     * not clone `value`.
      *
      * @private
      * @param {string} path The path of the property to get.
-     * @param {*} srcValue The value to compare.
+     * @param {*} value The value to compare.
      * @returns {Function} Returns the new function.
      */
-    function baseMatchesProperty(path, srcValue) {
+    function baseMatchesProperty(path, value) {
       var isArr = isArray(path),
-          isCommon = isKey(path) && isStrictComparable(srcValue),
+          isCommon = isKey(path) && isStrictComparable(value),
           pathKey = (path + '');
 
       path = toPath(path);
@@ -14648,9 +14705,9 @@ return jQuery;
           key = last(path);
           object = toObject(object);
         }
-        return object[key] === srcValue
-          ? (srcValue !== undefined || (key in object))
-          : baseIsEqual(srcValue, object[key], undefined, true);
+        return object[key] === value
+          ? (value !== undefined || (key in object))
+          : baseIsEqual(value, object[key], null, true);
       };
     }
 
@@ -14670,9 +14727,11 @@ return jQuery;
       if (!isObject(object)) {
         return object;
       }
-      var isSrcArr = isArrayLike(source) && (isArray(source) || isTypedArray(source)),
-          props = isSrcArr ? null : keys(source);
-
+      var isSrcArr = isArrayLike(source) && (isArray(source) || isTypedArray(source));
+      if (!isSrcArr) {
+        var props = keys(source);
+        push.apply(props, getSymbols(source));
+      }
       arrayEach(props || source, function(srcValue, key) {
         if (props) {
           key = srcValue;
@@ -14691,7 +14750,7 @@ return jQuery;
           if (isCommon) {
             result = srcValue;
           }
-          if ((result !== undefined || (isSrcArr && !(key in object))) &&
+          if ((isSrcArr || result !== undefined) &&
               (isCommon || (result === result ? (result !== value) : (value === value)))) {
             object[key] = result;
           }
@@ -14798,7 +14857,7 @@ return jQuery;
     function basePullAt(array, indexes) {
       var length = array ? indexes.length : 0;
       while (length--) {
-        var index = indexes[length];
+        var index = parseFloat(indexes[length]);
         if (index != previous && isIndex(index)) {
           var previous = index;
           splice.call(array, index, 1);
@@ -15111,7 +15170,7 @@ return jQuery;
           var mid = (low + high) >>> 1,
               computed = array[mid];
 
-          if ((retHighest ? (computed <= value) : (computed < value)) && computed !== null) {
+          if (retHighest ? (computed <= value) : (computed < value)) {
             low = mid + 1;
           } else {
             high = mid;
@@ -15141,23 +15200,17 @@ return jQuery;
       var low = 0,
           high = array ? array.length : 0,
           valIsNaN = value !== value,
-          valIsNull = value === null,
           valIsUndef = value === undefined;
 
       while (low < high) {
         var mid = floor((low + high) / 2),
             computed = iteratee(array[mid]),
-            isDef = computed !== undefined,
             isReflexive = computed === computed;
 
         if (valIsNaN) {
           var setLow = isReflexive || retHighest;
-        } else if (valIsNull) {
-          setLow = isReflexive && isDef && (retHighest || computed != null);
         } else if (valIsUndef) {
-          setLow = isReflexive && (retHighest || isDef);
-        } else if (computed == null) {
-          setLow = false;
+          setLow = isReflexive && (retHighest || computed !== undefined);
         } else {
           setLow = retHighest ? (computed <= value) : (computed < value);
         }
@@ -15347,19 +15400,19 @@ return jQuery;
       return restParam(function(object, sources) {
         var index = -1,
             length = object == null ? 0 : sources.length,
-            customizer = length > 2 ? sources[length - 2] : undefined,
-            guard = length > 2 ? sources[2] : undefined,
-            thisArg = length > 1 ? sources[length - 1] : undefined;
+            customizer = length > 2 && sources[length - 2],
+            guard = length > 2 && sources[2],
+            thisArg = length > 1 && sources[length - 1];
 
         if (typeof customizer == 'function') {
           customizer = bindCallback(customizer, thisArg, 5);
           length -= 2;
         } else {
-          customizer = typeof thisArg == 'function' ? thisArg : undefined;
+          customizer = typeof thisArg == 'function' ? thisArg : null;
           length -= (customizer ? 1 : 0);
         }
         if (guard && isIterateeCall(sources[0], sources[1], guard)) {
-          customizer = length < 3 ? undefined : customizer;
+          customizer = length < 3 ? null : customizer;
           length = 1;
         }
         while (++index < length) {
@@ -15484,20 +15537,8 @@ return jQuery;
      */
     function createCtorWrapper(Ctor) {
       return function() {
-        // Use a `switch` statement to work with class constructors.
-        // See https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-function-objects-call-thisargument-argumentslist
-        // for more details.
-        var args = arguments;
-        switch (args.length) {
-          case 0: return new Ctor;
-          case 1: return new Ctor(args[0]);
-          case 2: return new Ctor(args[0], args[1]);
-          case 3: return new Ctor(args[0], args[1], args[2]);
-          case 4: return new Ctor(args[0], args[1], args[2], args[3]);
-          case 5: return new Ctor(args[0], args[1], args[2], args[3], args[4]);
-        }
         var thisBinding = baseCreate(Ctor.prototype),
-            result = Ctor.apply(thisBinding, args);
+            result = Ctor.apply(thisBinding, arguments);
 
         // Mimic the constructor's `return` behavior.
         // See https://es5.github.io/#x13.2.2 for more details.
@@ -15528,24 +15569,32 @@ return jQuery;
      * Creates a `_.max` or `_.min` function.
      *
      * @private
-     * @param {Function} comparator The function used to compare values.
-     * @param {*} exValue The initial extremum value.
+     * @param {Function} arrayFunc The function to get the extremum value from an array.
+     * @param {boolean} [isMin] Specify returning the minimum, instead of the maximum,
+     *  extremum value.
      * @returns {Function} Returns the new extremum function.
      */
-    function createExtremum(comparator, exValue) {
+    function createExtremum(arrayFunc, isMin) {
       return function(collection, iteratee, thisArg) {
         if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
           iteratee = null;
         }
-        iteratee = getCallback(iteratee, thisArg, 3);
-        if (iteratee.length == 1) {
-          collection = toIterable(collection);
-          var result = arrayExtremum(collection, iteratee, comparator, exValue);
-          if (!(collection.length && result === exValue)) {
-            return result;
+        var func = getCallback(),
+            noIteratee = iteratee == null;
+
+        if (!(func === baseCallback && noIteratee)) {
+          noIteratee = false;
+          iteratee = func(iteratee, thisArg, 3);
+        }
+        if (noIteratee) {
+          var isArr = isArray(collection);
+          if (!isArr && isString(collection)) {
+            iteratee = charAtCallback;
+          } else {
+            return arrayFunc(isArr ? collection : toIterable(collection));
           }
         }
-        return baseExtremum(collection, iteratee, comparator, exValue);
+        return extremumBy(collection, iteratee, isMin);
       };
     }
 
@@ -15608,8 +15657,11 @@ return jQuery;
      */
     function createFlow(fromRight) {
       return function() {
+        var length = arguments.length;
+        if (!length) {
+          return function() { return arguments[0]; };
+        }
         var wrapper,
-            length = arguments.length,
             index = fromRight ? length : -1,
             leftIndex = 0,
             funcs = Array(length);
@@ -15619,17 +15671,15 @@ return jQuery;
           if (typeof func != 'function') {
             throw new TypeError(FUNC_ERROR_TEXT);
           }
-          if (!wrapper && LodashWrapper.prototype.thru && getFuncName(func) == 'wrapper') {
-            wrapper = new LodashWrapper([]);
-          }
+          var funcName = wrapper ? '' : getFuncName(func);
+          wrapper = funcName == 'wrapper' ? new LodashWrapper([]) : wrapper;
         }
         index = wrapper ? -1 : length;
         while (++index < length) {
           func = funcs[index];
+          funcName = getFuncName(func);
 
-          var funcName = getFuncName(func),
-              data = funcName == 'wrapper' ? getData(func) : null;
-
+          var data = funcName == 'wrapper' ? getData(func) : null;
           if (data && isLaziable(data[0]) && data[1] == (ARY_FLAG | CURRY_FLAG | PARTIAL_FLAG | REARG_FLAG) && !data[4].length && data[9] == 1) {
             wrapper = wrapper[getFuncName(data[0])].apply(wrapper, data[3]);
           } else {
@@ -15642,7 +15692,7 @@ return jQuery;
             return wrapper.plant(args[0]).value();
           }
           var index = 0,
-              result = length ? funcs[index].apply(this, args) : args[0];
+              result = funcs[index].apply(this, args);
 
           while (++index < length) {
             result = funcs[index].call(this, result);
@@ -15791,8 +15841,10 @@ return jQuery;
           isBindKey = bitmask & BIND_KEY_FLAG,
           isCurry = bitmask & CURRY_FLAG,
           isCurryBound = bitmask & CURRY_BOUND_FLAG,
-          isCurryRight = bitmask & CURRY_RIGHT_FLAG,
-          Ctor = isBindKey ? null : createCtorWrapper(func);
+          isCurryRight = bitmask & CURRY_RIGHT_FLAG;
+
+      var Ctor = !isBindKey && createCtorWrapper(func),
+          key = func;
 
       function wrapper() {
         // Avoid `arguments` object use disqualifying optimizations by
@@ -15839,18 +15891,17 @@ return jQuery;
             return result;
           }
         }
-        var thisBinding = isBind ? thisArg : this,
-            fn = isBindKey ? thisBinding[func] : func;
-
+        var thisBinding = isBind ? thisArg : this;
+        if (isBindKey) {
+          func = thisBinding[key];
+        }
         if (argPos) {
           args = reorder(args, argPos);
         }
         if (isAry && ary < args.length) {
           args.length = ary;
         }
-        if (this && this !== root && this instanceof wrapper) {
-          fn = Ctor || createCtorWrapper(func);
-        }
+        var fn = (this && this !== root && this instanceof wrapper) ? (Ctor || createCtorWrapper(func)) : func;
         return fn.apply(thisBinding, args);
       }
       return wrapper;
@@ -15924,10 +15975,10 @@ return jQuery;
      */
     function createSortedIndex(retHighest) {
       return function(array, value, iteratee, thisArg) {
-        var callback = getCallback(iteratee);
-        return (iteratee == null && callback === baseCallback)
+        var func = getCallback(iteratee);
+        return (func === baseCallback && iteratee == null)
           ? binaryIndex(array, value, retHighest)
-          : binaryIndexBy(array, value, callback(iteratee, thisArg, 1), retHighest);
+          : binaryIndexBy(array, value, func(iteratee, thisArg, 1), retHighest);
       };
     }
 
@@ -16013,35 +16064,40 @@ return jQuery;
     function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stackB) {
       var index = -1,
           arrLength = array.length,
-          othLength = other.length;
+          othLength = other.length,
+          result = true;
 
       if (arrLength != othLength && !(isLoose && othLength > arrLength)) {
         return false;
       }
-      // Ignore non-index properties.
-      while (++index < arrLength) {
+      // Deep compare the contents, ignoring non-numeric properties.
+      while (result && ++index < arrLength) {
         var arrValue = array[index],
-            othValue = other[index],
-            result = customizer ? customizer(isLoose ? othValue : arrValue, isLoose ? arrValue : othValue, index) : undefined;
+            othValue = other[index];
 
-        if (result !== undefined) {
-          if (result) {
-            continue;
-          }
-          return false;
+        result = undefined;
+        if (customizer) {
+          result = isLoose
+            ? customizer(othValue, arrValue, index)
+            : customizer(arrValue, othValue, index);
         }
-        // Recursively compare arrays (susceptible to call stack limits).
-        if (isLoose) {
-          if (!arraySome(other, function(othValue) {
-                return arrValue === othValue || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
-              })) {
-            return false;
+        if (result === undefined) {
+          // Recursively compare arrays (susceptible to call stack limits).
+          if (isLoose) {
+            var othIndex = othLength;
+            while (othIndex--) {
+              othValue = other[othIndex];
+              result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
+              if (result) {
+                break;
+              }
+            }
+          } else {
+            result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
           }
-        } else if (!(arrValue === othValue || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB))) {
-          return false;
         }
       }
-      return true;
+      return !!result;
     }
 
     /**
@@ -16106,22 +16162,29 @@ return jQuery;
       if (objLength != othLength && !isLoose) {
         return false;
       }
-      var index = objLength;
-      while (index--) {
-        var key = objProps[index];
-        if (!(isLoose ? key in other : hasOwnProperty.call(other, key))) {
-          return false;
-        }
-      }
-      var skipCtor = isLoose;
-      while (++index < objLength) {
-        key = objProps[index];
-        var objValue = object[key],
-            othValue = other[key],
-            result = customizer ? customizer(isLoose ? othValue : objValue, isLoose? objValue : othValue, key) : undefined;
+      var skipCtor = isLoose,
+          index = -1;
 
-        // Recursively compare objects (susceptible to call stack limits).
-        if (!(result === undefined ? equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB) : result)) {
+      while (++index < objLength) {
+        var key = objProps[index],
+            result = isLoose ? key in other : hasOwnProperty.call(other, key);
+
+        if (result) {
+          var objValue = object[key],
+              othValue = other[key];
+
+          result = undefined;
+          if (customizer) {
+            result = isLoose
+              ? customizer(othValue, objValue, key)
+              : customizer(objValue, othValue, key);
+          }
+          if (result === undefined) {
+            // Recursively compare objects (susceptible to call stack limits).
+            result = (objValue && objValue === othValue) || equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB);
+          }
+        }
+        if (!result) {
           return false;
         }
         skipCtor || (skipCtor = key == 'constructor');
@@ -16139,6 +16202,34 @@ return jQuery;
         }
       }
       return true;
+    }
+
+    /**
+     * Gets the extremum value of `collection` invoking `iteratee` for each value
+     * in `collection` to generate the criterion by which the value is ranked.
+     * The `iteratee` is invoked with three arguments: (value, index, collection).
+     *
+     * @private
+     * @param {Array|Object|string} collection The collection to iterate over.
+     * @param {Function} iteratee The function invoked per iteration.
+     * @param {boolean} [isMin] Specify returning the minimum, instead of the
+     *  maximum, extremum value.
+     * @returns {*} Returns the extremum value.
+     */
+    function extremumBy(collection, iteratee, isMin) {
+      var exValue = isMin ? POSITIVE_INFINITY : NEGATIVE_INFINITY,
+          computed = exValue,
+          result = computed;
+
+      baseEach(collection, function(value, index, collection) {
+        var current = iteratee(value, index, collection);
+        if ((isMin ? (current < computed) : (current > computed)) ||
+            (current === exValue && current === result)) {
+          computed = current;
+          result = value;
+        }
+      });
+      return result;
     }
 
     /**
@@ -16174,20 +16265,29 @@ return jQuery;
      * @param {Function} func The function to query.
      * @returns {string} Returns the function name.
      */
-    function getFuncName(func) {
-      var result = func.name,
-          array = realNames[result],
-          length = array ? array.length : 0;
-
-      while (length--) {
-        var data = array[length],
-            otherFunc = data.func;
-        if (otherFunc == null || otherFunc == func) {
-          return data.name;
-        }
+    var getFuncName = (function() {
+      if (!support.funcNames) {
+        return constant('');
       }
-      return result;
-    }
+      if (constant.name == 'constant') {
+        return baseProperty('name');
+      }
+      return function(func) {
+        var result = func.name,
+            array = realNames[result],
+            length = array ? array.length : 0;
+
+        while (length--) {
+          var data = array[length],
+              otherFunc = data.func;
+
+          if (otherFunc == null || otherFunc == func) {
+            return data.name;
+          }
+        }
+        return result;
+      };
+    }());
 
     /**
      * Gets the appropriate "indexOf" function. If the `_.indexOf` method is
@@ -16217,34 +16317,15 @@ return jQuery;
     var getLength = baseProperty('length');
 
     /**
-     * Gets the propery names, values, and compare flags of `object`.
+     * Creates an array of the own symbols of `object`.
      *
      * @private
      * @param {Object} object The object to query.
-     * @returns {Array} Returns the match data of `object`.
+     * @returns {Array} Returns the array of symbols.
      */
-    function getMatchData(object) {
-      var result = pairs(object),
-          length = result.length;
-
-      while (length--) {
-        result[length][2] = isStrictComparable(result[length][1]);
-      }
-      return result;
-    }
-
-    /**
-     * Gets the native function at `key` of `object`.
-     *
-     * @private
-     * @param {Object} object The object to query.
-     * @param {string} key The key of the method to get.
-     * @returns {*} Returns the function if it's native, else `undefined`.
-     */
-    function getNative(object, key) {
-      var value = object == null ? undefined : object[key];
-      return isNative(value) ? value : undefined;
-    }
+    var getSymbols = !getOwnPropertySymbols ? constant([]) : function(object) {
+      return getOwnPropertySymbols(toObject(object));
+    };
 
     /**
      * Gets the view, applying any `transforms` to the `start` and `end` positions.
@@ -16386,7 +16467,7 @@ return jQuery;
      * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
      */
     function isIndex(value, length) {
-      value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
+      value = +value;
       length = length == null ? MAX_SAFE_INTEGER : length;
       return value > -1 && value % 1 == 0 && value < length;
     }
@@ -16443,15 +16524,7 @@ return jQuery;
      */
     function isLaziable(func) {
       var funcName = getFuncName(func);
-      if (!(funcName in LazyWrapper.prototype)) {
-        return false;
-      }
-      var other = lodash[funcName];
-      if (func === other) {
-        return true;
-      }
-      var data = getData(other);
-      return !!data && func === data[0];
+      return !!funcName && func === lodash[funcName] && funcName in LazyWrapper.prototype;
     }
 
     /**
@@ -16691,10 +16764,11 @@ return jQuery;
     function shimKeys(object) {
       var props = keysIn(object),
           propsLength = props.length,
-          length = propsLength && object.length;
+          length = propsLength && object.length,
+          support = lodash.support;
 
-      var allowIndexes = !!length && isLength(length) &&
-        (isArray(object) || isArguments(object));
+      var allowIndexes = length && isLength(length) &&
+        (isArray(object) || (support.nonEnumArgs && isArguments(object)));
 
       var index = -1,
           result = [];
@@ -16709,7 +16783,7 @@ return jQuery;
     }
 
     /**
-     * Converts `value` to an array-like object if it's not one.
+     * Converts `value` to an array-like object if it is not one.
      *
      * @private
      * @param {*} value The value to process.
@@ -16726,7 +16800,7 @@ return jQuery;
     }
 
     /**
-     * Converts `value` to an object if it's not one.
+     * Converts `value` to an object if it is not one.
      *
      * @private
      * @param {*} value The value to process.
@@ -16737,7 +16811,7 @@ return jQuery;
     }
 
     /**
-     * Converts `value` to property path array if it's not one.
+     * Converts `value` to property path array if it is not one.
      *
      * @private
      * @param {*} value The value to process.
@@ -16766,8 +16840,6 @@ return jQuery;
         ? wrapper.clone()
         : new LodashWrapper(wrapper.__wrapped__, wrapper.__chain__, arrayCopy(wrapper.__actions__));
     }
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Creates an array of elements split into groups the length of `size`.
@@ -16836,8 +16908,8 @@ return jQuery;
     }
 
     /**
-     * Creates an array of unique `array` values not included in the other
-     * provided arrays using [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+     * Creates an array excluding all values of the provided arrays using
+     * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
      * for equality comparisons.
      *
      * @static
@@ -17310,8 +17382,8 @@ return jQuery;
     }
 
     /**
-     * Creates an array of unique values that are included in all of the provided
-     * arrays using [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+     * Creates an array of unique values in all provided arrays using
+     * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
      * for equality comparisons.
      *
      * @static
@@ -17323,19 +17395,27 @@ return jQuery;
      * _.intersection([1, 2], [4, 2], [2, 1]);
      * // => [2]
      */
-    var intersection = restParam(function(arrays) {
-      var othLength = arrays.length,
-          othIndex = othLength,
-          caches = Array(length),
+    function intersection() {
+      var args = [],
+          argsIndex = -1,
+          argsLength = arguments.length,
+          caches = [],
           indexOf = getIndexOf(),
           isCommon = indexOf == baseIndexOf,
           result = [];
 
-      while (othIndex--) {
-        var value = arrays[othIndex] = isArrayLike(value = arrays[othIndex]) ? value : [];
-        caches[othIndex] = (isCommon && value.length >= 120) ? createCache(othIndex && value) : null;
+      while (++argsIndex < argsLength) {
+        var value = arguments[argsIndex];
+        if (isArrayLike(value)) {
+          args.push(value);
+          caches.push((isCommon && value.length >= 120) ? createCache(argsIndex && value) : null);
+        }
       }
-      var array = arrays[0],
+      argsLength = args.length;
+      if (argsLength < 2) {
+        return result;
+      }
+      var array = args[0],
           index = -1,
           length = array ? array.length : 0,
           seen = caches[0];
@@ -17344,10 +17424,10 @@ return jQuery;
       while (++index < length) {
         value = array[index];
         if ((seen ? cacheIndexOf(seen, value) : indexOf(result, value, 0)) < 0) {
-          var othIndex = othLength;
-          while (--othIndex) {
-            var cache = caches[othIndex];
-            if ((cache ? cacheIndexOf(cache, value) : indexOf(arrays[othIndex], value, 0)) < 0) {
+          argsIndex = argsLength;
+          while (--argsIndex) {
+            var cache = caches[argsIndex];
+            if ((cache ? cacheIndexOf(cache, value) : indexOf(args[argsIndex], value, 0)) < 0) {
               continue outer;
             }
           }
@@ -17358,7 +17438,7 @@ return jQuery;
         }
       }
       return result;
-    });
+    }
 
     /**
      * Gets the last element of `array`.
@@ -17864,8 +17944,8 @@ return jQuery;
     }
 
     /**
-     * Creates an array of unique values, in order, from all of the provided arrays
-     * using [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+     * Creates an array of unique values, in order, of the provided arrays using
+     * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
      * for equality comparisons.
      *
      * @static
@@ -17941,9 +18021,9 @@ return jQuery;
         iteratee = isIterateeCall(array, isSorted, thisArg) ? null : isSorted;
         isSorted = false;
       }
-      var callback = getCallback();
-      if (!(iteratee == null && callback === baseCallback)) {
-        iteratee = callback(iteratee, thisArg, 3);
+      var func = getCallback();
+      if (!(func === baseCallback && iteratee == null)) {
+        iteratee = func(iteratee, thisArg, 3);
       }
       return (isSorted && getIndexOf() == baseIndexOf)
         ? sortedUniq(array, iteratee)
@@ -18046,7 +18126,7 @@ return jQuery;
     });
 
     /**
-     * Creates an array of unique values that is the [symmetric difference](https://en.wikipedia.org/wiki/Symmetric_difference)
+     * Creates an array that is the [symmetric difference](https://en.wikipedia.org/wiki/Symmetric_difference)
      * of the provided arrays.
      *
      * @static
@@ -18150,8 +18230,8 @@ return jQuery;
      */
     var zipWith = restParam(function(arrays) {
       var length = arrays.length,
-          iteratee = length > 2 ? arrays[length - 2] : undefined,
-          thisArg = length > 1 ? arrays[length - 1] : undefined;
+          iteratee = arrays[length - 2],
+          thisArg = arrays[length - 1];
 
       if (length > 2 && typeof iteratee == 'function') {
         length -= 2;
@@ -18162,8 +18242,6 @@ return jQuery;
       arrays.length = length;
       return unzipWith(arrays, iteratee, thisArg);
     });
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Creates a `lodash` object that wraps `value` with explicit method
@@ -18414,8 +18492,6 @@ return jQuery;
     function wrapperValue() {
       return baseWrapperValue(this.__wrapped__, this.__actions__);
     }
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Creates an array of elements corresponding to the given keys, or indexes,
@@ -18908,7 +18984,7 @@ return jQuery;
     });
 
     /**
-     * Invokes the method at `path` of each element in `collection`, returning
+     * Invokes the method at `path` on each element in `collection`, returning
      * an array of the results of each invoked method. Any additional arguments
      * are provided to each invoked method. If `methodName` is a function it is
      * invoked for, and `this` bound to, each element in `collection`.
@@ -18936,7 +19012,7 @@ return jQuery;
           result = isArrayLike(collection) ? Array(collection.length) : [];
 
       baseEach(collection, function(value) {
-        var func = isFunc ? path : ((isProp && value != null) ? value[path] : null);
+        var func = isFunc ? path : (isProp && value != null && value[path]);
         result[++index] = func ? func.apply(value, args) : invokePath(value, path, args);
       });
       return result;
@@ -18958,7 +19034,7 @@ return jQuery;
      * callback returns `true` for elements that have the properties of the given
      * object, else `false`.
      *
-     * Many lodash methods are guarded to work as iteratees for methods like
+     * Many lodash methods are guarded to work as interatees for methods like
      * `_.every`, `_.filter`, `_.map`, `_.mapValues`, `_.reject`, and `_.some`.
      *
      * The guarded methods are:
@@ -19102,7 +19178,7 @@ return jQuery;
      * value. The `iteratee` is bound to `thisArg` and invoked with four arguments:
      * (accumulator, value, index|key, collection).
      *
-     * Many lodash methods are guarded to work as iteratees for methods like
+     * Many lodash methods are guarded to work as interatees for methods like
      * `_.reduce`, `_.reduceRight`, and `_.transform`.
      *
      * The guarded methods are:
@@ -19224,20 +19300,8 @@ return jQuery;
         var length = collection.length;
         return length > 0 ? collection[baseRandom(0, length - 1)] : undefined;
       }
-      var index = -1,
-          result = toArray(collection),
-          length = result.length,
-          lastIndex = length - 1;
-
-      n = nativeMin(n < 0 ? 0 : (+n || 0), length);
-      while (++index < n) {
-        var rand = baseRandom(index, lastIndex),
-            value = result[rand];
-
-        result[rand] = result[index];
-        result[index] = value;
-      }
-      result.length = n;
+      var result = shuffle(collection);
+      result.length = nativeMin(n < 0 ? 0 : (+n || 0), result.length);
       return result;
     }
 
@@ -19256,7 +19320,20 @@ return jQuery;
      * // => [4, 1, 3, 2]
      */
     function shuffle(collection) {
-      return sample(collection, POSITIVE_INFINITY);
+      collection = toIterable(collection);
+
+      var index = -1,
+          length = collection.length,
+          result = Array(length);
+
+      while (++index < length) {
+        var rand = baseRandom(0, index);
+        if (index != rand) {
+          result[index] = result[rand];
+        }
+        result[rand] = collection[index];
+      }
+      return result;
     }
 
     /**
@@ -19537,8 +19614,6 @@ return jQuery;
       return filter(collection, baseMatches(source));
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      * Gets the number of milliseconds that have elapsed since the Unix epoch
      * (1 January 1970 00:00:00 UTC).
@@ -19556,8 +19631,6 @@ return jQuery;
     var now = nativeNow || function() {
       return new Date().getTime();
     };
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * The opposite of `_.before`; this method creates a function that invokes
@@ -19882,13 +19955,12 @@ return jQuery;
     var curryRight = createCurry(CURRY_RIGHT_FLAG);
 
     /**
-     * Creates a debounced function that delays invoking `func` until after `wait`
-     * milliseconds have elapsed since the last time the debounced function was
-     * invoked. The debounced function comes with a `cancel` method to cancel
-     * delayed invocations. Provide an options object to indicate that `func`
-     * should be invoked on the leading and/or trailing edge of the `wait` timeout.
-     * Subsequent calls to the debounced function return the result of the last
-     * `func` invocation.
+     * Creates a function that delays invoking `func` until after `wait` milliseconds
+     * have elapsed since the last time it was invoked. The created function comes
+     * with a `cancel` method to cancel delayed invocations. Provide an options
+     * object to indicate that `func` should be invoked on the leading and/or
+     * trailing edge of the `wait` timeout. Subsequent calls to the debounced
+     * function return the result of the last `func` invocation.
      *
      * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
      * on the trailing edge of the timeout only if the the debounced function is
@@ -20202,14 +20274,14 @@ return jQuery;
       }
       var memoized = function() {
         var args = arguments,
-            key = resolver ? resolver.apply(this, args) : args[0],
-            cache = memoized.cache;
+            cache = memoized.cache,
+            key = resolver ? resolver.apply(this, args) : args[0];
 
         if (cache.has(key)) {
           return cache.get(key);
         }
         var result = func.apply(this, args);
-        memoized.cache = cache.set(key, result);
+        cache.set(key, result);
         return result;
       };
       memoized.cache = new memoize.Cache;
@@ -20456,12 +20528,12 @@ return jQuery;
     }
 
     /**
-     * Creates a throttled function that only invokes `func` at most once per
-     * every `wait` milliseconds. The throttled function comes with a `cancel`
-     * method to cancel delayed invocations. Provide an options object to indicate
-     * that `func` should be invoked on the leading and/or trailing edge of the
-     * `wait` timeout. Subsequent calls to the throttled function return the
-     * result of the last `func` call.
+     * Creates a function that only invokes `func` at most once per every `wait`
+     * milliseconds. The created function comes with a `cancel` method to cancel
+     * delayed invocations. Provide an options object to indicate that `func`
+     * should be invoked on the leading and/or trailing edge of the `wait` timeout.
+     * Subsequent calls to the throttled function return the result of the last
+     * `func` call.
      *
      * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
      * on the trailing edge of the timeout only if the the throttled function is
@@ -20539,8 +20611,6 @@ return jQuery;
       return createWrapper(wrapper, PARTIAL_FLAG, null, [value], []);
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      * Creates a clone of `value`. If `isDeep` is `true` nested objects are cloned,
      * otherwise they are assigned by reference. If `customizer` is provided it is
@@ -20601,9 +20671,8 @@ return jQuery;
         customizer = isDeep;
         isDeep = false;
       }
-      return typeof customizer == 'function'
-        ? baseClone(value, isDeep, bindCallback(customizer, thisArg, 1))
-        : baseClone(value, isDeep);
+      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 1);
+      return baseClone(value, isDeep, customizer);
     }
 
     /**
@@ -20652,57 +20721,8 @@ return jQuery;
      * // => 20
      */
     function cloneDeep(value, customizer, thisArg) {
-      return typeof customizer == 'function'
-        ? baseClone(value, true, bindCallback(customizer, thisArg, 1))
-        : baseClone(value, true);
-    }
-
-    /**
-     * Checks if `value` is greater than `other`.
-     *
-     * @static
-     * @memberOf _
-     * @category Lang
-     * @param {*} value The value to compare.
-     * @param {*} other The other value to compare.
-     * @returns {boolean} Returns `true` if `value` is greater than `other`, else `false`.
-     * @example
-     *
-     * _.gt(3, 1);
-     * // => true
-     *
-     * _.gt(3, 3);
-     * // => false
-     *
-     * _.gt(1, 3);
-     * // => false
-     */
-    function gt(value, other) {
-      return value > other;
-    }
-
-    /**
-     * Checks if `value` is greater than or equal to `other`.
-     *
-     * @static
-     * @memberOf _
-     * @category Lang
-     * @param {*} value The value to compare.
-     * @param {*} other The other value to compare.
-     * @returns {boolean} Returns `true` if `value` is greater than or equal to `other`, else `false`.
-     * @example
-     *
-     * _.gte(3, 1);
-     * // => true
-     *
-     * _.gte(3, 3);
-     * // => true
-     *
-     * _.gte(1, 3);
-     * // => false
-     */
-    function gte(value, other) {
-      return value >= other;
+      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 1);
+      return baseClone(value, true, customizer);
     }
 
     /**
@@ -20865,7 +20885,6 @@ return jQuery;
      *
      * @static
      * @memberOf _
-     * @alias eq
      * @category Lang
      * @param {*} value The value to compare.
      * @param {*} other The other value to compare.
@@ -20895,9 +20914,12 @@ return jQuery;
      * // => true
      */
     function isEqual(value, other, customizer, thisArg) {
-      customizer = typeof customizer == 'function' ? bindCallback(customizer, thisArg, 3) : undefined;
+      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 3);
+      if (!customizer && isStrictComparable(value) && isStrictComparable(other)) {
+        return value === other;
+      }
       var result = customizer ? customizer(value, other) : undefined;
-      return  result === undefined ? baseIsEqual(value, other, customizer) : !!result;
+      return result === undefined ? baseIsEqual(value, other, customizer) : !!result;
     }
 
     /**
@@ -20999,7 +21021,7 @@ return jQuery;
       // Avoid a V8 JIT bug in Chrome 19-20.
       // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
       var type = typeof value;
-      return !!value && (type == 'object' || type == 'function');
+      return type == 'function' || (!!value && type == 'object');
     }
 
     /**
@@ -21042,8 +21064,33 @@ return jQuery;
      * // => true
      */
     function isMatch(object, source, customizer, thisArg) {
-      customizer = typeof customizer == 'function' ? bindCallback(customizer, thisArg, 3) : undefined;
-      return baseIsMatch(object, getMatchData(source), customizer);
+      var props = keys(source),
+          length = props.length;
+
+      if (!length) {
+        return true;
+      }
+      if (object == null) {
+        return false;
+      }
+      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 3);
+      object = toObject(object);
+      if (!customizer && length == 1) {
+        var key = props[0],
+            value = source[key];
+
+        if (isStrictComparable(value)) {
+          return value === object[key] && (value !== undefined || (key in object));
+        }
+      }
+      var values = Array(length),
+          strictCompareFlags = Array(length);
+
+      while (length--) {
+        value = values[length] = source[props[length]];
+        strictCompareFlags[length] = isStrictComparable(value);
+      }
+      return baseIsMatch(object, props, values, strictCompareFlags, customizer);
     }
 
     /**
@@ -21183,8 +21230,8 @@ return jQuery;
       if (!(value && objToString.call(value) == objectTag)) {
         return false;
       }
-      var valueOf = getNative(value, 'valueOf'),
-          objProto = valueOf && (objProto = getPrototypeOf(valueOf)) && getPrototypeOf(objProto);
+      var valueOf = value.valueOf,
+          objProto = isNative(valueOf) && (objProto = getPrototypeOf(valueOf)) && getPrototypeOf(objProto);
 
       return objProto
         ? (value == objProto || getPrototypeOf(value) == objProto)
@@ -21272,54 +21319,6 @@ return jQuery;
     }
 
     /**
-     * Checks if `value` is less than `other`.
-     *
-     * @static
-     * @memberOf _
-     * @category Lang
-     * @param {*} value The value to compare.
-     * @param {*} other The other value to compare.
-     * @returns {boolean} Returns `true` if `value` is less than `other`, else `false`.
-     * @example
-     *
-     * _.lt(1, 3);
-     * // => true
-     *
-     * _.lt(3, 3);
-     * // => false
-     *
-     * _.lt(3, 1);
-     * // => false
-     */
-    function lt(value, other) {
-      return value < other;
-    }
-
-    /**
-     * Checks if `value` is less than or equal to `other`.
-     *
-     * @static
-     * @memberOf _
-     * @category Lang
-     * @param {*} value The value to compare.
-     * @param {*} other The other value to compare.
-     * @returns {boolean} Returns `true` if `value` is less than or equal to `other`, else `false`.
-     * @example
-     *
-     * _.lte(1, 3);
-     * // => true
-     *
-     * _.lte(3, 3);
-     * // => true
-     *
-     * _.lte(3, 1);
-     * // => false
-     */
-    function lte(value, other) {
-      return value <= other;
-    }
-
-    /**
      * Converts `value` to an array.
      *
      * @static
@@ -21371,8 +21370,6 @@ return jQuery;
     function toPlainObject(value) {
       return baseCopy(value, keysIn(value));
     }
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Assigns own enumerable properties of source object(s) to the destination
@@ -21713,7 +21710,7 @@ return jQuery;
     }
 
     /**
-     * Gets the property value at `path` of `object`. If the resolved value is
+     * Gets the property value of `path` on `object`. If the resolved value is
      * `undefined` the `defaultValue` is used in its place.
      *
      * @static
@@ -21771,14 +21768,10 @@ return jQuery;
       if (!result && !isKey(path)) {
         path = toPath(path);
         object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
-        if (object == null) {
-          return false;
-        }
         path = last(path);
-        result = hasOwnProperty.call(object, path);
+        result = object != null && hasOwnProperty.call(object, path);
       }
-      return result || (isLength(object.length) && isIndex(path, object.length) &&
-        (isArray(object) || isArguments(object)));
+      return result;
     }
 
     /**
@@ -21859,7 +21852,7 @@ return jQuery;
      * // => ['0', '1']
      */
     var keys = !nativeKeys ? shimKeys : function(object) {
-      var Ctor = object == null ? null : object.constructor;
+      var Ctor = object != null && object.constructor;
       if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
           (typeof object != 'function' && isArrayLike(object))) {
         return shimKeys(object);
@@ -21898,7 +21891,7 @@ return jQuery;
       }
       var length = object.length;
       length = (length && isLength(length) &&
-        (isArray(object) || isArguments(object)) && length) || 0;
+        (isArray(object) || (support.nonEnumArgs && isArguments(object))) && length) || 0;
 
       var Ctor = object.constructor,
           index = -1,
@@ -22085,8 +22078,6 @@ return jQuery;
      * // => [['barney', 36], ['fred', 40]] (iteration order is not guaranteed)
      */
     function pairs(object) {
-      object = toObject(object);
-
       var index = -1,
           props = keys(object),
           length = props.length,
@@ -22207,13 +22198,13 @@ return jQuery;
 
       var index = -1,
           length = path.length,
-          lastIndex = length - 1,
+          endIndex = length - 1,
           nested = object;
 
       while (nested != null && ++index < length) {
         var key = path[index];
         if (isObject(nested)) {
-          if (index == lastIndex) {
+          if (index == endIndex) {
             nested[key] = value;
           } else if (nested[key] == null) {
             nested[key] = isIndex(path[index + 1]) ? [] : {};
@@ -22263,7 +22254,7 @@ return jQuery;
           if (isArr) {
             accumulator = isArray(object) ? new Ctor : [];
           } else {
-            accumulator = baseCreate(isFunction(Ctor) ? Ctor.prototype : null);
+            accumulator = baseCreate(isFunction(Ctor) && Ctor.prototype);
           }
         } else {
           accumulator = {};
@@ -22330,8 +22321,6 @@ return jQuery;
     function valuesIn(object) {
       return baseValues(object, keysIn(object));
     }
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * Checks if `n` is between `start` and up to but not including, `end`. If
@@ -22437,8 +22426,6 @@ return jQuery;
       return baseRandom(min, max);
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      * Converts `string` to [camel case](https://en.wikipedia.org/wiki/CamelCase).
      *
@@ -22542,7 +22529,7 @@ return jQuery;
      * use a third-party library like [_he_](https://mths.be/he).
      *
      * Though the ">" character is escaped for symmetry, characters like
-     * ">" and "/" don't need escaping in HTML and have no special meaning
+     * ">" and "/" don't require escaping in HTML and have no special meaning
      * unless they're part of a tag or unquoted attribute value.
      * See [Mathias Bynens's article](https://mathiasbynens.be/notes/ambiguous-ampersands)
      * (under "semi-related fun fact") for more details.
@@ -22619,7 +22606,7 @@ return jQuery;
     });
 
     /**
-     * Pads `string` on the left and right sides if it's shorter than `length`.
+     * Pads `string` on the left and right sides if it is shorter than `length`.
      * Padding characters are truncated if they can't be evenly divided by `length`.
      *
      * @static
@@ -22657,7 +22644,7 @@ return jQuery;
     }
 
     /**
-     * Pads `string` on the left side if it's shorter than `length`. Padding
+     * Pads `string` on the left side if it is shorter than `length`. Padding
      * characters are truncated if they exceed `length`.
      *
      * @static
@@ -22681,7 +22668,7 @@ return jQuery;
     var padLeft = createPadDir();
 
     /**
-     * Pads `string` on the right side if it's shorter than `length`. Padding
+     * Pads `string` on the right side if it is shorter than `length`. Padding
      * characters are truncated if they exceed `length`.
      *
      * @static
@@ -23162,7 +23149,7 @@ return jQuery;
     }
 
     /**
-     * Truncates `string` if it's longer than the given maximum string length.
+     * Truncates `string` if it is longer than the given maximum string length.
      * The last characters of the truncated string are replaced with the omission
      * string which defaults to "...".
      *
@@ -23304,8 +23291,6 @@ return jQuery;
       return string.match(pattern || reWords) || [];
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      * Attempts to invoke `func`, returning either the result or the caught error
      * object. Any additional arguments are provided to `func` when it is invoked.
@@ -23423,7 +23408,7 @@ return jQuery;
     }
 
     /**
-     * Creates a function that performs a deep comparison between a given object
+     * Creates a function which performs a deep comparison between a given object
      * and `source`, returning `true` if the given object has equivalent property
      * values, else `false`.
      *
@@ -23452,7 +23437,7 @@ return jQuery;
     }
 
     /**
-     * Creates a function that compares the property value of `path` on a given
+     * Creates a function which compares the property value of `path` on a given
      * object to `value`.
      *
      * **Note:** This method supports comparing arrays, booleans, `Date` objects,
@@ -23463,7 +23448,7 @@ return jQuery;
      * @memberOf _
      * @category Utility
      * @param {Array|string} path The path of the property to get.
-     * @param {*} srcValue The value to match.
+     * @param {*} value The value to compare.
      * @returns {Function} Returns the new function.
      * @example
      *
@@ -23475,19 +23460,17 @@ return jQuery;
      * _.find(users, _.matchesProperty('user', 'fred'));
      * // => { 'user': 'fred' }
      */
-    function matchesProperty(path, srcValue) {
-      return baseMatchesProperty(path, baseClone(srcValue, true));
+    function matchesProperty(path, value) {
+      return baseMatchesProperty(path, baseClone(value, true));
     }
 
     /**
-     * Creates a function that invokes the method at `path` on a given object.
-     * Any additional arguments are provided to the invoked method.
+     * Creates a function which invokes the method at `path` on a given object.
      *
      * @static
      * @memberOf _
      * @category Utility
      * @param {Array|string} path The path of the method to invoke.
-     * @param {...*} [args] The arguments to invoke the method with.
      * @returns {Function} Returns the new function.
      * @example
      *
@@ -23509,15 +23492,13 @@ return jQuery;
     });
 
     /**
-     * The opposite of `_.method`; this method creates a function that invokes
-     * the method at a given path on `object`. Any additional arguments are
-     * provided to the invoked method.
+     * The opposite of `_.method`; this method creates a function which invokes
+     * the method at a given path on `object`.
      *
      * @static
      * @memberOf _
      * @category Utility
      * @param {Object} object The object to query.
-     * @param {...*} [args] The arguments to invoke the method with.
      * @returns {Function} Returns the new function.
      * @example
      *
@@ -23561,6 +23542,9 @@ return jQuery;
      *   });
      * }
      *
+     * // use `_.runInContext` to avoid conflicts (esp. in Node.js)
+     * var _ = require('lodash').runInContext();
+     *
      * _.mixin({ 'vowels': vowels });
      * _.vowels('fred');
      * // => ['e']
@@ -23575,8 +23559,8 @@ return jQuery;
     function mixin(object, source, options) {
       if (options == null) {
         var isObj = isObject(source),
-            props = isObj ? keys(source) : null,
-            methodNames = (props && props.length) ? baseFunctions(source, props) : null;
+            props = isObj && keys(source),
+            methodNames = props && props.length && baseFunctions(source, props);
 
         if (!(methodNames ? methodNames.length : isObj)) {
           methodNames = false;
@@ -23643,7 +23627,7 @@ return jQuery;
     }
 
     /**
-     * A no-operation function that returns `undefined` regardless of the
+     * A no-operation function which returns `undefined` regardless of the
      * arguments it receives.
      *
      * @static
@@ -23661,7 +23645,7 @@ return jQuery;
     }
 
     /**
-     * Creates a function that returns the property value at `path` on a
+     * Creates a function which returns the property value at `path` on a
      * given object.
      *
      * @static
@@ -23687,7 +23671,7 @@ return jQuery;
     }
 
     /**
-     * The opposite of `_.property`; this method creates a function that returns
+     * The opposite of `_.property`; this method creates a function which returns
      * the property value at a given path on `object`.
      *
      * @static
@@ -23841,8 +23825,6 @@ return jQuery;
       return baseToString(prefix) + id;
     }
 
-    /*------------------------------------------------------------------------*/
-
     /**
      * Adds two numbers.
      *
@@ -23908,7 +23890,7 @@ return jQuery;
      * _.max(users, 'age');
      * // => { 'user': 'fred', 'age': 40 }
      */
-    var max = createExtremum(gt, NEGATIVE_INFINITY);
+    var max = createExtremum(arrayMax);
 
     /**
      * Gets the minimum value of `collection`. If `collection` is empty or falsey
@@ -23957,7 +23939,7 @@ return jQuery;
      * _.min(users, 'age');
      * // => { 'user': 'barney', 'age': 36 }
      */
-    var min = createExtremum(lt, POSITIVE_INFINITY);
+    var min = createExtremum(arrayMin, true);
 
     /**
      * Gets the sum of the values in `collection`.
@@ -23995,19 +23977,17 @@ return jQuery;
       if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
         iteratee = null;
       }
-      var callback = getCallback(),
+      var func = getCallback(),
           noIteratee = iteratee == null;
 
-      if (!(noIteratee && callback === baseCallback)) {
+      if (!(func === baseCallback && noIteratee)) {
         noIteratee = false;
-        iteratee = callback(iteratee, thisArg, 3);
+        iteratee = func(iteratee, thisArg, 3);
       }
       return noIteratee
         ? arraySum(isArray(collection) ? collection : toIterable(collection))
         : baseSum(collection, iteratee);
     }
-
-    /*------------------------------------------------------------------------*/
 
     // Ensure wrappers are instances of `baseLodash`.
     lodash.prototype = baseLodash.prototype;
@@ -24156,8 +24136,6 @@ return jQuery;
     // Add functions to `lodash.prototype`.
     mixin(lodash, lodash);
 
-    /*------------------------------------------------------------------------*/
-
     // Add functions that return unwrapped values when chaining.
     lodash.add = add;
     lodash.attempt = attempt;
@@ -24179,8 +24157,6 @@ return jQuery;
     lodash.findWhere = findWhere;
     lodash.first = first;
     lodash.get = get;
-    lodash.gt = gt;
-    lodash.gte = gte;
     lodash.has = has;
     lodash.identity = identity;
     lodash.includes = includes;
@@ -24210,8 +24186,6 @@ return jQuery;
     lodash.kebabCase = kebabCase;
     lodash.last = last;
     lodash.lastIndexOf = lastIndexOf;
-    lodash.lt = lt;
-    lodash.lte = lte;
     lodash.max = max;
     lodash.min = min;
     lodash.noConflict = noConflict;
@@ -24248,7 +24222,6 @@ return jQuery;
     lodash.all = every;
     lodash.any = some;
     lodash.contains = includes;
-    lodash.eq = isEqual;
     lodash.detect = find;
     lodash.foldl = reduce;
     lodash.foldr = reduceRight;
@@ -24266,8 +24239,6 @@ return jQuery;
       return source;
     }()), false);
 
-    /*------------------------------------------------------------------------*/
-
     // Add functions capable of returning wrapped and unwrapped values when chaining.
     lodash.sample = sample;
 
@@ -24279,8 +24250,6 @@ return jQuery;
         return sample(value, n);
       });
     };
-
-    /*------------------------------------------------------------------------*/
 
     /**
      * The semantic version number.
@@ -24509,8 +24478,6 @@ return jQuery;
     return lodash;
   }
 
-  /*--------------------------------------------------------------------------*/
-
   // Export lodash.
   var _ = runInContext();
 
@@ -24534,7 +24501,7 @@ return jQuery;
     if (moduleExports) {
       (freeModule.exports = _)._ = _;
     }
-    // Export for Rhino with CommonJS support.
+    // Export for Narwhal or Rhino -require.
     else {
       freeExports._ = _;
     }
@@ -24548,6365 +24515,13 @@ return jQuery;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],11:[function(require,module,exports){
 /**
-* matter-0.8.0.js 0.8.0-alpha 2014-05-04
+* matter-0.8.0.min.js 0.8.0-alpha 2014-05-04
 * http://brm.io/matter-js/
 * License: MIT
 */
 
-/**
- * The MIT License (MIT)
- * 
- * Copyright (c) 2014 Liam Brummitt
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-(function() {
-
-var Matter = {};
-
-// Begin Matter namespace closure
-
-// All Matter modules are included below during build
-// Outro.js then closes at the end of the file
-
-
-// Begin src/body/Body.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Body
-*/
-
-var Body = {};
-
-(function() {
-
-    var _nextGroupId = 1;
-
-    /**
-     * Description to be written.
-     * @method create
-     * @param {} options
-     * @return {body} body
-     */
-    Body.create = function(options) {
-        var defaults = {
-            id: Common.nextId(),
-            type: 'body',
-            label: 'Body',
-            angle: 0,
-            vertices: Vertices.fromPath('L 0 0 L 40 0 L 40 40 L 0 40'),
-            position: { x: 0, y: 0 },
-            force: { x: 0, y: 0 },
-            torque: 0,
-            positionImpulse: { x: 0, y: 0 },
-            constraintImpulse: { x: 0, y: 0, angle: 0 },
-            speed: 0,
-            angularSpeed: 0,
-            velocity: { x: 0, y: 0 },
-            angularVelocity: 0,
-            isStatic: false,
-            isSleeping: false,
-            motion: 0,
-            sleepThreshold: 60,
-            density: 0.001,
-            restitution: 0,
-            friction: 0.1,
-            frictionAir: 0.01,
-            groupId: 0,
-            slop: 0.05,
-            timeScale: 1,
-            render: {
-                visible: true,
-                sprite: {
-                    xScale: 1,
-                    yScale: 1
-                },
-                lineWidth: 1.5
-            }
-        };
-
-        var body = Common.extend(defaults, options);
-
-        _initProperties(body);
-
-        return body;
-    };
-
-    /**
-     * Description
-     * @method nextGroupId
-     * @return {Number} Unique groupID
-     */
-    Body.nextGroupId = function() {
-        return _nextGroupId++;
-    };
-
-    /**
-     * Initialises body properties
-     * @method _initProperties
-     * @private
-     * @param {body} body
-     */
-    var _initProperties = function(body) {
-        // calculated properties
-        body.axes = body.axes || Axes.fromVertices(body.vertices);
-        body.area = Vertices.area(body.vertices);
-        body.bounds = Bounds.create(body.vertices);
-        body.mass = body.mass || (body.density * body.area);
-        body.inverseMass = 1 / body.mass;
-        body.inertia = body.inertia || Vertices.inertia(body.vertices, body.mass);
-        body.inverseInertia = 1 / body.inertia;
-        body.positionPrev = body.positionPrev || { x: body.position.x, y: body.position.y };
-        body.anglePrev = body.anglePrev || body.angle;
-        body.render.fillStyle = body.render.fillStyle || (body.isStatic ? '#eeeeee' : Common.choose(['#556270', '#4ECDC4', '#C7F464', '#FF6B6B', '#C44D58']));
-        body.render.strokeStyle = body.render.strokeStyle || Common.shadeColor(body.render.fillStyle, -20);
-
-        // update geometry
-        Vertices.create(body.vertices, body);
-        var centre = Vertices.centre(body.vertices);
-        Vertices.translate(body.vertices, body.position);
-        Vertices.translate(body.vertices, centre, -1);
-        Vertices.rotate(body.vertices, body.angle, body.position);
-        Axes.rotate(body.axes, body.angle);
-        Bounds.update(body.bounds, body.vertices, body.velocity);
-
-        Body.setStatic(body, body.isStatic);
-        Sleeping.set(body, body.isSleeping);
-    };
-
-    /**
-     * Sets the body as static, including isStatic flag and setting mass and inertia to Infinity
-     * @method setStatic
-     * @param {bool} isStatic
-     */
-    Body.setStatic = function(body, isStatic) {
-        body.isStatic = isStatic;
-
-        if (isStatic) {
-            body.restitution = 0;
-            body.friction = 1;
-            body.mass = body.inertia = body.density = Infinity;
-            body.inverseMass = body.inverseInertia = 0;
-            body.render.lineWidth = 1;
-
-            body.positionPrev.x = body.position.x;
-            body.positionPrev.y = body.position.y;
-            body.anglePrev = body.angle;
-            body.angularVelocity = 0;
-            body.speed = 0;
-            body.angularSpeed = 0;
-            body.motion = 0;
-        }
-    };
-
-    /**
-     * Description
-     * @method resetForcesAll
-     * @param {body[]} bodies
-     */
-    Body.resetForcesAll = function(bodies) {
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            // reset force buffers
-            body.force.x = 0;
-            body.force.y = 0;
-            body.torque = 0;
-        }
-    };
-
-    /**
-     * Description
-     * @method applyGravityAll
-     * @param {body[]} bodies
-     * @param {vector} gravity
-     */
-    Body.applyGravityAll = function(bodies, gravity) {
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (body.isStatic || body.isSleeping)
-                continue;
-
-            // apply gravity
-            body.force.y += body.mass * gravity.y * 0.001;
-            body.force.x += body.mass * gravity.x * 0.001;
-        }
-    };
-
-    /**
-     * Description
-     * @method updateAll
-     * @param {body[]} bodies
-     * @param {number} deltaTime
-     * @param {number} timeScale
-     * @param {number} correction
-     * @param {bounds} worldBounds
-     */
-    Body.updateAll = function(bodies, deltaTime, timeScale, correction, worldBounds) {
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (body.isStatic || body.isSleeping)
-                continue;
-
-            // don't update out of world bodies
-            // TODO: viewports
-            if (body.bounds.max.x < worldBounds.min.x || body.bounds.min.x > worldBounds.max.x
-                || body.bounds.max.y < worldBounds.min.y || body.bounds.min.y > worldBounds.max.y)
-                continue;
-
-            Body.update(body, deltaTime, timeScale, correction);
-        }
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {body} body
-     * @param {number} deltaTime
-     * @param {number} timeScale
-     * @param {number} correction
-     */
-    Body.update = function(body, deltaTime, timeScale, correction) {
-        var deltaTimeSquared = Math.pow(deltaTime * timeScale * body.timeScale, 2);
-
-        // from the previous step
-        var frictionAir = 1 - body.frictionAir * timeScale * body.timeScale,
-            velocityPrevX = body.position.x - body.positionPrev.x,
-            velocityPrevY = body.position.y - body.positionPrev.y;
-
-        // update velocity with verlet integration
-        body.velocity.x = (velocityPrevX * frictionAir * correction) + (body.force.x / body.mass) * deltaTimeSquared;
-        body.velocity.y = (velocityPrevY * frictionAir * correction) + (body.force.y / body.mass) * deltaTimeSquared;
-
-        body.positionPrev.x = body.position.x;
-        body.positionPrev.y = body.position.y;
-        body.position.x += body.velocity.x;
-        body.position.y += body.velocity.y;
-
-        // update angular velocity with verlet integration
-        body.angularVelocity = ((body.angle - body.anglePrev) * frictionAir * correction) + (body.torque / body.inertia) * deltaTimeSquared;
-        body.anglePrev = body.angle;
-        body.angle += body.angularVelocity;
-
-        // track speed and acceleration
-        body.speed = Vector.magnitude(body.velocity);
-        body.angularSpeed = Math.abs(body.angularVelocity);
-
-        // transform the body geometry
-        Vertices.translate(body.vertices, body.velocity);
-        if (body.angularVelocity !== 0) {
-            Vertices.rotate(body.vertices, body.angularVelocity, body.position);
-            Axes.rotate(body.axes, body.angularVelocity);
-        }
-        Bounds.update(body.bounds, body.vertices, body.velocity);
-    };
-
-    /**
-     * Description
-     * @method applyForce
-     * @param {body} body
-     * @param {vector} position
-     * @param {vector} force
-     */
-    Body.applyForce = function(body, position, force) {
-        body.force.x += force.x;
-        body.force.y += force.y;
-        var offset = { x: position.x - body.position.x, y: position.y - body.position.y };
-        body.torque += (offset.x * force.y - offset.y * force.x) * body.inverseInertia;
-    };
-
-    /**
-     * Description
-     * @method translate
-     * @param {body} body
-     * @param {vector} translation
-     */
-    Body.translate = function(body, translation) {
-        body.positionPrev.x += translation.x;
-        body.positionPrev.y += translation.y;
-        body.position.x += translation.x;
-        body.position.y += translation.y;
-        Vertices.translate(body.vertices, translation);
-        Bounds.update(body.bounds, body.vertices, body.velocity);
-    };
-
-    /**
-     * Description
-     * @method rotate
-     * @param {body} body
-     * @param {number} angle
-     */
-    Body.rotate = function(body, angle) {
-        body.anglePrev += angle;
-        body.angle += angle;
-        Vertices.rotate(body.vertices, angle, body.position);
-        Axes.rotate(body.axes, angle);
-        Bounds.update(body.bounds, body.vertices, body.velocity);
-    };
-
-    /**
-     * Scales the body, including updating physical properties (mass, area, axes, inertia), from a point (default is centre)
-     * @method translate
-     * @param {body} body
-     * @param {number} scaleX
-     * @param {number} scaleY
-     * @param {vector} point
-     */
-    Body.scale = function(body, scaleX, scaleY, point) {
-        // scale vertices
-        Vertices.scale(body.vertices, scaleX, scaleY, point);
-
-        // update properties
-        body.axes = Axes.fromVertices(body.vertices);
-        body.area = Vertices.area(body.vertices);
-        body.mass = body.density * body.area;
-        body.inverseMass = 1 / body.mass;
-
-        // update inertia (requires vertices to be at origin)
-        Vertices.translate(body.vertices, { x: -body.position.x, y: -body.position.y });
-        body.inertia = Vertices.inertia(body.vertices, body.mass);
-        body.inverseInertia = 1 / body.inertia;
-        Vertices.translate(body.vertices, { x: body.position.x, y: body.position.y });
-
-        // update bounds
-        Bounds.update(body.bounds, body.vertices, body.velocity);
-    };
-
-})();
-
-;   // End src/body/Body.js
-
-
-// Begin src/body/Composite.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Composite
-*/
-
-// TODO: composite translate, rotate
-
-var Composite = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @param {} options
-     * @return {composite} A new composite
-     */
-    Composite.create = function(options) {
-        return Common.extend({ 
-            id: Common.nextId(),
-            type: 'composite',
-            parent: null,
-            isModified: false,
-            bodies: [], 
-            constraints: [], 
-            composites: [],
-            label: 'Composite'
-        }, options);
-    };
-
-    /**
-     * Sets the composite's `isModified` flag. 
-     * If `updateParents` is true, all parents will be set (default: false).
-     * If `updateChildren` is true, all children will be set (default: false).
-     * @method setModified
-     * @param {composite} composite
-     * @param {boolean} isModified
-     * @param {boolean} updateParents
-     * @param {boolean} updateChildren
-     */
-    Composite.setModified = function(composite, isModified, updateParents, updateChildren) {
-        composite.isModified = isModified;
-
-        if (updateParents && composite.parent) {
-            Composite.setModified(composite.parent, isModified, updateParents, updateChildren);
-        }
-
-        if (updateChildren) {
-            for(var i = 0; i < composite.composites.length; i++) {
-                var childComposite = composite.composites[i];
-                Composite.setModified(childComposite, isModified, updateParents, updateChildren);
-            }
-        }
-    };
-
-    /**
-     * Generic add function. Adds one or many body(s), constraint(s) or a composite(s) to the given composite.
-     * @method add
-     * @param {composite} composite
-     * @param {} object
-     * @return {composite} The original composite with the objects added
-     */
-    Composite.add = function(composite, object) {
-        var objects = [].concat(object);
-
-        for (var i = 0; i < objects.length; i++) {
-            var obj = objects[i];
-
-            switch (obj.type) {
-
-            case 'body':
-                Composite.addBody(composite, obj);
-                break;
-            case 'constraint':
-                Composite.addConstraint(composite, obj);
-                break;
-            case 'composite':
-                Composite.addComposite(composite, obj);
-                break;
-            case 'mouseConstraint':
-                Composite.addConstraint(composite, obj.constraint);
-                break;
-
-            }
-        }
-
-        return composite;
-    };
-
-    /**
-     * Generic remove function. Removes one or many body(s), constraint(s) or a composite(s) to the given composite.
-     * Optionally searching its children recursively.
-     * @method remove
-     * @param {composite} composite
-     * @param {} object
-     * @param {boolean} deep
-     * @return {composite} The original composite with the objects removed
-     */
-    Composite.remove = function(composite, object, deep) {
-        var objects = [].concat(object);
-
-        for (var i = 0; i < objects.length; i++) {
-            var obj = objects[i];
-
-            switch (obj.type) {
-
-            case 'body':
-                Composite.removeBody(composite, obj, deep);
-                break;
-            case 'constraint':
-                Composite.removeConstraint(composite, obj, deep);
-                break;
-            case 'composite':
-                Composite.removeComposite(composite, obj, deep);
-                break;
-            case 'mouseConstraint':
-                Composite.removeConstraint(composite, obj.constraint);
-                break;
-
-            }
-        }
-
-        return composite;
-    };
-
-    /**
-     * Description
-     * @method addComposite
-     * @param {composite} compositeA
-     * @param {composite} compositeB
-     * @return {composite} The original compositeA with the objects from compositeB added
-     */
-    Composite.addComposite = function(compositeA, compositeB) {
-        compositeA.composites.push(compositeB);
-        compositeB.parent = compositeA;
-        Composite.setModified(compositeA, true, true, false);
-        return compositeA;
-    };
-
-    /**
-     * Removes a composite from the given composite, and optionally searching its children recursively
-     * @method removeComposite
-     * @param {composite} compositeA
-     * @param {composite} compositeB
-     * @param {boolean} deep
-     * @return {composite} The original compositeA with the composite removed
-     */
-    Composite.removeComposite = function(compositeA, compositeB, deep) {
-        var position = compositeA.composites.indexOf(compositeB);
-        if (position !== -1) {
-            Composite.removeCompositeAt(compositeA, position);
-            Composite.setModified(compositeA, true, true, false);
-        }
-
-        if (deep) {
-            for (var i = 0; i < compositeA.composites.length; i++){
-                Composite.removeComposite(compositeA.composites[i], compositeB, true);
-            }
-        }
-
-        return compositeA;
-    };
-
-    /**
-     * Removes a composite from the given composite
-     * @method removeCompositeAt
-     * @param {composite} composite
-     * @param {number} position
-     * @return {composite} The original composite with the composite removed
-     */
-    Composite.removeCompositeAt = function(composite, position) {
-        composite.composites.splice(position, 1);
-        Composite.setModified(composite, true, true, false);
-        return composite;
-    };
-
-    /**
-     * Description
-     * @method addBody
-     * @param {composite} composite
-     * @param {body} body
-     * @return {composite} The original composite with the body added
-     */
-    Composite.addBody = function(composite, body) {
-        composite.bodies.push(body);
-        Composite.setModified(composite, true, true, false);
-        return composite;
-    };
-
-    /**
-     * Removes a body from the given composite, and optionally searching its children recursively
-     * @method removeBody
-     * @param {composite} composite
-     * @param {body} body
-     * @param {boolean} deep
-     * @return {composite} The original composite with the body removed
-     */
-    Composite.removeBody = function(composite, body, deep) {
-        var position = composite.bodies.indexOf(body);
-        if (position !== -1) {
-            Composite.removeBodyAt(composite, position);
-            Composite.setModified(composite, true, true, false);
-        }
-
-        if (deep) {
-            for (var i = 0; i < composite.composites.length; i++){
-                Composite.removeBody(composite.composites[i], body, true);
-            }
-        }
-
-        return composite;
-    };
-
-    /**
-     * Removes a body from the given composite
-     * @method removeBodyAt
-     * @param {composite} composite
-     * @param {number} position
-     * @return {composite} The original composite with the body removed
-     */
-    Composite.removeBodyAt = function(composite, position) {
-        composite.bodies.splice(position, 1);
-        Composite.setModified(composite, true, true, false);
-        return composite;
-    };
-
-    /**
-     * Description
-     * @method addConstraint
-     * @param {composite} composite
-     * @param {constraint} constraint
-     * @return {composite} The original composite with the constraint added
-     */
-    Composite.addConstraint = function(composite, constraint) {
-        composite.constraints.push(constraint);
-        Composite.setModified(composite, true, true, false);
-        return composite;
-    };
-
-    /**
-     * Removes a constraint from the given composite, and optionally searching its children recursively
-     * @method removeConstraint
-     * @param {composite} composite
-     * @param {constraint} constraint
-     * @param {boolean} deep
-     * @return {composite} The original composite with the constraint removed
-     */
-    Composite.removeConstraint = function(composite, constraint, deep) {
-        var position = composite.constraints.indexOf(constraint);
-        if (position !== -1) {
-            Composite.removeConstraintAt(composite, position);
-        }
-
-        if (deep) {
-            for (var i = 0; i < composite.composites.length; i++){
-                Composite.removeConstraint(composite.composites[i], constraint, true);
-            }
-        }
-
-        return composite;
-    };
-
-    /**
-     * Removes a body from the given composite
-     * @method removeConstraintAt
-     * @param {composite} composite
-     * @param {number} position
-     * @return {composite} The original composite with the constraint removed
-     */
-    Composite.removeConstraintAt = function(composite, position) {
-        composite.constraints.splice(position, 1);
-        Composite.setModified(composite, true, true, false);
-        return composite;
-    };
-
-    /**
-     * Removes all bodies, constraints and composites from the given composite
-     * Optionally clearing its children recursively
-     * @method clear
-     * @param {world} world
-     * @param {boolean} keepStatic
-     * @param {boolean} deep
-     */
-    Composite.clear = function(composite, keepStatic, deep) {
-        if (deep) {
-            for (var i = 0; i < composite.composites.length; i++){
-                Composite.clear(composite.composites[i], keepStatic, true);
-            }
-        }
-        
-        if (keepStatic) {
-            composite.bodies = composite.bodies.filter(function(body) { return body.isStatic; });
-        } else {
-            composite.bodies.length = 0;
-        }
-
-        composite.constraints.length = 0;
-        composite.composites.length = 0;
-        Composite.setModified(composite, true, true, false);
-
-        return composite;
-    };
-
-    /**
-     * Returns all bodies in the given composite, including all bodies in its children, recursively
-     * @method allBodies
-     * @param {composite} composite
-     * @return {body[]} All the bodies
-     */
-    Composite.allBodies = function(composite) {
-        var bodies = [].concat(composite.bodies);
-
-        for (var i = 0; i < composite.composites.length; i++)
-            bodies = bodies.concat(Composite.allBodies(composite.composites[i]));
-
-        return bodies;
-    };
-
-    /**
-     * Returns all constraints in the given composite, including all constraints in its children, recursively
-     * @method allConstraints
-     * @param {composite} composite
-     * @return {constraint[]} All the constraints
-     */
-    Composite.allConstraints = function(composite) {
-        var constraints = [].concat(composite.constraints);
-
-        for (var i = 0; i < composite.composites.length; i++)
-            constraints = constraints.concat(Composite.allConstraints(composite.composites[i]));
-
-        return constraints;
-    };
-
-    /**
-     * Returns all composites in the given composite, including all composites in its children, recursively
-     * @method allComposites
-     * @param {composite} composite
-     * @return {composite[]} All the composites
-     */
-    Composite.allComposites = function(composite) {
-        var composites = [].concat(composite.composites);
-
-        for (var i = 0; i < composite.composites.length; i++)
-            composites = composites.concat(Composite.allComposites(composite.composites[i]));
-
-        return composites;
-    };
-
-    /**
-     * Searches the composite recursively for an object matching the type and id supplied, null if not found
-     * @method get
-     * @param {composite} composite
-     * @param {number} id
-     * @param {string} type
-     * @return {object} The requested object, if found
-     */
-    Composite.get = function(composite, id, type) {
-        var objects,
-            object;
-
-        switch (type) {
-        case 'body':
-            objects = Composite.allBodies(composite);
-            break;
-        case 'constraint':
-            objects = Composite.allConstraints(composite);
-            break;
-        case 'composite':
-            objects = Composite.allComposites(composite).concat(composite);
-            break;
-        }
-
-        if (!objects)
-            return null;
-
-        object = objects.filter(function(object) { 
-            return object.id.toString() === id.toString(); 
-        });
-
-        return object.length === 0 ? null : object[0];
-    };
-
-    /**
-     * Moves the given object(s) from compositeA to compositeB (equal to a remove followed by an add)
-     * @method move
-     * @param {compositeA} compositeA
-     * @param {object[]} objects
-     * @param {compositeB} compositeB
-     * @return {composite} Returns compositeA
-     */
-    Composite.move = function(compositeA, objects, compositeB) {
-        Composite.remove(compositeA, objects);
-        Composite.add(compositeB, objects);
-        return compositeA;
-    };
-
-    /**
-     * Assigns new ids for all objects in the composite, recursively
-     * @method rebase
-     * @param {composite} composite
-     * @return {composite} Returns composite
-     */
-    Composite.rebase = function(composite) {
-        var objects = Composite.allBodies(composite)
-                        .concat(Composite.allConstraints(composite))
-                        .concat(Composite.allComposites(composite));
-
-        for (var i = 0; i < objects.length; i++) {
-            objects[i].id = Common.nextId();
-        }
-
-        Composite.setModified(composite, true, true, false);
-
-        return composite;
-    };
-
-})();
-
-;   // End src/body/Composite.js
-
-
-// Begin src/body/World.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class World
-*/
-
-var World = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @constructor
-     * @param {} options
-     * @return {world} A new world
-     */
-    World.create = function(options) {
-        var composite = Composite.create();
-
-        var defaults = {
-            label: 'World',
-            gravity: { x: 0, y: 1 },
-            bounds: { 
-                min: { x: 0, y: 0 }, 
-                max: { x: 800, y: 600 } 
-            }
-        };
-        
-        return Common.extend(composite, defaults, options);
-    };
-
-    // World is a Composite body
-    // see src/module/Outro.js for these aliases:
-    
-    /**
-     * An alias for Composite.clear since World is also a Composite (see Outro.js)
-     * @method clear
-     * @param {world} world
-     * @param {boolean} keepStatic
-     */
-
-    /**
-     * An alias for Composite.add since World is also a Composite (see Outro.js)
-     * @method addComposite
-     * @param {world} world
-     * @param {composite} composite
-     * @return {world} The original world with the objects from composite added
-     */
-    
-     /**
-      * An alias for Composite.addBody since World is also a Composite (see Outro.js)
-      * @method addBody
-      * @param {world} world
-      * @param {body} body
-      * @return {world} The original world with the body added
-      */
-
-     /**
-      * An alias for Composite.addConstraint since World is also a Composite (see Outro.js)
-      * @method addConstraint
-      * @param {world} world
-      * @param {constraint} constraint
-      * @return {world} The original world with the constraint added
-      */
-
-})();
-
-;   // End src/body/World.js
-
-
-// Begin src/collision/Contact.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Contact
-*/
-
-var Contact = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @param {vertex} vertex
-     * @return {contact} A new contact
-     */
-    Contact.create = function(vertex) {
-        return {
-            id: Contact.id(vertex),
-            vertex: vertex,
-            normalImpulse: 0,
-            tangentImpulse: 0
-        };
-    };
-    
-    /**
-     * Description
-     * @method id
-     * @param {vertex} vertex
-     * @return {Number} Unique contactID
-     */
-    Contact.id = function(vertex) {
-        return vertex.body.id + '_' + vertex.index;
-    };
-
-})();
-
-;   // End src/collision/Contact.js
-
-
-// Begin src/collision/Detector.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Detector
-*/
-
-// TODO: speculative contacts
-
-var Detector = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method collisions
-     * @param {pair[]} broadphasePairs
-     * @param {engine} engine
-     * @return {array} collisions
-     */
-    Detector.collisions = function(broadphasePairs, engine) {
-        var collisions = [],
-            metrics = engine.metrics,
-            pairsTable = engine.pairs.table;
-
-        for (var i = 0; i < broadphasePairs.length; i++) {
-            var bodyA = broadphasePairs[i][0], 
-                bodyB = broadphasePairs[i][1];
-
-            // NOTE: could share a function for the below, but may drop performance?
-
-            if (bodyA.groupId && bodyB.groupId && bodyA.groupId === bodyB.groupId)
-                continue;
-
-            if ((bodyA.isStatic || bodyA.isSleeping) && (bodyB.isStatic || bodyB.isSleeping))
-                continue;
-
-            metrics.midphaseTests += 1;
-
-            // mid phase
-            if (Bounds.overlaps(bodyA.bounds, bodyB.bounds)) {
-
-                // find a previous collision we could reuse
-                var pairId = Pair.id(bodyA, bodyB),
-                    pair = pairsTable[pairId],
-                    previousCollision;
-
-                if (pair && pair.isActive) {
-                    previousCollision = pair.collision;
-                } else {
-                    previousCollision = null;
-                }
-
-                // narrow phase
-                var collision = SAT.collides(bodyA, bodyB, previousCollision);
-
-                metrics.narrowphaseTests += 1;
-
-                if (collision.reused)
-                    metrics.narrowReuseCount += 1;
-
-                if (collision.collided) {
-                    collisions.push(collision);
-                    metrics.narrowDetections += 1;
-                }
-            }
-        }
-
-        return collisions;
-    };
-
-    /**
-     * Description
-     * @method bruteForce
-     * @param {body[]} bodies
-     * @param {engine} engine
-     * @return {array} collisions
-     */
-    Detector.bruteForce = function(bodies, engine) {
-        var collisions = [],
-            metrics = engine.metrics,
-            pairsTable = engine.pairs.table;
-
-        for (var i = 0; i < bodies.length; i++) {
-            for (var j = i + 1; j < bodies.length; j++) {
-                var bodyA = bodies[i], 
-                    bodyB = bodies[j];
-
-                // NOTE: could share a function for the below, but may drop performance?
-
-                if (bodyA.groupId && bodyB.groupId && bodyA.groupId === bodyB.groupId)
-                    continue;
-
-                if ((bodyA.isStatic || bodyA.isSleeping) && (bodyB.isStatic || bodyB.isSleeping))
-                    continue;
-
-                metrics.midphaseTests += 1;
-
-                // mid phase
-                if (Bounds.overlaps(bodyA.bounds, bodyB.bounds)) {
-
-                    // find a previous collision we could reuse
-                    var pairId = Pair.id(bodyA, bodyB),
-                        pair = pairsTable[pairId],
-                        previousCollision;
-
-                    if (pair && pair.isActive) {
-                        previousCollision = pair.collision;
-                    } else {
-                        previousCollision = null;
-                    }
-
-                    // narrow phase
-                    var collision = SAT.collides(bodyA, bodyB, previousCollision);
-
-                    metrics.narrowphaseTests += 1;
-
-                    if (collision.reused)
-                        metrics.narrowReuseCount += 1;
-
-                    if (collision.collided) {
-                        collisions.push(collision);
-                        metrics.narrowDetections += 1;
-                    }
-                }
-            }
-        }
-
-        return collisions;
-    };
-
-})();
-
-;   // End src/collision/Detector.js
-
-
-// Begin src/collision/Grid.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Grid
-*/
-
-var Grid = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @param {number} bucketWidth
-     * @param {number} bucketHeight
-     * @return {grid} A new grid
-     */
-    Grid.create = function(bucketWidth, bucketHeight) {
-        return {
-            buckets: {},
-            pairs: {},
-            pairsList: [],
-            bucketWidth: bucketWidth || 48,
-            bucketHeight: bucketHeight || 48
-        };
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {grid} grid
-     * @param {body[]} bodies
-     * @param {engine} engine
-     * @param {boolean} forceUpdate
-     */
-    Grid.update = function(grid, bodies, engine, forceUpdate) {
-        var i, col, row,
-            world = engine.world,
-            buckets = grid.buckets,
-            bucket,
-            bucketId,
-            metrics = engine.metrics,
-            gridChanged = false;
-
-        metrics.broadphaseTests = 0;
-
-        for (i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (body.isSleeping && !forceUpdate)
-                continue;
-
-            // don't update out of world bodies
-            if (body.bounds.max.x < 0 || body.bounds.min.x > world.bounds.width
-                || body.bounds.max.y < 0 || body.bounds.min.y > world.bounds.height)
-                continue;
-
-            var newRegion = _getRegion(grid, body);
-
-            // if the body has changed grid region
-            if (!body.region || newRegion.id !== body.region.id || forceUpdate) {
-
-                metrics.broadphaseTests += 1;
-
-                if (!body.region || forceUpdate)
-                    body.region = newRegion;
-
-                var union = _regionUnion(newRegion, body.region);
-
-                // update grid buckets affected by region change
-                // iterate over the union of both regions
-                for (col = union.startCol; col <= union.endCol; col++) {
-                    for (row = union.startRow; row <= union.endRow; row++) {
-                        bucketId = _getBucketId(col, row);
-                        bucket = buckets[bucketId];
-
-                        var isInsideNewRegion = (col >= newRegion.startCol && col <= newRegion.endCol
-                                                && row >= newRegion.startRow && row <= newRegion.endRow);
-
-                        var isInsideOldRegion = (col >= body.region.startCol && col <= body.region.endCol
-                                                && row >= body.region.startRow && row <= body.region.endRow);
-
-                        // remove from old region buckets
-                        if (!isInsideNewRegion && isInsideOldRegion) {
-                            if (isInsideOldRegion) {
-                                if (bucket)
-                                    _bucketRemoveBody(grid, bucket, body);
-                            }
-                        }
-
-                        // add to new region buckets
-                        if (body.region === newRegion || (isInsideNewRegion && !isInsideOldRegion) || forceUpdate) {
-                            if (!bucket)
-                                bucket = _createBucket(buckets, bucketId);
-                            _bucketAddBody(grid, bucket, body);
-                        }
-                    }
-                }
-
-                // set the new region
-                body.region = newRegion;
-
-                // flag changes so we can update pairs
-                gridChanged = true;
-            }
-        }
-
-        // update pairs list only if pairs changed (i.e. a body changed region)
-        if (gridChanged)
-            grid.pairsList = _createActivePairsList(grid);
-    };
-
-    /**
-     * Description
-     * @method clear
-     * @param {grid} grid
-     */
-    Grid.clear = function(grid) {
-        grid.buckets = {};
-        grid.pairs = {};
-        grid.pairsList = [];
-    };
-
-    /**
-     * Description
-     * @method _regionUnion
-     * @private
-     * @param {} regionA
-     * @param {} regionB
-     * @return CallExpression
-     */
-    var _regionUnion = function(regionA, regionB) {
-        var startCol = Math.min(regionA.startCol, regionB.startCol),
-            endCol = Math.max(regionA.endCol, regionB.endCol),
-            startRow = Math.min(regionA.startRow, regionB.startRow),
-            endRow = Math.max(regionA.endRow, regionB.endRow);
-
-        return _createRegion(startCol, endCol, startRow, endRow);
-    };
-
-    /**
-     * Description
-     * @method _getRegion
-     * @private
-     * @param {} grid
-     * @param {} body
-     * @return CallExpression
-     */
-    var _getRegion = function(grid, body) {
-        var bounds = body.bounds,
-            startCol = Math.floor(bounds.min.x / grid.bucketWidth),
-            endCol = Math.floor(bounds.max.x / grid.bucketWidth),
-            startRow = Math.floor(bounds.min.y / grid.bucketHeight),
-            endRow = Math.floor(bounds.max.y / grid.bucketHeight);
-
-        return _createRegion(startCol, endCol, startRow, endRow);
-    };
-
-    /**
-     * Description
-     * @method _createRegion
-     * @private
-     * @param {} startCol
-     * @param {} endCol
-     * @param {} startRow
-     * @param {} endRow
-     * @return ObjectExpression
-     */
-    var _createRegion = function(startCol, endCol, startRow, endRow) {
-        return { 
-            id: startCol + ',' + endCol + ',' + startRow + ',' + endRow,
-            startCol: startCol, 
-            endCol: endCol, 
-            startRow: startRow, 
-            endRow: endRow 
-        };
-    };
-
-    /**
-     * Description
-     * @method _getBucketId
-     * @private
-     * @param {} column
-     * @param {} row
-     * @return BinaryExpression
-     */
-    var _getBucketId = function(column, row) {
-        return column + ',' + row;
-    };
-
-    /**
-     * Description
-     * @method _createBucket
-     * @private
-     * @param {} buckets
-     * @param {} bucketId
-     * @return bucket
-     */
-    var _createBucket = function(buckets, bucketId) {
-        var bucket = buckets[bucketId] = [];
-        return bucket;
-    };
-
-    /**
-     * Description
-     * @method _bucketAddBody
-     * @private
-     * @param {} grid
-     * @param {} bucket
-     * @param {} body
-     */
-    var _bucketAddBody = function(grid, bucket, body) {
-        // add new pairs
-        for (var i = 0; i < bucket.length; i++) {
-            var bodyB = bucket[i];
-
-            if (body.id === bodyB.id || (body.isStatic && bodyB.isStatic))
-                continue;
-
-            // keep track of the number of buckets the pair exists in
-            // important for Grid.update to work
-            var pairId = Pair.id(body, bodyB),
-                pair = grid.pairs[pairId];
-
-            if (pair) {
-                pair[2] += 1;
-            } else {
-                grid.pairs[pairId] = [body, bodyB, 1];
-            }
-        }
-
-        // add to bodies (after pairs, otherwise pairs with self)
-        bucket.push(body);
-    };
-
-    /**
-     * Description
-     * @method _bucketRemoveBody
-     * @private
-     * @param {} grid
-     * @param {} bucket
-     * @param {} body
-     */
-    var _bucketRemoveBody = function(grid, bucket, body) {
-        // remove from bucket
-        bucket.splice(bucket.indexOf(body), 1);
-
-        // update pair counts
-        for (var i = 0; i < bucket.length; i++) {
-            // keep track of the number of buckets the pair exists in
-            // important for _createActivePairsList to work
-            var bodyB = bucket[i],
-                pairId = Pair.id(body, bodyB),
-                pair = grid.pairs[pairId];
-
-            if (pair)
-                pair[2] -= 1;
-        }
-    };
-
-    /**
-     * Description
-     * @method _createActivePairsList
-     * @private
-     * @param {} grid
-     * @return pairs
-     */
-    var _createActivePairsList = function(grid) {
-        var pairKeys,
-            pair,
-            pairs = [];
-
-        // grid.pairs is used as a hashmap
-        pairKeys = Common.keys(grid.pairs);
-
-        // iterate over grid.pairs
-        for (var k = 0; k < pairKeys.length; k++) {
-            pair = grid.pairs[pairKeys[k]];
-
-            // if pair exists in at least one bucket
-            // it is a pair that needs further collision testing so push it
-            if (pair[2] > 0) {
-                pairs.push(pair);
-            } else {
-                delete grid.pairs[pairKeys[k]];
-            }
-        }
-
-        return pairs;
-    };
-    
-})();
-
-;   // End src/collision/Grid.js
-
-
-// Begin src/collision/Pair.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Pair
-*/
-
-var Pair = {};
-
-(function() {
-    
-    /**
-     * Description
-     * @method create
-     * @param {collision} collision
-     * @return {pair} A new pair
-     */
-    Pair.create = function(collision, timestamp) {
-        var bodyA = collision.bodyA,
-            bodyB = collision.bodyB;
-
-        var pair = {
-            id: Pair.id(bodyA, bodyB),
-            bodyA: bodyA,
-            bodyB: bodyB,
-            contacts: {},
-            activeContacts: [],
-            separation: 0,
-            isActive: true,
-            timeCreated: timestamp,
-            timeUpdated: timestamp,
-            inverseMass: bodyA.inverseMass + bodyB.inverseMass,
-            friction: Math.min(bodyA.friction, bodyB.friction),
-            restitution: Math.max(bodyA.restitution, bodyB.restitution),
-            slop: Math.max(bodyA.slop, bodyB.slop)
-        };
-
-        Pair.update(pair, collision, timestamp);
-
-        return pair;
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {pair} pair
-     * @param {collision} collision
-     */
-    Pair.update = function(pair, collision, timestamp) {
-        var contacts = pair.contacts,
-            supports = collision.supports,
-            activeContacts = pair.activeContacts;
-        
-        pair.collision = collision;
-        activeContacts.length = 0;
-        
-        if (collision.collided) {
-            for (var i = 0; i < supports.length; i++) {
-                var support = supports[i],
-                    contactId = Contact.id(support),
-                    contact = contacts[contactId];
-
-                if (contact) {
-                    activeContacts.push(contact);
-                } else {
-                    activeContacts.push(contacts[contactId] = Contact.create(support));
-                }
-            }
-
-            pair.separation = collision.depth;
-            Pair.setActive(pair, true, timestamp);
-        } else {
-            if (pair.isActive === true)
-                Pair.setActive(pair, false, timestamp);
-        }
-    };
-    
-    /**
-     * Description
-     * @method setActive
-     * @param {pair} pair
-     * @param {bool} isActive
-     */
-    Pair.setActive = function(pair, isActive, timestamp) {
-        if (isActive) {
-            pair.isActive = true;
-            pair.timeUpdated = timestamp;
-        } else {
-            pair.isActive = false;
-            pair.activeContacts.length = 0;
-        }
-    };
-
-    /**
-     * Description
-     * @method id
-     * @param {body} bodyA
-     * @param {body} bodyB
-     * @return {number} Unique pairId
-     */
-    Pair.id = function(bodyA, bodyB) {
-        if (bodyA.id < bodyB.id) {
-            return bodyA.id + '_' + bodyB.id;
-        } else {
-            return bodyB.id + '_' + bodyA.id;
-        }
-    };
-
-})();
-
-;   // End src/collision/Pair.js
-
-
-// Begin src/collision/Pairs.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Pairs
-*/
-
-var Pairs = {};
-
-(function() {
-    
-    var _pairMaxIdleLife = 1000;
-
-    /**
-     * Creates a new pairs structure
-     * @method create
-     * @param {object} options
-     * @return {pairs} A new pairs structure
-     */
-    Pairs.create = function(options) {
-        return Common.extend({ 
-            table: {},
-            list: [],
-            collisionStart: [],
-            collisionActive: [],
-            collisionEnd: []
-        }, options);
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {object} pairs
-     * @param {collision[]} collisions
-     */
-    Pairs.update = function(pairs, collisions, timestamp) {
-        var pairsList = pairs.list,
-            pairsTable = pairs.table,
-            collisionStart = pairs.collisionStart,
-            collisionEnd = pairs.collisionEnd,
-            collisionActive = pairs.collisionActive,
-            activePairIds = [],
-            collision,
-            pairId,
-            pair,
-            i;
-
-        // clear collision state arrays, but maintain old reference
-        collisionStart.length = 0;
-        collisionEnd.length = 0;
-        collisionActive.length = 0;
-
-        for (i = 0; i < collisions.length; i++) {
-            collision = collisions[i];
-
-            if (collision.collided) {
-                pairId = Pair.id(collision.bodyA, collision.bodyB);
-                activePairIds.push(pairId);
-
-                pair = pairsTable[pairId];
-                
-                if (pair) {
-                    // pair already exists (but may or may not be active)
-                    if (pair.isActive) {
-                        // pair exists and is active
-                        collisionActive.push(pair);
-                    } else {
-                        // pair exists but was inactive, so a collision has just started again
-                        collisionStart.push(pair);
-                    }
-
-                    // update the pair
-                    Pair.update(pair, collision, timestamp);
-                } else {
-                    // pair did not exist, create a new pair
-                    pair = Pair.create(collision, timestamp);
-                    pairsTable[pairId] = pair;
-
-                    // push the new pair
-                    collisionStart.push(pair);
-                    pairsList.push(pair);
-                }
-            }
-        }
-
-        // deactivate previously active pairs that are now inactive
-        for (i = 0; i < pairsList.length; i++) {
-            pair = pairsList[i];
-            if (pair.isActive && activePairIds.indexOf(pair.id) === -1) {
-                Pair.setActive(pair, false, timestamp);
-                collisionEnd.push(pair);
-            }
-        }
-    };
-    
-    /**
-     * Description
-     * @method removeOld
-     * @param {object} pairs
-     */
-    Pairs.removeOld = function(pairs, timestamp) {
-        var pairsList = pairs.list,
-            pairsTable = pairs.table,
-            indexesToRemove = [],
-            pair,
-            collision,
-            pairIndex,
-            i;
-
-        for (i = 0; i < pairsList.length; i++) {
-            pair = pairsList[i];
-            collision = pair.collision;
-            
-            // never remove sleeping pairs
-            if (collision.bodyA.isSleeping || collision.bodyB.isSleeping) {
-                pair.timeUpdated = timestamp;
-                continue;
-            }
-
-            // if pair is inactive for too long, mark it to be removed
-            if (timestamp - pair.timeUpdated > _pairMaxIdleLife) {
-                indexesToRemove.push(i);
-            }
-        }
-
-        // remove marked pairs
-        for (i = 0; i < indexesToRemove.length; i++) {
-            pairIndex = indexesToRemove[i] - i;
-            pair = pairsList[pairIndex];
-            delete pairsTable[pair.id];
-            pairsList.splice(pairIndex, 1);
-        }
-    };
-
-    /**
-     * Clears the given pairs structure
-     * @method create
-     * @param {object} options
-     * @param {pairs} pairs
-     */
-    Pairs.clear = function(pairs) {
-        pairs.table = {};
-        pairs.list.length = 0;
-        pairs.collisionStart.length = 0;
-        pairs.collisionActive.length = 0;
-        pairs.collisionEnd.length = 0;
-        return pairs;
-    };
-
-})();
-
-;   // End src/collision/Pairs.js
-
-
-// Begin src/collision/Query.js
-
-/**
-* Functions for performing collision queries
-*
-* @class Query
-*/
-
-var Query = {};
-
-(function() {
-
-    /**
-     * Casts a ray segment against a set of bodies and returns all collisions, ray width is optional. Intersection points are not provided.
-     * @method ray
-     * @param {body[]} bodies
-     * @param {vector} startPoint
-     * @param {vector} endPoint
-     * @return {object[]} Collisions
-     */
-    Query.ray = function(bodies, startPoint, endPoint, rayWidth) {
-        rayWidth = rayWidth || Number.MIN_VALUE;
-
-        var rayAngle = Vector.angle(startPoint, endPoint),
-            rayLength = Vector.magnitude(Vector.sub(startPoint, endPoint)),
-            rayX = (endPoint.x + startPoint.x) * 0.5,
-            rayY = (endPoint.y + startPoint.y) * 0.5,
-            ray = Bodies.rectangle(rayX, rayY, rayLength, rayWidth, { angle: rayAngle }),
-            collisions = [];
-
-        for (var i = 0; i < bodies.length; i++) {
-            var bodyA = bodies[i];
-
-            if (Bounds.overlaps(bodyA.bounds, ray.bounds)) {
-                var collision = SAT.collides(bodyA, ray);
-                if (collision.collided) {
-                    collision.body = collision.bodyA = collision.bodyB = bodyA;
-                    collisions.push(collision);
-                }
-            }
-        }
-
-        return collisions;
-    };
-
-    /**
-     * Returns all bodies whose bounds are inside (or outside if set) the given set of bounds, from the given set of bodies
-     * @method region
-     * @param {body[]} bodies
-     * @param {bounds} bounds
-     * @param {bool} outside
-     * @return {body[]} The bodies matching the query
-     */
-    Query.region = function(bodies, bounds, outside) {
-        var result = [];
-
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i],
-                overlaps = Bounds.overlaps(body.bounds, bounds);
-            if ((overlaps && !outside) || (!overlaps && outside))
-                result.push(body);
-        }
-
-        return result;
-    };
-
-})();
-
-;   // End src/collision/Query.js
-
-
-// Begin src/collision/Resolver.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Resolver
-*/
-
-var Resolver = {};
-
-(function() {
-
-    var _restingThresh = 4,
-        _positionDampen = 0.2,
-        _positionWarming = 0.6;
-
-    /**
-     * Description
-     * @method solvePosition
-     * @param {pair[]} pairs
-     * @param {number} timeScale
-     */
-    Resolver.solvePosition = function(pairs, timeScale) {
-        var i,
-            pair,
-            collision,
-            bodyA,
-            bodyB,
-            vertex,
-            vertexCorrected,
-            normal,
-            bodyBtoA;
-
-        // find impulses required to resolve penetration
-        for (i = 0; i < pairs.length; i++) {
-            pair = pairs[i];
-            
-            if (!pair.isActive)
-                continue;
-            
-            collision = pair.collision;
-            bodyA = collision.bodyA;
-            bodyB = collision.bodyB;
-            vertex = collision.supports[0];
-            vertexCorrected = collision.supportCorrected;
-            normal = collision.normal;
-
-            // get current separation between body edges involved in collision
-            bodyBtoA = Vector.sub(Vector.add(bodyB.positionImpulse, vertex), 
-                                    Vector.add(bodyA.positionImpulse, vertexCorrected));
-
-            pair.separation = Vector.dot(normal, bodyBtoA);
-        }
-        
-        for (i = 0; i < pairs.length; i++) {
-            pair = pairs[i];
-            
-            if (!pair.isActive)
-                continue;
-            
-            collision = pair.collision;
-            bodyA = collision.bodyA;
-            bodyB = collision.bodyB;
-            normal = collision.normal;
-            positionImpulse = ((pair.separation * _positionDampen) - pair.slop) * timeScale;
-        
-            if (bodyA.isStatic || bodyB.isStatic)
-                positionImpulse *= 2;
-            
-            if (!(bodyA.isStatic || bodyA.isSleeping)) {
-                bodyA.positionImpulse.x += normal.x * positionImpulse;
-                bodyA.positionImpulse.y += normal.y * positionImpulse;
-            }
-
-            if (!(bodyB.isStatic || bodyB.isSleeping)) {
-                bodyB.positionImpulse.x -= normal.x * positionImpulse;
-                bodyB.positionImpulse.y -= normal.y * positionImpulse;
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method postSolvePosition
-     * @param {body[]} bodies
-     */
-    Resolver.postSolvePosition = function(bodies) {
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (body.positionImpulse.x !== 0 || body.positionImpulse.y !== 0) {
-                // move the body without changing velocity
-                body.position.x += body.positionImpulse.x;
-                body.position.y += body.positionImpulse.y;
-                body.positionPrev.x += body.positionImpulse.x;
-                body.positionPrev.y += body.positionImpulse.y;
-
-                // update body geometry
-                Vertices.translate(body.vertices, body.positionImpulse);
-                Bounds.update(body.bounds, body.vertices, body.velocity);
-                
-                // dampen accumulator to warm the next step
-                body.positionImpulse.x *= _positionWarming;
-                body.positionImpulse.y *= _positionWarming;
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method preSolveVelocity
-     * @param {pair[]} pairs
-     */
-    Resolver.preSolveVelocity = function(pairs) {
-        var impulse = {},
-            i,
-            j,
-            pair,
-            contacts,
-            collision,
-            bodyA,
-            bodyB,
-            normal,
-            tangent,
-            contact,
-            contactVertex,
-            normalImpulse,
-            tangentImpulse,
-            offset;
-        
-        for (i = 0; i < pairs.length; i++) {
-            pair = pairs[i];
-            
-            if (!pair.isActive)
-                continue;
-            
-            contacts = pair.activeContacts;
-            collision = pair.collision;
-            bodyA = collision.bodyA;
-            bodyB = collision.bodyB;
-            normal = collision.normal;
-            tangent = collision.tangent;
-                
-            // resolve each contact
-            for (j = 0; j < contacts.length; j++) {
-                contact = contacts[j];
-                contactVertex = contact.vertex;
-                normalImpulse = contact.normalImpulse;
-                tangentImpulse = contact.tangentImpulse;
-                
-                // total impulse from contact
-                impulse.x = (normal.x * normalImpulse) + (tangent.x * tangentImpulse);
-                impulse.y = (normal.y * normalImpulse) + (tangent.y * tangentImpulse);
-                
-                // apply impulse from contact
-                if (!(bodyA.isStatic || bodyA.isSleeping)) {
-                    offset = Vector.sub(contactVertex, bodyA.position);
-                    bodyA.positionPrev.x += impulse.x * bodyA.inverseMass;
-                    bodyA.positionPrev.y += impulse.y * bodyA.inverseMass;
-                    bodyA.anglePrev += Vector.cross(offset, impulse) * bodyA.inverseInertia;
-                }
-
-                if (!(bodyB.isStatic || bodyB.isSleeping)) {
-                    offset = Vector.sub(contactVertex, bodyB.position);
-                    bodyB.positionPrev.x -= impulse.x * bodyB.inverseMass;
-                    bodyB.positionPrev.y -= impulse.y * bodyB.inverseMass;
-                    bodyB.anglePrev -= Vector.cross(offset, impulse) * bodyB.inverseInertia;
-                }
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method solveVelocity
-     * @param {pair[]} pairs
-     */
-    Resolver.solveVelocity = function(pairs, timeScale) {
-        var impulse = {},
-            timeScaleSquared = timeScale * timeScale;
-        
-        for (var i = 0; i < pairs.length; i++) {
-            var pair = pairs[i];
-            
-            if (!pair.isActive)
-                continue;
-            
-            var collision = pair.collision,
-                bodyA = collision.bodyA,
-                bodyB = collision.bodyB,
-                normal = collision.normal,
-                tangent = collision.tangent,
-                contacts = pair.activeContacts,
-                contactShare = 1 / contacts.length;
-
-            // update body velocities
-            bodyA.velocity.x = bodyA.position.x - bodyA.positionPrev.x;
-            bodyA.velocity.y = bodyA.position.y - bodyA.positionPrev.y;
-            bodyB.velocity.x = bodyB.position.x - bodyB.positionPrev.x;
-            bodyB.velocity.y = bodyB.position.y - bodyB.positionPrev.y;
-            bodyA.angularVelocity = bodyA.angle - bodyA.anglePrev;
-            bodyB.angularVelocity = bodyB.angle - bodyB.anglePrev;
-
-            // resolve each contact
-            for (var j = 0; j < contacts.length; j++) {
-                var contact = contacts[j],
-                    contactVertex = contact.vertex,
-                    offsetA = Vector.sub(contactVertex, bodyA.position),
-                    offsetB = Vector.sub(contactVertex, bodyB.position),
-                    velocityPointA = Vector.add(bodyA.velocity, Vector.mult(Vector.perp(offsetA), bodyA.angularVelocity)),
-                    velocityPointB = Vector.add(bodyB.velocity, Vector.mult(Vector.perp(offsetB), bodyB.angularVelocity)), 
-                    relativeVelocity = Vector.sub(velocityPointA, velocityPointB),
-                    normalVelocity = Vector.dot(normal, relativeVelocity);
-
-                var tangentVelocity = Vector.dot(tangent, relativeVelocity),
-                    tangentSpeed = Math.abs(tangentVelocity),
-                    tangentVelocityDirection = Common.sign(tangentVelocity);
-
-                // raw impulses
-                var normalImpulse = (1 + pair.restitution) * normalVelocity,
-                    normalForce = Common.clamp(pair.separation + normalVelocity, 0, 1);
-
-                // coulomb friction
-                var tangentImpulse = tangentVelocity;
-                if (tangentSpeed > normalForce * pair.friction * timeScaleSquared)
-                    tangentImpulse = normalForce * pair.friction * timeScaleSquared * tangentVelocityDirection;
-
-                // modify impulses accounting for mass, inertia and offset
-                var oAcN = Vector.cross(offsetA, normal),
-                    oBcN = Vector.cross(offsetB, normal),
-                    share = contactShare / (pair.inverseMass + bodyA.inverseInertia * oAcN * oAcN  + bodyB.inverseInertia * oBcN * oBcN);
-                normalImpulse *= share;
-                tangentImpulse *= share;
-                
-                // handle high velocity and resting collisions separately
-                if (normalVelocity < 0 && normalVelocity * normalVelocity > _restingThresh * timeScaleSquared) {
-                    // high velocity so clear cached contact impulse
-                    contact.normalImpulse = 0;
-                    contact.tangentImpulse = 0;
-                } else {
-                    // solve resting collision constraints using Erin Catto's method (GDC08)
-
-                    // impulse constraint, tends to 0
-                    var contactNormalImpulse = contact.normalImpulse;
-                    contact.normalImpulse = Math.min(contact.normalImpulse + normalImpulse, 0);
-                    normalImpulse = contact.normalImpulse - contactNormalImpulse;
-                    
-                    // tangent impulse, tends to -maxFriction or maxFriction
-                    var contactTangentImpulse = contact.tangentImpulse;
-                    contact.tangentImpulse = Common.clamp(contact.tangentImpulse + tangentImpulse, -tangentSpeed, tangentSpeed);
-                    tangentImpulse = contact.tangentImpulse - contactTangentImpulse;
-                }
-                
-                // total impulse from contact
-                impulse.x = (normal.x * normalImpulse) + (tangent.x * tangentImpulse);
-                impulse.y = (normal.y * normalImpulse) + (tangent.y * tangentImpulse);
-                
-                // apply impulse from contact
-                if (!(bodyA.isStatic || bodyA.isSleeping)) {
-                    bodyA.positionPrev.x += impulse.x * bodyA.inverseMass;
-                    bodyA.positionPrev.y += impulse.y * bodyA.inverseMass;
-                    bodyA.anglePrev += Vector.cross(offsetA, impulse) * bodyA.inverseInertia;
-                }
-
-                if (!(bodyB.isStatic || bodyB.isSleeping)) {
-                    bodyB.positionPrev.x -= impulse.x * bodyB.inverseMass;
-                    bodyB.positionPrev.y -= impulse.y * bodyB.inverseMass;
-                    bodyB.anglePrev -= Vector.cross(offsetB, impulse) * bodyB.inverseInertia;
-                }
-            }
-        }
-    };
-
-})();
-
-;   // End src/collision/Resolver.js
-
-
-// Begin src/collision/SAT.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class SAT
-*/
-
-// TODO: true circles and curves
-
-var SAT = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method collides
-     * @param {body} bodyA
-     * @param {body} bodyB
-     * @param {collision} previousCollision
-     * @return {collision} collision
-     */
-    SAT.collides = function(bodyA, bodyB, previousCollision) {
-        var overlapAB,
-            overlapBA, 
-            minOverlap,
-            collision,
-            prevCol = previousCollision,
-            canReusePrevCol = false;
-
-        if (prevCol) {
-            // estimate total motion
-            var motion = bodyA.speed * bodyA.speed + bodyA.angularSpeed * bodyA.angularSpeed
-                       + bodyB.speed * bodyB.speed + bodyB.angularSpeed * bodyB.angularSpeed;
-
-            // we may be able to (partially) reuse collision result 
-            // but only safe if collision was resting
-            canReusePrevCol = prevCol && prevCol.collided && motion < 0.2;
-
-            // reuse collision object
-            collision = prevCol;
-        } else {
-            collision = { collided: false, bodyA: bodyA, bodyB: bodyB };
-        }
-
-        if (prevCol && canReusePrevCol) {
-            // if we can reuse the collision result
-            // we only need to test the previously found axis
-            var axes = [prevCol.bodyA.axes[prevCol.axisNumber]];
-
-            minOverlap = _overlapAxes(prevCol.bodyA.vertices, prevCol.bodyB.vertices, axes);
-            collision.reused = true;
-
-            if (minOverlap.overlap <= 0) {
-                collision.collided = false;
-                return collision;
-            }
-        } else {
-            // if we can't reuse a result, perform a full SAT test
-
-            overlapAB = _overlapAxes(bodyA.vertices, bodyB.vertices, bodyA.axes);
-
-            if (overlapAB.overlap <= 0) {
-                collision.collided = false;
-                return collision;
-            }
-
-            overlapBA = _overlapAxes(bodyB.vertices, bodyA.vertices, bodyB.axes);
-
-            if (overlapBA.overlap <= 0) {
-                collision.collided = false;
-                return collision;
-            }
-
-            if (overlapAB.overlap < overlapBA.overlap) {
-                minOverlap = overlapAB;
-                collision.bodyA = bodyA;
-                collision.bodyB = bodyB;
-            } else {
-                minOverlap = overlapBA;
-                collision.bodyA = bodyB;
-                collision.bodyB = bodyA;
-            }
-
-            // important for reuse later
-            collision.axisNumber = minOverlap.axisNumber;
-        }
-
-        collision.collided = true;
-        collision.normal = minOverlap.axis;
-        collision.depth = minOverlap.overlap;
-        
-        bodyA = collision.bodyA;
-        bodyB = collision.bodyB;
-
-        // ensure normal is facing away from bodyA
-        if (Vector.dot(collision.normal, Vector.sub(bodyB.position, bodyA.position)) > 0) 
-            collision.normal = Vector.neg(collision.normal);
-
-        collision.tangent = Vector.perp(collision.normal);
-
-        collision.penetration = { 
-            x: collision.normal.x * collision.depth, 
-            y: collision.normal.y * collision.depth 
-        };
-
-        // find support points, there is always either exactly one or two
-        var verticesB = _findSupports(bodyA, bodyB, collision.normal),
-            supports = [verticesB[0]];
-        
-        if (Vertices.contains(bodyA.vertices, verticesB[1])) {
-            supports.push(verticesB[1]);
-        } else {
-            var verticesA = _findSupports(bodyB, bodyA, Vector.neg(collision.normal));
-            
-            if (Vertices.contains(bodyB.vertices, verticesA[0])) {
-                supports.push(verticesA[0]);
-            }
-
-            if (supports.length < 2 && Vertices.contains(bodyB.vertices, verticesA[1])) {
-                supports.push(verticesA[1]);
-            }
-        }
-        
-        collision.supports = supports;
-        collision.supportCorrected = Vector.sub(verticesB[0], collision.penetration);
-
-        return collision;
-    };
-
-    /**
-     * Description
-     * @method _overlapAxes
-     * @private
-     * @param {} verticesA
-     * @param {} verticesB
-     * @param {} axes
-     * @return result
-     */
-    var _overlapAxes = function(verticesA, verticesB, axes) {
-        var projectionA = {}, 
-            projectionB = {},
-            result = { overlap: Number.MAX_VALUE },
-            overlap,
-            axis;
-
-        for (var i = 0; i < axes.length; i++) {
-            axis = axes[i];
-
-            _projectToAxis(projectionA, verticesA, axis);
-            _projectToAxis(projectionB, verticesB, axis);
-
-            overlap = projectionA.min < projectionB.min 
-                        ? projectionA.max - projectionB.min 
-                        : projectionB.max - projectionA.min;
-
-            if (overlap <= 0) {
-                result.overlap = overlap;
-                return result;
-            }
-
-            if (overlap < result.overlap) {
-                result.overlap = overlap;
-                result.axis = axis;
-                result.axisNumber = i;
-            }
-        }
-
-        return result;
-    };
-
-    /**
-     * Description
-     * @method _projectToAxis
-     * @private
-     * @param {} projection
-     * @param {} vertices
-     * @param {} axis
-     */
-    var _projectToAxis = function(projection, vertices, axis) {
-        var min = Vector.dot(vertices[0], axis),
-            max = min;
-
-        for (var i = 1; i < vertices.length; i += 1) {
-            var dot = Vector.dot(vertices[i], axis);
-
-            if (dot > max) { 
-                max = dot; 
-            } else if (dot < min) { 
-                min = dot; 
-            }
-        }
-
-        projection.min = min;
-        projection.max = max;
-    };
-    
-    /**
-     * Description
-     * @method _findSupports
-     * @private
-     * @param {} bodyA
-     * @param {} bodyB
-     * @param {} normal
-     * @return ArrayExpression
-     */
-    var _findSupports = function(bodyA, bodyB, normal) {
-        var nearestDistance = Number.MAX_VALUE,
-            vertexToBody = { x: 0, y: 0 },
-            vertices = bodyB.vertices,
-            bodyAPosition = bodyA.position,
-            distance,
-            vertex,
-            vertexA = vertices[0],
-            vertexB = vertices[1];
-
-        // find closest vertex on bodyB
-        for (var i = 0; i < vertices.length; i++) {
-            vertex = vertices[i];
-            vertexToBody.x = vertex.x - bodyAPosition.x;
-            vertexToBody.y = vertex.y - bodyAPosition.y;
-            distance = -Vector.dot(normal, vertexToBody);
-
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                vertexA = vertex;
-            }
-        }
-
-        // find next closest vertex using the two connected to it
-        var prevIndex = vertexA.index - 1 >= 0 ? vertexA.index - 1 : vertices.length - 1;
-        vertex = vertices[prevIndex];
-        vertexToBody.x = vertex.x - bodyAPosition.x;
-        vertexToBody.y = vertex.y - bodyAPosition.y;
-        nearestDistance = -Vector.dot(normal, vertexToBody);
-        vertexB = vertex;
-
-        var nextIndex = (vertexA.index + 1) % vertices.length;
-        vertex = vertices[nextIndex];
-        vertexToBody.x = vertex.x - bodyAPosition.x;
-        vertexToBody.y = vertex.y - bodyAPosition.y;
-        distance = -Vector.dot(normal, vertexToBody);
-        if (distance < nearestDistance) {
-            nearestDistance = distance;
-            vertexB = vertex;
-        }
-
-        return [vertexA, vertexB];
-    };
-
-})();
-
-;   // End src/collision/SAT.js
-
-
-// Begin src/constraint/Constraint.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Constraint
-*/
-
-// TODO: fix instabillity issues with torque
-// TODO: linked constraints
-// TODO: breakable constraints
-// TODO: collidable constraints
-// TODO: allow constrained bodies to sleep
-// TODO: handle 0 length constraints properly
-// TODO: impulse caching and warming
-
-var Constraint = {};
-
-(function() {
-
-    var _minLength = 0.000001,
-        _minDifference = 0.001;
-
-    /**
-     * Description
-     * @method create
-     * @param {} options
-     * @return {constraint} constraint
-     */
-    Constraint.create = function(options) {
-        var constraint = options;
-
-        // if bodies defined but no points, use body centre
-        if (constraint.bodyA && !constraint.pointA)
-            constraint.pointA = { x: 0, y: 0 };
-        if (constraint.bodyB && !constraint.pointB)
-            constraint.pointB = { x: 0, y: 0 };
-
-        // calculate static length using initial world space points
-        var initialPointA = constraint.bodyA ? Vector.add(constraint.bodyA.position, constraint.pointA) : constraint.pointA,
-            initialPointB = constraint.bodyB ? Vector.add(constraint.bodyB.position, constraint.pointB) : constraint.pointB,
-            length = Vector.magnitude(Vector.sub(initialPointA, initialPointB));
-    
-        constraint.length = constraint.length || length || _minLength;
-
-        // render
-        var render = {
-            visible: true,
-            lineWidth: 2,
-            strokeStyle: '#666'
-        };
-        
-        constraint.render = Common.extend(render, constraint.render);
-
-        // option defaults
-        constraint.id = constraint.id || Common.nextId();
-        constraint.label = constraint.label || 'Constraint';
-        constraint.type = 'constraint';
-        constraint.stiffness = constraint.stiffness || 1;
-        constraint.angularStiffness = constraint.angularStiffness || 0;
-        constraint.angleA = constraint.bodyA ? constraint.bodyA.angle : constraint.angleA;
-        constraint.angleB = constraint.bodyB ? constraint.bodyB.angle : constraint.angleB;
-
-        return constraint;
-    };
-
-    /**
-     * Description
-     * @method solveAll
-     * @param {constraint[]} constraints
-     * @param {number} timeScale
-     */
-    Constraint.solveAll = function(constraints, timeScale) {
-        for (var i = 0; i < constraints.length; i++) {
-            Constraint.solve(constraints[i], timeScale);
-        }
-    };
-
-    /**
-     * Description
-     * @method solve
-     * @param {constraint} constraint
-     * @param {number} timeScale
-     */
-    Constraint.solve = function(constraint, timeScale) {
-        var bodyA = constraint.bodyA,
-            bodyB = constraint.bodyB,
-            pointA = constraint.pointA,
-            pointB = constraint.pointB;
-
-        // update reference angle
-        if (bodyA && !bodyA.isStatic) {
-            constraint.pointA = Vector.rotate(pointA, bodyA.angle - constraint.angleA);
-            constraint.angleA = bodyA.angle;
-        }
-        
-        // update reference angle
-        if (bodyB && !bodyB.isStatic) {
-            constraint.pointB = Vector.rotate(pointB, bodyB.angle - constraint.angleB);
-            constraint.angleB = bodyB.angle;
-        }
-
-        var pointAWorld = pointA,
-            pointBWorld = pointB;
-
-        if (bodyA) pointAWorld = Vector.add(bodyA.position, pointA);
-        if (bodyB) pointBWorld = Vector.add(bodyB.position, pointB);
-
-        if (!pointAWorld || !pointBWorld)
-            return;
-
-        var delta = Vector.sub(pointAWorld, pointBWorld),
-            currentLength = Vector.magnitude(delta);
-
-        // prevent singularity
-        if (currentLength === 0)
-            currentLength = _minLength;
-
-        // solve distance constraint with Gauss-Siedel method
-        var difference = (currentLength - constraint.length) / currentLength,
-            normal = Vector.div(delta, currentLength),
-            force = Vector.mult(delta, difference * 0.5 * constraint.stiffness * timeScale * timeScale);
-        
-        // if difference is very small, we can skip
-        if (Math.abs(1 - (currentLength / constraint.length)) < _minDifference * timeScale)
-            return;
-
-        var velocityPointA,
-            velocityPointB,
-            offsetA,
-            offsetB,
-            oAn,
-            oBn,
-            bodyADenom,
-            bodyBDenom;
-    
-        if (bodyA && !bodyA.isStatic) {
-            // point body offset
-            offsetA = { 
-                x: pointAWorld.x - bodyA.position.x + force.x, 
-                y: pointAWorld.y - bodyA.position.y + force.y
-            };
-            
-            // update velocity
-            bodyA.velocity.x = bodyA.position.x - bodyA.positionPrev.x;
-            bodyA.velocity.y = bodyA.position.y - bodyA.positionPrev.y;
-            bodyA.angularVelocity = bodyA.angle - bodyA.anglePrev;
-            
-            // find point velocity and body mass
-            velocityPointA = Vector.add(bodyA.velocity, Vector.mult(Vector.perp(offsetA), bodyA.angularVelocity));
-            oAn = Vector.dot(offsetA, normal);
-            bodyADenom = bodyA.inverseMass + bodyA.inverseInertia * oAn * oAn;
-        } else {
-            velocityPointA = { x: 0, y: 0 };
-            bodyADenom = bodyA ? bodyA.inverseMass : 0;
-        }
-            
-        if (bodyB && !bodyB.isStatic) {
-            // point body offset
-            offsetB = { 
-                x: pointBWorld.x - bodyB.position.x - force.x, 
-                y: pointBWorld.y - bodyB.position.y - force.y 
-            };
-            
-            // update velocity
-            bodyB.velocity.x = bodyB.position.x - bodyB.positionPrev.x;
-            bodyB.velocity.y = bodyB.position.y - bodyB.positionPrev.y;
-            bodyB.angularVelocity = bodyB.angle - bodyB.anglePrev;
-
-            // find point velocity and body mass
-            velocityPointB = Vector.add(bodyB.velocity, Vector.mult(Vector.perp(offsetB), bodyB.angularVelocity));
-            oBn = Vector.dot(offsetB, normal);
-            bodyBDenom = bodyB.inverseMass + bodyB.inverseInertia * oBn * oBn;
-        } else {
-            velocityPointB = { x: 0, y: 0 };
-            bodyBDenom = bodyB ? bodyB.inverseMass : 0;
-        }
-        
-        var relativeVelocity = Vector.sub(velocityPointB, velocityPointA),
-            normalImpulse = Vector.dot(normal, relativeVelocity) / (bodyADenom + bodyBDenom);
-    
-        if (normalImpulse > 0) normalImpulse = 0;
-    
-        var normalVelocity = {
-            x: normal.x * normalImpulse, 
-            y: normal.y * normalImpulse
-        };
-
-        var torque;
- 
-        if (bodyA && !bodyA.isStatic) {
-            torque = Vector.cross(offsetA, normalVelocity) * bodyA.inverseInertia * (1 - constraint.angularStiffness);
-
-            Sleeping.set(bodyA, false);
-            
-            // clamp to prevent instabillity
-            // TODO: solve this properlly
-            torque = Common.clamp(torque, -0.01, 0.01);
-
-            // keep track of applied impulses for post solving
-            bodyA.constraintImpulse.x -= force.x;
-            bodyA.constraintImpulse.y -= force.y;
-            bodyA.constraintImpulse.angle += torque;
-
-            // apply forces
-            bodyA.position.x -= force.x;
-            bodyA.position.y -= force.y;
-            bodyA.angle += torque;
-        }
-
-        if (bodyB && !bodyB.isStatic) {
-            torque = Vector.cross(offsetB, normalVelocity) * bodyB.inverseInertia * (1 - constraint.angularStiffness);
-
-            Sleeping.set(bodyB, false);
-            
-            // clamp to prevent instabillity
-            // TODO: solve this properlly
-            torque = Common.clamp(torque, -0.01, 0.01);
-
-            // keep track of applied impulses for post solving
-            bodyB.constraintImpulse.x += force.x;
-            bodyB.constraintImpulse.y += force.y;
-            bodyB.constraintImpulse.angle -= torque;
-            
-            // apply forces
-            bodyB.position.x += force.x;
-            bodyB.position.y += force.y;
-            bodyB.angle -= torque;
-        }
-
-    };
-
-    /**
-     * Performs body updates required after solving constraints
-     * @method postSolveAll
-     * @param {body[]} bodies
-     */
-    Constraint.postSolveAll = function(bodies) {
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i],
-                impulse = body.constraintImpulse;
-
-            // update geometry and reset
-            Vertices.translate(body.vertices, impulse);
-
-            if (impulse.angle !== 0) {
-                Vertices.rotate(body.vertices, impulse.angle, body.position);
-                Axes.rotate(body.axes, impulse.angle);
-                impulse.angle = 0;
-            }
-
-            Bounds.update(body.bounds, body.vertices);
-
-            impulse.x = 0;
-            impulse.y = 0;
-        }
-    };
-
-})();
-
-;   // End src/constraint/Constraint.js
-
-
-// Begin src/constraint/MouseConstraint.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class MouseConstraint
-*/
-
-var MouseConstraint = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @param {engine} engine
-     * @param {} options
-     * @return {MouseConstraint} A new MouseConstraint
-     */
-    MouseConstraint.create = function(engine, options) {
-        var mouse = engine.input.mouse;
-
-        var constraint = Constraint.create({ 
-            label: 'Mouse Constraint',
-            pointA: mouse.position,
-            pointB: { x: 0, y: 0 },
-            length: 0.01, 
-            stiffness: 0.1,
-            angularStiffness: 1,
-            render: {
-                strokeStyle: '#90EE90',
-                lineWidth: 3
-            }
-        });
-
-        var defaults = {
-            type: 'mouseConstraint',
-            mouse: mouse,
-            dragBody: null,
-            dragPoint: null,
-            constraint: constraint
-        };
-
-        var mouseConstraint = Common.extend(defaults, options);
-
-        Events.on(engine, 'tick', function(event) {
-            var allBodies = Composite.allBodies(engine.world);
-            MouseConstraint.update(mouseConstraint, allBodies);
-        });
-
-        return mouseConstraint;
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {MouseConstraint} mouseConstraint
-     * @param {body[]} bodies
-     */
-    MouseConstraint.update = function(mouseConstraint, bodies) {
-        var mouse = mouseConstraint.mouse,
-            constraint = mouseConstraint.constraint;
-
-        if (mouse.button === 0) {
-            if (!constraint.bodyB) {
-                for (var i = 0; i < bodies.length; i++) {
-                    var body = bodies[i];
-                    if (Bounds.contains(body.bounds, mouse.position) 
-                            && Vertices.contains(body.vertices, mouse.position)) {
-                        constraint.pointA = mouse.position;
-                        constraint.bodyB = body;
-                        constraint.pointB = { x: mouse.position.x - body.position.x, y: mouse.position.y - body.position.y };
-                        constraint.angleB = body.angle;
-                        Sleeping.set(body, false);
-                    }
-                }
-            }
-        } else {
-            constraint.bodyB = null;
-            constraint.pointB = null;
-        }
-
-        if (constraint.bodyB) {
-            Sleeping.set(constraint.bodyB, false);
-            constraint.pointA = mouse.position;
-        }
-    };
-
-})();
-
-;   // End src/constraint/MouseConstraint.js
-
-
-// Begin src/core/Common.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Common
-*/
-
-var Common = {};
-
-(function() {
-
-    Common._nextId = 0;
-
-    /**
-     * Description
-     * @method extend
-     * @param {} obj
-     * @param {boolean} deep
-     * @return {} obj extended
-     */
-    Common.extend = function(obj, deep) {
-        var argsStart,
-            args,
-            deepClone;
-
-        if (typeof deep === 'boolean') {
-            argsStart = 2;
-            deepClone = deep;
-        } else {
-            argsStart = 1;
-            deepClone = true;
-        }
-
-        args = Array.prototype.slice.call(arguments, argsStart);
-
-        for (var i = 0; i < args.length; i++) {
-            var source = args[i];
-
-            if (source) {
-                for (var prop in source) {
-                    if (deepClone && source[prop] && source[prop].constructor === Object) {
-                        if (!obj[prop] || obj[prop].constructor === Object) {
-                            obj[prop] = obj[prop] || {};
-                            Common.extend(obj[prop], deepClone, source[prop]);
-                        } else {
-                            obj[prop] = source[prop];
-                        }
-                    } else {
-                        obj[prop] = source[prop];
-                    }
-                }
-            }
-        }
-        
-        return obj;
-    };
-
-    /**
-     * Creates a new clone of the object, if deep is true references will also be cloned
-     * @method clone
-     * @param {} obj
-     * @param {bool} deep
-     * @return {} obj cloned
-     */
-    Common.clone = function(obj, deep) {
-        return Common.extend({}, deep, obj);
-    };
-
-    /**
-     * Description
-     * @method keys
-     * @param {} obj
-     * @return {string[]} keys
-     */
-    Common.keys = function(obj) {
-        if (Object.keys)
-            return Object.keys(obj);
-
-        // avoid hasOwnProperty for performance
-        var keys = [];
-        for (var key in obj)
-            keys.push(key);
-        return keys;
-    };
-
-    /**
-     * Description
-     * @method values
-     * @param {} obj
-     * @return {array} Array of the objects property values
-     */
-    Common.values = function(obj) {
-        var values = [];
-        
-        if (Object.keys) {
-            var keys = Object.keys(obj);
-            for (var i = 0; i < keys.length; i++) {
-                values.push(obj[keys[i]]);
-            }
-            return values;
-        }
-        
-        // avoid hasOwnProperty for performance
-        for (var key in obj)
-            values.push(obj[key]);
-        return values;
-    };
-
-    /**
-     * Description
-     * @method shadeColor
-     * @param {string} color
-     * @param {number} percent
-     * @return {string} A hex colour string made by lightening or darkening color by percent
-     */
-    Common.shadeColor = function(color, percent) {   
-        // http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color
-        var colorInteger = parseInt(color.slice(1),16), 
-            amount = Math.round(2.55 * percent), 
-            R = (colorInteger >> 16) + amount, 
-            B = (colorInteger >> 8 & 0x00FF) + amount, 
-            G = (colorInteger & 0x0000FF) + amount;
-        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R :255) * 0x10000 
-                + (B < 255 ? B < 1 ? 0 : B : 255) * 0x100 
-                + (G < 255 ? G < 1 ? 0 : G : 255)).toString(16).slice(1);
-    };
-
-    /**
-     * Description
-     * @method shuffle
-     * @param {array} array
-     * @return {array} array shuffled randomly
-     */
-    Common.shuffle = function(array) {
-        for (var i = array.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-        return array;
-    };
-
-    /**
-     * Description
-     * @method choose
-     * @param {array} choices
-     * @return {object} A random choice object from the array
-     */
-    Common.choose = function(choices) {
-        return choices[Math.floor(Math.random() * choices.length)];
-    };
-
-    /**
-     * Description
-     * @method isElement
-     * @param {object} obj
-     * @return {boolean} True if the object is a HTMLElement, otherwise false
-     */
-    Common.isElement = function(obj) {
-        // http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
-        try {
-            return obj instanceof HTMLElement;
-        }
-        catch(e){
-            return (typeof obj==="object") &&
-              (obj.nodeType===1) && (typeof obj.style === "object") &&
-              (typeof obj.ownerDocument ==="object");
-        }
-    };
-    
-    /**
-     * Description
-     * @method clamp
-     * @param {number} value
-     * @param {number} min
-     * @param {number} max
-     * @return {number} The value clamped between min and max inclusive
-     */
-    Common.clamp = function(value, min, max) {
-        if (value < min)
-            return min;
-        if (value > max)
-            return max;
-        return value;
-    };
-    
-    /**
-     * Description
-     * @method sign
-     * @param {number} value
-     * @return {number} -1 if negative, +1 if 0 or positive
-     */
-    Common.sign = function(value) {
-        return value < 0 ? -1 : 1;
-    };
-    
-    /**
-     * Description
-     * @method now
-     * @return {number} the current timestamp (high-res if avaliable)
-     */
-    Common.now = function() {
-        // http://stackoverflow.com/questions/221294/how-do-you-get-a-timestamp-in-javascript
-        // https://gist.github.com/davidwaterston/2982531
-        
-        var perf = window.performance;
-
-        if (perf) {
-            perf.now = perf.now || perf.webkitNow || perf.msNow || perf.oNow || perf.mozNow;
-            return +(perf.now());
-        }
-        
-        return +(new Date());
-    };
-
-    
-    /**
-     * Description
-     * @method random
-     * @param {number} min
-     * @param {number} max
-     * @return {number} A random number between min and max inclusive
-     */
-    Common.random = function(min, max) {
-        return min + Math.random() * (max - min);
-    };
-
-    /**
-     * Converts a CSS hex colour string into an integer
-     * @method colorToNumber
-     * @param {string} colorString
-     * @return {number} An integer representing the CSS hex string
-     */
-    Common.colorToNumber = function(colorString) {
-        colorString = colorString.replace('#','');
-
-        if (colorString.length == 3) {
-            colorString = colorString.charAt(0) + colorString.charAt(0)
-                        + colorString.charAt(1) + colorString.charAt(1)
-                        + colorString.charAt(2) + colorString.charAt(2);
-        }
-
-        return parseInt(colorString, 16);
-    };
-
-    /**
-     * A wrapper for console.log, for providing errors and warnings
-     * @method log
-     * @param {string} message
-     * @param {string} type
-     */
-    Common.log = function(message, type) {
-        if (!console || !console.log)
-            return;
-
-        var style;
-
-        switch (type) {
-
-        case 'warn':
-            style = 'color: coral';
-            break;
-        case 'error':
-            style = 'color: red';
-            break;
-
-        }
-
-        console.log('%c [Matter] ' + type + ': ' + message, style);
-    };
-
-    /**
-     * Returns the next unique sequential ID
-     * @method nextId
-     * @return {Number} Unique sequential ID
-     */
-    Common.nextId = function() {
-        return Common._nextId++;
-    };
-
-})();
-
-;   // End src/core/Common.js
-
-
-// Begin src/core/Engine.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Engine
-*/
-
-// TODO: viewports
-
-var Engine = {};
-
-(function() {
-
-    var _fps = 60,
-        _deltaSampleSize = _fps,
-        _delta = 1000 / _fps;
-        
-    var _requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame
-                                      || window.mozRequestAnimationFrame || window.msRequestAnimationFrame 
-                                      || function(callback){ window.setTimeout(function() { callback(Common.now()); }, _delta); };
-   
-    /**
-     * Description
-     * @method create
-     * @param {HTMLElement} element
-     * @param {object} options
-     * @return {engine} engine
-     */
-    Engine.create = function(element, options) {
-
-        // options may be passed as the first (and only) argument
-        options = Common.isElement(element) ? options : element;
-        element = Common.isElement(element) ? element : null;
-
-        var defaults = {
-            enabled: true,
-            positionIterations: 6,
-            velocityIterations: 4,
-            constraintIterations: 2,
-            enableSleeping: false,
-            timeScale: 1,
-            input: {},
-            events: [],
-            timing: {
-                fps: _fps,
-                timestamp: 0,
-                delta: _delta,
-                correction: 1,
-                deltaMin: 1000 / _fps,
-                deltaMax: 1000 / (_fps * 0.5),
-                timeScale: 1,
-                isFixed: false
-            },
-            render: {
-                element: element,
-                controller: Render
-            }
-        };
-        
-        var engine = Common.extend(defaults, options);
-
-        engine.render = engine.render.controller.create(engine.render);
-        engine.world = World.create(engine.world);
-        engine.pairs = Pairs.create();
-        engine.metrics = engine.metrics || Metrics.create();
-        engine.input.mouse = engine.input.mouse || Mouse.create(engine.render.canvas);
-
-        engine.broadphase = engine.broadphase || {
-            current: 'grid',
-            grid: {
-                controller: Grid,
-                instance: Grid.create(),
-                detector: Detector.collisions
-            },
-            bruteForce: {
-                detector: Detector.bruteForce
-            }
-        };
-
-        return engine;
-    };
-
-    /**
-     * An optional utility function that provides a game loop, that handles updating the engine for you.
-     * Calls `Engine.update` and `Engine.render` on the `requestAnimationFrame` event automatically.
-     * Handles time correction and non-fixed dynamic timing (if enabled). 
-     * Triggers `beforeTick`, `tick` and `afterTick` events.
-     * @method run
-     * @param {engine} engine
-     */
-    Engine.run = function(engine) {
-        var counterTimestamp = 0,
-            frameCounter = 0,
-            deltaHistory = [],
-            timePrev,
-            timeScalePrev = 1;
-
-        (function render(time){
-            _requestAnimationFrame(render);
-
-            if (!engine.enabled)
-                return;
-
-            var timing = engine.timing,
-                delta,
-                correction;
-
-            // create an event object
-            var event = {
-                timestamp: time
-            };
-
-            Events.trigger(engine, 'beforeTick', event);
-
-            if (timing.isFixed) {
-                // fixed timestep
-                delta = timing.delta;
-            } else {
-                // dynamic timestep based on wall clock between calls
-                delta = (time - timePrev) || timing.delta;
-                timePrev = time;
-
-                // optimistically filter delta over a few frames, to improve stability
-                deltaHistory.push(delta);
-                deltaHistory = deltaHistory.slice(-_deltaSampleSize);
-                delta = Math.min.apply(null, deltaHistory);
-                
-                // limit delta
-                delta = delta < timing.deltaMin ? timing.deltaMin : delta;
-                delta = delta > timing.deltaMax ? timing.deltaMax : delta;
-
-                // time correction for delta
-                correction = delta / timing.delta;
-
-                // update engine timing object
-                timing.delta = delta;
-            }
-
-            // time correction for time scaling
-            if (timeScalePrev !== 0)
-                correction *= timing.timeScale / timeScalePrev;
-
-            if (timing.timeScale === 0)
-                correction = 0;
-
-            timeScalePrev = timing.timeScale;
-            
-            // fps counter
-            frameCounter += 1;
-            if (time - counterTimestamp >= 1000) {
-                timing.fps = frameCounter * ((time - counterTimestamp) / 1000);
-                counterTimestamp = time;
-                frameCounter = 0;
-            }
-
-            Events.trigger(engine, 'tick', event);
-
-            // if world has been modified, clear the render scene graph
-            if (engine.world.isModified)
-                engine.render.controller.clear(engine.render);
-
-            // update
-            Engine.update(engine, delta, correction);
-
-            // trigger events that may have occured during the step
-            _triggerCollisionEvents(engine);
-            _triggerMouseEvents(engine);
-
-            // render
-            Engine.render(engine);
-
-            Events.trigger(engine, 'afterTick', event);
-        })();
-    };
-
-    /**
-     * Moves the simulation forward in time by `delta` ms. Triggers `beforeUpdate` and `afterUpdate` events.
-     * @method update
-     * @param {engine} engine
-     * @param {number} delta
-     * @param {number} correction
-     * @return engine
-     */
-    Engine.update = function(engine, delta, correction) {
-        correction = (typeof correction !== 'undefined') ? correction : 1;
-
-        var world = engine.world,
-            timing = engine.timing,
-            broadphase = engine.broadphase[engine.broadphase.current],
-            broadphasePairs = [],
-            i;
-
-        // increment timestamp
-        timing.timestamp += delta * timing.timeScale;
-        timing.correction = correction;
-
-        // create an event object
-        var event = {
-            timestamp: engine.timing.timestamp
-        };
-
-        Events.trigger(engine, 'beforeUpdate', event);
-
-        // get lists of all bodies and constraints, no matter what composites they are in
-        var allBodies = Composite.allBodies(world),
-            allConstraints = Composite.allConstraints(world);
-
-        // reset metrics logging
-        Metrics.reset(engine.metrics);
-
-        // if sleeping enabled, call the sleeping controller
-        if (engine.enableSleeping)
-            Sleeping.update(allBodies);
-
-        // applies gravity to all bodies
-        Body.applyGravityAll(allBodies, world.gravity);
-
-        // update all body position and rotation by integration
-        Body.updateAll(allBodies, delta, timing.timeScale, correction, world.bounds);
-
-        // update all constraints
-        for (i = 0; i < engine.constraintIterations; i++) {
-            Constraint.solveAll(allConstraints, timing.timeScale);
-        }
-        Constraint.postSolveAll(allBodies);
-
-        // broadphase pass: find potential collision pairs
-        if (broadphase.controller) {
-
-            // if world is dirty, we must flush the whole grid
-            if (world.isModified)
-                broadphase.controller.clear(broadphase.instance);
-
-            // update the grid buckets based on current bodies
-            broadphase.controller.update(broadphase.instance, allBodies, engine, world.isModified);
-            broadphasePairs = broadphase.instance.pairsList;
-        } else {
-
-            // if no broadphase set, we just pass all bodies
-            broadphasePairs = allBodies;
-        }
-
-        // narrowphase pass: find actual collisions, then create or update collision pairs
-        var collisions = broadphase.detector(broadphasePairs, engine);
-
-        // update collision pairs
-        var pairs = engine.pairs,
-            timestamp = timing.timestamp;
-        Pairs.update(pairs, collisions, timestamp);
-        Pairs.removeOld(pairs, timestamp);
-
-        // wake up bodies involved in collisions
-        if (engine.enableSleeping)
-            Sleeping.afterCollisions(pairs.list);
-
-        // iteratively resolve velocity between collisions
-        Resolver.preSolveVelocity(pairs.list);
-        for (i = 0; i < engine.velocityIterations; i++) {
-            Resolver.solveVelocity(pairs.list, timing.timeScale);
-        }
-        
-        // iteratively resolve position between collisions
-        for (i = 0; i < engine.positionIterations; i++) {
-            Resolver.solvePosition(pairs.list, timing.timeScale);
-        }
-        Resolver.postSolvePosition(allBodies);
-
-        // update metrics log
-        Metrics.update(engine.metrics, engine);
-
-        // clear force buffers
-        Body.resetForcesAll(allBodies);
-
-        // clear all composite modified flags
-        if (world.isModified)
-            Composite.setModified(world, false, false, true);
-
-        Events.trigger(engine, 'afterUpdate', event);
-
-        return engine;
-    };
-
-    /**
-     * Renders the world by calling its defined renderer `engine.render.controller`. Triggers `beforeRender` and `afterRender` events.
-     * @method render
-     * @param {engine} engineA
-     * @param {engine} engineB
-     */
-    Engine.render = function(engine) {
-        // create an event object
-        var event = {
-            timestamp: engine.timing.timestamp
-        };
-
-        Events.trigger(engine, 'beforeRender', event);
-        engine.render.controller.world(engine);
-        Events.trigger(engine, 'afterRender', event);
-    };
-    
-    /**
-     * Description
-     * @method merge
-     * @param {engine} engineA
-     * @param {engine} engineB
-     */
-    Engine.merge = function(engineA, engineB) {
-        Common.extend(engineA, engineB);
-        
-        if (engineB.world) {
-            engineA.world = engineB.world;
-
-            Engine.clear(engineA);
-
-            var bodies = Composite.allBodies(engineA.world);
-
-            for (var i = 0; i < bodies.length; i++) {
-                var body = bodies[i];
-                Sleeping.set(body, false);
-                body.id = Common.nextId();
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method clear
-     * @param {engine} engine
-     */
-    Engine.clear = function(engine) {
-        var world = engine.world;
-        
-        Pairs.clear(engine.pairs);
-
-        var broadphase = engine.broadphase[engine.broadphase.current];
-        if (broadphase.controller) {
-            var bodies = Composite.allBodies(world);
-            broadphase.controller.clear(broadphase.instance);
-            broadphase.controller.update(broadphase.instance, bodies, engine, true);
-        }
-    };
-
-    /**
-     * Triggers mouse events
-     * @method _triggerMouseEvents
-     * @private
-     * @param {engine} engine
-     */
-    var _triggerMouseEvents = function(engine) {
-        var mouse = engine.input.mouse,
-            mouseEvents = mouse.sourceEvents;
-
-        if (mouseEvents.mousemove) {
-            Events.trigger(engine, 'mousemove', {
-                mouse: mouse
-            });
-        }
-
-        if (mouseEvents.mousedown) {
-            Events.trigger(engine, 'mousedown', {
-                mouse: mouse
-            });
-        }
-
-        if (mouseEvents.mouseup) {
-            Events.trigger(engine, 'mouseup', {
-                mouse: mouse
-            });
-        }
-
-        // reset the mouse state ready for the next step
-        Mouse.clearSourceEvents(mouse);
-    };
-
-    /**
-     * Triggers collision events
-     * @method _triggerMouseEvents
-     * @private
-     * @param {engine} engine
-     */
-    var _triggerCollisionEvents = function(engine) {
-        var pairs = engine.pairs;
-
-        if (pairs.collisionStart.length > 0) {
-            Events.trigger(engine, 'collisionStart', {
-                pairs: pairs.collisionStart
-            });
-        }
-
-        if (pairs.collisionActive.length > 0) {
-            Events.trigger(engine, 'collisionActive', {
-                pairs: pairs.collisionActive
-            });
-        }
-
-        if (pairs.collisionEnd.length > 0) {
-            Events.trigger(engine, 'collisionEnd', {
-                pairs: pairs.collisionEnd
-            });
-        }
-    };
-
-    /*
-    *
-    *  Events Documentation
-    *
-    */
-
-    /**
-    * Fired at the start of a tick, before any updates to the engine or timing
-    *
-    * @event beforeTick
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after engine timing updated, but just before engine state updated
-    *
-    * @event tick
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired just before an update
-    *
-    * @event beforeUpdate
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after engine update and all collision events
-    *
-    * @event afterUpdate
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired just before rendering
-    *
-    * @event beforeRender
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after rendering
-    *
-    * @event afterRender
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after engine update and after rendering
-    *
-    * @event afterTick
-    * @param {} event An event object
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired when the mouse has moved (or a touch moves) during the last step
-    *
-    * @event mousemove
-    * @param {} event An event object
-    * @param {mouse} event.mouse The engine's mouse instance
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired when the mouse is down (or a touch has started) during the last step
-    *
-    * @event mousedown
-    * @param {} event An event object
-    * @param {mouse} event.mouse The engine's mouse instance
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired when the mouse is up (or a touch has ended) during the last step
-    *
-    * @event mouseup
-    * @param {} event An event object
-    * @param {mouse} event.mouse The engine's mouse instance
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after engine update, provides a list of all pairs that have started to collide in the current tick (if any)
-    *
-    * @event collisionStart
-    * @param {} event An event object
-    * @param {} event.pairs List of affected pairs
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after engine update, provides a list of all pairs that are colliding in the current tick (if any)
-    *
-    * @event collisionActive
-    * @param {} event An event object
-    * @param {} event.pairs List of affected pairs
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-    /**
-    * Fired after engine update, provides a list of all pairs that have ended collision in the current tick (if any)
-    *
-    * @event collisionEnd
-    * @param {} event An event object
-    * @param {} event.pairs List of affected pairs
-    * @param {DOMHighResTimeStamp} event.timestamp The timestamp of the current tick
-    * @param {} event.source The source object of the event
-    * @param {} event.name The name of the event
-    */
-
-})();
-
-;   // End src/core/Engine.js
-
-
-// Begin src/core/Events.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Events
-*/
-
-var Events = {};
-
-(function() {
-
-    /**
-     * Subscribes a callback function to the given object's eventName
-     * @method on
-     * @param {} object
-     * @param {string} eventNames
-     * @param {function} callback
-     */
-    Events.on = function(object, eventNames, callback) {
-        var names = eventNames.split(' '),
-            name;
-
-        for (var i = 0; i < names.length; i++) {
-            name = names[i];
-            object.events = object.events || {};
-            object.events[name] = object.events[name] || [];
-            object.events[name].push(callback);
-        }
-
-        return callback;
-    };
-
-    /**
-     * Removes the given event callback. If no callback, clears all callbacks in eventNames. If no eventNames, clears all events.
-     * @method off
-     * @param {} object
-     * @param {string} eventNames
-     * @param {function} callback
-     */
-    Events.off = function(object, eventNames, callback) {
-        if (!eventNames) {
-            object.events = {};
-            return;
-        }
-
-        // handle Events.off(object, callback)
-        if (typeof eventNames === 'function') {
-            callback = eventNames;
-            eventNames = Common.keys(object.events).join(' ');
-        }
-
-        var names = eventNames.split(' ');
-
-        for (var i = 0; i < names.length; i++) {
-            var callbacks = object.events[names[i]],
-                newCallbacks = [];
-
-            if (callback) {
-                for (var j = 0; j < callbacks.length; j++) {
-                    if (callbacks[j] !== callback)
-                        newCallbacks.push(callbacks[j]);
-                }
-            }
-
-            object.events[names[i]] = newCallbacks;
-        }
-    };
-
-    /**
-     * Fires all the callbacks subscribed to the given object's eventName, in the order they subscribed, if any
-     * @method trigger
-     * @param {} object
-     * @param {string} eventNames
-     * @param {} event
-     */
-    Events.trigger = function(object, eventNames, event) {
-        var names,
-            name,
-            callbacks,
-            eventClone;
-
-        if (object.events) {
-            if (!event)
-                event = {};
-
-            names = eventNames.split(' ');
-
-            for (var i = 0; i < names.length; i++) {
-                name = names[i];
-                callbacks = object.events[name];
-
-                if (callbacks) {
-                    eventClone = Common.clone(event, false);
-                    eventClone.name = name;
-                    eventClone.source = object;
-
-                    for (var j = 0; j < callbacks.length; j++) {
-                        callbacks[j].apply(object, [eventClone]);
-                    }
-                }
-            }
-        }
-    };
-
-})();
-
-;   // End src/core/Events.js
-
-
-// Begin src/core/Metrics.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Metrics
-*/
-
-var Metrics = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @return {metrics} A new metrics
-     */
-    Metrics.create = function() {
-        return {
-            extended: false,
-            narrowDetections: 0,
-            narrowphaseTests: 0,
-            narrowReuse: 0,
-            narrowReuseCount: 0,
-            midphaseTests: 0,
-            broadphaseTests: 0,
-            narrowEff: 0.0001,
-            midEff: 0.0001,
-            broadEff: 0.0001,
-            collisions: 0,
-            buckets: 0,
-            bodies: 0,
-            pairs: 0
-        };
-    };
-
-    /**
-     * Description
-     * @method reset
-     * @param {metrics} metrics
-     */
-    Metrics.reset = function(metrics) {
-        if (metrics.extended) {
-            metrics.narrowDetections = 0;
-            metrics.narrowphaseTests = 0;
-            metrics.narrowReuse = 0;
-            metrics.narrowReuseCount = 0;
-            metrics.midphaseTests = 0;
-            metrics.broadphaseTests = 0;
-            metrics.narrowEff = 0;
-            metrics.midEff = 0;
-            metrics.broadEff = 0;
-            metrics.collisions = 0;
-            metrics.buckets = 0;
-            metrics.pairs = 0;
-            metrics.bodies = 0;
-        }
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {metrics} metrics
-     * @param {engine} engine
-     */
-    Metrics.update = function(metrics, engine) {
-        if (metrics.extended) {
-            var world = engine.world,
-                broadphase = engine.broadphase[engine.broadphase.current],
-                bodies = Composite.allBodies(world);
-
-            metrics.collisions = metrics.narrowDetections;
-            metrics.pairs = engine.pairs.list.length;
-            metrics.bodies = bodies.length;
-            metrics.midEff = (metrics.narrowDetections / (metrics.midphaseTests || 1)).toFixed(2);
-            metrics.narrowEff = (metrics.narrowDetections / (metrics.narrowphaseTests || 1)).toFixed(2);
-            metrics.broadEff = (1 - (metrics.broadphaseTests / (bodies.length || 1))).toFixed(2);
-            metrics.narrowReuse = (metrics.narrowReuseCount / (metrics.narrowphaseTests || 1)).toFixed(2);
-            //if (broadphase.instance)
-            //    metrics.buckets = Common.keys(broadphase.instance.buckets).length;
-        }
-    };
-
-})();
-
-;   // End src/core/Metrics.js
-
-
-// Begin src/core/Mouse.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Mouse
-*/
-
-var Mouse;
-
-(function() {
-    
-    /**
-     * Description
-     * @param {HTMLElement} element
-     */
-    Mouse = function(element) {
-        var mouse = this;
-        
-        this.element = element || document.body;
-        this.absolute = { x: 0, y: 0 };
-        this.position = { x: 0, y: 0 };
-        this.mousedownPosition = { x: 0, y: 0 };
-        this.mouseupPosition = { x: 0, y: 0 };
-        this.offset = { x: 0, y: 0 };
-        this.scale = { x: 1, y: 1 };
-        this.wheelDelta = 0;
-        this.button = -1;
-
-        this.sourceEvents = {
-            mousemove: null,
-            mousedown: null,
-            mouseup: null,
-            mousewheel: null
-        };
-        
-        this.mousemove = function(event) { 
-            var position = _getRelativeMousePosition(event, mouse.element),
-                touches = event.changedTouches;
-
-            if (touches) {
-                mouse.button = 0;
-                event.preventDefault();
-            }
-
-            mouse.absolute.x = position.x;
-            mouse.absolute.y = position.y;
-            mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
-            mouse.position.y = mouse.absolute.y * mouse.scale.y + mouse.offset.y;
-            mouse.sourceEvents.mousemove = event;
-        };
-        
-        this.mousedown = function(event) {
-            var position = _getRelativeMousePosition(event, mouse.element),
-                touches = event.changedTouches;
-
-            if (touches) {
-                mouse.button = 0;
-                event.preventDefault();
-            } else {
-                mouse.button = event.button;
-            }
-
-            mouse.absolute.x = position.x;
-            mouse.absolute.y = position.y;
-            mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
-            mouse.position.y = mouse.absolute.y * mouse.scale.y + mouse.offset.y;
-            mouse.mousedownPosition.x = mouse.position.x;
-            mouse.mousedownPosition.y = mouse.position.y;
-            mouse.sourceEvents.mousedown = event;
-        };
-        
-        this.mouseup = function(event) {
-            var position = _getRelativeMousePosition(event, mouse.element),
-                touches = event.changedTouches;
-
-            if (touches) {
-                event.preventDefault();
-            }
-            
-            mouse.button = -1;
-            mouse.absolute.x = position.x;
-            mouse.absolute.y = position.y;
-            mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
-            mouse.position.y = mouse.absolute.y * mouse.scale.y + mouse.offset.y;
-            mouse.mouseupPosition.x = mouse.position.x;
-            mouse.mouseupPosition.y = mouse.position.y;
-            mouse.sourceEvents.mouseup = event;
-        };
-
-        this.mousewheel = function(event) {
-            mouse.wheelDelta = Math.max(-1, Math.min(1, event.wheelDelta || -event.detail));
-            event.preventDefault();
-        };
-
-        Mouse.setElement(mouse, mouse.element);
-    };
-
-    /**
-     * Description
-     * @method create
-     * @param {HTMLElement} element
-     * @return {mouse} A new mouse
-     */
-    Mouse.create = function(element) {
-        return new Mouse(element);
-    };
-
-    /**
-     * Sets the element the mouse is bound to (and relative to)
-     * @method setElement
-     * @param {mouse} mouse
-     * @param {HTMLElement} element
-     */
-    Mouse.setElement = function(mouse, element) {
-        mouse.element = element;
-
-        element.addEventListener('mousemove', mouse.mousemove);
-        element.addEventListener('mousedown', mouse.mousedown);
-        element.addEventListener('mouseup', mouse.mouseup);
-        
-        element.addEventListener("mousewheel", mouse.mousewheel);
-        element.addEventListener("DOMMouseScroll", mouse.mousewheel);
-
-        element.addEventListener('touchmove', mouse.mousemove);
-        element.addEventListener('touchstart', mouse.mousedown);
-        element.addEventListener('touchend', mouse.mouseup);
-    };
-
-    /**
-     * Clears all captured source events
-     * @method clearSourceEvents
-     * @param {mouse} mouse
-     */
-    Mouse.clearSourceEvents = function(mouse) {
-        mouse.sourceEvents.mousemove = null;
-        mouse.sourceEvents.mousedown = null;
-        mouse.sourceEvents.mouseup = null;
-        mouse.sourceEvents.mousewheel = null;
-        mouse.wheelDelta = 0;
-    };
-
-    /**
-     * Sets the offset
-     * @method setOffset
-     * @param {mouse} mouse
-     */
-    Mouse.setOffset = function(mouse, offset) {
-        mouse.offset.x = offset.x;
-        mouse.offset.y = offset.y;
-        mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
-        mouse.position.y = mouse.absolute.y * mouse.scale.y + mouse.offset.y;
-    };
-
-    /**
-     * Sets the scale
-     * @method setScale
-     * @param {mouse} mouse
-     */
-    Mouse.setScale = function(mouse, scale) {
-        mouse.scale.x = scale.x;
-        mouse.scale.y = scale.y;
-        mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
-        mouse.position.y = mouse.absolute.y * mouse.scale.y + mouse.offset.y;
-    };
-    
-    /**
-     * Description
-     * @method _getRelativeMousePosition
-     * @private
-     * @param {} event
-     * @param {} element
-     * @return ObjectExpression
-     */
-    var _getRelativeMousePosition = function(event, element) {
-        var elementBounds = element.getBoundingClientRect(),
-            rootNode = (document.documentElement || document.body.parentNode || document.body),
-            scrollX = (window.pageXOffset !== undefined) ? window.pageXOffset : rootNode.scrollLeft,
-            scrollY = (window.pageYOffset !== undefined) ? window.pageYOffset : rootNode.scrollTop,
-            touches = event.changedTouches,
-            x, y;
-        
-        if (touches) {
-            x = touches[0].pageX - elementBounds.left - scrollX;
-            y = touches[0].pageY - elementBounds.top - scrollY;
-        } else {
-            x = event.pageX - elementBounds.left - scrollX;
-            y = event.pageY - elementBounds.top - scrollY;
-        }
-        
-        return { 
-            x: x / (element.clientWidth / element.width), 
-            y: y / (element.clientHeight / element.height)
-        };
-    };
-
-})();
-
-;   // End src/core/Mouse.js
-
-
-// Begin src/core/Sleeping.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Sleeping
-*/
-
-var Sleeping = {};
-
-(function() {
-
-    var _motionWakeThreshold = 0.18,
-        _motionSleepThreshold = 0.08,
-        _minBias = 0.9;
-
-    /**
-     * Description
-     * @method update
-     * @param {body[]} bodies
-     */
-    Sleeping.update = function(bodies) {
-        // update bodies sleeping status
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i],
-                motion = body.speed * body.speed + body.angularSpeed * body.angularSpeed;
-
-            // wake up bodies if they have a force applied
-            if (body.force.x > 0 || body.force.y > 0) {
-                Sleeping.set(body, false);
-                continue;
-            }
-
-            var minMotion = Math.min(body.motion, motion),
-                maxMotion = Math.max(body.motion, motion);
-        
-            // biased average motion estimation between frames
-            body.motion = _minBias * minMotion + (1 - _minBias) * maxMotion;
-            
-            if (body.sleepThreshold > 0 && body.motion < _motionSleepThreshold) {
-                body.sleepCounter += 1;
-                
-                if (body.sleepCounter >= body.sleepThreshold)
-                    Sleeping.set(body, true);
-            } else if (body.sleepCounter > 0) {
-                body.sleepCounter -= 1;
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method afterCollisions
-     * @param {pair[]} pairs
-     */
-    Sleeping.afterCollisions = function(pairs) {
-        // wake up bodies involved in collisions
-        for (var i = 0; i < pairs.length; i++) {
-            var pair = pairs[i];
-            
-            // don't wake inactive pairs
-            if (!pair.isActive)
-                continue;
-
-            var collision = pair.collision,
-                bodyA = collision.bodyA, 
-                bodyB = collision.bodyB;
-        
-            // don't wake if at least one body is static
-            if ((bodyA.isSleeping && bodyB.isSleeping) || bodyA.isStatic || bodyB.isStatic)
-                continue;
-        
-            if (bodyA.isSleeping || bodyB.isSleeping) {
-                var sleepingBody = (bodyA.isSleeping && !bodyA.isStatic) ? bodyA : bodyB,
-                    movingBody = sleepingBody === bodyA ? bodyB : bodyA;
-
-                if (!sleepingBody.isStatic && movingBody.motion > _motionWakeThreshold) {
-                    Sleeping.set(sleepingBody, false);
-                }
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method set
-     * @param {body} body
-     * @param {boolean} isSleeping
-     */
-    Sleeping.set = function(body, isSleeping) {
-        if (isSleeping) {
-            body.isSleeping = true;
-            body.sleepCounter = body.sleepThreshold;
-
-            body.positionImpulse.x = 0;
-            body.positionImpulse.y = 0;
-
-            body.positionPrev.x = body.position.x;
-            body.positionPrev.y = body.position.y;
-
-            body.anglePrev = body.angle;
-            body.speed = 0;
-            body.angularSpeed = 0;
-            body.motion = 0;
-        } else {
-            body.isSleeping = false;
-            body.sleepCounter = 0;
-        }
-    };
-
-})();
-
-;   // End src/core/Sleeping.js
-
-
-// Begin src/factory/Bodies.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Bodies
-*/
-
-// TODO: true circle bodies
-
-var Bodies = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method rectangle
-     * @param {number} x
-     * @param {number} y
-     * @param {number} width
-     * @param {number} height
-     * @param {object} options
-     * @return {body} A new rectangle body
-     */
-    Bodies.rectangle = function(x, y, width, height, options) {
-        options = options || {};
-
-        var rectangle = { 
-            label: 'Rectangle Body',
-            position: { x: x, y: y },
-            vertices: Vertices.fromPath('L 0 0 L ' + width + ' 0 L ' + width + ' ' + height + ' L 0 ' + height)
-        };
-
-        if (options.chamfer) {
-            var chamfer = options.chamfer;
-            rectangle.vertices = Vertices.chamfer(rectangle.vertices, chamfer.radius, 
-                                    chamfer.quality, chamfer.qualityMin, chamfer.qualityMax);
-            delete options.chamfer;
-        }
-
-        return Body.create(Common.extend({}, rectangle, options));
-    };
-    
-    /**
-     * Description
-     * @method trapezoid
-     * @param {number} x
-     * @param {number} y
-     * @param {number} width
-     * @param {number} height
-     * @param {number} slope
-     * @param {object} options
-     * @return {body} A new trapezoid body
-     */
-    Bodies.trapezoid = function(x, y, width, height, slope, options) {
-        options = options || {};
-
-        slope *= 0.5;
-        var roof = (1 - (slope * 2)) * width;
-        
-        var x1 = width * slope,
-            x2 = x1 + roof,
-            x3 = x2 + x1;
-
-        var trapezoid = { 
-            label: 'Trapezoid Body',
-            position: { x: x, y: y },
-            vertices: Vertices.fromPath('L 0 0 L ' + x1 + ' ' + (-height) + ' L ' + x2 + ' ' + (-height) + ' L ' + x3 + ' 0')
-        };
-
-        if (options.chamfer) {
-            var chamfer = options.chamfer;
-            trapezoid.vertices = Vertices.chamfer(trapezoid.vertices, chamfer.radius, 
-                                    chamfer.quality, chamfer.qualityMin, chamfer.qualityMax);
-            delete options.chamfer;
-        }
-
-        return Body.create(Common.extend({}, trapezoid, options));
-    };
-
-    /**
-     * Description
-     * @method circle
-     * @param {number} x
-     * @param {number} y
-     * @param {number} radius
-     * @param {object} options
-     * @param {number} maxSides
-     * @return {body} A new circle body
-     */
-    Bodies.circle = function(x, y, radius, options, maxSides) {
-        options = options || {};
-        options.label = 'Circle Body';
-        
-        // approximate circles with polygons until true circles implemented in SAT
-
-        maxSides = maxSides || 25;
-        var sides = Math.ceil(Math.max(10, Math.min(maxSides, radius)));
-
-        // optimisation: always use even number of sides (half the number of unique axes)
-        if (sides % 2 === 1)
-            sides += 1;
-
-        // flag for better rendering
-        options.circleRadius = radius;
-
-        return Bodies.polygon(x, y, sides, radius, options);
-    };
-
-    /**
-     * Description
-     * @method polygon
-     * @param {number} x
-     * @param {number} y
-     * @param {number} sides
-     * @param {number} radius
-     * @param {object} options
-     * @return {body} A new regular polygon body
-     */
-    Bodies.polygon = function(x, y, sides, radius, options) {
-        options = options || {};
-
-        if (sides < 3)
-            return Bodies.circle(x, y, radius, options);
-
-        var theta = 2 * Math.PI / sides,
-            path = '',
-            offset = theta * 0.5;
-
-        for (var i = 0; i < sides; i += 1) {
-            var angle = offset + (i * theta),
-                xx = Math.cos(angle) * radius,
-                yy = Math.sin(angle) * radius;
-
-            path += 'L ' + xx.toFixed(3) + ' ' + yy.toFixed(3) + ' ';
-        }
-
-        var polygon = { 
-            label: 'Polygon Body',
-            position: { x: x, y: y },
-            vertices: Vertices.fromPath(path)
-        };
-
-        if (options.chamfer) {
-            var chamfer = options.chamfer;
-            polygon.vertices = Vertices.chamfer(polygon.vertices, chamfer.radius, 
-                                    chamfer.quality, chamfer.qualityMin, chamfer.qualityMax);
-            delete options.chamfer;
-        }
-
-        return Body.create(Common.extend({}, polygon, options));
-    };
-
-})();
-
-;   // End src/factory/Bodies.js
-
-
-// Begin src/factory/Composites.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Composites
-*/
-
-var Composites = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method stack
-     * @param {number} xx
-     * @param {number} yy
-     * @param {number} columns
-     * @param {number} rows
-     * @param {number} columnGap
-     * @param {number} rowGap
-     * @param {function} callback
-     * @return {composite} A new composite containing objects created in the callback
-     */
-    Composites.stack = function(xx, yy, columns, rows, columnGap, rowGap, callback) {
-        var stack = Composite.create({ label: 'Stack' }),
-            x = xx,
-            y = yy,
-            lastBody,
-            i = 0;
-
-        for (var row = 0; row < rows; row++) {
-            var maxHeight = 0;
-            
-            for (var column = 0; column < columns; column++) {
-                var body = callback(x, y, column, row, lastBody, i);
-                    
-                if (body) {
-                    var bodyHeight = body.bounds.max.y - body.bounds.min.y,
-                        bodyWidth = body.bounds.max.x - body.bounds.min.x; 
-
-                    if (bodyHeight > maxHeight)
-                        maxHeight = bodyHeight;
-                    
-                    Body.translate(body, { x: bodyWidth * 0.5, y: bodyHeight * 0.5 });
-
-                    x = body.bounds.max.x + columnGap;
-
-                    Composite.addBody(stack, body);
-                    
-                    lastBody = body;
-                    i += 1;
-                }
-            }
-            
-            y += maxHeight + rowGap;
-            x = xx;
-        }
-
-        return stack;
-    };
-    
-    /**
-     * Description
-     * @method chain
-     * @param {composite} composite
-     * @param {number} xOffsetA
-     * @param {number} yOffsetA
-     * @param {number} xOffsetB
-     * @param {number} yOffsetB
-     * @param {object} options
-     * @return {composite} A new composite containing objects chained together with constraints
-     */
-    Composites.chain = function(composite, xOffsetA, yOffsetA, xOffsetB, yOffsetB, options) {
-        var bodies = composite.bodies;
-        
-        for (var i = 1; i < bodies.length; i++) {
-            var bodyA = bodies[i - 1],
-                bodyB = bodies[i],
-                bodyAHeight = bodyA.bounds.max.y - bodyA.bounds.min.y,
-                bodyAWidth = bodyA.bounds.max.x - bodyA.bounds.min.x, 
-                bodyBHeight = bodyB.bounds.max.y - bodyB.bounds.min.y,
-                bodyBWidth = bodyB.bounds.max.x - bodyB.bounds.min.x;
-        
-            var defaults = {
-                bodyA: bodyA,
-                pointA: { x: bodyAWidth * xOffsetA, y: bodyAHeight * yOffsetA },
-                bodyB: bodyB,
-                pointB: { x: bodyBWidth * xOffsetB, y: bodyBHeight * yOffsetB }
-            };
-            
-            var constraint = Common.extend(defaults, options);
-        
-            Composite.addConstraint(composite, Constraint.create(constraint));
-        }
-
-        composite.label += ' Chain';
-        
-        return composite;
-    };
-
-    /**
-     * Connects bodies in the composite with constraints in a grid pattern, with optional cross braces
-     * @method mesh
-     * @param {composite} composite
-     * @param {number} columns
-     * @param {number} rows
-     * @param {boolean} crossBrace
-     * @param {object} options
-     * @return {composite} The composite containing objects meshed together with constraints
-     */
-    Composites.mesh = function(composite, columns, rows, crossBrace, options) {
-        var bodies = composite.bodies,
-            row,
-            col,
-            bodyA,
-            bodyB,
-            bodyC;
-        
-        for (row = 0; row < rows; row++) {
-            for (col = 0; col < columns; col++) {
-                if (col > 0) {
-                    bodyA = bodies[(col - 1) + (row * columns)];
-                    bodyB = bodies[col + (row * columns)];
-                    Composite.addConstraint(composite, Constraint.create(Common.extend({ bodyA: bodyA, bodyB: bodyB }, options)));
-                }
-            }
-
-            for (col = 0; col < columns; col++) {
-                if (row > 0) {
-                    bodyA = bodies[col + ((row - 1) * columns)];
-                    bodyB = bodies[col + (row * columns)];
-                    Composite.addConstraint(composite, Constraint.create(Common.extend({ bodyA: bodyA, bodyB: bodyB }, options)));
-
-                    if (crossBrace && col > 0) {
-                        bodyC = bodies[(col - 1) + ((row - 1) * columns)];
-                        Composite.addConstraint(composite, Constraint.create(Common.extend({ bodyA: bodyC, bodyB: bodyB }, options)));
-                    }
-
-                    if (crossBrace && col < columns - 1) {
-                        bodyC = bodies[(col + 1) + ((row - 1) * columns)];
-                        Composite.addConstraint(composite, Constraint.create(Common.extend({ bodyA: bodyC, bodyB: bodyB }, options)));
-                    }
-                }
-            }
-        }
-
-        composite.label += ' Mesh';
-        
-        return composite;
-    };
-    
-    /**
-     * Description
-     * @method pyramid
-     * @param {number} xx
-     * @param {number} yy
-     * @param {number} columns
-     * @param {number} rows
-     * @param {number} columnGap
-     * @param {number} rowGap
-     * @param {function} callback
-     * @return {composite} A new composite containing objects created in the callback
-     */
-    Composites.pyramid = function(xx, yy, columns, rows, columnGap, rowGap, callback) {
-        return Composites.stack(xx, yy, columns, rows, columnGap, rowGap, function(x, y, column, row, lastBody, i) {
-            var actualRows = Math.min(rows, Math.ceil(columns / 2)),
-                lastBodyWidth = lastBody ? lastBody.bounds.max.x - lastBody.bounds.min.x : 0;
-            
-            if (row > actualRows)
-                return;
-            
-            // reverse row order
-            row = actualRows - row;
-            
-            var start = row,
-                end = columns - 1 - row;
-
-            if (column < start || column > end)
-                return;
-            
-            // retroactively fix the first body's position, since width was unknown
-            if (i === 1) {
-                Body.translate(lastBody, { x: (column + (columns % 2 === 1 ? 1 : -1)) * lastBodyWidth, y: 0 });
-            }
-
-            var xOffset = lastBody ? column * lastBodyWidth : 0;
-            
-            return callback(xx + xOffset + column * columnGap, y, column, row, lastBody, i);
-        });
-    };
-
-    /**
-     * Description
-     * @method newtonsCradle
-     * @param {number} xx
-     * @param {number} yy
-     * @param {number} number
-     * @param {number} size
-     * @param {number} length
-     * @return {composite} A new composite newtonsCradle body
-     */
-    Composites.newtonsCradle = function(xx, yy, number, size, length) {
-        var newtonsCradle = Composite.create({ label: 'Newtons Cradle' });
-
-        for (var i = 0; i < number; i++) {
-            var separation = 1.9,
-                circle = Bodies.circle(xx + i * (size * separation), yy + length, size, 
-                            { inertia: 99999, restitution: 1, friction: 0, frictionAir: 0.0001, slop: 0.01 }),
-                constraint = Constraint.create({ pointA: { x: xx + i * (size * separation), y: yy }, bodyB: circle });
-
-            Composite.addBody(newtonsCradle, circle);
-            Composite.addConstraint(newtonsCradle, constraint);
-        }
-
-        return newtonsCradle;
-    };
-    
-    /**
-     * Description
-     * @method car
-     * @param {number} xx
-     * @param {number} yy
-     * @param {number} width
-     * @param {number} height
-     * @param {number} wheelSize
-     * @return {composite} A new composite car body
-     */
-    Composites.car = function(xx, yy, width, height, wheelSize) {
-        var groupId = Body.nextGroupId(),
-            wheelBase = -20,
-            wheelAOffset = -width * 0.5 + wheelBase,
-            wheelBOffset = width * 0.5 - wheelBase,
-            wheelYOffset = 0;
-    
-        var car = Composite.create({ label: 'Car' }),
-            body = Bodies.trapezoid(xx, yy, width, height, 0.3, { 
-                groupId: groupId, 
-                friction: 0.01,
-                chamfer: {
-                    radius: 10
-                }
-            });
-    
-        var wheelA = Bodies.circle(xx + wheelAOffset, yy + wheelYOffset, wheelSize, { 
-            groupId: groupId, 
-            restitution: 0.5, 
-            friction: 0.9,
-            density: 0.01
-        });
-                    
-        var wheelB = Bodies.circle(xx + wheelBOffset, yy + wheelYOffset, wheelSize, { 
-            groupId: groupId, 
-            restitution: 0.5, 
-            friction: 0.9,
-            density: 0.01
-        });
-                    
-        var axelA = Constraint.create({
-            bodyA: body,
-            pointA: { x: wheelAOffset, y: wheelYOffset },
-            bodyB: wheelA,
-            stiffness: 0.5
-        });
-                        
-        var axelB = Constraint.create({
-            bodyA: body,
-            pointA: { x: wheelBOffset, y: wheelYOffset },
-            bodyB: wheelB,
-            stiffness: 0.5
-        });
-        
-        Composite.addBody(car, body);
-        Composite.addBody(car, wheelA);
-        Composite.addBody(car, wheelB);
-        Composite.addConstraint(car, axelA);
-        Composite.addConstraint(car, axelB);
-
-        return car;
-    };
-
-    /**
-     * Creates a simple soft body like object
-     * @method softBody
-     * @param {number} xx
-     * @param {number} yy
-     * @param {number} columns
-     * @param {number} rows
-     * @param {number} columnGap
-     * @param {number} rowGap
-     * @param {boolean} crossBrace
-     * @param {number} particleRadius
-     * @param {} particleOptions
-     * @param {} constraintOptions
-     * @return {composite} A new composite softBody
-     */
-    Composites.softBody = function(xx, yy, columns, rows, columnGap, rowGap, crossBrace, particleRadius, particleOptions, constraintOptions) {
-        particleOptions = Common.extend({ inertia: Infinity }, particleOptions);
-        constraintOptions = Common.extend({ stiffness: 0.4 }, constraintOptions);
-
-        var softBody = Composites.stack(xx, yy, columns, rows, columnGap, rowGap, function(x, y, column, row) {
-            return Bodies.circle(x, y, particleRadius, particleOptions);
-        });
-
-        Composites.mesh(softBody, columns, rows, crossBrace, constraintOptions);
-
-        softBody.label = 'Soft Body';
-
-        return softBody;
-    };
-
-})();
-
-;   // End src/factory/Composites.js
-
-
-// Begin src/geometry/Axes.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Axes
-*/
-
-var Axes = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method fromVertices
-     * @param {vertices} vertices
-     * @return {axes} A new axes from the given vertices
-     */
-    Axes.fromVertices = function(vertices) {
-        var axes = {};
-
-        // find the unique axes, using edge normal gradients
-        for (var i = 0; i < vertices.length; i++) {
-            var j = (i + 1) % vertices.length, 
-                normal = Vector.normalise({ 
-                    x: vertices[j].y - vertices[i].y, 
-                    y: vertices[i].x - vertices[j].x
-                }),
-                gradient = (normal.y === 0) ? Infinity : (normal.x / normal.y);
-            
-            // limit precision
-            gradient = gradient.toFixed(3).toString();
-
-            axes[gradient] = normal;
-        }
-
-        return Common.values(axes);
-    };
-
-    /**
-     * Description
-     * @method rotate
-     * @param {axes} axes
-     * @param {number} angle
-     */
-    Axes.rotate = function(axes, angle) {
-        if (angle === 0)
-            return;
-        
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle);
-
-        for (var i = 0; i < axes.length; i++) {
-            var axis = axes[i],
-                xx;
-            xx = axis.x * cos - axis.y * sin;
-            axis.y = axis.x * sin + axis.y * cos;
-            axis.x = xx;
-        }
-    };
-
-})();
-
-;   // End src/geometry/Axes.js
-
-
-// Begin src/geometry/Bounds.js
-
-/**
-* _Internal Class_, not generally used outside of the engine's internals.
-*
-* @class Bounds
-*/
-
-var Bounds = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @param {vertices} vertices
-     * @return {bounds} A new bounds object
-     */
-    Bounds.create = function(vertices) {
-        var bounds = { 
-            min: { x: 0, y: 0 }, 
-            max: { x: 0, y: 0 }
-        };
-
-        if (vertices)
-            Bounds.update(bounds, vertices);
-        
-        return bounds;
-    };
-
-    /**
-     * Description
-     * @method update
-     * @param {bounds} bounds
-     * @param {vertices} vertices
-     * @param {vector} velocity
-     */
-    Bounds.update = function(bounds, vertices, velocity) {
-        bounds.min.x = Number.MAX_VALUE;
-        bounds.max.x = Number.MIN_VALUE;
-        bounds.min.y = Number.MAX_VALUE;
-        bounds.max.y = Number.MIN_VALUE;
-
-        for (var i = 0; i < vertices.length; i++) {
-            var vertex = vertices[i];
-            if (vertex.x > bounds.max.x) bounds.max.x = vertex.x;
-            if (vertex.x < bounds.min.x) bounds.min.x = vertex.x;
-            if (vertex.y > bounds.max.y) bounds.max.y = vertex.y;
-            if (vertex.y < bounds.min.y) bounds.min.y = vertex.y;
-        }
-        
-        if (velocity) {
-            if (velocity.x > 0) {
-                bounds.max.x += velocity.x;
-            } else {
-                bounds.min.x += velocity.x;
-            }
-            
-            if (velocity.y > 0) {
-                bounds.max.y += velocity.y;
-            } else {
-                bounds.min.y += velocity.y;
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method contains
-     * @param {bounds} bounds
-     * @param {vector} point
-     * @return {boolean} True if the bounds contain the point, otherwise false
-     */
-    Bounds.contains = function(bounds, point) {
-        return point.x >= bounds.min.x && point.x <= bounds.max.x 
-               && point.y >= bounds.min.y && point.y <= bounds.max.y;
-    };
-
-    /**
-     * Description
-     * @method overlaps
-     * @param {bounds} boundsA
-     * @param {bounds} boundsB
-     * @return {boolean} True if the bounds overlap, otherwise false
-     */
-    Bounds.overlaps = function(boundsA, boundsB) {
-        return (boundsA.min.x <= boundsB.max.x && boundsA.max.x >= boundsB.min.x
-                && boundsA.max.y >= boundsB.min.y && boundsA.min.y <= boundsB.max.y);
-    };
-
-    /**
-     * Translates the bounds by the given vector
-     * @method translate
-     * @param {bounds} bounds
-     * @param {vector} vector
-     */
-    Bounds.translate = function(bounds, vector) {
-        bounds.min.x += vector.x;
-        bounds.max.x += vector.x;
-        bounds.min.y += vector.y;
-        bounds.max.y += vector.y;
-    };
-
-    /**
-     * Shifts the bounds to the given position
-     * @method shift
-     * @param {bounds} bounds
-     * @param {vector} position
-     */
-    Bounds.shift = function(bounds, position) {
-        var deltaX = bounds.max.x - bounds.min.x,
-            deltaY = bounds.max.y - bounds.min.y;
-            
-        bounds.min.x = position.x;
-        bounds.max.x = position.x + deltaX;
-        bounds.min.y = position.y;
-        bounds.max.y = position.y + deltaY;
-    };
-    
-})();
-
-;   // End src/geometry/Bounds.js
-
-
-// Begin src/geometry/Vector.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Vector
-*/
-
-// TODO: consider params for reusing vector objects
-
-var Vector = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method magnitude
-     * @param {vector} vector
-     * @return {number} The magnitude of the vector
-     */
-    Vector.magnitude = function(vector) {
-        return Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
-    };
-
-    /**
-     * Description
-     * @method magnitudeSquared
-     * @param {vector} vector
-     * @return {number} The squared magnitude of the vector
-     */
-    Vector.magnitudeSquared = function(vector) {
-        return (vector.x * vector.x) + (vector.y * vector.y);
-    };
-
-    /**
-     * Description
-     * @method rotate
-     * @param {vector} vector
-     * @param {number} angle
-     * @return {vector} A new vector rotated
-     */
-    Vector.rotate = function(vector, angle) {
-        var cos = Math.cos(angle), sin = Math.sin(angle);
-        return {
-            x: vector.x * cos - vector.y * sin,
-            y: vector.x * sin + vector.y * cos
-        };
-    };
-
-    /**
-     * Description
-     * @method rotateAbout
-     * @param {vector} vector
-     * @param {number} angle
-     * @param {vector} point
-     * @return {vector} A new vector rotated about the point
-     */
-    Vector.rotateAbout = function(vector, angle, point) {
-        var cos = Math.cos(angle), sin = Math.sin(angle);
-        return {
-            x: point.x + ((vector.x - point.x) * cos - (vector.y - point.y) * sin),
-            y: point.y + ((vector.x - point.x) * sin + (vector.y - point.y) * cos)
-        };
-    };
-
-    /**
-     * Description
-     * @method normalise
-     * @param {vector} vector
-     * @return {vector} A new vector normalised
-     */
-    Vector.normalise = function(vector) {
-        var magnitude = Vector.magnitude(vector);
-        if (magnitude === 0)
-            return { x: 0, y: 0 };
-        return { x: vector.x / magnitude, y: vector.y / magnitude };
-    };
-
-    /**
-     * Description
-     * @method dot
-     * @param {vector} vectorA
-     * @param {vector} vectorB
-     * @return {number} The dot product of the two vectors
-     */
-    Vector.dot = function(vectorA, vectorB) {
-        return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
-    };
-
-    /**
-     * Description
-     * @method cross
-     * @param {vector} vectorA
-     * @param {vector} vectorB
-     * @return {number} The cross product of the two vectors
-     */
-    Vector.cross = function(vectorA, vectorB) {
-        return (vectorA.x * vectorB.y) - (vectorA.y * vectorB.x);
-    };
-
-    /**
-     * Description
-     * @method add
-     * @param {vector} vectorA
-     * @param {vector} vectorB
-     * @return {vector} A new vector added
-     */
-    Vector.add = function(vectorA, vectorB) {
-        return { x: vectorA.x + vectorB.x, y: vectorA.y + vectorB.y };
-    };
-
-    /**
-     * Description
-     * @method sub
-     * @param {vector} vectorA
-     * @param {vector} vectorB
-     * @return {vector} A new vector subtracted
-     */
-    Vector.sub = function(vectorA, vectorB) {
-        return { x: vectorA.x - vectorB.x, y: vectorA.y - vectorB.y };
-    };
-
-    /**
-     * Description
-     * @method mult
-     * @param {vector} vector
-     * @param {number} scalar
-     * @return {vector} A new vector multiplied by scalar
-     */
-    Vector.mult = function(vector, scalar) {
-        return { x: vector.x * scalar, y: vector.y * scalar };
-    };
-
-    /**
-     * Description
-     * @method div
-     * @param {vector} vector
-     * @param {number} scalar
-     * @return {vector} A new vector divided by scalar
-     */
-    Vector.div = function(vector, scalar) {
-        return { x: vector.x / scalar, y: vector.y / scalar };
-    };
-
-    /**
-     * Description
-     * @method perp
-     * @param {vector} vector
-     * @param {bool} negate
-     * @return {vector} The perpendicular vector
-     */
-    Vector.perp = function(vector, negate) {
-        negate = negate === true ? -1 : 1;
-        return { x: negate * -vector.y, y: negate * vector.x };
-    };
-
-    /**
-     * Description
-     * @method neg
-     * @param {vector} vector
-     * @return {vector} The negated vector
-     */
-    Vector.neg = function(vector) {
-        return { x: -vector.x, y: -vector.y };
-    };
-
-    /**
-     * Returns the angle in radians between the two vectors relative to the x-axis
-     * @method angle
-     * @param {vector} vectorA
-     * @param {vector} vectorB
-     * @return {number} The angle in radians
-     */
-    Vector.angle = function(vectorA, vectorB) {
-        return Math.atan2(vectorB.y - vectorA.y, vectorB.x - vectorA.x);
-    };
-
-})();
-
-;   // End src/geometry/Vector.js
-
-
-// Begin src/geometry/Vertices.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Vertices
-*/
-
-// TODO: convex decomposition - http://mnbayazit.com/406/bayazit
-
-var Vertices = {};
-
-(function() {
-
-    /**
-     * Description
-     * @method create
-     * @param {vertices} vertices
-     * @param {body} body
-     */
-    Vertices.create = function(vertices, body) {
-        for (var i = 0; i < vertices.length; i++) {
-            vertices[i].index = i;
-            vertices[i].body = body;
-        }
-    };
-
-    /**
-     * Description
-     * @method fromPath
-     * @param {string} path
-     * @return {vertices} vertices
-     */
-    Vertices.fromPath = function(path) {
-        var pathPattern = /L\s*([\-\d\.]*)\s*([\-\d\.]*)/ig,
-            vertices = [];
-
-        path.replace(pathPattern, function(match, x, y) {
-            vertices.push({ x: parseFloat(x, 10), y: parseFloat(y, 10) });
-        });
-
-        return vertices;
-    };
-
-    /**
-     * Description
-     * @method centre
-     * @param {vertices} vertices
-     * @return {vector} The centre point
-     */
-    Vertices.centre = function(vertices) {
-        var area = Vertices.area(vertices, true),
-            centre = { x: 0, y: 0 },
-            cross,
-            temp,
-            j;
-
-        for (var i = 0; i < vertices.length; i++) {
-            j = (i + 1) % vertices.length;
-            cross = Vector.cross(vertices[i], vertices[j]);
-            temp = Vector.mult(Vector.add(vertices[i], vertices[j]), cross);
-            centre = Vector.add(centre, temp);
-        }
-
-        return Vector.div(centre, 6 * area);
-    };
-
-    /**
-     * Description
-     * @method area
-     * @param {vertices} vertices
-     * @param {bool} signed
-     * @return {number} The area
-     */
-    Vertices.area = function(vertices, signed) {
-        var area = 0,
-            j = vertices.length - 1;
-
-        for (var i = 0; i < vertices.length; i++) {
-            area += (vertices[j].x - vertices[i].x) * (vertices[j].y + vertices[i].y);
-            j = i;
-        }
-
-        if (signed)
-            return area / 2;
-
-        return Math.abs(area) / 2;
-    };
-
-    /**
-     * Description
-     * @method inertia
-     * @param {vertices} vertices
-     * @param {number} mass
-     * @return {number} The polygon's moment of inertia, using second moment of area
-     */
-    Vertices.inertia = function(vertices, mass) {
-        var numerator = 0,
-            denominator = 0,
-            v = vertices,
-            cross,
-            j;
-
-        // find the polygon's moment of inertia, using second moment of area
-        // http://www.physicsforums.com/showthread.php?t=25293
-        for (var n = 0; n < v.length; n++) {
-            j = (n + 1) % v.length;
-            cross = Math.abs(Vector.cross(v[j], v[n]));
-            numerator += cross * (Vector.dot(v[j], v[j]) + Vector.dot(v[j], v[n]) + Vector.dot(v[n], v[n]));
-            denominator += cross;
-        }
-
-        return (mass / 6) * (numerator / denominator);
-    };
-
-    /**
-     * Description
-     * @method translate
-     * @param {vertices} vertices
-     * @param {vector} vector
-     * @param {number} scalar
-     */
-    Vertices.translate = function(vertices, vector, scalar) {
-        var i;
-        if (scalar) {
-            for (i = 0; i < vertices.length; i++) {
-                vertices[i].x += vector.x * scalar;
-                vertices[i].y += vector.y * scalar;
-            }
-        } else {
-            for (i = 0; i < vertices.length; i++) {
-                vertices[i].x += vector.x;
-                vertices[i].y += vector.y;
-            }
-        } 
-    };
-
-    /**
-     * Description
-     * @method rotate
-     * @param {vertices} vertices
-     * @param {number} angle
-     * @param {vector} point
-     */
-    Vertices.rotate = function(vertices, angle, point) {
-        if (angle === 0)
-            return;
-
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle);
-
-        for (var i = 0; i < vertices.length; i++) {
-            var vertice = vertices[i],
-                dx = vertice.x - point.x,
-                dy = vertice.y - point.y;
-                
-            vertice.x = point.x + (dx * cos - dy * sin);
-            vertice.y = point.y + (dx * sin + dy * cos);
-        }
-    };
-
-    /**
-     * Description
-     * @method contains
-     * @param {vertices} vertices
-     * @param {vector} point
-     * @return {boolean} True if the vertices contains point, otherwise false
-     */
-    Vertices.contains = function(vertices, point) {
-        for (var i = 0; i < vertices.length; i++) {
-            var vertice = vertices[i],
-                nextVertice = vertices[(i + 1) % vertices.length];
-            if ((point.x - vertice.x) * (nextVertice.y - vertice.y) + (point.y - vertice.y) * (vertice.x - nextVertice.x) > 0) {
-                return false;
-            }
-        }
-
-        return true;
-    };
-
-    /**
-     * Scales the vertices from a point (default is centre)
-     * @method scale
-     * @param {vertices} vertices
-     * @param {number} scaleX
-     * @param {number} scaleY
-     * @param {vector} point
-     */
-    Vertices.scale = function(vertices, scaleX, scaleY, point) {
-        if (scaleX === 1 && scaleY === 1)
-            return vertices;
-
-        point = point || Vertices.centre(vertices);
-
-        var vertex,
-            delta;
-
-        for (var i = 0; i < vertices.length; i++) {
-            vertex = vertices[i];
-            delta = Vector.sub(vertex, point);
-            vertices[i].x = point.x + delta.x * scaleX;
-            vertices[i].y = point.y + delta.y * scaleY;
-        }
-
-        return vertices;
-    };
-
-    /**
-     * Chamfers a set of vertices by giving them rounded corners, returns a new set of vertices.
-     * The radius parameter is a single number or an array to specify the radius for each vertex.
-     * @method chamfer
-     * @param {vertices} vertices
-     * @param {number[]} radius
-     * @param {number} quality
-     * @param {number} qualityMin
-     * @param {number} qualityMax
-     */
-    Vertices.chamfer = function(vertices, radius, quality, qualityMin, qualityMax) {
-        radius = radius || [8];
-
-        if (!radius.length)
-            radius = [radius];
-
-        // quality defaults to -1, which is auto
-        quality = (typeof quality !== 'undefined') ? quality : -1;
-        qualityMin = qualityMin || 2;
-        qualityMax = qualityMax || 14;
-
-        var centre = Vertices.centre(vertices),
-            newVertices = [];
-
-        for (var i = 0; i < vertices.length; i++) {
-            var prevVertex = vertices[i - 1 >= 0 ? i - 1 : vertices.length - 1],
-                vertex = vertices[i],
-                nextVertex = vertices[(i + 1) % vertices.length],
-                currentRadius = radius[i < radius.length ? i : radius.length - 1];
-
-            if (currentRadius === 0) {
-                newVertices.push(vertex);
-                continue;
-            }
-
-            var prevNormal = Vector.normalise({ 
-                x: vertex.y - prevVertex.y, 
-                y: prevVertex.x - vertex.x
-            });
-
-            var nextNormal = Vector.normalise({ 
-                x: nextVertex.y - vertex.y, 
-                y: vertex.x - nextVertex.x
-            });
-
-            var diagonalRadius = Math.sqrt(2 * Math.pow(currentRadius, 2)),
-                radiusVector = Vector.mult(Common.clone(prevNormal), currentRadius),
-                midNormal = Vector.normalise(Vector.mult(Vector.add(prevNormal, nextNormal), 0.5)),
-                scaledVertex = Vector.sub(vertex, Vector.mult(midNormal, diagonalRadius));
-
-            var precision = quality;
-
-            if (quality === -1) {
-                // automatically decide precision
-                precision = Math.pow(currentRadius, 0.32) * 1.75;
-            }
-
-            precision = Common.clamp(precision, qualityMin, qualityMax);
-
-            // use an even value for precision, more likely to reduce axes by using symmetry
-            if (precision % 2 === 1)
-                precision += 1;
-
-            var alpha = Math.acos(Vector.dot(prevNormal, nextNormal)),
-                theta = alpha / precision;
-
-            for (var j = 0; j < precision; j++) {
-                newVertices.push(Vector.add(Vector.rotate(radiusVector, theta * j), scaledVertex));
-            }
-        }
-
-        return newVertices;
-    };
-
-})();
-
-;   // End src/geometry/Vertices.js
-
-
-// Begin src/render/Render.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class Render
-*/
-
-// TODO: viewports
-// TODO: two.js, pixi.js
-
-var Render = {};
-
-(function() {
-    
-    /**
-     * Description
-     * @method create
-     * @param {object} options
-     * @return {render} A new renderer
-     */
-    Render.create = function(options) {
-        var defaults = {
-            controller: Render,
-            element: null,
-            canvas: null,
-            options: {
-                width: 800,
-                height: 600,
-                background: '#fafafa',
-                wireframeBackground: '#222',
-                hasBounds: false,
-                enabled: true,
-                wireframes: true,
-                showSleeping: true,
-                showDebug: false,
-                showBroadphase: false,
-                showBounds: false,
-                showVelocity: false,
-                showCollisions: false,
-                showAxes: false,
-                showPositions: false,
-                showAngleIndicator: false,
-                showIds: false,
-                showShadows: false
-            }
-        };
-
-        var render = Common.extend(defaults, options);
-
-        render.canvas = render.canvas || _createCanvas(render.options.width, render.options.height);
-        render.context = render.canvas.getContext('2d');
-        render.textures = {};
-
-        render.bounds = render.bounds || { 
-            min: { 
-                x: 0,
-                y: 0
-            }, 
-            max: { 
-                x: render.options.width,
-                y: render.options.height
-            }
-        };
-
-        Render.setBackground(render, render.options.background);
-
-        if (Common.isElement(render.element)) {
-            render.element.appendChild(render.canvas);
-        } else {
-            Common.log('No "render.element" passed, "render.canvas" was not inserted into document.', 'warn');
-        }
-
-        return render;
-    };
-
-    /**
-     * Clears the renderer. In this implementation, this is a noop.
-     * @method clear
-     * @param {RenderPixi} render
-     */
-    Render.clear = function(render) {
-        // nothing required to clear this renderer implentation
-        // if a scene graph is required, clear it here (see RenderPixi.js)
-    };
-
-    /**
-     * Sets the background CSS property of the canvas 
-     * @method setBackground
-     * @param {render} render
-     * @param {string} background
-     */
-    Render.setBackground = function(render, background) {
-        if (render.currentBackground !== background) {
-            var cssBackground = background;
-
-            if (/(jpg|gif|png)$/.test(background))
-                cssBackground = 'url(' + background + ')';
-
-            render.canvas.style.background = cssBackground;
-            render.canvas.style.backgroundSize = "contain";
-            render.currentBackground = background;
-        }
-    };
-
-    /**
-     * Description
-     * @method world
-     * @param {engine} engine
-     */
-    Render.world = function(engine) {
-        var render = engine.render,
-            world = engine.world,
-            canvas = render.canvas,
-            context = render.context,
-            options = render.options,
-            allBodies = Composite.allBodies(world),
-            allConstraints = Composite.allConstraints(world),
-            bodies = [],
-            constraints = [],
-            i;
-
-        if (options.wireframes) {
-            Render.setBackground(render, options.wireframeBackground);
-        } else {
-            Render.setBackground(render, options.background);
-        }
-
-        // clear the canvas with a transparent fill, to allow the canvas background to show
-        context.globalCompositeOperation = 'source-in';
-        context.fillStyle = "transparent";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.globalCompositeOperation = 'source-over';
-
-        // handle bounds
-        var boundsWidth = render.bounds.max.x - render.bounds.min.x,
-            boundsHeight = render.bounds.max.y - render.bounds.min.y,
-            boundsScaleX = boundsWidth / render.options.width,
-            boundsScaleY = boundsHeight / render.options.height;
-
-        if (options.hasBounds) {
-            // filter out bodies that are not in view
-            for (i = 0; i < allBodies.length; i++) {
-                var body = allBodies[i];
-                if (Bounds.overlaps(body.bounds, render.bounds))
-                    bodies.push(body);
-            }
-
-            // filter out constraints that are not in view
-            for (i = 0; i < allConstraints.length; i++) {
-                var constraint = allConstraints[i],
-                    bodyA = constraint.bodyA,
-                    bodyB = constraint.bodyB,
-                    pointAWorld = constraint.pointA,
-                    pointBWorld = constraint.pointB;
-
-                if (bodyA) pointAWorld = Vector.add(bodyA.position, constraint.pointA);
-                if (bodyB) pointBWorld = Vector.add(bodyB.position, constraint.pointB);
-
-                if (!pointAWorld || !pointBWorld)
-                    continue;
-
-                if (Bounds.contains(render.bounds, pointAWorld) || Bounds.contains(render.bounds, pointBWorld))
-                    constraints.push(constraint);
-            }
-
-            // transform the view
-            context.scale(1 / boundsScaleX, 1 / boundsScaleY);
-            context.translate(-render.bounds.min.x, -render.bounds.min.y);
-        } else {
-            constraints = allConstraints;
-            bodies = allBodies;
-        }
-
-        if (!options.wireframes || (engine.enableSleeping && options.showSleeping)) {
-            // fully featured rendering of bodies
-            Render.bodies(engine, bodies, context);
-        } else {
-            // optimised method for wireframes only
-            Render.bodyWireframes(engine, bodies, context);
-        }
-
-        if (options.showBounds)
-            Render.bodyBounds(engine, bodies, context);
-
-        if (options.showAxes || options.showAngleIndicator)
-            Render.bodyAxes(engine, bodies, context);
-        
-        if (options.showPositions)
-            Render.bodyPositions(engine, bodies, context);
-
-        if (options.showVelocity)
-            Render.bodyVelocity(engine, bodies, context);
-
-        if (options.showIds)
-            Render.bodyIds(engine, bodies, context);
-
-        if (options.showCollisions)
-            Render.collisions(engine, engine.pairs.list, context);
-
-        Render.constraints(constraints, context);
-
-        if (options.showBroadphase && engine.broadphase.current === 'grid')
-            Render.grid(engine, engine.broadphase[engine.broadphase.current].instance, context);
-
-        if (options.showDebug)
-            Render.debug(engine, context);
-
-        if (options.hasBounds) {
-            // revert view transforms
-            context.setTransform(1, 0, 0, 1, 0, 0);
-        }
-    };
-
-    /**
-     * Description
-     * @method debug
-     * @param {engine} engine
-     * @param {RenderingContext} context
-     */
-    Render.debug = function(engine, context) {
-        var c = context,
-            world = engine.world,
-            render = engine.render,
-            options = render.options,
-            bodies = Composite.allBodies(world),
-            space = "    ";
-
-        if (engine.timing.timestamp - (render.debugTimestamp || 0) >= 500) {
-            var text = "";
-            text += "fps: " + Math.round(engine.timing.fps) + space;
-
-            if (engine.metrics.extended) {
-                text += "delta: " + engine.timing.delta.toFixed(3) + space;
-                text += "correction: " + engine.timing.correction.toFixed(3) + space;
-                text += "bodies: " + bodies.length + space;
-
-                if (engine.broadphase.controller === Grid)
-                    text += "buckets: " + engine.metrics.buckets + space;
-
-                text += "\n";
-
-                text += "collisions: " + engine.metrics.collisions + space;
-                text += "pairs: " + engine.pairs.list.length + space;
-                text += "broad: " + engine.metrics.broadEff + space;
-                text += "mid: " + engine.metrics.midEff + space;
-                text += "narrow: " + engine.metrics.narrowEff + space;
-            }            
-
-            render.debugString = text;
-            render.debugTimestamp = engine.timing.timestamp;
-        }
-
-        if (render.debugString) {
-            c.font = "12px Arial";
-
-            if (options.wireframes) {
-                c.fillStyle = 'rgba(255,255,255,0.5)';
-            } else {
-                c.fillStyle = 'rgba(0,0,0,0.5)';
-            }
-
-            var split = render.debugString.split('\n');
-
-            for (var i = 0; i < split.length; i++) {
-                c.fillText(split[i], 50, 50 + i * 18);
-            }
-        }
-    };
-
-    /**
-     * Description
-     * @method constraints
-     * @param {constraint[]} constraints
-     * @param {RenderingContext} context
-     */
-    Render.constraints = function(constraints, context) {
-        var c = context;
-
-        for (var i = 0; i < constraints.length; i++) {
-            var constraint = constraints[i];
-
-            if (!constraint.render.visible || !constraint.pointA || !constraint.pointB)
-                continue;
-
-            var bodyA = constraint.bodyA,
-                bodyB = constraint.bodyB;
-
-            if (bodyA) {
-                c.beginPath();
-                c.moveTo(bodyA.position.x + constraint.pointA.x, bodyA.position.y + constraint.pointA.y);
-            } else {
-                c.beginPath();
-                c.moveTo(constraint.pointA.x, constraint.pointA.y);
-            }
-
-            if (bodyB) {
-                c.lineTo(bodyB.position.x + constraint.pointB.x, bodyB.position.y + constraint.pointB.y);
-            } else {
-                c.lineTo(constraint.pointB.x, constraint.pointB.y);
-            }
-
-            c.lineWidth = constraint.render.lineWidth;
-            c.strokeStyle = constraint.render.strokeStyle;
-            c.stroke();
-        }
-    };
-    
-    /**
-     * Description
-     * @method bodyShadows
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyShadows = function(engine, bodies, context) {
-        var c = context,
-            render = engine.render,
-            options = render.options;
-
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (!body.render.visible)
-                continue;
-
-            if (body.circleRadius) {
-                c.beginPath();
-                c.arc(body.position.x, body.position.y, body.circleRadius, 0, 2 * Math.PI);
-                c.closePath();
-            } else {
-                c.beginPath();
-                c.moveTo(body.vertices[0].x, body.vertices[0].y);
-                for (var j = 1; j < body.vertices.length; j++) {
-                    c.lineTo(body.vertices[j].x, body.vertices[j].y);
-                }
-                c.closePath();
-            }
-
-            var distanceX = body.position.x - render.options.width * 0.5,
-                distanceY = body.position.y - render.options.height * 0.2,
-                distance = Math.abs(distanceX) + Math.abs(distanceY);
-
-            c.shadowColor = 'rgba(0,0,0,0.15)';
-            c.shadowOffsetX = 0.05 * distanceX;
-            c.shadowOffsetY = 0.05 * distanceY;
-            c.shadowBlur = 1 + 12 * Math.min(1, distance / 1000);
-
-            c.fill();
-
-            c.shadowColor = null;
-            c.shadowOffsetX = null;
-            c.shadowOffsetY = null;
-            c.shadowBlur = null;
-        }
-    };
-
-    /**
-     * Description
-     * @method bodies
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodies = function(engine, bodies, context) {
-        var c = context,
-            render = engine.render,
-            options = render.options,
-            i;
-
-        for (i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (!body.render.visible)
-                continue;
-
-            if (body.render.sprite && body.render.sprite.texture && !options.wireframes) {
-                // body sprite
-                var sprite = body.render.sprite,
-                    texture = _getTexture(render, sprite.texture);
-
-                if (options.showSleeping && body.isSleeping) 
-                    c.globalAlpha = 0.5;
-
-                c.translate(body.position.x, body.position.y); 
-                c.rotate(body.angle);
-
-                c.drawImage(texture, texture.width * -0.5 * sprite.xScale, texture.height * -0.5 * sprite.yScale, 
-                            texture.width * sprite.xScale, texture.height * sprite.yScale);
-
-                // revert translation, hopefully faster than save / restore
-                c.rotate(-body.angle);
-                c.translate(-body.position.x, -body.position.y); 
-
-                if (options.showSleeping && body.isSleeping) 
-                    c.globalAlpha = 1;
-            } else {
-                // body polygon
-                if (body.circleRadius) {
-                    c.beginPath();
-                    c.arc(body.position.x, body.position.y, body.circleRadius, 0, 2 * Math.PI);
-                } else {
-                    c.beginPath();
-                    c.moveTo(body.vertices[0].x, body.vertices[0].y);
-                    for (var j = 1; j < body.vertices.length; j++) {
-                        c.lineTo(body.vertices[j].x, body.vertices[j].y);
-                    }
-                    c.closePath();
-                }
-
-                if (!options.wireframes) {
-                    if (options.showSleeping && body.isSleeping) {
-                        c.fillStyle = Common.shadeColor(body.render.fillStyle, 50);
-                    } else {
-                        c.fillStyle = body.render.fillStyle;
-                    }
-
-                    c.lineWidth = body.render.lineWidth;
-                    c.strokeStyle = body.render.strokeStyle;
-                    c.fill();
-                    c.stroke();
-                } else {
-                    c.lineWidth = 1;
-                    c.strokeStyle = '#bbb';
-                    if (options.showSleeping && body.isSleeping)
-                        c.strokeStyle = 'rgba(255,255,255,0.2)';
-                    c.stroke();
-                }
-            }
-        }
-
-    };
-
-    /**
-     * Optimised method for drawing body wireframes in one pass
-     * @method bodyWireframes
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyWireframes = function(engine, bodies, context) {
-        var c = context,
-            i,
-            j;
-
-        c.beginPath();
-
-        for (i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (!body.render.visible)
-                continue;
-
-            c.moveTo(body.vertices[0].x, body.vertices[0].y);
-
-            for (j = 1; j < body.vertices.length; j++) {
-                c.lineTo(body.vertices[j].x, body.vertices[j].y);
-            }
-            
-            c.lineTo(body.vertices[0].x, body.vertices[0].y);
-        }
-
-        c.lineWidth = 1;
-        c.strokeStyle = '#bbb';
-        c.stroke();
-    };
-
-    /**
-     * Draws body bounds
-     * @method bodyBounds
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyBounds = function(engine, bodies, context) {
-        var c = context,
-            render = engine.render,
-            options = render.options;
-
-        c.beginPath();
-
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (body.render.visible)
-                c.rect(body.bounds.min.x, body.bounds.min.y, body.bounds.max.x - body.bounds.min.x, body.bounds.max.y - body.bounds.min.y);
-        }
-
-        if (options.wireframes) {
-            c.strokeStyle = 'rgba(255,255,255,0.08)';
-        } else {
-            c.strokeStyle = 'rgba(0,0,0,0.1)';
-        }
-
-        c.lineWidth = 1;
-        c.stroke();
-    };
-
-    /**
-     * Draws body angle indicators and axes
-     * @method bodyAxes
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyAxes = function(engine, bodies, context) {
-        var c = context,
-            render = engine.render,
-            options = render.options,
-            i,
-            j;
-
-        c.beginPath();
-
-        for (i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (!body.render.visible)
-                continue;
-
-            if (options.showAxes) {
-                // render all axes
-                for (j = 0; j < body.axes.length; j++) {
-                    var axis = body.axes[j];
-                    c.moveTo(body.position.x, body.position.y);
-                    c.lineTo(body.position.x + axis.x * 20, body.position.y + axis.y * 20);
-                }
-            } else {
-                // render a single axis indicator
-                c.moveTo(body.position.x, body.position.y);
-                c.lineTo((body.vertices[0].x + body.vertices[body.vertices.length-1].x) / 2, 
-                         (body.vertices[0].y + body.vertices[body.vertices.length-1].y) / 2);
-            }
-        }
-
-        if (options.wireframes) {
-            c.strokeStyle = 'indianred';
-        } else {
-            c.strokeStyle = 'rgba(0,0,0,0.3)';
-        }
-
-        c.lineWidth = 1;
-        c.stroke();
-    };
-
-    /**
-     * Draws body positions
-     * @method bodyPositions
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyPositions = function(engine, bodies, context) {
-        var c = context,
-            render = engine.render,
-            options = render.options,
-            body,
-            i;
-
-        c.beginPath();
-
-        // render current positions
-        for (i = 0; i < bodies.length; i++) {
-            body = bodies[i];
-            if (body.render.visible) {
-                c.arc(body.position.x, body.position.y, 3, 0, 2 * Math.PI, false);
-                c.closePath();
-            }
-        }
-
-        if (options.wireframes) {
-            c.fillStyle = 'indianred';
-        } else {
-            c.fillStyle = 'rgba(0,0,0,0.5)';
-        }
-        c.fill();
-
-        c.beginPath();
-
-        // render previous positions
-        for (i = 0; i < bodies.length; i++) {
-            body = bodies[i];
-            if (body.render.visible) {
-                c.arc(body.positionPrev.x, body.positionPrev.y, 2, 0, 2 * Math.PI, false);
-                c.closePath();
-            }
-        }
-
-        c.fillStyle = 'rgba(255,165,0,0.8)';
-        c.fill();
-    };
-
-    /**
-     * Draws body velocity
-     * @method bodyVelocity
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyVelocity = function(engine, bodies, context) {
-        var c = context,
-            render = engine.render,
-            options = render.options;
-
-        c.beginPath();
-
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (!body.render.visible)
-                continue;
-
-            c.moveTo(body.position.x, body.position.y);
-            c.lineTo(body.position.x + (body.position.x - body.positionPrev.x) * 2, body.position.y + (body.position.y - body.positionPrev.y) * 2);
-        }
-
-        c.lineWidth = 3;
-        c.strokeStyle = 'cornflowerblue';
-        c.stroke();
-    };
-
-    /**
-     * Draws body ids
-     * @method bodyIds
-     * @param {engine} engine
-     * @param {body[]} bodies
-     * @param {RenderingContext} context
-     */
-    Render.bodyIds = function(engine, bodies, context) {
-        var c = context;
-
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i];
-
-            if (!body.render.visible)
-                continue;
-
-            c.font = "12px Arial";
-            c.fillStyle = 'rgba(255,255,255,0.5)';
-            c.fillText(body.id, body.position.x + 10, body.position.y - 10);
-        }
-    };
-
-    /**
-     * Description
-     * @method collisions
-     * @param {engine} engine
-     * @param {pair[]} pairs
-     * @param {RenderingContext} context
-     */
-    Render.collisions = function(engine, pairs, context) {
-        var c = context,
-            options = engine.render.options,
-            pair,
-            collision,
-            i,
-            j;
-
-        c.beginPath();
-
-        // render collision positions
-        for (i = 0; i < pairs.length; i++) {
-            pair = pairs[i];
-            collision = pair.collision;
-            for (j = 0; j < pair.activeContacts.length; j++) {
-                var contact = pair.activeContacts[j],
-                    vertex = contact.vertex;
-                c.rect(vertex.x - 1.5, vertex.y - 1.5, 3.5, 3.5);
-            }
-        }
-
-        if (options.wireframes) {
-            c.fillStyle = 'rgba(255,255,255,0.7)';
-        } else {
-            c.fillStyle = 'orange';
-        }
-        c.fill();
-
-        c.beginPath();
-            
-        // render collision normals
-        for (i = 0; i < pairs.length; i++) {
-            pair = pairs[i];
-            collision = pair.collision;
-
-            if (pair.activeContacts.length > 0) {
-                var normalPosX = pair.activeContacts[0].vertex.x,
-                    normalPosY = pair.activeContacts[0].vertex.y;
-
-                if (pair.activeContacts.length === 2) {
-                    normalPosX = (pair.activeContacts[0].vertex.x + pair.activeContacts[1].vertex.x) / 2;
-                    normalPosY = (pair.activeContacts[0].vertex.y + pair.activeContacts[1].vertex.y) / 2;
-                }
-                
-                c.moveTo(normalPosX - collision.normal.x * 8, normalPosY - collision.normal.y * 8);
-                c.lineTo(normalPosX, normalPosY);
-            }
-        }
-
-        if (options.wireframes) {
-            c.strokeStyle = 'rgba(255,165,0,0.7)';
-        } else {
-            c.strokeStyle = 'orange';
-        }
-
-        c.lineWidth = 1;
-        c.stroke();
-    };
-
-    /**
-     * Description
-     * @method grid
-     * @param {engine} engine
-     * @param {grid} grid
-     * @param {RenderingContext} context
-     */
-    Render.grid = function(engine, grid, context) {
-        var c = context,
-            options = engine.render.options;
-
-        if (options.wireframes) {
-            c.strokeStyle = 'rgba(255,180,0,0.1)';
-        } else {
-            c.strokeStyle = 'rgba(255,180,0,0.5)';
-        }
-
-        c.beginPath();
-
-        var bucketKeys = Common.keys(grid.buckets);
-
-        for (var i = 0; i < bucketKeys.length; i++) {
-            var bucketId = bucketKeys[i];
-
-            if (grid.buckets[bucketId].length < 2)
-                continue;
-
-            var region = bucketId.split(',');
-            c.rect(0.5 + parseInt(region[0], 10) * grid.bucketWidth, 
-                    0.5 + parseInt(region[1], 10) * grid.bucketHeight, 
-                    grid.bucketWidth, 
-                    grid.bucketHeight);
-        }
-
-        c.lineWidth = 1;
-        c.stroke();
-    };
-
-    /**
-     * Description
-     * @method inspector
-     * @param {inspector} inspector
-     * @param {RenderingContext} context
-     */
-    Render.inspector = function(inspector, context) {
-        var engine = inspector.engine,
-            mouse = engine.input.mouse,
-            selected = inspector.selected,
-            c = context,
-            render = engine.render,
-            options = render.options,
-            bounds;
-
-        if (options.hasBounds) {
-            var boundsWidth = render.bounds.max.x - render.bounds.min.x,
-                boundsHeight = render.bounds.max.y - render.bounds.min.y,
-                boundsScaleX = boundsWidth / render.options.width,
-                boundsScaleY = boundsHeight / render.options.height;
-            
-            context.scale(1 / boundsScaleX, 1 / boundsScaleY);
-            context.translate(-render.bounds.min.x, -render.bounds.min.y);
-        }
-
-        for (var i = 0; i < selected.length; i++) {
-            var item = selected[i].data;
-
-            context.translate(0.5, 0.5);
-            context.lineWidth = 1;
-            context.strokeStyle = 'rgba(255,165,0,0.9)';
-            context.setLineDash([1,2]);
-
-            switch (item.type) {
-
-            case 'body':
-
-                // render body selections
-                bounds = item.bounds;
-                context.beginPath();
-                context.rect(Math.floor(bounds.min.x - 3), Math.floor(bounds.min.y - 3), 
-                             Math.floor(bounds.max.x - bounds.min.x + 6), Math.floor(bounds.max.y - bounds.min.y + 6));
-                context.closePath();
-                context.stroke();
-
-                break;
-
-            case 'constraint':
-
-                // render constraint selections
-                var point = item.pointA;
-                if (item.bodyA)
-                    point = item.pointB;
-                context.beginPath();
-                context.arc(point.x, point.y, 10, 0, 2 * Math.PI);
-                context.closePath();
-                context.stroke();
-
-                break;
-
-            }
-
-            context.setLineDash([0]);
-            context.translate(-0.5, -0.5);
-        }
-
-        // render selection region
-        if (inspector.selectStart !== null) {
-            context.translate(0.5, 0.5);
-            context.lineWidth = 1;
-            context.strokeStyle = 'rgba(255,165,0,0.6)';
-            context.fillStyle = 'rgba(255,165,0,0.1)';
-            bounds = inspector.selectBounds;
-            context.beginPath();
-            context.rect(Math.floor(bounds.min.x), Math.floor(bounds.min.y), 
-                         Math.floor(bounds.max.x - bounds.min.x), Math.floor(bounds.max.y - bounds.min.y));
-            context.closePath();
-            context.stroke();
-            context.fill();
-            context.translate(-0.5, -0.5);
-        }
-
-        if (options.hasBounds)
-            context.setTransform(1, 0, 0, 1, 0, 0);
-    };
-
-    /**
-     * Description
-     * @method _createCanvas
-     * @private
-     * @param {} width
-     * @param {} height
-     * @return canvas
-     */
-    var _createCanvas = function(width, height) {
-        var canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.oncontextmenu = function() { return false; };
-        canvas.onselectstart = function() { return false; };
-        return canvas;
-    };
-
-    /**
-     * Gets the requested texture (an Image) via its path
-     * @method _getTexture
-     * @private
-     * @param {render} render
-     * @param {string} imagePath
-     * @return {Image} texture
-     */
-    var _getTexture = function(render, imagePath) {
-        var image = render.textures[imagePath];
-
-        if (image)
-            return image;
-
-        image = render.textures[imagePath] = new Image();
-        image.src = imagePath;
-
-        return image;
-    };
-
-})();
-
-;   // End src/render/Render.js
-
-
-// Begin src/render/RenderPixi.js
-
-/**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
-*
-* @class RenderPixi
-*/
-
-var RenderPixi = {};
-
-(function() {
-    
-    /**
-     * Creates a new Pixi.js WebGL renderer
-     * @method create
-     * @param {object} options
-     * @return {RenderPixi} A new renderer
-     */
-    RenderPixi.create = function(options) {
-        var defaults = {
-            controller: RenderPixi,
-            element: null,
-            canvas: null,
-            options: {
-                width: 800,
-                height: 600,
-                background: '#fafafa',
-                wireframeBackground: '#222',
-                enabled: true,
-                wireframes: true,
-                showSleeping: true,
-                showDebug: false,
-                showBroadphase: false,
-                showBounds: false,
-                showVelocity: false,
-                showCollisions: false,
-                showAxes: false,
-                showPositions: false,
-                showAngleIndicator: false,
-                showIds: false,
-                showShadows: false
-            }
-        };
-
-        var render = Common.extend(defaults, options);
-
-        // init pixi
-        render.context = new PIXI.WebGLRenderer(800, 600, render.canvas, false, true);
-        render.canvas = render.context.view;
-        render.stage = new PIXI.Stage();
-
-        // caches
-        render.textures = {};
-        render.sprites = {};
-        render.primitives = {};
-
-        // use a sprite batch for performance
-        render.spriteBatch = new PIXI.SpriteBatch();
-        render.stage.addChild(render.spriteBatch);
-
-        // insert canvas
-        if (Common.isElement(render.element)) {
-            render.element.appendChild(render.canvas);
-        } else {
-            Common.log('No "render.element" passed, "render.canvas" was not inserted into document.', 'warn');
-        }
-
-        // prevent menus on canvas
-        render.canvas.oncontextmenu = function() { return false; };
-        render.canvas.onselectstart = function() { return false; };
-
-        return render;
-    };
-
-    /**
-     * Clears the scene graph
-     * @method clear
-     * @param {RenderPixi} render
-     */
-    RenderPixi.clear = function(render) {
-        var stage = render.stage,
-            spriteBatch = render.spriteBatch;
-
-        // clear stage
-        while (stage.children[0]) { 
-            stage.removeChild(stage.children[0]); 
-        }
-
-        // clear sprite batch
-        while (spriteBatch.children[0]) { 
-            spriteBatch.removeChild(spriteBatch.children[0]); 
-        }
-
-        var bgSprite = render.sprites['bg-0'];
-
-        // clear caches
-        render.textures = {};
-        render.sprites = {};
-        render.primitives = {};
-
-        // set background sprite
-        render.sprites['bg-0'] = bgSprite;
-        if (bgSprite)
-            spriteBatch.addChildAt(bgSprite, 0);
-
-        // add sprite batch back into stage
-        render.stage.addChild(render.spriteBatch);
-
-        // reset background state
-        render.currentBackground = null;
-    };
-
-    /**
-     * Sets the background of the canvas 
-     * @method setBackground
-     * @param {RenderPixi} render
-     * @param {string} background
-     */
-    RenderPixi.setBackground = function(render, background) {
-        if (render.currentBackground !== background) {
-            var isColor = background.indexOf && background.indexOf('#') !== -1,
-                bgSprite = render.sprites['bg-0'];
-
-            if (isColor) {
-                // if solid background color
-                var color = Common.colorToNumber(background);
-                render.stage.setBackgroundColor(color);
-
-                // remove background sprite if existing
-                if (bgSprite)
-                    render.spriteBatch.removeChild(bgSprite); 
-            } else {
-                // initialise background sprite if needed
-                if (!bgSprite) {
-                    var texture = _getTexture(render, background);
-
-                    bgSprite = render.sprites['bg-0'] = new PIXI.Sprite(texture);
-                    bgSprite.position.x = 0;
-                    bgSprite.position.y = 0;
-                    render.spriteBatch.addChildAt(bgSprite, 0);
-                }
-            }
-
-            render.currentBackground = background;
-        }
-    };
-
-    /**
-     * Description
-     * @method world
-     * @param {engine} engine
-     */
-    RenderPixi.world = function(engine) {
-        var render = engine.render,
-            world = engine.world,
-            context = render.context,
-            stage = render.stage,
-            options = render.options,
-            bodies = Composite.allBodies(world),
-            constraints = Composite.allConstraints(world),
-            i;
-
-        if (options.wireframes) {
-            RenderPixi.setBackground(render, options.wireframeBackground);
-        } else {
-            RenderPixi.setBackground(render, options.background);
-        }
-
-        for (i = 0; i < bodies.length; i++)
-            RenderPixi.body(engine, bodies[i]);
-
-        for (i = 0; i < constraints.length; i++)
-            RenderPixi.constraint(engine, constraints[i]);
-
-        context.render(stage);
-    };
-
-
-    /**
-     * Description
-     * @method constraint
-     * @param {engine} engine
-     * @param {constraint} constraint
-     */
-    RenderPixi.constraint = function(engine, constraint) {
-        var render = engine.render,
-            bodyA = constraint.bodyA,
-            bodyB = constraint.bodyB,
-            pointA = constraint.pointA,
-            pointB = constraint.pointB,
-            stage = render.stage,
-            constraintRender = constraint.render,
-            primitiveId = 'c-' + constraint.id,
-            primitive = render.primitives[primitiveId];
-
-        // initialise constraint primitive if not existing
-        if (!primitive)
-            primitive = render.primitives[primitiveId] = new PIXI.Graphics();
-
-        // don't render if constraint does not have two end points
-        if (!constraintRender.visible || !constraint.pointA || !constraint.pointB) {
-            primitive.clear();
-            return;
-        }
-
-        // add to scene graph if not already there
-        if (stage.children.indexOf(primitive) === -1)
-            stage.addChild(primitive);
-
-        // render the constraint on every update, since they can change dynamically
-        primitive.clear();
-        primitive.beginFill(0, 0);
-        primitive.lineStyle(constraintRender.lineWidth, Common.colorToNumber(constraintRender.strokeStyle), 1);
-        
-        if (bodyA) {
-            primitive.moveTo(bodyA.position.x + pointA.x, bodyA.position.y + pointA.y);
-        } else {
-            primitive.moveTo(pointA.x, pointA.y);
-        }
-
-        if (bodyB) {
-            primitive.lineTo(bodyB.position.x + pointB.x, bodyB.position.y + pointB.y);
-        } else {
-            primitive.lineTo(pointB.x, pointB.y);
-        }
-
-        primitive.endFill();
-    };
-    
-    /**
-     * Description
-     * @method body
-     * @param {engine} engine
-     * @param {body} body
-     */
-    RenderPixi.body = function(engine, body) {
-        var render = engine.render,
-            bodyRender = body.render;
-
-        if (!bodyRender.visible)
-            return;
-
-        if (bodyRender.sprite && bodyRender.sprite.texture) {
-            var spriteId = 'b-' + body.id,
-                sprite = render.sprites[spriteId],
-                spriteBatch = render.spriteBatch;
-
-            // initialise body sprite if not existing
-            if (!sprite)
-                sprite = render.sprites[spriteId] = _createBodySprite(render, body);
-
-            // add to scene graph if not already there
-            if (spriteBatch.children.indexOf(sprite) === -1)
-                spriteBatch.addChild(sprite);
-
-            // update body sprite
-            sprite.position.x = body.position.x;
-            sprite.position.y = body.position.y;
-            sprite.rotation = body.angle;
-        } else {
-            var primitiveId = 'b-' + body.id,
-                primitive = render.primitives[primitiveId],
-                stage = render.stage;
-
-            // initialise body primitive if not existing
-            if (!primitive) {
-                primitive = render.primitives[primitiveId] = _createBodyPrimitive(render, body);
-                primitive.initialAngle = body.angle;
-            }
-
-            // add to scene graph if not already there
-            if (stage.children.indexOf(primitive) === -1)
-                stage.addChild(primitive);
-
-            // update body primitive
-            primitive.position.x = body.position.x;
-            primitive.position.y = body.position.y;
-            primitive.rotation = body.angle - primitive.initialAngle;
-        }
-    };
-
-    /**
-     * Creates a body sprite
-     * @method _createBodySprite
-     * @private
-     * @param {RenderPixi} render
-     * @param {body} body
-     * @return {PIXI.Sprite} sprite
-     */
-    var _createBodySprite = function(render, body) {
-        var bodyRender = body.render,
-            texturePath = bodyRender.sprite.texture,
-            texture = _getTexture(render, texturePath),
-            sprite = new PIXI.Sprite(texture);
-
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
-
-        return sprite;
-    };
-
-    /**
-     * Creates a body primitive
-     * @method _createBodyPrimitive
-     * @private
-     * @param {RenderPixi} render
-     * @param {body} body
-     * @return {PIXI.Graphics} graphics
-     */
-    var _createBodyPrimitive = function(render, body) {
-        var bodyRender = body.render,
-            options = render.options,
-            primitive = new PIXI.Graphics();
-
-        primitive.clear();
-
-        if (!options.wireframes) {
-            primitive.beginFill(Common.colorToNumber(bodyRender.fillStyle), 1);
-            primitive.lineStyle(body.render.lineWidth, Common.colorToNumber(bodyRender.strokeStyle), 1);
-        } else {
-            primitive.beginFill(0, 0);
-            primitive.lineStyle(1, Common.colorToNumber('#bbb'), 1);
-        }
-
-        primitive.moveTo(body.vertices[0].x - body.position.x, body.vertices[0].y - body.position.y);
-
-        for (var j = 1; j < body.vertices.length; j++) {
-            primitive.lineTo(body.vertices[j].x - body.position.x, body.vertices[j].y - body.position.y);
-        }
-
-        primitive.lineTo(body.vertices[0].x - body.position.x, body.vertices[0].y - body.position.y);
-
-        primitive.endFill();
-
-        // angle indicator
-        if (options.showAngleIndicator || options.showAxes) {
-            primitive.beginFill(0, 0);
-
-            if (options.wireframes) {
-                primitive.lineStyle(1, Common.colorToNumber('#CD5C5C'), 1);
-            } else {
-                primitive.lineStyle(1, Common.colorToNumber(body.render.strokeStyle));
-            }
-
-            primitive.moveTo(0, 0);
-            primitive.lineTo(((body.vertices[0].x + body.vertices[body.vertices.length-1].x) / 2) - body.position.x, 
-                             ((body.vertices[0].y + body.vertices[body.vertices.length-1].y) / 2) - body.position.y);
-
-            primitive.endFill();
-        }
-
-        return primitive;
-    };
-
-    /**
-     * Gets the requested texture (a PIXI.Texture) via its path
-     * @method _getTexture
-     * @private
-     * @param {RenderPixi} render
-     * @param {string} imagePath
-     * @return {PIXI.Texture} texture
-     */
-    var _getTexture = function(render, imagePath) {
-        var texture = render.textures[imagePath];
-
-        if (!texture)
-            texture = render.textures[imagePath] = PIXI.Texture.fromImage(imagePath);
-
-        return texture;
-    };
-
-})();
-
-;   // End src/render/RenderPixi.js
-
-
-// aliases
-
-World.add = Composite.add;
-World.remove = Composite.remove;
-World.addComposite = Composite.addComposite;
-World.addBody = Composite.addBody;
-World.addConstraint = Composite.addConstraint;
-World.clear = Composite.clear;
-
-// exports
-
-Matter.Body = Body;
-Matter.Composite = Composite;
-Matter.World = World;
-Matter.Contact = Contact;
-Matter.Detector = Detector;
-Matter.Grid = Grid;
-Matter.Pairs = Pairs;
-Matter.Pair = Pair;
-Matter.Resolver = Resolver;
-Matter.SAT = SAT;
-Matter.Constraint = Constraint;
-Matter.MouseConstraint = MouseConstraint;
-Matter.Common = Common;
-Matter.Engine = Engine;
-Matter.Metrics = Metrics;
-Matter.Mouse = Mouse;
-Matter.Sleeping = Sleeping;
-Matter.Bodies = Bodies;
-Matter.Composites = Composites;
-Matter.Axes = Axes;
-Matter.Bounds = Bounds;
-Matter.Vector = Vector;
-Matter.Vertices = Vertices;
-Matter.Render = Render;
-Matter.RenderPixi = RenderPixi;
-Matter.Events = Events;
-Matter.Query = Query;
-
-// CommonJS module
-if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-        exports = module.exports = Matter;
-    }
-    exports.Matter = Matter;
-}
-
-// AMD module
-if (typeof define === 'function' && define.amd) {
-    define('Matter', [], function () {
-        return Matter;
-    });
-}
-
-// browser
-if (typeof window === 'object' && typeof window.document === 'object') {
-    window.Matter = Matter;
-}
-
-// End Matter namespace closure
-
-})();
+!function(){var a={},b={};!function(){var a=1;b.create=function(a){var b={id:o.nextId(),type:"body",label:"Body",angle:0,vertices:z.fromPath("L 0 0 L 40 0 L 40 40 L 0 40"),position:{x:0,y:0},force:{x:0,y:0},torque:0,positionImpulse:{x:0,y:0},constraintImpulse:{x:0,y:0,angle:0},speed:0,angularSpeed:0,velocity:{x:0,y:0},angularVelocity:0,isStatic:!1,isSleeping:!1,motion:0,sleepThreshold:60,density:.001,restitution:0,friction:.1,frictionAir:.01,groupId:0,slop:.05,timeScale:1,render:{visible:!0,sprite:{xScale:1,yScale:1},lineWidth:1.5}},d=o.extend(b,a);return c(d),d},b.nextGroupId=function(){return a++};var c=function(a){a.axes=a.axes||w.fromVertices(a.vertices),a.area=z.area(a.vertices),a.bounds=x.create(a.vertices),a.mass=a.mass||a.density*a.area,a.inverseMass=1/a.mass,a.inertia=a.inertia||z.inertia(a.vertices,a.mass),a.inverseInertia=1/a.inertia,a.positionPrev=a.positionPrev||{x:a.position.x,y:a.position.y},a.anglePrev=a.anglePrev||a.angle,a.render.fillStyle=a.render.fillStyle||(a.isStatic?"#eeeeee":o.choose(["#556270","#4ECDC4","#C7F464","#FF6B6B","#C44D58"])),a.render.strokeStyle=a.render.strokeStyle||o.shadeColor(a.render.fillStyle,-20),z.create(a.vertices,a);var c=z.centre(a.vertices);z.translate(a.vertices,a.position),z.translate(a.vertices,c,-1),z.rotate(a.vertices,a.angle,a.position),w.rotate(a.axes,a.angle),x.update(a.bounds,a.vertices,a.velocity),b.setStatic(a,a.isStatic),t.set(a,a.isSleeping)};b.setStatic=function(a,b){a.isStatic=b,b&&(a.restitution=0,a.friction=1,a.mass=a.inertia=a.density=1/0,a.inverseMass=a.inverseInertia=0,a.render.lineWidth=1,a.positionPrev.x=a.position.x,a.positionPrev.y=a.position.y,a.anglePrev=a.angle,a.angularVelocity=0,a.speed=0,a.angularSpeed=0,a.motion=0)},b.resetForcesAll=function(a){for(var b=0;b<a.length;b++){var c=a[b];c.force.x=0,c.force.y=0,c.torque=0}},b.applyGravityAll=function(a,b){for(var c=0;c<a.length;c++){var d=a[c];d.isStatic||d.isSleeping||(d.force.y+=d.mass*b.y*.001,d.force.x+=d.mass*b.x*.001)}},b.updateAll=function(a,c,d,e,f){for(var g=0;g<a.length;g++){var h=a[g];h.isStatic||h.isSleeping||h.bounds.max.x<f.min.x||h.bounds.min.x>f.max.x||h.bounds.max.y<f.min.y||h.bounds.min.y>f.max.y||b.update(h,c,d,e)}},b.update=function(a,b,c,d){var e=Math.pow(b*c*a.timeScale,2),f=1-a.frictionAir*c*a.timeScale,g=a.position.x-a.positionPrev.x,h=a.position.y-a.positionPrev.y;a.velocity.x=g*f*d+a.force.x/a.mass*e,a.velocity.y=h*f*d+a.force.y/a.mass*e,a.positionPrev.x=a.position.x,a.positionPrev.y=a.position.y,a.position.x+=a.velocity.x,a.position.y+=a.velocity.y,a.angularVelocity=(a.angle-a.anglePrev)*f*d+a.torque/a.inertia*e,a.anglePrev=a.angle,a.angle+=a.angularVelocity,a.speed=y.magnitude(a.velocity),a.angularSpeed=Math.abs(a.angularVelocity),z.translate(a.vertices,a.velocity),0!==a.angularVelocity&&(z.rotate(a.vertices,a.angularVelocity,a.position),w.rotate(a.axes,a.angularVelocity)),x.update(a.bounds,a.vertices,a.velocity)},b.applyForce=function(a,b,c){a.force.x+=c.x,a.force.y+=c.y;var d={x:b.x-a.position.x,y:b.y-a.position.y};a.torque+=(d.x*c.y-d.y*c.x)*a.inverseInertia},b.translate=function(a,b){a.positionPrev.x+=b.x,a.positionPrev.y+=b.y,a.position.x+=b.x,a.position.y+=b.y,z.translate(a.vertices,b),x.update(a.bounds,a.vertices,a.velocity)},b.rotate=function(a,b){a.anglePrev+=b,a.angle+=b,z.rotate(a.vertices,b,a.position),w.rotate(a.axes,b),x.update(a.bounds,a.vertices,a.velocity)},b.scale=function(a,b,c,d){z.scale(a.vertices,b,c,d),a.axes=w.fromVertices(a.vertices),a.area=z.area(a.vertices),a.mass=a.density*a.area,a.inverseMass=1/a.mass,z.translate(a.vertices,{x:-a.position.x,y:-a.position.y}),a.inertia=z.inertia(a.vertices,a.mass),a.inverseInertia=1/a.inertia,z.translate(a.vertices,{x:a.position.x,y:a.position.y}),x.update(a.bounds,a.vertices,a.velocity)}}();var c={};!function(){c.create=function(a){return o.extend({id:o.nextId(),type:"composite",parent:null,isModified:!1,bodies:[],constraints:[],composites:[],label:"Composite"},a)},c.setModified=function(a,b,d,e){if(a.isModified=b,d&&a.parent&&c.setModified(a.parent,b,d,e),e)for(var f=0;f<a.composites.length;f++){var g=a.composites[f];c.setModified(g,b,d,e)}},c.add=function(a,b){for(var d=[].concat(b),e=0;e<d.length;e++){var f=d[e];switch(f.type){case"body":c.addBody(a,f);break;case"constraint":c.addConstraint(a,f);break;case"composite":c.addComposite(a,f);break;case"mouseConstraint":c.addConstraint(a,f.constraint)}}return a},c.remove=function(a,b,d){for(var e=[].concat(b),f=0;f<e.length;f++){var g=e[f];switch(g.type){case"body":c.removeBody(a,g,d);break;case"constraint":c.removeConstraint(a,g,d);break;case"composite":c.removeComposite(a,g,d);break;case"mouseConstraint":c.removeConstraint(a,g.constraint)}}return a},c.addComposite=function(a,b){return a.composites.push(b),b.parent=a,c.setModified(a,!0,!0,!1),a},c.removeComposite=function(a,b,d){var e=a.composites.indexOf(b);if(-1!==e&&(c.removeCompositeAt(a,e),c.setModified(a,!0,!0,!1)),d)for(var f=0;f<a.composites.length;f++)c.removeComposite(a.composites[f],b,!0);return a},c.removeCompositeAt=function(a,b){return a.composites.splice(b,1),c.setModified(a,!0,!0,!1),a},c.addBody=function(a,b){return a.bodies.push(b),c.setModified(a,!0,!0,!1),a},c.removeBody=function(a,b,d){var e=a.bodies.indexOf(b);if(-1!==e&&(c.removeBodyAt(a,e),c.setModified(a,!0,!0,!1)),d)for(var f=0;f<a.composites.length;f++)c.removeBody(a.composites[f],b,!0);return a},c.removeBodyAt=function(a,b){return a.bodies.splice(b,1),c.setModified(a,!0,!0,!1),a},c.addConstraint=function(a,b){return a.constraints.push(b),c.setModified(a,!0,!0,!1),a},c.removeConstraint=function(a,b,d){var e=a.constraints.indexOf(b);if(-1!==e&&c.removeConstraintAt(a,e),d)for(var f=0;f<a.composites.length;f++)c.removeConstraint(a.composites[f],b,!0);return a},c.removeConstraintAt=function(a,b){return a.constraints.splice(b,1),c.setModified(a,!0,!0,!1),a},c.clear=function(a,b,d){if(d)for(var e=0;e<a.composites.length;e++)c.clear(a.composites[e],b,!0);return b?a.bodies=a.bodies.filter(function(a){return a.isStatic}):a.bodies.length=0,a.constraints.length=0,a.composites.length=0,c.setModified(a,!0,!0,!1),a},c.allBodies=function(a){for(var b=[].concat(a.bodies),d=0;d<a.composites.length;d++)b=b.concat(c.allBodies(a.composites[d]));return b},c.allConstraints=function(a){for(var b=[].concat(a.constraints),d=0;d<a.composites.length;d++)b=b.concat(c.allConstraints(a.composites[d]));return b},c.allComposites=function(a){for(var b=[].concat(a.composites),d=0;d<a.composites.length;d++)b=b.concat(c.allComposites(a.composites[d]));return b},c.get=function(a,b,d){var e,f;switch(d){case"body":e=c.allBodies(a);break;case"constraint":e=c.allConstraints(a);break;case"composite":e=c.allComposites(a).concat(a)}return e?(f=e.filter(function(a){return a.id.toString()===b.toString()}),0===f.length?null:f[0]):null},c.move=function(a,b,d){return c.remove(a,b),c.add(d,b),a},c.rebase=function(a){for(var b=c.allBodies(a).concat(c.allConstraints(a)).concat(c.allComposites(a)),d=0;d<b.length;d++)b[d].id=o.nextId();return c.setModified(a,!0,!0,!1),a}}();var d={};!function(){d.create=function(a){var b=c.create(),d={label:"World",gravity:{x:0,y:1},bounds:{min:{x:0,y:0},max:{x:800,y:600}}};return o.extend(b,d,a)}}();var e={};!function(){e.create=function(a){return{id:e.id(a),vertex:a,normalImpulse:0,tangentImpulse:0}},e.id=function(a){return a.body.id+"_"+a.index}}();var f={};!function(){f.collisions=function(a,b){for(var c=[],d=b.metrics,e=b.pairs.table,f=0;f<a.length;f++){var g=a[f][0],i=a[f][1];if(!(g.groupId&&i.groupId&&g.groupId===i.groupId||(g.isStatic||g.isSleeping)&&(i.isStatic||i.isSleeping)||(d.midphaseTests+=1,!x.overlaps(g.bounds,i.bounds)))){var j,k=h.id(g,i),m=e[k];j=m&&m.isActive?m.collision:null;var n=l.collides(g,i,j);d.narrowphaseTests+=1,n.reused&&(d.narrowReuseCount+=1),n.collided&&(c.push(n),d.narrowDetections+=1)}}return c},f.bruteForce=function(a,b){for(var c=[],d=b.metrics,e=b.pairs.table,f=0;f<a.length;f++)for(var g=f+1;g<a.length;g++){var i=a[f],j=a[g];if(!(i.groupId&&j.groupId&&i.groupId===j.groupId||(i.isStatic||i.isSleeping)&&(j.isStatic||j.isSleeping)||(d.midphaseTests+=1,!x.overlaps(i.bounds,j.bounds)))){var k,m=h.id(i,j),n=e[m];k=n&&n.isActive?n.collision:null;var o=l.collides(i,j,k);d.narrowphaseTests+=1,o.reused&&(d.narrowReuseCount+=1),o.collided&&(c.push(o),d.narrowDetections+=1)}}return c}}();var g={};!function(){g.create=function(a,b){return{buckets:{},pairs:{},pairsList:[],bucketWidth:a||48,bucketHeight:b||48}},g.update=function(c,g,h,k){var l,m,n,o,p,q=h.world,r=c.buckets,s=h.metrics,t=!1;for(s.broadphaseTests=0,l=0;l<g.length;l++){var u=g[l];if((!u.isSleeping||k)&&!(u.bounds.max.x<0||u.bounds.min.x>q.bounds.width||u.bounds.max.y<0||u.bounds.min.y>q.bounds.height)){var v=b(c,u);if(!u.region||v.id!==u.region.id||k){s.broadphaseTests+=1,(!u.region||k)&&(u.region=v);var w=a(v,u.region);for(m=w.startCol;m<=w.endCol;m++)for(n=w.startRow;n<=w.endRow;n++){p=d(m,n),o=r[p];var x=m>=v.startCol&&m<=v.endCol&&n>=v.startRow&&n<=v.endRow,y=m>=u.region.startCol&&m<=u.region.endCol&&n>=u.region.startRow&&n<=u.region.endRow;!x&&y&&y&&o&&i(c,o,u),(u.region===v||x&&!y||k)&&(o||(o=e(r,p)),f(c,o,u))}u.region=v,t=!0}}}t&&(c.pairsList=j(c))},g.clear=function(a){a.buckets={},a.pairs={},a.pairsList=[]};var a=function(a,b){var d=Math.min(a.startCol,b.startCol),e=Math.max(a.endCol,b.endCol),f=Math.min(a.startRow,b.startRow),g=Math.max(a.endRow,b.endRow);return c(d,e,f,g)},b=function(a,b){var d=b.bounds,e=Math.floor(d.min.x/a.bucketWidth),f=Math.floor(d.max.x/a.bucketWidth),g=Math.floor(d.min.y/a.bucketHeight),h=Math.floor(d.max.y/a.bucketHeight);return c(e,f,g,h)},c=function(a,b,c,d){return{id:a+","+b+","+c+","+d,startCol:a,endCol:b,startRow:c,endRow:d}},d=function(a,b){return a+","+b},e=function(a,b){var c=a[b]=[];return c},f=function(a,b,c){for(var d=0;d<b.length;d++){var e=b[d];if(!(c.id===e.id||c.isStatic&&e.isStatic)){var f=h.id(c,e),g=a.pairs[f];g?g[2]+=1:a.pairs[f]=[c,e,1]}}b.push(c)},i=function(a,b,c){b.splice(b.indexOf(c),1);for(var d=0;d<b.length;d++){var e=b[d],f=h.id(c,e),g=a.pairs[f];g&&(g[2]-=1)}},j=function(a){var b,c,d=[];b=o.keys(a.pairs);for(var e=0;e<b.length;e++)c=a.pairs[b[e]],c[2]>0?d.push(c):delete a.pairs[b[e]];return d}}();var h={};!function(){h.create=function(a,b){var c=a.bodyA,d=a.bodyB,e={id:h.id(c,d),bodyA:c,bodyB:d,contacts:{},activeContacts:[],separation:0,isActive:!0,timeCreated:b,timeUpdated:b,inverseMass:c.inverseMass+d.inverseMass,friction:Math.min(c.friction,d.friction),restitution:Math.max(c.restitution,d.restitution),slop:Math.max(c.slop,d.slop)};return h.update(e,a,b),e},h.update=function(a,b,c){var d=a.contacts,f=b.supports,g=a.activeContacts;if(a.collision=b,g.length=0,b.collided){for(var i=0;i<f.length;i++){var j=f[i],k=e.id(j),l=d[k];g.push(l?l:d[k]=e.create(j))}a.separation=b.depth,h.setActive(a,!0,c)}else a.isActive===!0&&h.setActive(a,!1,c)},h.setActive=function(a,b,c){b?(a.isActive=!0,a.timeUpdated=c):(a.isActive=!1,a.activeContacts.length=0)},h.id=function(a,b){return a.id<b.id?a.id+"_"+b.id:b.id+"_"+a.id}}();var i={};!function(){var a=1e3;i.create=function(a){return o.extend({table:{},list:[],collisionStart:[],collisionActive:[],collisionEnd:[]},a)},i.update=function(a,b,c){var d,e,f,g,i=a.list,j=a.table,k=a.collisionStart,l=a.collisionEnd,m=a.collisionActive,n=[];for(k.length=0,l.length=0,m.length=0,g=0;g<b.length;g++)d=b[g],d.collided&&(e=h.id(d.bodyA,d.bodyB),n.push(e),f=j[e],f?(f.isActive?m.push(f):k.push(f),h.update(f,d,c)):(f=h.create(d,c),j[e]=f,k.push(f),i.push(f)));for(g=0;g<i.length;g++)f=i[g],f.isActive&&-1===n.indexOf(f.id)&&(h.setActive(f,!1,c),l.push(f))},i.removeOld=function(b,c){var d,e,f,g,h=b.list,i=b.table,j=[];for(g=0;g<h.length;g++)d=h[g],e=d.collision,e.bodyA.isSleeping||e.bodyB.isSleeping?d.timeUpdated=c:c-d.timeUpdated>a&&j.push(g);for(g=0;g<j.length;g++)f=j[g]-g,d=h[f],delete i[d.id],h.splice(f,1)},i.clear=function(a){return a.table={},a.list.length=0,a.collisionStart.length=0,a.collisionActive.length=0,a.collisionEnd.length=0,a}}();var j={};!function(){j.ray=function(a,b,c,d){d=d||Number.MIN_VALUE;for(var e=y.angle(b,c),f=y.magnitude(y.sub(b,c)),g=.5*(c.x+b.x),h=.5*(c.y+b.y),i=u.rectangle(g,h,f,d,{angle:e}),j=[],k=0;k<a.length;k++){var m=a[k];if(x.overlaps(m.bounds,i.bounds)){var n=l.collides(m,i);n.collided&&(n.body=n.bodyA=n.bodyB=m,j.push(n))}}return j},j.region=function(a,b,c){for(var d=[],e=0;e<a.length;e++){var f=a[e],g=x.overlaps(f.bounds,b);(g&&!c||!g&&c)&&d.push(f)}return d}}();var k={};!function(){var a=4,b=.2,c=.6;k.solvePosition=function(a,c){var d,e,f,g,h,i,j,k,l;for(d=0;d<a.length;d++)e=a[d],e.isActive&&(f=e.collision,g=f.bodyA,h=f.bodyB,i=f.supports[0],j=f.supportCorrected,k=f.normal,l=y.sub(y.add(h.positionImpulse,i),y.add(g.positionImpulse,j)),e.separation=y.dot(k,l));for(d=0;d<a.length;d++)e=a[d],e.isActive&&(f=e.collision,g=f.bodyA,h=f.bodyB,k=f.normal,positionImpulse=(e.separation*b-e.slop)*c,(g.isStatic||h.isStatic)&&(positionImpulse*=2),g.isStatic||g.isSleeping||(g.positionImpulse.x+=k.x*positionImpulse,g.positionImpulse.y+=k.y*positionImpulse),h.isStatic||h.isSleeping||(h.positionImpulse.x-=k.x*positionImpulse,h.positionImpulse.y-=k.y*positionImpulse))},k.postSolvePosition=function(a){for(var b=0;b<a.length;b++){var d=a[b];(0!==d.positionImpulse.x||0!==d.positionImpulse.y)&&(d.position.x+=d.positionImpulse.x,d.position.y+=d.positionImpulse.y,d.positionPrev.x+=d.positionImpulse.x,d.positionPrev.y+=d.positionImpulse.y,z.translate(d.vertices,d.positionImpulse),x.update(d.bounds,d.vertices,d.velocity),d.positionImpulse.x*=c,d.positionImpulse.y*=c)}},k.preSolveVelocity=function(a){var b,c,d,e,f,g,h,i,j,k,l,m,n,o,p={};for(b=0;b<a.length;b++)if(d=a[b],d.isActive)for(e=d.activeContacts,f=d.collision,g=f.bodyA,h=f.bodyB,i=f.normal,j=f.tangent,c=0;c<e.length;c++)k=e[c],l=k.vertex,m=k.normalImpulse,n=k.tangentImpulse,p.x=i.x*m+j.x*n,p.y=i.y*m+j.y*n,g.isStatic||g.isSleeping||(o=y.sub(l,g.position),g.positionPrev.x+=p.x*g.inverseMass,g.positionPrev.y+=p.y*g.inverseMass,g.anglePrev+=y.cross(o,p)*g.inverseInertia),h.isStatic||h.isSleeping||(o=y.sub(l,h.position),h.positionPrev.x-=p.x*h.inverseMass,h.positionPrev.y-=p.y*h.inverseMass,h.anglePrev-=y.cross(o,p)*h.inverseInertia)},k.solveVelocity=function(b,c){for(var d={},e=c*c,f=0;f<b.length;f++){var g=b[f];if(g.isActive){var h=g.collision,i=h.bodyA,j=h.bodyB,k=h.normal,l=h.tangent,m=g.activeContacts,n=1/m.length;i.velocity.x=i.position.x-i.positionPrev.x,i.velocity.y=i.position.y-i.positionPrev.y,j.velocity.x=j.position.x-j.positionPrev.x,j.velocity.y=j.position.y-j.positionPrev.y,i.angularVelocity=i.angle-i.anglePrev,j.angularVelocity=j.angle-j.anglePrev;for(var p=0;p<m.length;p++){var q=m[p],r=q.vertex,s=y.sub(r,i.position),t=y.sub(r,j.position),u=y.add(i.velocity,y.mult(y.perp(s),i.angularVelocity)),v=y.add(j.velocity,y.mult(y.perp(t),j.angularVelocity)),w=y.sub(u,v),x=y.dot(k,w),z=y.dot(l,w),A=Math.abs(z),B=o.sign(z),C=(1+g.restitution)*x,D=o.clamp(g.separation+x,0,1),E=z;A>D*g.friction*e&&(E=D*g.friction*e*B);var F=y.cross(s,k),G=y.cross(t,k),H=n/(g.inverseMass+i.inverseInertia*F*F+j.inverseInertia*G*G);if(C*=H,E*=H,0>x&&x*x>a*e)q.normalImpulse=0,q.tangentImpulse=0;else{var I=q.normalImpulse;q.normalImpulse=Math.min(q.normalImpulse+C,0),C=q.normalImpulse-I;var J=q.tangentImpulse;q.tangentImpulse=o.clamp(q.tangentImpulse+E,-A,A),E=q.tangentImpulse-J}d.x=k.x*C+l.x*E,d.y=k.y*C+l.y*E,i.isStatic||i.isSleeping||(i.positionPrev.x+=d.x*i.inverseMass,i.positionPrev.y+=d.y*i.inverseMass,i.anglePrev+=y.cross(s,d)*i.inverseInertia),j.isStatic||j.isSleeping||(j.positionPrev.x-=d.x*j.inverseMass,j.positionPrev.y-=d.y*j.inverseMass,j.anglePrev-=y.cross(t,d)*j.inverseInertia)}}}}}();var l={};!function(){l.collides=function(b,d,e){var f,g,h,i,j=e,k=!1;if(j){var l=b.speed*b.speed+b.angularSpeed*b.angularSpeed+d.speed*d.speed+d.angularSpeed*d.angularSpeed;k=j&&j.collided&&.2>l,i=j}else i={collided:!1,bodyA:b,bodyB:d};if(j&&k){var m=[j.bodyA.axes[j.axisNumber]];if(h=a(j.bodyA.vertices,j.bodyB.vertices,m),i.reused=!0,h.overlap<=0)return i.collided=!1,i}else{if(f=a(b.vertices,d.vertices,b.axes),f.overlap<=0)return i.collided=!1,i;if(g=a(d.vertices,b.vertices,d.axes),g.overlap<=0)return i.collided=!1,i;f.overlap<g.overlap?(h=f,i.bodyA=b,i.bodyB=d):(h=g,i.bodyA=d,i.bodyB=b),i.axisNumber=h.axisNumber}i.collided=!0,i.normal=h.axis,i.depth=h.overlap,b=i.bodyA,d=i.bodyB,y.dot(i.normal,y.sub(d.position,b.position))>0&&(i.normal=y.neg(i.normal)),i.tangent=y.perp(i.normal),i.penetration={x:i.normal.x*i.depth,y:i.normal.y*i.depth};var n=c(b,d,i.normal),o=[n[0]];if(z.contains(b.vertices,n[1]))o.push(n[1]);else{var p=c(d,b,y.neg(i.normal));z.contains(d.vertices,p[0])&&o.push(p[0]),o.length<2&&z.contains(d.vertices,p[1])&&o.push(p[1])}return i.supports=o,i.supportCorrected=y.sub(n[0],i.penetration),i};var a=function(a,c,d){for(var e,f,g={},h={},i={overlap:Number.MAX_VALUE},j=0;j<d.length;j++){if(f=d[j],b(g,a,f),b(h,c,f),e=g.min<h.min?g.max-h.min:h.max-g.min,0>=e)return i.overlap=e,i;e<i.overlap&&(i.overlap=e,i.axis=f,i.axisNumber=j)}return i},b=function(a,b,c){for(var d=y.dot(b[0],c),e=d,f=1;f<b.length;f+=1){var g=y.dot(b[f],c);g>e?e=g:d>g&&(d=g)}a.min=d,a.max=e},c=function(a,b,c){for(var d,e,f=Number.MAX_VALUE,g={x:0,y:0},h=b.vertices,i=a.position,j=h[0],k=h[1],l=0;l<h.length;l++)e=h[l],g.x=e.x-i.x,g.y=e.y-i.y,d=-y.dot(c,g),f>d&&(f=d,j=e);var m=j.index-1>=0?j.index-1:h.length-1;e=h[m],g.x=e.x-i.x,g.y=e.y-i.y,f=-y.dot(c,g),k=e;var n=(j.index+1)%h.length;return e=h[n],g.x=e.x-i.x,g.y=e.y-i.y,d=-y.dot(c,g),f>d&&(f=d,k=e),[j,k]}}();var m={};!function(){var a=1e-6,b=.001;m.create=function(b){var c=b;c.bodyA&&!c.pointA&&(c.pointA={x:0,y:0}),c.bodyB&&!c.pointB&&(c.pointB={x:0,y:0});var d=c.bodyA?y.add(c.bodyA.position,c.pointA):c.pointA,e=c.bodyB?y.add(c.bodyB.position,c.pointB):c.pointB,f=y.magnitude(y.sub(d,e));c.length=c.length||f||a;var g={visible:!0,lineWidth:2,strokeStyle:"#666"};return c.render=o.extend(g,c.render),c.id=c.id||o.nextId(),c.label=c.label||"Constraint",c.type="constraint",c.stiffness=c.stiffness||1,c.angularStiffness=c.angularStiffness||0,c.angleA=c.bodyA?c.bodyA.angle:c.angleA,c.angleB=c.bodyB?c.bodyB.angle:c.angleB,c},m.solveAll=function(a,b){for(var c=0;c<a.length;c++)m.solve(a[c],b)},m.solve=function(c,d){var e=c.bodyA,f=c.bodyB,g=c.pointA,h=c.pointB;e&&!e.isStatic&&(c.pointA=y.rotate(g,e.angle-c.angleA),c.angleA=e.angle),f&&!f.isStatic&&(c.pointB=y.rotate(h,f.angle-c.angleB),c.angleB=f.angle);var i=g,j=h;if(e&&(i=y.add(e.position,g)),f&&(j=y.add(f.position,h)),i&&j){var k=y.sub(i,j),l=y.magnitude(k);0===l&&(l=a);var m=(l-c.length)/l,n=y.div(k,l),p=y.mult(k,.5*m*c.stiffness*d*d);if(!(Math.abs(1-l/c.length)<b*d)){var q,r,s,u,v,w,x,z;e&&!e.isStatic?(s={x:i.x-e.position.x+p.x,y:i.y-e.position.y+p.y},e.velocity.x=e.position.x-e.positionPrev.x,e.velocity.y=e.position.y-e.positionPrev.y,e.angularVelocity=e.angle-e.anglePrev,q=y.add(e.velocity,y.mult(y.perp(s),e.angularVelocity)),v=y.dot(s,n),x=e.inverseMass+e.inverseInertia*v*v):(q={x:0,y:0},x=e?e.inverseMass:0),f&&!f.isStatic?(u={x:j.x-f.position.x-p.x,y:j.y-f.position.y-p.y},f.velocity.x=f.position.x-f.positionPrev.x,f.velocity.y=f.position.y-f.positionPrev.y,f.angularVelocity=f.angle-f.anglePrev,r=y.add(f.velocity,y.mult(y.perp(u),f.angularVelocity)),w=y.dot(u,n),z=f.inverseMass+f.inverseInertia*w*w):(r={x:0,y:0},z=f?f.inverseMass:0);var A=y.sub(r,q),B=y.dot(n,A)/(x+z);B>0&&(B=0);var C,D={x:n.x*B,y:n.y*B};e&&!e.isStatic&&(C=y.cross(s,D)*e.inverseInertia*(1-c.angularStiffness),t.set(e,!1),C=o.clamp(C,-.01,.01),e.constraintImpulse.x-=p.x,e.constraintImpulse.y-=p.y,e.constraintImpulse.angle+=C,e.position.x-=p.x,e.position.y-=p.y,e.angle+=C),f&&!f.isStatic&&(C=y.cross(u,D)*f.inverseInertia*(1-c.angularStiffness),t.set(f,!1),C=o.clamp(C,-.01,.01),f.constraintImpulse.x+=p.x,f.constraintImpulse.y+=p.y,f.constraintImpulse.angle-=C,f.position.x+=p.x,f.position.y+=p.y,f.angle-=C)}}},m.postSolveAll=function(a){for(var b=0;b<a.length;b++){var c=a[b],d=c.constraintImpulse;z.translate(c.vertices,d),0!==d.angle&&(z.rotate(c.vertices,d.angle,c.position),w.rotate(c.axes,d.angle),d.angle=0),x.update(c.bounds,c.vertices),d.x=0,d.y=0}}}();var n={};!function(){n.create=function(a,b){var d=a.input.mouse,e=m.create({label:"Mouse Constraint",pointA:d.position,pointB:{x:0,y:0},length:.01,stiffness:.1,angularStiffness:1,render:{strokeStyle:"#90EE90",lineWidth:3}}),f={type:"mouseConstraint",mouse:d,dragBody:null,dragPoint:null,constraint:e},g=o.extend(f,b);return q.on(a,"tick",function(){var b=c.allBodies(a.world);n.update(g,b)}),g},n.update=function(a,b){var c=a.mouse,d=a.constraint;if(0===c.button){if(!d.bodyB)for(var e=0;e<b.length;e++){var f=b[e];x.contains(f.bounds,c.position)&&z.contains(f.vertices,c.position)&&(d.pointA=c.position,d.bodyB=f,d.pointB={x:c.position.x-f.position.x,y:c.position.y-f.position.y},d.angleB=f.angle,t.set(f,!1))}}else d.bodyB=null,d.pointB=null;d.bodyB&&(t.set(d.bodyB,!1),d.pointA=c.position)}}();var o={};!function(){o._nextId=0,o.extend=function(a,b){var c,d,e;"boolean"==typeof b?(c=2,e=b):(c=1,e=!0),d=Array.prototype.slice.call(arguments,c);for(var f=0;f<d.length;f++){var g=d[f];if(g)for(var h in g)e&&g[h]&&g[h].constructor===Object?a[h]&&a[h].constructor!==Object?a[h]=g[h]:(a[h]=a[h]||{},o.extend(a[h],e,g[h])):a[h]=g[h]}return a},o.clone=function(a,b){return o.extend({},b,a)},o.keys=function(a){if(Object.keys)return Object.keys(a);var b=[];for(var c in a)b.push(c);return b},o.values=function(a){var b=[];if(Object.keys){for(var c=Object.keys(a),d=0;d<c.length;d++)b.push(a[c[d]]);return b}for(var e in a)b.push(a[e]);return b},o.shadeColor=function(a,b){var c=parseInt(a.slice(1),16),d=Math.round(2.55*b),e=(c>>16)+d,f=(c>>8&255)+d,g=(255&c)+d;return"#"+(16777216+65536*(255>e?1>e?0:e:255)+256*(255>f?1>f?0:f:255)+(255>g?1>g?0:g:255)).toString(16).slice(1)},o.shuffle=function(a){for(var b=a.length-1;b>0;b--){var c=Math.floor(Math.random()*(b+1)),d=a[b];a[b]=a[c],a[c]=d}return a},o.choose=function(a){return a[Math.floor(Math.random()*a.length)]},o.isElement=function(a){try{return a instanceof HTMLElement}catch(b){return"object"==typeof a&&1===a.nodeType&&"object"==typeof a.style&&"object"==typeof a.ownerDocument}},o.clamp=function(a,b,c){return b>a?b:a>c?c:a},o.sign=function(a){return 0>a?-1:1},o.now=function(){var a=window.performance;return a?(a.now=a.now||a.webkitNow||a.msNow||a.oNow||a.mozNow,+a.now()):+new Date},o.random=function(a,b){return a+Math.random()*(b-a)},o.colorToNumber=function(a){return a=a.replace("#",""),3==a.length&&(a=a.charAt(0)+a.charAt(0)+a.charAt(1)+a.charAt(1)+a.charAt(2)+a.charAt(2)),parseInt(a,16)},o.log=function(a,b){if(console&&console.log){var c;switch(b){case"warn":c="color: coral";break;case"error":c="color: red"}console.log("%c [Matter] "+b+": "+a,c)}},o.nextId=function(){return o._nextId++}}();var p={};!function(){var a=60,e=a,h=1e3/a,j=window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.msRequestAnimationFrame||function(a){window.setTimeout(function(){a(o.now())},h)};p.create=function(b,c){c=o.isElement(b)?c:b,b=o.isElement(b)?b:null;var e={enabled:!0,positionIterations:6,velocityIterations:4,constraintIterations:2,enableSleeping:!1,timeScale:1,input:{},events:[],timing:{fps:a,timestamp:0,delta:h,correction:1,deltaMin:1e3/a,deltaMax:1e3/(.5*a),timeScale:1,isFixed:!1},render:{element:b,controller:A}},j=o.extend(e,c);return j.render=j.render.controller.create(j.render),j.world=d.create(j.world),j.pairs=i.create(),j.metrics=j.metrics||r.create(),j.input.mouse=j.input.mouse||s.create(j.render.canvas),j.broadphase=j.broadphase||{current:"grid",grid:{controller:g,instance:g.create(),detector:f.collisions},bruteForce:{detector:f.bruteForce}},j},p.run=function(a){var b,c=0,d=0,f=[],g=1;!function h(i){if(j(h),a.enabled){var k,m,o=a.timing,r={timestamp:i};q.trigger(a,"beforeTick",r),o.isFixed?k=o.delta:(k=i-b||o.delta,b=i,f.push(k),f=f.slice(-e),k=Math.min.apply(null,f),k=k<o.deltaMin?o.deltaMin:k,k=k>o.deltaMax?o.deltaMax:k,m=k/o.delta,o.delta=k),0!==g&&(m*=o.timeScale/g),0===o.timeScale&&(m=0),g=o.timeScale,d+=1,i-c>=1e3&&(o.fps=d*((i-c)/1e3),c=i,d=0),q.trigger(a,"tick",r),a.world.isModified&&a.render.controller.clear(a.render),p.update(a,k,m),n(a),l(a),p.render(a),q.trigger(a,"afterTick",r)}}()},p.update=function(a,d,e){e="undefined"!=typeof e?e:1;var f,g=a.world,h=a.timing,j=a.broadphase[a.broadphase.current],l=[];h.timestamp+=d*h.timeScale,h.correction=e;var n={timestamp:a.timing.timestamp};q.trigger(a,"beforeUpdate",n);var o=c.allBodies(g),p=c.allConstraints(g);for(r.reset(a.metrics),a.enableSleeping&&t.update(o),b.applyGravityAll(o,g.gravity),b.updateAll(o,d,h.timeScale,e,g.bounds),f=0;f<a.constraintIterations;f++)m.solveAll(p,h.timeScale);m.postSolveAll(o),j.controller?(g.isModified&&j.controller.clear(j.instance),j.controller.update(j.instance,o,a,g.isModified),l=j.instance.pairsList):l=o;var s=j.detector(l,a),u=a.pairs,v=h.timestamp;for(i.update(u,s,v),i.removeOld(u,v),a.enableSleeping&&t.afterCollisions(u.list),k.preSolveVelocity(u.list),f=0;f<a.velocityIterations;f++)k.solveVelocity(u.list,h.timeScale);for(f=0;f<a.positionIterations;f++)k.solvePosition(u.list,h.timeScale);return k.postSolvePosition(o),r.update(a.metrics,a),b.resetForcesAll(o),g.isModified&&c.setModified(g,!1,!1,!0),q.trigger(a,"afterUpdate",n),a},p.render=function(a){var b={timestamp:a.timing.timestamp};q.trigger(a,"beforeRender",b),a.render.controller.world(a),q.trigger(a,"afterRender",b)},p.merge=function(a,b){if(o.extend(a,b),b.world){a.world=b.world,p.clear(a);for(var d=c.allBodies(a.world),e=0;e<d.length;e++){var f=d[e];t.set(f,!1),f.id=o.nextId()}}},p.clear=function(a){var b=a.world;i.clear(a.pairs);var d=a.broadphase[a.broadphase.current];if(d.controller){var e=c.allBodies(b);d.controller.clear(d.instance),d.controller.update(d.instance,e,a,!0)}};var l=function(a){var b=a.input.mouse,c=b.sourceEvents;c.mousemove&&q.trigger(a,"mousemove",{mouse:b}),c.mousedown&&q.trigger(a,"mousedown",{mouse:b}),c.mouseup&&q.trigger(a,"mouseup",{mouse:b}),s.clearSourceEvents(b)},n=function(a){var b=a.pairs;b.collisionStart.length>0&&q.trigger(a,"collisionStart",{pairs:b.collisionStart}),b.collisionActive.length>0&&q.trigger(a,"collisionActive",{pairs:b.collisionActive}),b.collisionEnd.length>0&&q.trigger(a,"collisionEnd",{pairs:b.collisionEnd})}}();var q={};!function(){q.on=function(a,b,c){for(var d,e=b.split(" "),f=0;f<e.length;f++)d=e[f],a.events=a.events||{},a.events[d]=a.events[d]||[],a.events[d].push(c);return c},q.off=function(a,b,c){if(!b)return void(a.events={});"function"==typeof b&&(c=b,b=o.keys(a.events).join(" "));for(var d=b.split(" "),e=0;e<d.length;e++){var f=a.events[d[e]],g=[];if(c)for(var h=0;h<f.length;h++)f[h]!==c&&g.push(f[h]);a.events[d[e]]=g}},q.trigger=function(a,b,c){var d,e,f,g;if(a.events){c||(c={}),d=b.split(" ");for(var h=0;h<d.length;h++)if(e=d[h],f=a.events[e]){g=o.clone(c,!1),g.name=e,g.source=a;for(var i=0;i<f.length;i++)f[i].apply(a,[g])}}}}();var r={};!function(){r.create=function(){return{extended:!1,narrowDetections:0,narrowphaseTests:0,narrowReuse:0,narrowReuseCount:0,midphaseTests:0,broadphaseTests:0,narrowEff:1e-4,midEff:1e-4,broadEff:1e-4,collisions:0,buckets:0,bodies:0,pairs:0}},r.reset=function(a){a.extended&&(a.narrowDetections=0,a.narrowphaseTests=0,a.narrowReuse=0,a.narrowReuseCount=0,a.midphaseTests=0,a.broadphaseTests=0,a.narrowEff=0,a.midEff=0,a.broadEff=0,a.collisions=0,a.buckets=0,a.pairs=0,a.bodies=0)},r.update=function(a,b){if(a.extended){var d=b.world,e=(b.broadphase[b.broadphase.current],c.allBodies(d));a.collisions=a.narrowDetections,a.pairs=b.pairs.list.length,a.bodies=e.length,a.midEff=(a.narrowDetections/(a.midphaseTests||1)).toFixed(2),a.narrowEff=(a.narrowDetections/(a.narrowphaseTests||1)).toFixed(2),a.broadEff=(1-a.broadphaseTests/(e.length||1)).toFixed(2),a.narrowReuse=(a.narrowReuseCount/(a.narrowphaseTests||1)).toFixed(2)}}}();var s;!function(){s=function(b){var c=this;this.element=b||document.body,this.absolute={x:0,y:0},this.position={x:0,y:0},this.mousedownPosition={x:0,y:0},this.mouseupPosition={x:0,y:0},this.offset={x:0,y:0},this.scale={x:1,y:1},this.wheelDelta=0,this.button=-1,this.sourceEvents={mousemove:null,mousedown:null,mouseup:null,mousewheel:null},this.mousemove=function(b){var d=a(b,c.element),e=b.changedTouches;e&&(c.button=0,b.preventDefault()),c.absolute.x=d.x,c.absolute.y=d.y,c.position.x=c.absolute.x*c.scale.x+c.offset.x,c.position.y=c.absolute.y*c.scale.y+c.offset.y,c.sourceEvents.mousemove=b},this.mousedown=function(b){var d=a(b,c.element),e=b.changedTouches;e?(c.button=0,b.preventDefault()):c.button=b.button,c.absolute.x=d.x,c.absolute.y=d.y,c.position.x=c.absolute.x*c.scale.x+c.offset.x,c.position.y=c.absolute.y*c.scale.y+c.offset.y,c.mousedownPosition.x=c.position.x,c.mousedownPosition.y=c.position.y,c.sourceEvents.mousedown=b},this.mouseup=function(b){var d=a(b,c.element),e=b.changedTouches;e&&b.preventDefault(),c.button=-1,c.absolute.x=d.x,c.absolute.y=d.y,c.position.x=c.absolute.x*c.scale.x+c.offset.x,c.position.y=c.absolute.y*c.scale.y+c.offset.y,c.mouseupPosition.x=c.position.x,c.mouseupPosition.y=c.position.y,c.sourceEvents.mouseup=b},this.mousewheel=function(a){c.wheelDelta=Math.max(-1,Math.min(1,a.wheelDelta||-a.detail)),a.preventDefault()},s.setElement(c,c.element)},s.create=function(a){return new s(a)},s.setElement=function(a,b){a.element=b,b.addEventListener("mousemove",a.mousemove),b.addEventListener("mousedown",a.mousedown),b.addEventListener("mouseup",a.mouseup),b.addEventListener("mousewheel",a.mousewheel),b.addEventListener("DOMMouseScroll",a.mousewheel),b.addEventListener("touchmove",a.mousemove),b.addEventListener("touchstart",a.mousedown),b.addEventListener("touchend",a.mouseup)},s.clearSourceEvents=function(a){a.sourceEvents.mousemove=null,a.sourceEvents.mousedown=null,a.sourceEvents.mouseup=null,a.sourceEvents.mousewheel=null,a.wheelDelta=0},s.setOffset=function(a,b){a.offset.x=b.x,a.offset.y=b.y,a.position.x=a.absolute.x*a.scale.x+a.offset.x,a.position.y=a.absolute.y*a.scale.y+a.offset.y},s.setScale=function(a,b){a.scale.x=b.x,a.scale.y=b.y,a.position.x=a.absolute.x*a.scale.x+a.offset.x,a.position.y=a.absolute.y*a.scale.y+a.offset.y};var a=function(a,b){var c,d,e=b.getBoundingClientRect(),f=document.documentElement||document.body.parentNode||document.body,g=void 0!==window.pageXOffset?window.pageXOffset:f.scrollLeft,h=void 0!==window.pageYOffset?window.pageYOffset:f.scrollTop,i=a.changedTouches;return i?(c=i[0].pageX-e.left-g,d=i[0].pageY-e.top-h):(c=a.pageX-e.left-g,d=a.pageY-e.top-h),{x:c/(b.clientWidth/b.width),y:d/(b.clientHeight/b.height)}}}();var t={};!function(){var a=.18,b=.08,c=.9;t.update=function(a){for(var d=0;d<a.length;d++){var e=a[d],f=e.speed*e.speed+e.angularSpeed*e.angularSpeed;if(e.force.x>0||e.force.y>0)t.set(e,!1);else{var g=Math.min(e.motion,f),h=Math.max(e.motion,f);e.motion=c*g+(1-c)*h,e.sleepThreshold>0&&e.motion<b?(e.sleepCounter+=1,e.sleepCounter>=e.sleepThreshold&&t.set(e,!0)):e.sleepCounter>0&&(e.sleepCounter-=1)}}},t.afterCollisions=function(b){for(var c=0;c<b.length;c++){var d=b[c];if(d.isActive){var e=d.collision,f=e.bodyA,g=e.bodyB;if(!(f.isSleeping&&g.isSleeping||f.isStatic||g.isStatic)&&(f.isSleeping||g.isSleeping)){var h=f.isSleeping&&!f.isStatic?f:g,i=h===f?g:f;!h.isStatic&&i.motion>a&&t.set(h,!1)}}}},t.set=function(a,b){b?(a.isSleeping=!0,a.sleepCounter=a.sleepThreshold,a.positionImpulse.x=0,a.positionImpulse.y=0,a.positionPrev.x=a.position.x,a.positionPrev.y=a.position.y,a.anglePrev=a.angle,a.speed=0,a.angularSpeed=0,a.motion=0):(a.isSleeping=!1,a.sleepCounter=0)}}();var u={};!function(){u.rectangle=function(a,c,d,e,f){f=f||{};var g={label:"Rectangle Body",position:{x:a,y:c},vertices:z.fromPath("L 0 0 L "+d+" 0 L "+d+" "+e+" L 0 "+e)};if(f.chamfer){var h=f.chamfer;g.vertices=z.chamfer(g.vertices,h.radius,h.quality,h.qualityMin,h.qualityMax),delete f.chamfer}return b.create(o.extend({},g,f))},u.trapezoid=function(a,c,d,e,f,g){g=g||{},f*=.5;var h=(1-2*f)*d,i=d*f,j=i+h,k=j+i,l={label:"Trapezoid Body",position:{x:a,y:c},vertices:z.fromPath("L 0 0 L "+i+" "+-e+" L "+j+" "+-e+" L "+k+" 0")};
+if(g.chamfer){var m=g.chamfer;l.vertices=z.chamfer(l.vertices,m.radius,m.quality,m.qualityMin,m.qualityMax),delete g.chamfer}return b.create(o.extend({},l,g))},u.circle=function(a,b,c,d,e){d=d||{},d.label="Circle Body",e=e||25;var f=Math.ceil(Math.max(10,Math.min(e,c)));return f%2===1&&(f+=1),d.circleRadius=c,u.polygon(a,b,f,c,d)},u.polygon=function(a,c,d,e,f){if(f=f||{},3>d)return u.circle(a,c,e,f);for(var g=2*Math.PI/d,h="",i=.5*g,j=0;d>j;j+=1){var k=i+j*g,l=Math.cos(k)*e,m=Math.sin(k)*e;h+="L "+l.toFixed(3)+" "+m.toFixed(3)+" "}var n={label:"Polygon Body",position:{x:a,y:c},vertices:z.fromPath(h)};if(f.chamfer){var p=f.chamfer;n.vertices=z.chamfer(n.vertices,p.radius,p.quality,p.qualityMin,p.qualityMax),delete f.chamfer}return b.create(o.extend({},n,f))}}();var v={};!function(){v.stack=function(a,d,e,f,g,h,i){for(var j,k=c.create({label:"Stack"}),l=a,m=d,n=0,o=0;f>o;o++){for(var p=0,q=0;e>q;q++){var r=i(l,m,q,o,j,n);if(r){var s=r.bounds.max.y-r.bounds.min.y,t=r.bounds.max.x-r.bounds.min.x;s>p&&(p=s),b.translate(r,{x:.5*t,y:.5*s}),l=r.bounds.max.x+g,c.addBody(k,r),j=r,n+=1}}m+=p+h,l=a}return k},v.chain=function(a,b,d,e,f,g){for(var h=a.bodies,i=1;i<h.length;i++){var j=h[i-1],k=h[i],l=j.bounds.max.y-j.bounds.min.y,n=j.bounds.max.x-j.bounds.min.x,p=k.bounds.max.y-k.bounds.min.y,q=k.bounds.max.x-k.bounds.min.x,r={bodyA:j,pointA:{x:n*b,y:l*d},bodyB:k,pointB:{x:q*e,y:p*f}},s=o.extend(r,g);c.addConstraint(a,m.create(s))}return a.label+=" Chain",a},v.mesh=function(a,b,d,e,f){var g,h,i,j,k,l=a.bodies;for(g=0;d>g;g++){for(h=0;b>h;h++)h>0&&(i=l[h-1+g*b],j=l[h+g*b],c.addConstraint(a,m.create(o.extend({bodyA:i,bodyB:j},f))));for(h=0;b>h;h++)g>0&&(i=l[h+(g-1)*b],j=l[h+g*b],c.addConstraint(a,m.create(o.extend({bodyA:i,bodyB:j},f))),e&&h>0&&(k=l[h-1+(g-1)*b],c.addConstraint(a,m.create(o.extend({bodyA:k,bodyB:j},f)))),e&&b-1>h&&(k=l[h+1+(g-1)*b],c.addConstraint(a,m.create(o.extend({bodyA:k,bodyB:j},f)))))}return a.label+=" Mesh",a},v.pyramid=function(a,c,d,e,f,g,h){return v.stack(a,c,d,e,f,g,function(c,g,i,j,k,l){var m=Math.min(e,Math.ceil(d/2)),n=k?k.bounds.max.x-k.bounds.min.x:0;if(!(j>m)){j=m-j;var o=j,p=d-1-j;if(!(o>i||i>p)){1===l&&b.translate(k,{x:(i+(d%2===1?1:-1))*n,y:0});var q=k?i*n:0;return h(a+q+i*f,g,i,j,k,l)}}})},v.newtonsCradle=function(a,b,d,e,f){for(var g=c.create({label:"Newtons Cradle"}),h=0;d>h;h++){var i=1.9,j=u.circle(a+h*e*i,b+f,e,{inertia:99999,restitution:1,friction:0,frictionAir:1e-4,slop:.01}),k=m.create({pointA:{x:a+h*e*i,y:b},bodyB:j});c.addBody(g,j),c.addConstraint(g,k)}return g},v.car=function(a,d,e,f,g){var h=b.nextGroupId(),i=-20,j=.5*-e+i,k=.5*e-i,l=0,n=c.create({label:"Car"}),o=u.trapezoid(a,d,e,f,.3,{groupId:h,friction:.01,chamfer:{radius:10}}),p=u.circle(a+j,d+l,g,{groupId:h,restitution:.5,friction:.9,density:.01}),q=u.circle(a+k,d+l,g,{groupId:h,restitution:.5,friction:.9,density:.01}),r=m.create({bodyA:o,pointA:{x:j,y:l},bodyB:p,stiffness:.5}),s=m.create({bodyA:o,pointA:{x:k,y:l},bodyB:q,stiffness:.5});return c.addBody(n,o),c.addBody(n,p),c.addBody(n,q),c.addConstraint(n,r),c.addConstraint(n,s),n},v.softBody=function(a,b,c,d,e,f,g,h,i,j){i=o.extend({inertia:1/0},i),j=o.extend({stiffness:.4},j);var k=v.stack(a,b,c,d,e,f,function(a,b){return u.circle(a,b,h,i)});return v.mesh(k,c,d,g,j),k.label="Soft Body",k}}();var w={};!function(){w.fromVertices=function(a){for(var b={},c=0;c<a.length;c++){var d=(c+1)%a.length,e=y.normalise({x:a[d].y-a[c].y,y:a[c].x-a[d].x}),f=0===e.y?1/0:e.x/e.y;f=f.toFixed(3).toString(),b[f]=e}return o.values(b)},w.rotate=function(a,b){if(0!==b)for(var c=Math.cos(b),d=Math.sin(b),e=0;e<a.length;e++){var f,g=a[e];f=g.x*c-g.y*d,g.y=g.x*d+g.y*c,g.x=f}}}();var x={};!function(){x.create=function(a){var b={min:{x:0,y:0},max:{x:0,y:0}};return a&&x.update(b,a),b},x.update=function(a,b,c){a.min.x=Number.MAX_VALUE,a.max.x=Number.MIN_VALUE,a.min.y=Number.MAX_VALUE,a.max.y=Number.MIN_VALUE;for(var d=0;d<b.length;d++){var e=b[d];e.x>a.max.x&&(a.max.x=e.x),e.x<a.min.x&&(a.min.x=e.x),e.y>a.max.y&&(a.max.y=e.y),e.y<a.min.y&&(a.min.y=e.y)}c&&(c.x>0?a.max.x+=c.x:a.min.x+=c.x,c.y>0?a.max.y+=c.y:a.min.y+=c.y)},x.contains=function(a,b){return b.x>=a.min.x&&b.x<=a.max.x&&b.y>=a.min.y&&b.y<=a.max.y},x.overlaps=function(a,b){return a.min.x<=b.max.x&&a.max.x>=b.min.x&&a.max.y>=b.min.y&&a.min.y<=b.max.y},x.translate=function(a,b){a.min.x+=b.x,a.max.x+=b.x,a.min.y+=b.y,a.max.y+=b.y},x.shift=function(a,b){var c=a.max.x-a.min.x,d=a.max.y-a.min.y;a.min.x=b.x,a.max.x=b.x+c,a.min.y=b.y,a.max.y=b.y+d}}();var y={};!function(){y.magnitude=function(a){return Math.sqrt(a.x*a.x+a.y*a.y)},y.magnitudeSquared=function(a){return a.x*a.x+a.y*a.y},y.rotate=function(a,b){var c=Math.cos(b),d=Math.sin(b);return{x:a.x*c-a.y*d,y:a.x*d+a.y*c}},y.rotateAbout=function(a,b,c){var d=Math.cos(b),e=Math.sin(b);return{x:c.x+((a.x-c.x)*d-(a.y-c.y)*e),y:c.y+((a.x-c.x)*e+(a.y-c.y)*d)}},y.normalise=function(a){var b=y.magnitude(a);return 0===b?{x:0,y:0}:{x:a.x/b,y:a.y/b}},y.dot=function(a,b){return a.x*b.x+a.y*b.y},y.cross=function(a,b){return a.x*b.y-a.y*b.x},y.add=function(a,b){return{x:a.x+b.x,y:a.y+b.y}},y.sub=function(a,b){return{x:a.x-b.x,y:a.y-b.y}},y.mult=function(a,b){return{x:a.x*b,y:a.y*b}},y.div=function(a,b){return{x:a.x/b,y:a.y/b}},y.perp=function(a,b){return b=b===!0?-1:1,{x:b*-a.y,y:b*a.x}},y.neg=function(a){return{x:-a.x,y:-a.y}},y.angle=function(a,b){return Math.atan2(b.y-a.y,b.x-a.x)}}();var z={};!function(){z.create=function(a,b){for(var c=0;c<a.length;c++)a[c].index=c,a[c].body=b},z.fromPath=function(a){var b=/L\s*([\-\d\.]*)\s*([\-\d\.]*)/gi,c=[];return a.replace(b,function(a,b,d){c.push({x:parseFloat(b,10),y:parseFloat(d,10)})}),c},z.centre=function(a){for(var b,c,d,e=z.area(a,!0),f={x:0,y:0},g=0;g<a.length;g++)d=(g+1)%a.length,b=y.cross(a[g],a[d]),c=y.mult(y.add(a[g],a[d]),b),f=y.add(f,c);return y.div(f,6*e)},z.area=function(a,b){for(var c=0,d=a.length-1,e=0;e<a.length;e++)c+=(a[d].x-a[e].x)*(a[d].y+a[e].y),d=e;return b?c/2:Math.abs(c)/2},z.inertia=function(a,b){for(var c,d,e=0,f=0,g=a,h=0;h<g.length;h++)d=(h+1)%g.length,c=Math.abs(y.cross(g[d],g[h])),e+=c*(y.dot(g[d],g[d])+y.dot(g[d],g[h])+y.dot(g[h],g[h])),f+=c;return b/6*(e/f)},z.translate=function(a,b,c){var d;if(c)for(d=0;d<a.length;d++)a[d].x+=b.x*c,a[d].y+=b.y*c;else for(d=0;d<a.length;d++)a[d].x+=b.x,a[d].y+=b.y},z.rotate=function(a,b,c){if(0!==b)for(var d=Math.cos(b),e=Math.sin(b),f=0;f<a.length;f++){var g=a[f],h=g.x-c.x,i=g.y-c.y;g.x=c.x+(h*d-i*e),g.y=c.y+(h*e+i*d)}},z.contains=function(a,b){for(var c=0;c<a.length;c++){var d=a[c],e=a[(c+1)%a.length];if((b.x-d.x)*(e.y-d.y)+(b.y-d.y)*(d.x-e.x)>0)return!1}return!0},z.scale=function(a,b,c,d){if(1===b&&1===c)return a;d=d||z.centre(a);for(var e,f,g=0;g<a.length;g++)e=a[g],f=y.sub(e,d),a[g].x=d.x+f.x*b,a[g].y=d.y+f.y*c;return a},z.chamfer=function(a,b,c,d,e){b=b||[8],b.length||(b=[b]),c="undefined"!=typeof c?c:-1,d=d||2,e=e||14;for(var f=(z.centre(a),[]),g=0;g<a.length;g++){var h=a[g-1>=0?g-1:a.length-1],i=a[g],j=a[(g+1)%a.length],k=b[g<b.length?g:b.length-1];if(0!==k){var l=y.normalise({x:i.y-h.y,y:h.x-i.x}),m=y.normalise({x:j.y-i.y,y:i.x-j.x}),n=Math.sqrt(2*Math.pow(k,2)),p=y.mult(o.clone(l),k),q=y.normalise(y.mult(y.add(l,m),.5)),r=y.sub(i,y.mult(q,n)),s=c;-1===c&&(s=1.75*Math.pow(k,.32)),s=o.clamp(s,d,e),s%2===1&&(s+=1);for(var t=Math.acos(y.dot(l,m)),u=t/s,v=0;s>v;v++)f.push(y.add(y.rotate(p,u*v),r))}else f.push(i)}return f}}();var A={};!function(){A.create=function(b){var c={controller:A,element:null,canvas:null,options:{width:800,height:600,background:"#fafafa",wireframeBackground:"#222",hasBounds:!1,enabled:!0,wireframes:!0,showSleeping:!0,showDebug:!1,showBroadphase:!1,showBounds:!1,showVelocity:!1,showCollisions:!1,showAxes:!1,showPositions:!1,showAngleIndicator:!1,showIds:!1,showShadows:!1}},d=o.extend(c,b);return d.canvas=d.canvas||a(d.options.width,d.options.height),d.context=d.canvas.getContext("2d"),d.textures={},d.bounds=d.bounds||{min:{x:0,y:0},max:{x:d.options.width,y:d.options.height}},A.setBackground(d,d.options.background),o.isElement(d.element)?d.element.appendChild(d.canvas):o.log('No "render.element" passed, "render.canvas" was not inserted into document.',"warn"),d},A.clear=function(){},A.setBackground=function(a,b){if(a.currentBackground!==b){var c=b;/(jpg|gif|png)$/.test(b)&&(c="url("+b+")"),a.canvas.style.background=c,a.canvas.style.backgroundSize="contain",a.currentBackground=b}},A.world=function(a){var b,d=a.render,e=a.world,f=d.canvas,g=d.context,h=d.options,i=c.allBodies(e),j=c.allConstraints(e),k=[],l=[];h.wireframes?A.setBackground(d,h.wireframeBackground):A.setBackground(d,h.background),g.globalCompositeOperation="source-in",g.fillStyle="transparent",g.fillRect(0,0,f.width,f.height),g.globalCompositeOperation="source-over";var m=d.bounds.max.x-d.bounds.min.x,n=d.bounds.max.y-d.bounds.min.y,o=m/d.options.width,p=n/d.options.height;if(h.hasBounds){for(b=0;b<i.length;b++){var q=i[b];x.overlaps(q.bounds,d.bounds)&&k.push(q)}for(b=0;b<j.length;b++){var r=j[b],s=r.bodyA,t=r.bodyB,u=r.pointA,v=r.pointB;s&&(u=y.add(s.position,r.pointA)),t&&(v=y.add(t.position,r.pointB)),u&&v&&(x.contains(d.bounds,u)||x.contains(d.bounds,v))&&l.push(r)}g.scale(1/o,1/p),g.translate(-d.bounds.min.x,-d.bounds.min.y)}else l=j,k=i;!h.wireframes||a.enableSleeping&&h.showSleeping?A.bodies(a,k,g):A.bodyWireframes(a,k,g),h.showBounds&&A.bodyBounds(a,k,g),(h.showAxes||h.showAngleIndicator)&&A.bodyAxes(a,k,g),h.showPositions&&A.bodyPositions(a,k,g),h.showVelocity&&A.bodyVelocity(a,k,g),h.showIds&&A.bodyIds(a,k,g),h.showCollisions&&A.collisions(a,a.pairs.list,g),A.constraints(l,g),h.showBroadphase&&"grid"===a.broadphase.current&&A.grid(a,a.broadphase[a.broadphase.current].instance,g),h.showDebug&&A.debug(a,g),h.hasBounds&&g.setTransform(1,0,0,1,0,0)},A.debug=function(a,b){var d=b,e=a.world,f=a.render,h=f.options,i=c.allBodies(e),j="    ";if(a.timing.timestamp-(f.debugTimestamp||0)>=500){var k="";k+="fps: "+Math.round(a.timing.fps)+j,a.metrics.extended&&(k+="delta: "+a.timing.delta.toFixed(3)+j,k+="correction: "+a.timing.correction.toFixed(3)+j,k+="bodies: "+i.length+j,a.broadphase.controller===g&&(k+="buckets: "+a.metrics.buckets+j),k+="\n",k+="collisions: "+a.metrics.collisions+j,k+="pairs: "+a.pairs.list.length+j,k+="broad: "+a.metrics.broadEff+j,k+="mid: "+a.metrics.midEff+j,k+="narrow: "+a.metrics.narrowEff+j),f.debugString=k,f.debugTimestamp=a.timing.timestamp}if(f.debugString){d.font="12px Arial",d.fillStyle=h.wireframes?"rgba(255,255,255,0.5)":"rgba(0,0,0,0.5)";for(var l=f.debugString.split("\n"),m=0;m<l.length;m++)d.fillText(l[m],50,50+18*m)}},A.constraints=function(a,b){for(var c=b,d=0;d<a.length;d++){var e=a[d];if(e.render.visible&&e.pointA&&e.pointB){var f=e.bodyA,g=e.bodyB;f?(c.beginPath(),c.moveTo(f.position.x+e.pointA.x,f.position.y+e.pointA.y)):(c.beginPath(),c.moveTo(e.pointA.x,e.pointA.y)),g?c.lineTo(g.position.x+e.pointB.x,g.position.y+e.pointB.y):c.lineTo(e.pointB.x,e.pointB.y),c.lineWidth=e.render.lineWidth,c.strokeStyle=e.render.strokeStyle,c.stroke()}}},A.bodyShadows=function(a,b,c){for(var d=c,e=a.render,f=(e.options,0);f<b.length;f++){var g=b[f];if(g.render.visible){if(g.circleRadius)d.beginPath(),d.arc(g.position.x,g.position.y,g.circleRadius,0,2*Math.PI),d.closePath();else{d.beginPath(),d.moveTo(g.vertices[0].x,g.vertices[0].y);for(var h=1;h<g.vertices.length;h++)d.lineTo(g.vertices[h].x,g.vertices[h].y);d.closePath()}var i=g.position.x-.5*e.options.width,j=g.position.y-.2*e.options.height,k=Math.abs(i)+Math.abs(j);d.shadowColor="rgba(0,0,0,0.15)",d.shadowOffsetX=.05*i,d.shadowOffsetY=.05*j,d.shadowBlur=1+12*Math.min(1,k/1e3),d.fill(),d.shadowColor=null,d.shadowOffsetX=null,d.shadowOffsetY=null,d.shadowBlur=null}}},A.bodies=function(a,c,d){var e,f=d,g=a.render,h=g.options;for(e=0;e<c.length;e++){var i=c[e];if(i.render.visible)if(i.render.sprite&&i.render.sprite.texture&&!h.wireframes){var j=i.render.sprite,k=b(g,j.texture);h.showSleeping&&i.isSleeping&&(f.globalAlpha=.5),f.translate(i.position.x,i.position.y),f.rotate(i.angle),f.drawImage(k,k.width*-.5*j.xScale,k.height*-.5*j.yScale,k.width*j.xScale,k.height*j.yScale),f.rotate(-i.angle),f.translate(-i.position.x,-i.position.y),h.showSleeping&&i.isSleeping&&(f.globalAlpha=1)}else{if(i.circleRadius)f.beginPath(),f.arc(i.position.x,i.position.y,i.circleRadius,0,2*Math.PI);else{f.beginPath(),f.moveTo(i.vertices[0].x,i.vertices[0].y);for(var l=1;l<i.vertices.length;l++)f.lineTo(i.vertices[l].x,i.vertices[l].y);f.closePath()}h.wireframes?(f.lineWidth=1,f.strokeStyle="#bbb",h.showSleeping&&i.isSleeping&&(f.strokeStyle="rgba(255,255,255,0.2)"),f.stroke()):(f.fillStyle=h.showSleeping&&i.isSleeping?o.shadeColor(i.render.fillStyle,50):i.render.fillStyle,f.lineWidth=i.render.lineWidth,f.strokeStyle=i.render.strokeStyle,f.fill(),f.stroke())}}},A.bodyWireframes=function(a,b,c){var d,e,f=c;for(f.beginPath(),d=0;d<b.length;d++){var g=b[d];if(g.render.visible){for(f.moveTo(g.vertices[0].x,g.vertices[0].y),e=1;e<g.vertices.length;e++)f.lineTo(g.vertices[e].x,g.vertices[e].y);f.lineTo(g.vertices[0].x,g.vertices[0].y)}}f.lineWidth=1,f.strokeStyle="#bbb",f.stroke()},A.bodyBounds=function(a,b,c){var d=c,e=a.render,f=e.options;d.beginPath();for(var g=0;g<b.length;g++){var h=b[g];h.render.visible&&d.rect(h.bounds.min.x,h.bounds.min.y,h.bounds.max.x-h.bounds.min.x,h.bounds.max.y-h.bounds.min.y)}d.strokeStyle=f.wireframes?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)",d.lineWidth=1,d.stroke()},A.bodyAxes=function(a,b,c){var d,e,f=c,g=a.render,h=g.options;for(f.beginPath(),d=0;d<b.length;d++){var i=b[d];if(i.render.visible)if(h.showAxes)for(e=0;e<i.axes.length;e++){var j=i.axes[e];f.moveTo(i.position.x,i.position.y),f.lineTo(i.position.x+20*j.x,i.position.y+20*j.y)}else f.moveTo(i.position.x,i.position.y),f.lineTo((i.vertices[0].x+i.vertices[i.vertices.length-1].x)/2,(i.vertices[0].y+i.vertices[i.vertices.length-1].y)/2)}f.strokeStyle=h.wireframes?"indianred":"rgba(0,0,0,0.3)",f.lineWidth=1,f.stroke()},A.bodyPositions=function(a,b,c){var d,e,f=c,g=a.render,h=g.options;for(f.beginPath(),e=0;e<b.length;e++)d=b[e],d.render.visible&&(f.arc(d.position.x,d.position.y,3,0,2*Math.PI,!1),f.closePath());for(f.fillStyle=h.wireframes?"indianred":"rgba(0,0,0,0.5)",f.fill(),f.beginPath(),e=0;e<b.length;e++)d=b[e],d.render.visible&&(f.arc(d.positionPrev.x,d.positionPrev.y,2,0,2*Math.PI,!1),f.closePath());f.fillStyle="rgba(255,165,0,0.8)",f.fill()},A.bodyVelocity=function(a,b,c){{var d=c,e=a.render;e.options}d.beginPath();for(var f=0;f<b.length;f++){var g=b[f];g.render.visible&&(d.moveTo(g.position.x,g.position.y),d.lineTo(g.position.x+2*(g.position.x-g.positionPrev.x),g.position.y+2*(g.position.y-g.positionPrev.y)))}d.lineWidth=3,d.strokeStyle="cornflowerblue",d.stroke()},A.bodyIds=function(a,b,c){for(var d=c,e=0;e<b.length;e++){var f=b[e];f.render.visible&&(d.font="12px Arial",d.fillStyle="rgba(255,255,255,0.5)",d.fillText(f.id,f.position.x+10,f.position.y-10))}},A.collisions=function(a,b,c){var d,e,f,g,h=c,i=a.render.options;for(h.beginPath(),f=0;f<b.length;f++)for(d=b[f],e=d.collision,g=0;g<d.activeContacts.length;g++){var j=d.activeContacts[g],k=j.vertex;h.rect(k.x-1.5,k.y-1.5,3.5,3.5)}for(h.fillStyle=i.wireframes?"rgba(255,255,255,0.7)":"orange",h.fill(),h.beginPath(),f=0;f<b.length;f++)if(d=b[f],e=d.collision,d.activeContacts.length>0){var l=d.activeContacts[0].vertex.x,m=d.activeContacts[0].vertex.y;2===d.activeContacts.length&&(l=(d.activeContacts[0].vertex.x+d.activeContacts[1].vertex.x)/2,m=(d.activeContacts[0].vertex.y+d.activeContacts[1].vertex.y)/2),h.moveTo(l-8*e.normal.x,m-8*e.normal.y),h.lineTo(l,m)}h.strokeStyle=i.wireframes?"rgba(255,165,0,0.7)":"orange",h.lineWidth=1,h.stroke()},A.grid=function(a,b,c){var d=c,e=a.render.options;d.strokeStyle=e.wireframes?"rgba(255,180,0,0.1)":"rgba(255,180,0,0.5)",d.beginPath();for(var f=o.keys(b.buckets),g=0;g<f.length;g++){var h=f[g];if(!(b.buckets[h].length<2)){var i=h.split(",");d.rect(.5+parseInt(i[0],10)*b.bucketWidth,.5+parseInt(i[1],10)*b.bucketHeight,b.bucketWidth,b.bucketHeight)}}d.lineWidth=1,d.stroke()},A.inspector=function(a,b){var c,d=a.engine,e=(d.input.mouse,a.selected),f=d.render,g=f.options;if(g.hasBounds){var h=f.bounds.max.x-f.bounds.min.x,i=f.bounds.max.y-f.bounds.min.y,j=h/f.options.width,k=i/f.options.height;b.scale(1/j,1/k),b.translate(-f.bounds.min.x,-f.bounds.min.y)}for(var l=0;l<e.length;l++){var m=e[l].data;switch(b.translate(.5,.5),b.lineWidth=1,b.strokeStyle="rgba(255,165,0,0.9)",b.setLineDash([1,2]),m.type){case"body":c=m.bounds,b.beginPath(),b.rect(Math.floor(c.min.x-3),Math.floor(c.min.y-3),Math.floor(c.max.x-c.min.x+6),Math.floor(c.max.y-c.min.y+6)),b.closePath(),b.stroke();break;case"constraint":var n=m.pointA;m.bodyA&&(n=m.pointB),b.beginPath(),b.arc(n.x,n.y,10,0,2*Math.PI),b.closePath(),b.stroke()}b.setLineDash([0]),b.translate(-.5,-.5)}null!==a.selectStart&&(b.translate(.5,.5),b.lineWidth=1,b.strokeStyle="rgba(255,165,0,0.6)",b.fillStyle="rgba(255,165,0,0.1)",c=a.selectBounds,b.beginPath(),b.rect(Math.floor(c.min.x),Math.floor(c.min.y),Math.floor(c.max.x-c.min.x),Math.floor(c.max.y-c.min.y)),b.closePath(),b.stroke(),b.fill(),b.translate(-.5,-.5)),g.hasBounds&&b.setTransform(1,0,0,1,0,0)};var a=function(a,b){var c=document.createElement("canvas");return c.width=a,c.height=b,c.oncontextmenu=function(){return!1},c.onselectstart=function(){return!1},c},b=function(a,b){var c=a.textures[b];return c?c:(c=a.textures[b]=new Image,c.src=b,c)}}();var B={};!function(){B.create=function(a){var b={controller:B,element:null,canvas:null,options:{width:800,height:600,background:"#fafafa",wireframeBackground:"#222",enabled:!0,wireframes:!0,showSleeping:!0,showDebug:!1,showBroadphase:!1,showBounds:!1,showVelocity:!1,showCollisions:!1,showAxes:!1,showPositions:!1,showAngleIndicator:!1,showIds:!1,showShadows:!1}},c=o.extend(b,a);return c.context=new PIXI.WebGLRenderer(800,600,c.canvas,!1,!0),c.canvas=c.context.view,c.stage=new PIXI.Stage,c.textures={},c.sprites={},c.primitives={},c.spriteBatch=new PIXI.SpriteBatch,c.stage.addChild(c.spriteBatch),o.isElement(c.element)?c.element.appendChild(c.canvas):o.log('No "render.element" passed, "render.canvas" was not inserted into document.',"warn"),c.canvas.oncontextmenu=function(){return!1},c.canvas.onselectstart=function(){return!1},c},B.clear=function(a){for(var b=a.stage,c=a.spriteBatch;b.children[0];)b.removeChild(b.children[0]);for(;c.children[0];)c.removeChild(c.children[0]);var d=a.sprites["bg-0"];a.textures={},a.sprites={},a.primitives={},a.sprites["bg-0"]=d,d&&c.addChildAt(d,0),a.stage.addChild(a.spriteBatch),a.currentBackground=null},B.setBackground=function(a,b){if(a.currentBackground!==b){var c=b.indexOf&&-1!==b.indexOf("#"),e=a.sprites["bg-0"];if(c){var f=o.colorToNumber(b);a.stage.setBackgroundColor(f),e&&a.spriteBatch.removeChild(e)}else if(!e){var g=d(a,b);e=a.sprites["bg-0"]=new PIXI.Sprite(g),e.position.x=0,e.position.y=0,a.spriteBatch.addChildAt(e,0)}a.currentBackground=b}},B.world=function(a){var b,d=a.render,e=a.world,f=d.context,g=d.stage,h=d.options,i=c.allBodies(e),j=c.allConstraints(e);for(h.wireframes?B.setBackground(d,h.wireframeBackground):B.setBackground(d,h.background),b=0;b<i.length;b++)B.body(a,i[b]);for(b=0;b<j.length;b++)B.constraint(a,j[b]);f.render(g)},B.constraint=function(a,b){var c=a.render,d=b.bodyA,e=b.bodyB,f=b.pointA,g=b.pointB,h=c.stage,i=b.render,j="c-"+b.id,k=c.primitives[j];return k||(k=c.primitives[j]=new PIXI.Graphics),i.visible&&b.pointA&&b.pointB?(-1===h.children.indexOf(k)&&h.addChild(k),k.clear(),k.beginFill(0,0),k.lineStyle(i.lineWidth,o.colorToNumber(i.strokeStyle),1),d?k.moveTo(d.position.x+f.x,d.position.y+f.y):k.moveTo(f.x,f.y),e?k.lineTo(e.position.x+g.x,e.position.y+g.y):k.lineTo(g.x,g.y),void k.endFill()):void k.clear()},B.body=function(c,d){var e=c.render,f=d.render;if(f.visible)if(f.sprite&&f.sprite.texture){var g="b-"+d.id,h=e.sprites[g],i=e.spriteBatch;h||(h=e.sprites[g]=a(e,d)),-1===i.children.indexOf(h)&&i.addChild(h),h.position.x=d.position.x,h.position.y=d.position.y,h.rotation=d.angle}else{var j="b-"+d.id,k=e.primitives[j],l=e.stage;k||(k=e.primitives[j]=b(e,d),k.initialAngle=d.angle),-1===l.children.indexOf(k)&&l.addChild(k),k.position.x=d.position.x,k.position.y=d.position.y,k.rotation=d.angle-k.initialAngle}};var a=function(a,b){var c=b.render,e=c.sprite.texture,f=d(a,e),g=new PIXI.Sprite(f);return g.anchor.x=.5,g.anchor.y=.5,g},b=function(a,b){var c=b.render,d=a.options,e=new PIXI.Graphics;e.clear(),d.wireframes?(e.beginFill(0,0),e.lineStyle(1,o.colorToNumber("#bbb"),1)):(e.beginFill(o.colorToNumber(c.fillStyle),1),e.lineStyle(b.render.lineWidth,o.colorToNumber(c.strokeStyle),1)),e.moveTo(b.vertices[0].x-b.position.x,b.vertices[0].y-b.position.y);for(var f=1;f<b.vertices.length;f++)e.lineTo(b.vertices[f].x-b.position.x,b.vertices[f].y-b.position.y);return e.lineTo(b.vertices[0].x-b.position.x,b.vertices[0].y-b.position.y),e.endFill(),(d.showAngleIndicator||d.showAxes)&&(e.beginFill(0,0),d.wireframes?e.lineStyle(1,o.colorToNumber("#CD5C5C"),1):e.lineStyle(1,o.colorToNumber(b.render.strokeStyle)),e.moveTo(0,0),e.lineTo((b.vertices[0].x+b.vertices[b.vertices.length-1].x)/2-b.position.x,(b.vertices[0].y+b.vertices[b.vertices.length-1].y)/2-b.position.y),e.endFill()),e},d=function(a,b){var c=a.textures[b];return c||(c=a.textures[b]=PIXI.Texture.fromImage(b)),c}}(),d.add=c.add,d.remove=c.remove,d.addComposite=c.addComposite,d.addBody=c.addBody,d.addConstraint=c.addConstraint,d.clear=c.clear,a.Body=b,a.Composite=c,a.World=d,a.Contact=e,a.Detector=f,a.Grid=g,a.Pairs=i,a.Pair=h,a.Resolver=k,a.SAT=l,a.Constraint=m,a.MouseConstraint=n,a.Common=o,a.Engine=p,a.Metrics=r,a.Mouse=s,a.Sleeping=t,a.Bodies=u,a.Composites=v,a.Axes=w,a.Bounds=x,a.Vector=y,a.Vertices=z,a.Render=A,a.RenderPixi=B,a.Events=q,a.Query=j,"undefined"!=typeof exports&&("undefined"!=typeof module&&module.exports&&(exports=module.exports=a),exports.Matter=a),"function"==typeof define&&define.amd&&define("Matter",[],function(){return a}),"object"==typeof window&&"object"==typeof window.document&&(window.Matter=a)}();
 },{}],12:[function(require,module,exports){
 (function (process){
 /*!
@@ -30953,6 +24568,9 @@ if (typeof window === 'object' && typeof window.document === 'object') {
     };
 
     var _each = function (arr, iterator) {
+        if (arr.forEach) {
+            return arr.forEach(iterator);
+        }
         for (var i = 0; i < arr.length; i += 1) {
             iterator(arr[i], i, arr);
         }
@@ -31729,26 +25347,23 @@ if (typeof window === 'object' && typeof window.document === 'object') {
             pause: function () {
                 if (q.paused === true) { return; }
                 q.paused = true;
+                q.process();
             },
             resume: function () {
                 if (q.paused === false) { return; }
                 q.paused = false;
-                // Need to call q.process once per concurrent
-                // worker to preserve full concurrency after pause
-                for (var w = 1; w <= q.concurrency; w++) {
-                    async.setImmediate(q.process);
-                }
+                q.process();
             }
         };
         return q;
     };
-
+    
     async.priorityQueue = function (worker, concurrency) {
-
+        
         function _compareTasks(a, b){
           return a.priority - b.priority;
         };
-
+        
         function _binarySearch(sequence, item, compare) {
           var beg = -1,
               end = sequence.length - 1;
@@ -31762,7 +25377,7 @@ if (typeof window === 'object' && typeof window.document === 'object') {
           }
           return beg;
         }
-
+        
         function _insert(q, data, priority, callback) {
           if (!q.started){
             q.started = true;
@@ -31784,7 +25399,7 @@ if (typeof window === 'object' && typeof window.document === 'object') {
                   priority: priority,
                   callback: typeof callback === 'function' ? callback : null
               };
-
+              
               q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
 
               if (q.saturated && q.tasks.length === q.concurrency) {
@@ -31793,15 +25408,15 @@ if (typeof window === 'object' && typeof window.document === 'object') {
               async.setImmediate(q.process);
           });
         }
-
+        
         // Start with a normal queue
         var q = async.queue(worker, concurrency);
-
+        
         // Override push to accept second parameter representing priority
         q.push = function (data, priority, callback) {
           _insert(q, data, priority, callback);
         };
-
+        
         // Remove unshift function
         delete q.unshift;
 
@@ -32037,680 +25652,6 @@ if (typeof window === 'object' && typeof window.document === 'object') {
 },{"_process":2}],13:[function(require,module,exports){
 'use strict';
 
-module.exports = earcut;
-
-function earcut(data, holeIndices, dim) {
-
-    dim = dim || 2;
-
-    var hasHoles = holeIndices && holeIndices.length,
-        outerLen = hasHoles ? holeIndices[0] * dim : data.length,
-        outerNode = filterPoints(data, linkedList(data, 0, outerLen, dim, true)),
-        triangles = [];
-
-    if (!outerNode) return triangles;
-
-    var minX, minY, maxX, maxY, x, y, size;
-
-    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);
-
-    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
-    if (data.length > 80 * dim) {
-        minX = maxX = data[0];
-        minY = maxY = data[1];
-
-        for (var i = dim; i < outerLen; i += dim) {
-            x = data[i];
-            y = data[i + 1];
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-        }
-
-        // minX, minY and size are later used to transform coords into integers for z-order calculation
-        size = Math.max(maxX - minX, maxY - minY);
-    }
-
-    earcutLinked(data, outerNode, triangles, dim, minX, minY, size);
-
-    return triangles;
-}
-
-// create a circular doubly linked list from polygon points in the specified winding order
-function linkedList(data, start, end, dim, clockwise) {
-    var sum = 0,
-        i, j, last;
-
-    // calculate original winding order of a polygon ring
-    for (i = start, j = end - dim; i < end; i += dim) {
-        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
-        j = i;
-    }
-
-    // link points into circular doubly-linked list in the specified winding order
-    if (clockwise === (sum > 0)) {
-        for (i = start; i < end; i += dim) last = insertNode(i, last);
-    } else {
-        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, last);
-    }
-
-    return last;
-}
-
-// eliminate colinear or duplicate points
-function filterPoints(data, start, end) {
-    if (!end) end = start;
-
-    var node = start,
-        again;
-    do {
-        again = false;
-
-        if (!node.steiner && (equals(data, node.i, node.next.i) || orient(data, node.prev.i, node.i, node.next.i) === 0)) {
-
-            // remove node
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-
-            if (node.prevZ) node.prevZ.nextZ = node.nextZ;
-            if (node.nextZ) node.nextZ.prevZ = node.prevZ;
-
-            node = end = node.prev;
-
-            if (node === node.next) return null;
-            again = true;
-
-        } else {
-            node = node.next;
-        }
-    } while (again || node !== end);
-
-    return end;
-}
-
-// main ear slicing loop which triangulates a polygon (given as a linked list)
-function earcutLinked(data, ear, triangles, dim, minX, minY, size, pass) {
-    if (!ear) return;
-
-    // interlink polygon nodes in z-order
-    if (!pass && minX !== undefined) indexCurve(data, ear, minX, minY, size);
-
-    var stop = ear,
-        prev, next;
-
-    // iterate through ears, slicing them one by one
-    while (ear.prev !== ear.next) {
-        prev = ear.prev;
-        next = ear.next;
-
-        if (isEar(data, ear, minX, minY, size)) {
-            // cut off the triangle
-            triangles.push(prev.i / dim);
-            triangles.push(ear.i / dim);
-            triangles.push(next.i / dim);
-
-            // remove ear node
-            next.prev = prev;
-            prev.next = next;
-
-            if (ear.prevZ) ear.prevZ.nextZ = ear.nextZ;
-            if (ear.nextZ) ear.nextZ.prevZ = ear.prevZ;
-
-            // skipping the next vertice leads to less sliver triangles
-            ear = next.next;
-            stop = next.next;
-
-            continue;
-        }
-
-        ear = next;
-
-        // if we looped through the whole remaining polygon and can't find any more ears
-        if (ear === stop) {
-            // try filtering points and slicing again
-            if (!pass) {
-                earcutLinked(data, filterPoints(data, ear), triangles, dim, minX, minY, size, 1);
-
-            // if this didn't work, try curing all small self-intersections locally
-            } else if (pass === 1) {
-                ear = cureLocalIntersections(data, ear, triangles, dim);
-                earcutLinked(data, ear, triangles, dim, minX, minY, size, 2);
-
-            // as a last resort, try splitting the remaining polygon into two
-            } else if (pass === 2) {
-                splitEarcut(data, ear, triangles, dim, minX, minY, size);
-            }
-
-            break;
-        }
-    }
-}
-
-// check whether a polygon node forms a valid ear with adjacent nodes
-function isEar(data, ear, minX, minY, size) {
-
-    var a = ear.prev.i,
-        b = ear.i,
-        c = ear.next.i,
-
-        ax = data[a], ay = data[a + 1],
-        bx = data[b], by = data[b + 1],
-        cx = data[c], cy = data[c + 1],
-
-        abd = ax * by - ay * bx,
-        acd = ax * cy - ay * cx,
-        cbd = cx * by - cy * bx,
-        A = abd - acd - cbd;
-
-    if (A <= 0) return false; // reflex, can't be an ear
-
-    // now make sure we don't have other points inside the potential ear;
-    // the code below is a bit verbose and repetitive but this is done for performance
-
-    var cay = cy - ay,
-        acx = ax - cx,
-        aby = ay - by,
-        bax = bx - ax,
-        i, px, py, s, t, k, node;
-
-    // if we use z-order curve hashing, iterate through the curve
-    if (minX !== undefined) {
-
-        // triangle bbox; min & max are calculated like this for speed
-        var minTX = ax < bx ? (ax < cx ? ax : cx) : (bx < cx ? bx : cx),
-            minTY = ay < by ? (ay < cy ? ay : cy) : (by < cy ? by : cy),
-            maxTX = ax > bx ? (ax > cx ? ax : cx) : (bx > cx ? bx : cx),
-            maxTY = ay > by ? (ay > cy ? ay : cy) : (by > cy ? by : cy),
-
-            // z-order range for the current triangle bbox;
-            minZ = zOrder(minTX, minTY, minX, minY, size),
-            maxZ = zOrder(maxTX, maxTY, minX, minY, size);
-
-        // first look for points inside the triangle in increasing z-order
-        node = ear.nextZ;
-
-        while (node && node.z <= maxZ) {
-            i = node.i;
-            node = node.nextZ;
-            if (i === a || i === c) continue;
-
-            px = data[i];
-            py = data[i + 1];
-
-            s = cay * px + acx * py - acd;
-            if (s >= 0) {
-                t = aby * px + bax * py + abd;
-                if (t >= 0) {
-                    k = A - s - t;
-                    if ((k >= 0) && ((s && t) || (s && k) || (t && k))) return false;
-                }
-            }
-        }
-
-        // then look for points in decreasing z-order
-        node = ear.prevZ;
-
-        while (node && node.z >= minZ) {
-            i = node.i;
-            node = node.prevZ;
-            if (i === a || i === c) continue;
-
-            px = data[i];
-            py = data[i + 1];
-
-            s = cay * px + acx * py - acd;
-            if (s >= 0) {
-                t = aby * px + bax * py + abd;
-                if (t >= 0) {
-                    k = A - s - t;
-                    if ((k >= 0) && ((s && t) || (s && k) || (t && k))) return false;
-                }
-            }
-        }
-
-    // if we don't use z-order curve hash, simply iterate through all other points
-    } else {
-        node = ear.next.next;
-
-        while (node !== ear.prev) {
-            i = node.i;
-            node = node.next;
-
-            px = data[i];
-            py = data[i + 1];
-
-            s = cay * px + acx * py - acd;
-            if (s >= 0) {
-                t = aby * px + bax * py + abd;
-                if (t >= 0) {
-                    k = A - s - t;
-                    if ((k >= 0) && ((s && t) || (s && k) || (t && k))) return false;
-                }
-            }
-        }
-    }
-
-    return true;
-}
-
-// go through all polygon nodes and cure small local self-intersections
-function cureLocalIntersections(data, start, triangles, dim) {
-    var node = start;
-    do {
-        var a = node.prev,
-            b = node.next.next;
-
-        // a self-intersection where edge (v[i-1],v[i]) intersects (v[i+1],v[i+2])
-        if (a.i !== b.i && intersects(data, a.i, node.i, node.next.i, b.i) &&
-                locallyInside(data, a, b) && locallyInside(data, b, a)) {
-
-            triangles.push(a.i / dim);
-            triangles.push(node.i / dim);
-            triangles.push(b.i / dim);
-
-            // remove two nodes involved
-            a.next = b;
-            b.prev = a;
-
-            var az = node.prevZ,
-                bz = node.nextZ && node.nextZ.nextZ;
-
-            if (az) az.nextZ = bz;
-            if (bz) bz.prevZ = az;
-
-            node = start = b;
-        }
-        node = node.next;
-    } while (node !== start);
-
-    return node;
-}
-
-// try splitting polygon into two and triangulate them independently
-function splitEarcut(data, start, triangles, dim, minX, minY, size) {
-    // look for a valid diagonal that divides the polygon into two
-    var a = start;
-    do {
-        var b = a.next.next;
-        while (b !== a.prev) {
-            if (a.i !== b.i && isValidDiagonal(data, a, b)) {
-                // split the polygon in two by the diagonal
-                var c = splitPolygon(a, b);
-
-                // filter colinear points around the cuts
-                a = filterPoints(data, a, a.next);
-                c = filterPoints(data, c, c.next);
-
-                // run earcut on each half
-                earcutLinked(data, a, triangles, dim, minX, minY, size);
-                earcutLinked(data, c, triangles, dim, minX, minY, size);
-                return;
-            }
-            b = b.next;
-        }
-        a = a.next;
-    } while (a !== start);
-}
-
-// link every hole into the outer loop, producing a single-ring polygon without holes
-function eliminateHoles(data, holeIndices, outerNode, dim) {
-    var queue = [],
-        i, len, start, end, list;
-
-    for (i = 0, len = holeIndices.length; i < len; i++) {
-        start = holeIndices[i] * dim;
-        end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
-        list = linkedList(data, start, end, dim, false);
-        if (list === list.next) list.steiner = true;
-        list = filterPoints(data, list);
-        if (list) queue.push(getLeftmost(data, list));
-    }
-
-    queue.sort(function (a, b) {
-        return data[a.i] - data[b.i];
-    });
-
-    // process holes from left to right
-    for (i = 0; i < queue.length; i++) {
-        eliminateHole(data, queue[i], outerNode);
-        outerNode = filterPoints(data, outerNode, outerNode.next);
-    }
-
-    return outerNode;
-}
-
-// find a bridge between vertices that connects hole with an outer ring and and link it
-function eliminateHole(data, holeNode, outerNode) {
-    outerNode = findHoleBridge(data, holeNode, outerNode);
-    if (outerNode) {
-        var b = splitPolygon(outerNode, holeNode);
-        filterPoints(data, b, b.next);
-    }
-}
-
-// David Eberly's algorithm for finding a bridge between hole and outer polygon
-function findHoleBridge(data, holeNode, outerNode) {
-    var node = outerNode,
-        i = holeNode.i,
-        px = data[i],
-        py = data[i + 1],
-        qMax = -Infinity,
-        mNode, a, b;
-
-    // find a segment intersected by a ray from the hole's leftmost point to the left;
-    // segment's endpoint with lesser x will be potential connection point
-    do {
-        a = node.i;
-        b = node.next.i;
-
-        if (py <= data[a + 1] && py >= data[b + 1]) {
-            var qx = data[a] + (py - data[a + 1]) * (data[b] - data[a]) / (data[b + 1] - data[a + 1]);
-            if (qx <= px && qx > qMax) {
-                qMax = qx;
-                mNode = data[a] < data[b] ? node : node.next;
-            }
-        }
-        node = node.next;
-    } while (node !== outerNode);
-
-    if (!mNode) return null;
-
-    // look for points strictly inside the triangle of hole point, segment intersection and endpoint;
-    // if there are no points found, we have a valid connection;
-    // otherwise choose the point of the minimum angle with the ray as connection point
-
-    var bx = data[mNode.i],
-        by = data[mNode.i + 1],
-        pbd = px * by - py * bx,
-        pcd = px * py - py * qMax,
-        cpy = py - py,
-        pcx = px - qMax,
-        pby = py - by,
-        bpx = bx - px,
-        A = pbd - pcd - (qMax * by - py * bx),
-        sign = A <= 0 ? -1 : 1,
-        stop = mNode,
-        tanMin = Infinity,
-        mx, my, amx, s, t, tan;
-
-    node = mNode.next;
-
-    while (node !== stop) {
-
-        mx = data[node.i];
-        my = data[node.i + 1];
-        amx = px - mx;
-
-        if (amx >= 0 && mx >= bx) {
-            s = (cpy * mx + pcx * my - pcd) * sign;
-            if (s >= 0) {
-                t = (pby * mx + bpx * my + pbd) * sign;
-
-                if (t >= 0 && A * sign - s - t >= 0) {
-                    tan = Math.abs(py - my) / amx; // tangential
-                    if (tan < tanMin && locallyInside(data, node, holeNode)) {
-                        mNode = node;
-                        tanMin = tan;
-                    }
-                }
-            }
-        }
-
-        node = node.next;
-    }
-
-    return mNode;
-}
-
-// interlink polygon nodes in z-order
-function indexCurve(data, start, minX, minY, size) {
-    var node = start;
-
-    do {
-        if (node.z === null) node.z = zOrder(data[node.i], data[node.i + 1], minX, minY, size);
-        node.prevZ = node.prev;
-        node.nextZ = node.next;
-        node = node.next;
-    } while (node !== start);
-
-    node.prevZ.nextZ = null;
-    node.prevZ = null;
-
-    sortLinked(node);
-}
-
-// Simon Tatham's linked list merge sort algorithm
-// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-function sortLinked(list) {
-    var i, p, q, e, tail, numMerges, pSize, qSize,
-        inSize = 1;
-
-    do {
-        p = list;
-        list = null;
-        tail = null;
-        numMerges = 0;
-
-        while (p) {
-            numMerges++;
-            q = p;
-            pSize = 0;
-            for (i = 0; i < inSize; i++) {
-                pSize++;
-                q = q.nextZ;
-                if (!q) break;
-            }
-
-            qSize = inSize;
-
-            while (pSize > 0 || (qSize > 0 && q)) {
-
-                if (pSize === 0) {
-                    e = q;
-                    q = q.nextZ;
-                    qSize--;
-                } else if (qSize === 0 || !q) {
-                    e = p;
-                    p = p.nextZ;
-                    pSize--;
-                } else if (p.z <= q.z) {
-                    e = p;
-                    p = p.nextZ;
-                    pSize--;
-                } else {
-                    e = q;
-                    q = q.nextZ;
-                    qSize--;
-                }
-
-                if (tail) tail.nextZ = e;
-                else list = e;
-
-                e.prevZ = tail;
-                tail = e;
-            }
-
-            p = q;
-        }
-
-        tail.nextZ = null;
-        inSize *= 2;
-
-    } while (numMerges > 1);
-
-    return list;
-}
-
-// z-order of a point given coords and size of the data bounding box
-function zOrder(x, y, minX, minY, size) {
-    // coords are transformed into (0..1000) integer range
-    x = 1000 * (x - minX) / size;
-    x = (x | (x << 8)) & 0x00FF00FF;
-    x = (x | (x << 4)) & 0x0F0F0F0F;
-    x = (x | (x << 2)) & 0x33333333;
-    x = (x | (x << 1)) & 0x55555555;
-
-    y = 1000 * (y - minY) / size;
-    y = (y | (y << 8)) & 0x00FF00FF;
-    y = (y | (y << 4)) & 0x0F0F0F0F;
-    y = (y | (y << 2)) & 0x33333333;
-    y = (y | (y << 1)) & 0x55555555;
-
-    return x | (y << 1);
-}
-
-// find the leftmost node of a polygon ring
-function getLeftmost(data, start) {
-    var node = start,
-        leftmost = start;
-    do {
-        if (data[node.i] < data[leftmost.i]) leftmost = node;
-        node = node.next;
-    } while (node !== start);
-
-    return leftmost;
-}
-
-// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
-function isValidDiagonal(data, a, b) {
-    return !intersectsPolygon(data, a, a.i, b.i) &&
-           locallyInside(data, a, b) && locallyInside(data, b, a) &&
-           middleInside(data, a, a.i, b.i);
-}
-
-// winding order of triangle formed by 3 given points
-function orient(data, p, q, r) {
-    var o = (data[q + 1] - data[p + 1]) * (data[r] - data[q]) - (data[q] - data[p]) * (data[r + 1] - data[q + 1]);
-    return o > 0 ? 1 :
-           o < 0 ? -1 : 0;
-}
-
-// check if two points are equal
-function equals(data, p1, p2) {
-    return data[p1] === data[p2] && data[p1 + 1] === data[p2 + 1];
-}
-
-// check if two segments intersect
-function intersects(data, p1, q1, p2, q2) {
-    return orient(data, p1, q1, p2) !== orient(data, p1, q1, q2) &&
-           orient(data, p2, q2, p1) !== orient(data, p2, q2, q1);
-}
-
-// check if a polygon diagonal intersects any polygon segments
-function intersectsPolygon(data, start, a, b) {
-    var node = start;
-    do {
-        var p1 = node.i,
-            p2 = node.next.i;
-
-        if (p1 !== a && p2 !== a && p1 !== b && p2 !== b && intersects(data, p1, p2, a, b)) return true;
-
-        node = node.next;
-    } while (node !== start);
-
-    return false;
-}
-
-// check if a polygon diagonal is locally inside the polygon
-function locallyInside(data, a, b) {
-    return orient(data, a.prev.i, a.i, a.next.i) === -1 ?
-        orient(data, a.i, b.i, a.next.i) !== -1 && orient(data, a.i, a.prev.i, b.i) !== -1 :
-        orient(data, a.i, b.i, a.prev.i) === -1 || orient(data, a.i, a.next.i, b.i) === -1;
-}
-
-// check if the middle point of a polygon diagonal is inside the polygon
-function middleInside(data, start, a, b) {
-    var node = start,
-        inside = false,
-        px = (data[a] + data[b]) / 2,
-        py = (data[a + 1] + data[b + 1]) / 2;
-    do {
-        var p1 = node.i,
-            p2 = node.next.i;
-
-        if (((data[p1 + 1] > py) !== (data[p2 + 1] > py)) &&
-            (px < (data[p2] - data[p1]) * (py - data[p1 + 1]) / (data[p2 + 1] - data[p1 + 1]) + data[p1]))
-                inside = !inside;
-
-        node = node.next;
-    } while (node !== start);
-
-    return inside;
-}
-
-// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;
-// if one belongs to the outer ring and another to a hole, it merges it into a single ring
-function splitPolygon(a, b) {
-    var a2 = new Node(a.i),
-        b2 = new Node(b.i),
-        an = a.next,
-        bp = b.prev;
-
-    a.next = b;
-    b.prev = a;
-
-    a2.next = an;
-    an.prev = a2;
-
-    b2.next = a2;
-    a2.prev = b2;
-
-    bp.next = b2;
-    b2.prev = bp;
-
-    return b2;
-}
-
-// create a node and optionally link it with previous one (in a circular doubly linked list)
-function insertNode(i, last) {
-    var node = new Node(i);
-
-    if (!last) {
-        node.prev = node;
-        node.next = node;
-
-    } else {
-        node.next = last.next;
-        node.prev = last;
-        last.next.prev = node;
-        last.next = node;
-    }
-    return node;
-}
-
-function Node(i) {
-    // vertex coordinates
-    this.i = i;
-
-    // previous and next vertice nodes in a polygon ring
-    this.prev = null;
-    this.next = null;
-
-    // z-order curve value
-    this.z = null;
-
-    // previous and next nodes in z-order
-    this.prevZ = null;
-    this.nextZ = null;
-
-    // indicates whether this is a steiner point
-    this.steiner = false;
-}
-
-},{}],14:[function(require,module,exports){
-'use strict';
-
-//
-// We store our EE objects in a plain object whose properties are event names.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// `~` to make sure that the built-in object properties are not overridden or
-// used as an attack vector.
-// We also assume that `Object.create(null)` is available when the event name
-// is an ES6 Symbol.
-//
-var prefix = typeof Object.create !== 'function' ? '~' : false;
-
 /**
  * Representation of a single EventEmitter function.
  *
@@ -32751,15 +25692,15 @@ EventEmitter.prototype._events = undefined;
  * @api public
  */
 EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events && this._events[evt];
+  var prefix = '~'+ event
+    , available = this._events && this._events[prefix];
 
   if (exists) return !!available;
   if (!available) return [];
-  if (this._events[evt].fn) return [this._events[evt].fn];
+  if (this._events[prefix].fn) return [this._events[prefix].fn];
 
-  for (var i = 0, l = this._events[evt].length, ee = new Array(l); i < l; i++) {
-    ee[i] = this._events[evt][i].fn;
+  for (var i = 0, l = this._events[prefix].length, ee = new Array(l); i < l; i++) {
+    ee[i] = this._events[prefix][i].fn;
   }
 
   return ee;
@@ -32773,11 +25714,11 @@ EventEmitter.prototype.listeners = function listeners(event, exists) {
  * @api public
  */
 EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
+  var prefix = '~'+ event;
 
-  if (!this._events || !this._events[evt]) return false;
+  if (!this._events || !this._events[prefix]) return false;
 
-  var listeners = this._events[evt]
+  var listeners = this._events[prefix]
     , len = arguments.length
     , args
     , i;
@@ -32833,14 +25774,14 @@ EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
  */
 EventEmitter.prototype.on = function on(event, fn, context) {
   var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
+    , prefix = '~'+ event;
 
-  if (!this._events) this._events = prefix ? {} : Object.create(null);
-  if (!this._events[evt]) this._events[evt] = listener;
+  if (!this._events) this._events = {};
+  if (!this._events[prefix]) this._events[prefix] = listener;
   else {
-    if (!this._events[evt].fn) this._events[evt].push(listener);
-    else this._events[evt] = [
-      this._events[evt], listener
+    if (!this._events[prefix].fn) this._events[prefix].push(listener);
+    else this._events[prefix] = [
+      this._events[prefix], listener
     ];
   }
 
@@ -32857,14 +25798,14 @@ EventEmitter.prototype.on = function on(event, fn, context) {
  */
 EventEmitter.prototype.once = function once(event, fn, context) {
   var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
+    , prefix = '~'+ event;
 
-  if (!this._events) this._events = prefix ? {} : Object.create(null);
-  if (!this._events[evt]) this._events[evt] = listener;
+  if (!this._events) this._events = {};
+  if (!this._events[prefix]) this._events[prefix] = listener;
   else {
-    if (!this._events[evt].fn) this._events[evt].push(listener);
-    else this._events[evt] = [
-      this._events[evt], listener
+    if (!this._events[prefix].fn) this._events[prefix].push(listener);
+    else this._events[prefix] = [
+      this._events[prefix], listener
     ];
   }
 
@@ -32881,11 +25822,11 @@ EventEmitter.prototype.once = function once(event, fn, context) {
  * @api public
  */
 EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
+  var prefix = '~'+ event;
 
-  if (!this._events || !this._events[evt]) return this;
+  if (!this._events || !this._events[prefix]) return this;
 
-  var listeners = this._events[evt]
+  var listeners = this._events[prefix]
     , events = [];
 
   if (fn) {
@@ -32914,9 +25855,9 @@ EventEmitter.prototype.removeListener = function removeListener(event, fn, conte
   // Reset the array, or remove it completely if we have no more listeners.
   //
   if (events.length) {
-    this._events[evt] = events.length === 1 ? events[0] : events;
+    this._events[prefix] = events.length === 1 ? events[0] : events;
   } else {
-    delete this._events[evt];
+    delete this._events[prefix];
   }
 
   return this;
@@ -32931,8 +25872,8 @@ EventEmitter.prototype.removeListener = function removeListener(event, fn, conte
 EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
   if (!this._events) return this;
 
-  if (event) delete this._events[prefix ? prefix + event : event];
-  else this._events = prefix ? {} : Object.create(null);
+  if (event) delete this._events['~'+ event];
+  else this._events = {};
 
   return this;
 };
@@ -32951,16 +25892,11 @@ EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
 };
 
 //
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
 // Expose the module.
 //
 module.exports = EventEmitter;
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 function ToObject(val) {
@@ -32988,7 +25924,7 @@ module.exports = Object.assign || function (target, source) {
 	return to;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var async       = require('async'),
     urlParser   = require('url'),
     Resource    = require('./Resource'),
@@ -33443,12 +26379,10 @@ Loader.LOAD_TYPE = Resource.LOAD_TYPE;
 Loader.XHR_READY_STATE = Resource.XHR_READY_STATE;
 Loader.XHR_RESPONSE_TYPE = Resource.XHR_RESPONSE_TYPE;
 
-},{"./Resource":17,"async":12,"eventemitter3":14,"url":7}],17:[function(require,module,exports){
+},{"./Resource":16,"async":12,"eventemitter3":13,"url":7}],16:[function(require,module,exports){
 var EventEmitter = require('eventemitter3'),
-    _url = require('url'),
     // tests is CORS is supported in XHR, if not we need to use XDR
-    useXdr = !!(window.XDomainRequest && !('withCredentials' in (new XMLHttpRequest()))),
-    tempAnchor = null;
+    useXdr = !!(window.XDomainRequest && !('withCredentials' in (new XMLHttpRequest())));
 
 /**
  * Manages the state and loading of a single resource represented by
@@ -33489,14 +26423,6 @@ function Resource(name, url, options) {
     this.url = url;
 
     /**
-     * Stores whether or not this url is a data url.
-     *
-     * @member {boolean}
-     * @readonly
-     */
-    this.isDataUrl = this.url.indexOf('data:') === 0;
-
-    /**
      * The data that was loaded by the resource.
      *
      * @member {any}
@@ -33508,7 +26434,7 @@ function Resource(name, url, options) {
      *
      * @member {string}
      */
-    this.crossOrigin = options.crossOrigin === true ? 'anonymous' : null;
+    this.crossOrigin = options.crossOrigin;
 
     /**
      * The method of loading to use for this resource.
@@ -33698,7 +26624,7 @@ Resource.prototype.load = function (cb) {
 
     // if unset, determine the value
     if (typeof this.crossOrigin !== 'string') {
-        this.crossOrigin = this._determineCrossOrigin(this.url);
+        this.crossOrigin = this._determineCrossOrigin();
     }
 
     switch(this.loadType) {
@@ -33717,7 +26643,7 @@ Resource.prototype.load = function (cb) {
         case Resource.LOAD_TYPE.XHR:
             /* falls through */
         default:
-            if (useXdr && this.crossOrigin) {
+            if (useXdr) {
                 this._loadXdr();
             }
             else {
@@ -33736,7 +26662,7 @@ Resource.prototype._loadImage = function () {
     this.data = new Image();
 
     if (this.crossOrigin) {
-        this.data.crossOrigin = this.crossOrigin;
+        this.data.crossOrigin = '';
     }
 
     this.data.src = this.url;
@@ -33987,33 +26913,22 @@ function reqType(xhr) {
  * function does nothing.
  *
  * @private
- * @param url {string} The url to test.
- * @param [location=window.location] {object} The location object to test against.
  * @return {string} The crossOrigin value to use (or empty string for none).
  */
-Resource.prototype._determineCrossOrigin = function (url, loc) {
+Resource.prototype._determineCrossOrigin = function () {
     // data: and javascript: urls are considered same-origin
-    if (url.indexOf('data:') === 0) {
+    if (this.url.indexOf('data:') === 0) {
         return '';
     }
 
-    // default is window.location
-    loc = loc || window.location;
+    // check if this is a cross-origin url
+    var loc = window.location,
+        a = document.createElement('a');
 
-    if (!tempAnchor) {
-        tempAnchor = document.createElement('a');
-    }
-
-    // let the browser determine the full href for the url of this resource and then
-    // parse with the node url lib, we can't use the properties of the anchor element
-    // because they don't work in IE9 :(
-    tempAnchor.href = url;
-    url = _url.parse(tempAnchor.href);
-
-    var samePort = (!url.port && loc.port === '') || (url.port === loc.port);
+    a.href = this.url;
 
     // if cross origin
-    if (url.hostname !== loc.hostname || !samePort || url.protocol !== loc.protocol) {
+    if (a.hostname !== loc.hostname || a.port !== loc.port || a.protocol !== loc.protocol) {
         return 'anonymous';
     }
 
@@ -34028,26 +26943,15 @@ Resource.prototype._determineCrossOrigin = function (url, loc) {
  * @return {Resource.XHR_RESPONSE_TYPE} The responseType to use.
  */
 Resource.prototype._determineXhrType = function () {
-    return Resource._xhrTypeMap[this._getExtension()] || Resource.XHR_RESPONSE_TYPE.TEXT;
+    var ext = this.url.substr(this.url.lastIndexOf('.') + 1);
+
+    return Resource._xhrTypeMap[ext] || Resource.XHR_RESPONSE_TYPE.TEXT;
 };
 
 Resource.prototype._determineLoadType = function () {
-    return Resource._loadTypeMap[this._getExtension()] || Resource.LOAD_TYPE.XHR;
-};
+    var ext = this.url.substr(this.url.lastIndexOf('.') + 1);
 
-Resource.prototype._getExtension = function () {
-    var url = this.url,
-        ext;
-
-    if (this.isDataUrl) {
-        var slashIndex = url.indexOf('/');
-        ext = url.substring(slashIndex + 1, url.indexOf(';', slashIndex));
-    }
-    else {
-        ext = url.substring(url.lastIndexOf('.') + 1);
-    }
-
-    return ext;
+    return Resource._loadTypeMap[ext] || Resource.LOAD_TYPE.XHR;
 };
 
 /**
@@ -34148,8 +27052,7 @@ Resource._loadTypeMap = {
     'jpeg':     Resource.LOAD_TYPE.IMAGE,
     'tif':      Resource.LOAD_TYPE.IMAGE,
     'tiff':     Resource.LOAD_TYPE.IMAGE,
-    'webp':     Resource.LOAD_TYPE.IMAGE,
-    'tga':      Resource.LOAD_TYPE.IMAGE
+    'webp':     Resource.LOAD_TYPE.IMAGE
 };
 
 Resource._xhrTypeMap = {
@@ -34171,7 +27074,6 @@ Resource._xhrTypeMap = {
     'tif':      Resource.XHR_RESPONSE_TYPE.BLOB,
     'tiff':     Resource.XHR_RESPONSE_TYPE.BLOB,
     'webp':     Resource.XHR_RESPONSE_TYPE.BLOB,
-    'tga':      Resource.XHR_RESPONSE_TYPE.BLOB,
 
     // json
     'json':     Resource.XHR_RESPONSE_TYPE.JSON,
@@ -34215,7 +27117,7 @@ function setExtMap(map, extname, val) {
     map[extname] = val;
 }
 
-},{"eventemitter3":14,"url":7}],18:[function(require,module,exports){
+},{"eventemitter3":13}],17:[function(require,module,exports){
 module.exports = {
 
     // private property
@@ -34281,7 +27183,7 @@ module.exports = {
     }
 };
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 module.exports = require('./Loader');
 
 module.exports.Resource = require('./Resource');
@@ -34295,7 +27197,7 @@ module.exports.middleware = {
     }
 };
 
-},{"./Loader":16,"./Resource":17,"./middlewares/caching/memory":20,"./middlewares/parsing/blob":21}],20:[function(require,module,exports){
+},{"./Loader":15,"./Resource":16,"./middlewares/caching/memory":19,"./middlewares/parsing/blob":20}],19:[function(require,module,exports){
 // a simple in-memory cache for resources
 var cache = {};
 
@@ -34317,7 +27219,7 @@ module.exports = function () {
     };
 };
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var Resource = require('../../Resource'),
     b64 = require('../../b64');
 
@@ -34377,10 +27279,10 @@ module.exports = function () {
     };
 };
 
-},{"../../Resource":17,"../../b64":18}],22:[function(require,module,exports){
+},{"../../Resource":16,"../../b64":17}],21:[function(require,module,exports){
 module.exports={
   "name": "pixi.js",
-  "version": "3.0.6",
+  "version": "3.0.2",
   "description": "Pixi.js is a fast lightweight 2D library that works across all devices.",
   "author": {
     "name": "Mat Groves"
@@ -34412,10 +27314,9 @@ module.exports={
   "dependencies": {
     "async": "^0.9.0",
     "brfs": "^1.4.0",
-    "earcut": "^2.0.0",
-    "eventemitter3": "^1.1.0",
+    "eventemitter3": "^1.0.1",
     "object-assign": "^2.0.0",
-    "resource-loader": "^1.6.0"
+    "resource-loader": "^1.5.2"
   },
   "devDependencies": {
     "browserify": "^9.0.8",
@@ -34432,7 +27333,7 @@ module.exports={
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
-    "jaguarjs-jsdoc": "git+https://github.com/davidshimjs/jaguarjs-jsdoc.git",
+    "ink-docstrap": "git+https://github.com/Pilatch/docstrap.git",
     "jsdoc": "^3.3.0-beta3",
     "jshint-summary": "^0.4.0",
     "minimist": "^1.1.1",
@@ -34449,23 +27350,36 @@ module.exports={
       "brfs"
     ]
   },
-  "readme": "Pixi.js - A 2D JavaScript Renderer\n=============\n\n![pixi.js logo](http://www.goodboydigital.com/pixijs/pixi_v3_github-pad.png)\n\n[![projects](http://www.pixijs.com/wp-content/uploads/2013/05/headerPanel_projects-898x342.jpg)](http://www.pixijs.com/projects)\n\n## Pixi.js ##\n\n[![Inline docs](http://inch-ci.org/github/GoodBoyDigital/pixi.js.svg?branch=dev)](http://inch-ci.org/github/GoodBoyDigital/pixi.js)\n[![Build Status](https://travis-ci.org/GoodBoyDigital/pixi.js.svg?branch=dev)](https://travis-ci.org/GoodBoyDigital/pixi.js)\n\nThe aim of this project is to provide a fast lightweight 2D library that works\nacross all devices. The Pixi renderer allows everyone to enjoy the power of\nhardware acceleration without prior knowledge of WebGL. Also, it's fast. Really fast.\n\nIf you want to keep up to date with the latest pixi.js news then feel free to follow us on twitter\n([@doormat23](https://twitter.com/doormat23), and [@rolnaaba](https://twitter.com/rolnaaba))\nand we will keep you posted! You can also check back on [our site](http://www.goodboydigital.com/blog)\nas any breakthroughs will be posted up there too!\n\n### Demos ###\n\n- [WebGL Filters!](http://www.goodboydigital.com/pixijs/examples/15/indexAll.html)\n- [Run pixie run](http://www.goodboydigital.com/runpixierun)\n- [Fight for Everyone](http://www.goodboydigital.com/casestudies/fightforeveryone)\n- [Flash vs HTML](http://flashvhtml.com)\n- [Bunny Demo](http://www.goodboydigital.com/pixijs/bunnymark)\n- [Storm Brewing](http://www.goodboydigital.com/pixijs/storm)\n- [Filters Demo](http://www.goodboydigital.com/pixijs/examples/15/indexAll.html)\n- [Render Texture Demo](http://www.goodboydigital.com/pixijs/examples/11)\n- [Primitives Demo](http://www.goodboydigital.com/pixijs/examples/13)\n- [Masking Demo](http://www.goodboydigital.com/pixijs/examples/14)\n- [Interaction Demo](http://www.goodboydigital.com/pixijs/examples/6)\n- [photonstorm's Balls Demo](http://gametest.mobi/pixi/balls)\n- [photonstorm's Morph Demo](http://gametest.mobi/pixi/morph)\n\nThanks to [@photonstorm](https://twitter.com/photonstorm) for providing\nthose last 2 examples and allowing us to share the source code :)\n\n### Resources ###\n\n- API Documentation is [here](http://pixijs.github.io/docs).\n- Feature Examples are [here](https://pixijs.github.io/examples).\n- The Pixi.js Forum is [here](http://www.html5gamedevs.com/forum/15-pixijs).\n- Other misc tutorials and resources are [on the Wiki](https://github.com/GoodBoyDigital/pixi.js/wiki/Resources).\n\n### Contribute ###\n\nWant to be part of the pixi.js project? Great! All are welcome! We will get there quicker\ntogether :) Whether you find a bug, have a great feature request or you fancy owning a task\nfrom the road map above feel free to get in touch.\n\nMake sure to read the [Contributing Guide](https://github.com/GoodBoyDigital/pixi.js/blob/master/CONTRIBUTING.md)\nbefore submitting changes.\n\n## How to build ##\n\nNote that for most users you don't need to build this project. If all you want is to use pixi, then\njust download one of our [prebuilt releases](https://github.com/GoodBoyDigital/pixi.js/releases). Really\nthe only time you should need to build pixi.js is if you are developing it.\n\nIf you don't already have Node.js and NPM, go install them. Once you do, you can then install the gulp\nexecutable:\n\n```\n$> npm install -g gulp\n```\n\nThen, in the folder where you have cloned the repository, install the build dependencies using npm:\n\n```\n$> npm install\n```\n\nThen, to build the source, run:\n\n```\n$> gulp build\n```\n\nThis will create a minified version at `bin/pixi.min.js` and a non-minified version at `bin/pixi.js`\nwith all the plugins in the pixi.js project.\n\nIf there are specific plugins you don't want, say \"spine\" or \"interaction\", you can exclude those:\n\n```\n$> gulp build --exclude spine --exclude interaction\n```\n\nYou can also use the short-form `-e`:\n\n```\n$> gulp build -e extras -e spine -e interaction -e filters\n```\n\n### How to generate the documentation ###\n\nThe docs can be generated using npm:\n\n```\n$> npm run docs\n```\n\nThere is also a gulp task to generate them if you want to:\n\n```\n$> gulp jsdoc\n```\n\nThe documentation uses [Jaguar.js](https://github.com/davidshimjs/jaguarjs-jsdoc) and the jsdoc format, the configuration\nfile can be found at [gulp/utils/jsdoc.conf.json](https://github.com/GoodBoyDigital/pixi.js/blob/dev/gulp/util/jsdoc.conf.json)\n\n### Current features ###\n\n- WebGL renderer (with automatic smart batching allowing for REALLY fast performance)\n- Canvas renderer (Fastest in town!)\n- Full scene graph\n- Super easy to use API (similar to the flash display list API)\n- Support for texture atlases\n- Asset loader / sprite sheet loader\n- Auto-detect which renderer should be used\n- Full Mouse and Multi-touch Interaction\n- Text\n- BitmapFont text\n- Multiline Text\n- Render Texture\n- Spine support\n- Primitive Drawing\n- Masking\n- Filters\n\n### Basic Usage Example ###\n\n```js\n    // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`\n    // which will try to choose the best renderer for the environment you are in.\n    var renderer = new PIXI.WebGLRenderer(800, 600);\n\n    // The renderer will create a canvas element for you that you can then insert into the DOM.\n    document.body.appendChild(renderer.view);\n\n    // You need to create a root container that will hold the scene you want to draw.\n    var stage = new PIXI.Container();\n\n    // This creates a texture from a 'bunny.png' image.\n    var bunnyTexture = PIXI.Texture.fromImage('bunny.png');\n    var bunny = new PIXI.Sprite(bunnyTexture);\n\n    // Setup the position and scale of the bunny\n    bunny.position.x = 400;\n    bunny.position.y = 300;\n\n    bunny.scale.x = 2;\n    bunny.scale.y = 2;\n\n    // Add the bunny to the scene we are building.\n    stage.addChild(bunny);\n\n    // kick off the animation loop (defined below)\n    animate();\n\n    function animate() {\n        // start the timer for the next animation loop\n        requestAnimationFrame(animate);\n\n        // each frame we spin the bunny around a bit\n        bunny.rotation += 0.01;\n\n        // this is the main render call that makes pixi draw your container and its children.\n        renderer.render(stage);\n    }\n```\n\n### License ###\n\nThis content is released under the (http://opensource.org/licenses/MIT) MIT License.\n\n[![Analytics](https://ga-beacon.appspot.com/UA-39213431-2/pixi.js/index)](https://github.com/igrigorik/ga-beacon)\n",
-  "readmeFilename": "README.md",
-  "_id": "pixi.js@3.0.6",
-  "dist": {
-    "shasum": "9d94c52ece1144b08b0e2d5b315837b23fab4281"
+  "gitHead": "8f20bf28d7f0eaa308e5611a40e652a72194c80c",
+  "_id": "pixi.js@3.0.2",
+  "_shasum": "6463b786897a35688cc9d6baa9a41bb594ff127a",
+  "_from": "pixi.js@*",
+  "_npmVersion": "1.4.23",
+  "_npmUser": {
+    "name": "englercj",
+    "email": "englercj@live.com"
   },
-  "_from": "pixi.js@^3.0.2",
-  "_resolved": "https://registry.npmjs.org/pixi.js/-/pixi.js-3.0.6.tgz"
+  "maintainers": [
+    {
+      "name": "englercj",
+      "email": "englercj@live.com"
+    }
+  ],
+  "dist": {
+    "shasum": "6463b786897a35688cc9d6baa9a41bb594ff127a",
+    "tarball": "http://registry.npmjs.org/pixi.js/-/pixi.js-3.0.2.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/pixi.js/-/pixi.js-3.0.2.tgz"
 }
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /**
  * Constant values used in pixi
  *
- * @lends PIXI
+ * @memberof PIXI
  */
-var CONST = {
+module.exports = {
     /**
      * String of the current PIXI version
      *
@@ -34654,9 +27568,7 @@ var CONST = {
     SPRITE_BATCH_SIZE: 2000 //nice balance between mobile and desktop machines
 };
 
-module.exports = CONST;
-
-},{"../../package.json":22}],24:[function(require,module,exports){
+},{"../../package.json":21}],23:[function(require,module,exports){
 var math = require('../math'),
     DisplayObject = require('./DisplayObject'),
     RenderTexture = require('../textures/RenderTexture'),
@@ -34671,7 +27583,7 @@ var math = require('../math'),
  * container.addChild(sprite);
  * ```
  * @class
- * @extends PIXI.DisplayObject
+ * @extends DisplayObject
  * @memberof PIXI
  */
 function Container()
@@ -34697,7 +27609,7 @@ Object.defineProperties(Container.prototype, {
      * The width of the Container, setting this will actually modify the scale to achieve the value set
      *
      * @member {number}
-     * @memberof PIXI.Container#
+     * @memberof Container#
      */
     width: {
         get: function ()
@@ -34727,7 +27639,7 @@ Object.defineProperties(Container.prototype, {
      * The height of the Container, setting this will actually modify the scale to achieve the value set
      *
      * @member {number}
-     * @memberof PIXI.Container#
+     * @memberof Container#
      */
     height: {
         get: function ()
@@ -35227,7 +28139,7 @@ Container.prototype.destroy = function (destroyChildren)
     this.children = null;
 };
 
-},{"../math":33,"../textures/RenderTexture":71,"./DisplayObject":25}],25:[function(require,module,exports){
+},{"../math":32,"../textures/RenderTexture":70,"./DisplayObject":24}],24:[function(require,module,exports){
 var math = require('../math'),
     RenderTexture = require('../textures/RenderTexture'),
     EventEmitter = require('eventemitter3'),
@@ -35239,7 +28151,6 @@ var math = require('../math'),
  * This is an abstract class and should not be used on its own rather it should be extended.
  *
  * @class
- * @extends EventEmitter
  * @memberof PIXI
  */
 function DisplayObject()
@@ -35426,7 +28337,7 @@ Object.defineProperties(DisplayObject.prototype, {
      * Indicates if the sprite is globally visible.
      *
      * @member {boolean}
-     * @memberof PIXI.DisplayObject#
+     * @memberof DisplayObject#
      * @readonly
      */
     worldVisible: {
@@ -35453,8 +28364,7 @@ Object.defineProperties(DisplayObject.prototype, {
      * To remove a mask, set this property to null.
      *
      * @member {Graphics}
-     * @property {Graphics}
-     * @memberof PIXI.DisplayObject#
+     * @memberof DisplayObject#
      */
     mask: {
         get: function ()
@@ -35483,7 +28393,7 @@ Object.defineProperties(DisplayObject.prototype, {
      * To remove filters simply set this property to 'null'
      *
      * @member {Filter[]}
-     * @memberof PIXI.DisplayObject#
+     * @memberof DisplayObject#
      */
     filters: {
         get: function ()
@@ -35502,6 +28412,8 @@ Object.defineProperties(DisplayObject.prototype, {
  * Updates the object transform for rendering
  *
  * TODO - Optimization pass!
+ *
+ * @private
  */
 DisplayObject.prototype.updateTransform = function ()
 {
@@ -35655,15 +28567,15 @@ DisplayObject.prototype.renderCanvas = function (renderer) // jshint unused:fals
  * This can be quite useful if your displayObject is static / complicated and needs to be reused multiple times.
  *
  * @param renderer {CanvasRenderer|WebGLRenderer} The renderer used to generate the texture.
- * @param scaleMode {Number} See {@link SCALE_MODES} for possible values
  * @param resolution {Number} The resolution of the texture being generated
+ * @param scaleMode {Number} See {@link SCALE_MODES} for possible values
  * @return {Texture} a texture of the display object
  */
-DisplayObject.prototype.generateTexture = function (renderer, scaleMode, resolution)
+DisplayObject.prototype.generateTexture = function (renderer, resolution, scaleMode)
 {
     var bounds = this.getLocalBounds();
 
-    var renderTexture = new RenderTexture(renderer, bounds.width | 0, bounds.height | 0, scaleMode, resolution);
+    var renderTexture = new RenderTexture(renderer, bounds.width | 0, bounds.height | 0, renderer, scaleMode, resolution);
 
     _tempMatrix.tx = -bounds.x;
     _tempMatrix.ty = -bounds.y;
@@ -35694,8 +28606,9 @@ DisplayObject.prototype.destroy = function ()
     this.filterArea = null;
 };
 
-},{"../const":23,"../math":33,"../textures/RenderTexture":71,"eventemitter3":14}],26:[function(require,module,exports){
+},{"../const":22,"../math":32,"../textures/RenderTexture":70,"eventemitter3":13}],25:[function(require,module,exports){
 var Container = require('../display/Container'),
+    Sprite = require('../sprites/Sprite'),
     Texture = require('../textures/Texture'),
     CanvasBuffer = require('../renderers/canvas/utils/CanvasBuffer'),
     CanvasGraphics = require('../renderers/canvas/utils/CanvasGraphics'),
@@ -35709,7 +28622,7 @@ var Container = require('../display/Container'),
  * rectangles to the display, and to color and fill them.
  *
  * @class
- * @extends PIXI.Container
+ * @extends Container
  * @memberof PIXI
  */
 function Graphics()
@@ -36476,9 +29389,6 @@ Graphics.prototype._renderCanvas = function (renderer)
         this._prevTint = this.tint;
     }
 
-    // this code may still be needed so leaving for now..
-    //
-    /*
     if (this._cacheAsBitmap)
     {
         if (this.dirty || this.cachedSpriteDirty)
@@ -36498,27 +29408,29 @@ Graphics.prototype._renderCanvas = function (renderer)
 
         return;
     }
-    */
-    var context = renderer.context;
-    var transform = this.worldTransform;
-
-    if (this.blendMode !== renderer.currentBlendMode)
+    else
     {
-        renderer.currentBlendMode = this.blendMode;
-        context.globalCompositeOperation = renderer.blendModes[renderer.currentBlendMode];
+        var context = renderer.context;
+        var transform = this.worldTransform;
+
+        if (this.blendMode !== renderer.currentBlendMode)
+        {
+            renderer.currentBlendMode = this.blendMode;
+            context.globalCompositeOperation = renderer.blendModes[renderer.currentBlendMode];
+        }
+
+        var resolution = renderer.resolution;
+        context.setTransform(
+            transform.a * resolution,
+            transform.b * resolution,
+            transform.c * resolution,
+            transform.d * resolution,
+            transform.tx * resolution,
+            transform.ty * resolution
+        );
+
+        CanvasGraphics.renderGraphics(this, context);
     }
-
-    var resolution = renderer.resolution;
-    context.setTransform(
-        transform.a * resolution,
-        transform.b * resolution,
-        transform.c * resolution,
-        transform.d * resolution,
-        transform.tx * resolution,
-        transform.ty * resolution
-    );
-
-    CanvasGraphics.renderGraphics(this, context);
 };
 
 /**
@@ -36876,7 +29788,7 @@ Graphics.prototype.destroy = function () {
     this._localBounds = null;
 };
 
-},{"../const":23,"../display/Container":24,"../math":33,"../renderers/canvas/utils/CanvasBuffer":45,"../renderers/canvas/utils/CanvasGraphics":46,"../textures/Texture":72,"./GraphicsData":27}],27:[function(require,module,exports){
+},{"../const":22,"../display/Container":23,"../math":32,"../renderers/canvas/utils/CanvasBuffer":44,"../renderers/canvas/utils/CanvasGraphics":45,"../sprites/Sprite":66,"../textures/Texture":71,"./GraphicsData":26}],26:[function(require,module,exports){
 /**
  * A GraphicsData object.
  *
@@ -36966,14 +29878,13 @@ GraphicsData.prototype.destroy = function () {
     this.shape = null;
 };
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var utils = require('../../utils'),
     math = require('../../math'),
     CONST = require('../../const'),
     ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
     WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
-    WebGLGraphicsData = require('./WebGLGraphicsData'),
-    earcut = require('earcut');
+    WebGLGraphicsData = require('./WebGLGraphicsData');
 
 /**
  * Renders the graphics object.
@@ -36981,7 +29892,7 @@ var utils = require('../../utils'),
  * @class
  * @private
  * @memberof PIXI
- * @extends PIXI.ObjectRenderer
+ * @extends ObjectRenderer
  * @param renderer {WebGLRenderer} The renderer this object renderer works for.
  */
 function GraphicsRenderer(renderer)
@@ -37060,8 +29971,6 @@ GraphicsRenderer.prototype.render = function(graphics)
             webGLData = webGL.data[i];
 
             renderer.stencilManager.pushStencil(graphics, webGLData, renderer);
-
-            gl.uniform1f(renderer.shaderManager.complexPrimitiveShader.uniforms.alpha._location, graphics.worldAlpha * webGLData.alpha);
 
             // render quad..
             gl.drawElements(gl.TRIANGLE_FAN, 4, gl.UNSIGNED_SHORT, ( webGLData.indices.length - 4 ) * 2 );
@@ -37352,7 +30261,6 @@ GraphicsRenderer.prototype.buildRoundedRectangle = function (graphicsData, webGL
     this.quadraticBezierCurve(x + width - radius, y + height, x + width, y + height, x + width, y + height - radius, recPoints);
     this.quadraticBezierCurve(x + width, y + radius, x + width, y, x + width - radius, y, recPoints);
     this.quadraticBezierCurve(x + radius, y, x, y, x, y + radius + 0.0000000001, recPoints);
-
     // this tiny number deals with the issue that occurs when points overlap and polyK fails to triangulate the item.
     // TODO - fix this properly, this is not very elegant.. but it works for now.
 
@@ -37370,7 +30278,9 @@ GraphicsRenderer.prototype.buildRoundedRectangle = function (graphicsData, webGL
 
         var vecPos = verts.length/6;
 
-        var triangles = earcut(recPoints, null, 2);
+        //TODO use this https://github.com/mapbox/earcut
+        var triangles = utils.PolyK.Triangulate(recPoints);
+        //
 
         var i = 0;
         for (i = 0; i < triangles.length; i+=3)
@@ -37838,7 +30748,7 @@ GraphicsRenderer.prototype.buildPoly = function (graphicsData, webGLData)
     var g = color[1] * alpha;
     var b = color[2] * alpha;
 
-    var triangles = earcut(points, null, 2);
+    var triangles = utils.PolyK.Triangulate(points);
 
     if (!triangles) {
         return false;
@@ -37866,7 +30776,7 @@ GraphicsRenderer.prototype.buildPoly = function (graphicsData, webGLData)
     return true;
 };
 
-},{"../../const":23,"../../math":33,"../../renderers/webgl/WebGLRenderer":49,"../../renderers/webgl/utils/ObjectRenderer":63,"../../utils":77,"./WebGLGraphicsData":29,"earcut":13}],29:[function(require,module,exports){
+},{"../../const":22,"../../math":32,"../../renderers/webgl/WebGLRenderer":48,"../../renderers/webgl/utils/ObjectRenderer":62,"../../utils":75,"./WebGLGraphicsData":28}],28:[function(require,module,exports){
 /**
  * An object containing WebGL specific properties to be used by the WebGL renderer
  *
@@ -37983,7 +30893,7 @@ WebGLGraphicsData.prototype.destroy = function () {
     this.glIndices = null;
 };
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI core library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -37999,7 +30909,6 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
     // utils
     utils: require('./utils'),
     math: require('./math'),
-    ticker: require('./ticker'),
 
     // display
     DisplayObject:          require('./display/DisplayObject'),
@@ -38074,7 +30983,7 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
     }
 });
 
-},{"./const":23,"./display/Container":24,"./display/DisplayObject":25,"./graphics/Graphics":26,"./graphics/GraphicsData":27,"./graphics/webgl/GraphicsRenderer":28,"./math":33,"./particles/ParticleContainer":39,"./particles/webgl/ParticleRenderer":41,"./renderers/canvas/CanvasRenderer":44,"./renderers/canvas/utils/CanvasBuffer":45,"./renderers/canvas/utils/CanvasGraphics":46,"./renderers/webgl/WebGLRenderer":49,"./renderers/webgl/filters/AbstractFilter":50,"./renderers/webgl/managers/ShaderManager":56,"./renderers/webgl/shaders/Shader":61,"./renderers/webgl/utils/ObjectRenderer":63,"./renderers/webgl/utils/RenderTarget":65,"./sprites/Sprite":67,"./sprites/webgl/SpriteRenderer":68,"./text/Text":69,"./textures/BaseTexture":70,"./textures/RenderTexture":71,"./textures/Texture":72,"./textures/TextureUvs":73,"./textures/VideoBaseTexture":74,"./ticker":76,"./utils":77}],31:[function(require,module,exports){
+},{"./const":22,"./display/Container":23,"./display/DisplayObject":24,"./graphics/Graphics":25,"./graphics/GraphicsData":26,"./graphics/webgl/GraphicsRenderer":27,"./math":32,"./particles/ParticleContainer":38,"./particles/webgl/ParticleRenderer":40,"./renderers/canvas/CanvasRenderer":43,"./renderers/canvas/utils/CanvasBuffer":44,"./renderers/canvas/utils/CanvasGraphics":45,"./renderers/webgl/WebGLRenderer":48,"./renderers/webgl/filters/AbstractFilter":49,"./renderers/webgl/managers/ShaderManager":55,"./renderers/webgl/shaders/Shader":60,"./renderers/webgl/utils/ObjectRenderer":62,"./renderers/webgl/utils/RenderTarget":64,"./sprites/Sprite":66,"./sprites/webgl/SpriteRenderer":67,"./text/Text":68,"./textures/BaseTexture":69,"./textures/RenderTexture":70,"./textures/Texture":71,"./textures/TextureUvs":72,"./textures/VideoBaseTexture":73,"./utils":75}],30:[function(require,module,exports){
 var Point = require('./Point');
 
 /**
@@ -38434,7 +31343,7 @@ Matrix.IDENTITY = new Matrix();
  */
 Matrix.TEMP_MATRIX = new Matrix();
 
-},{"./Point":32}],32:[function(require,module,exports){
+},{"./Point":31}],31:[function(require,module,exports){
 /**
  * The Point object represents a location in a two-dimensional coordinate system, where x represents
  * the horizontal axis and y represents the vertical axis.
@@ -38504,7 +31413,7 @@ Point.prototype.set = function (x, y)
     this.y = y || ( (y !== 0) ? this.x : 0 ) ;
 };
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = {
     Point:      require('./Point'),
     Matrix:     require('./Matrix'),
@@ -38516,7 +31425,7 @@ module.exports = {
     RoundedRectangle: require('./shapes/RoundedRectangle')
 };
 
-},{"./Matrix":31,"./Point":32,"./shapes/Circle":34,"./shapes/Ellipse":35,"./shapes/Polygon":36,"./shapes/Rectangle":37,"./shapes/RoundedRectangle":38}],34:[function(require,module,exports){
+},{"./Matrix":30,"./Point":31,"./shapes/Circle":33,"./shapes/Ellipse":34,"./shapes/Polygon":35,"./shapes/Rectangle":36,"./shapes/RoundedRectangle":37}],33:[function(require,module,exports){
 var Rectangle = require('./Rectangle'),
     CONST = require('../../const');
 
@@ -38604,7 +31513,7 @@ Circle.prototype.getBounds = function ()
     return new Rectangle(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
 };
 
-},{"../../const":23,"./Rectangle":37}],35:[function(require,module,exports){
+},{"../../const":22,"./Rectangle":36}],34:[function(require,module,exports){
 var Rectangle = require('./Rectangle'),
     CONST = require('../../const');
 
@@ -38699,7 +31608,7 @@ Ellipse.prototype.getBounds = function ()
     return new Rectangle(this.x - this.width, this.y - this.height, this.width, this.height);
 };
 
-},{"../../const":23,"./Rectangle":37}],36:[function(require,module,exports){
+},{"../../const":22,"./Rectangle":36}],35:[function(require,module,exports){
 var Point = require('../Point'),
     CONST = require('../../const');
 
@@ -38802,7 +31711,7 @@ Polygon.prototype.contains = function (x, y)
     return inside;
 };
 
-},{"../../const":23,"../Point":32}],37:[function(require,module,exports){
+},{"../../const":22,"../Point":31}],36:[function(require,module,exports){
 var CONST = require('../../const');
 
 /**
@@ -38896,7 +31805,7 @@ Rectangle.prototype.contains = function (x, y)
     return false;
 };
 
-},{"../../const":23}],38:[function(require,module,exports){
+},{"../../const":22}],37:[function(require,module,exports){
 var CONST = require('../../const');
 
 /**
@@ -38988,7 +31897,7 @@ RoundedRectangle.prototype.contains = function (x, y)
     return false;
 };
 
-},{"../../const":23}],39:[function(require,module,exports){
+},{"../../const":22}],38:[function(require,module,exports){
 var Container = require('../display/Container'),
     CONST = require('../const');
 
@@ -39013,7 +31922,7 @@ var Container = require('../display/Container'),
  * And here you have a hundred sprites that will be renderer at the speed of light.
  *
  * @class
- * @extends PIXI.Container
+ * @extends Container
  * @memberof PIXI
  *
  * @param [size=15000] {number} The number of images in the SpriteBatch before it flushes.
@@ -39319,7 +32228,7 @@ ParticleContainer.prototype.destroy = function () {
     this._buffers = null;
 };
 
-},{"../const":23,"../display/Container":24}],40:[function(require,module,exports){
+},{"../const":22,"../display/Container":23}],39:[function(require,module,exports){
 
 /**
  * @author Mat Groves
@@ -39532,7 +32441,7 @@ ParticleBuffer.prototype.destroy = function ()
     this.gl.deleteBuffer(this.staticBuffer);
 };
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
     WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
     ParticleShader = require('./ParticleShader'),
@@ -40027,12 +32936,12 @@ ParticleRenderer.prototype.destroy = function ()
     this.tempMatrix = null;
 };
 
-},{"../../math":33,"../../renderers/webgl/WebGLRenderer":49,"../../renderers/webgl/utils/ObjectRenderer":63,"./ParticleBuffer":40,"./ParticleShader":42}],42:[function(require,module,exports){
+},{"../../math":32,"../../renderers/webgl/WebGLRenderer":48,"../../renderers/webgl/utils/ObjectRenderer":62,"./ParticleBuffer":39,"./ParticleShader":41}],41:[function(require,module,exports){
 var TextureShader = require('../../renderers/webgl/shaders/TextureShader');
 
 /**
  * @class
- * @extends PIXI.TextureShader
+ * @extends TextureShader
  * @memberof PIXI
  * @param shaderManager {ShaderManager} The webgl shader manager this shader works for.
  */
@@ -40103,7 +33012,7 @@ ParticleShader.prototype.constructor = ParticleShader;
 
 module.exports = ParticleShader;
 
-},{"../../renderers/webgl/shaders/TextureShader":62}],43:[function(require,module,exports){
+},{"../../renderers/webgl/shaders/TextureShader":61}],42:[function(require,module,exports){
 var utils = require('../utils'),
     math = require('../math'),
     CONST = require('../const'),
@@ -40345,7 +33254,7 @@ SystemRenderer.prototype.destroy = function (removeView) {
     this._backgroundColorString = null;
 };
 
-},{"../const":23,"../math":33,"../utils":77,"eventemitter3":14}],44:[function(require,module,exports){
+},{"../const":22,"../math":32,"../utils":75,"eventemitter3":13}],43:[function(require,module,exports){
 var SystemRenderer = require('../SystemRenderer'),
     CanvasMaskManager = require('./utils/CanvasMaskManager'),
     utils = require('../../utils'),
@@ -40358,7 +33267,7 @@ var SystemRenderer = require('../SystemRenderer'),
  *
  * @class
  * @memberof PIXI
- * @extends PIXI.SystemRenderer
+ * @extends SystemRenderer
  * @param [width=800] {number} the width of the canvas view
  * @param [height=600] {number} the height of the canvas view
  * @param [options] {object} The optional renderer parameters
@@ -40587,7 +33496,7 @@ CanvasRenderer.prototype._mapBlendModes = function ()
             this.blendModes[CONST.BLEND_MODES.DIFFERENCE]    = 'difference';
             this.blendModes[CONST.BLEND_MODES.EXCLUSION]     = 'exclusion';
             this.blendModes[CONST.BLEND_MODES.HUE]           = 'hue';
-            this.blendModes[CONST.BLEND_MODES.SATURATION]    = 'saturate';
+            this.blendModes[CONST.BLEND_MODES.SATURATION]    = 'saturation';
             this.blendModes[CONST.BLEND_MODES.COLOR]         = 'color';
             this.blendModes[CONST.BLEND_MODES.LUMINOSITY]    = 'luminosity';
         }
@@ -40615,7 +33524,7 @@ CanvasRenderer.prototype._mapBlendModes = function ()
     }
 };
 
-},{"../../const":23,"../../math":33,"../../utils":77,"../SystemRenderer":43,"./utils/CanvasMaskManager":47}],45:[function(require,module,exports){
+},{"../../const":22,"../../math":32,"../../utils":75,"../SystemRenderer":42,"./utils/CanvasMaskManager":46}],44:[function(require,module,exports){
 /**
  * Creates a Canvas element of the given size.
  *
@@ -40715,17 +33624,15 @@ CanvasBuffer.prototype.destroy = function ()
     this.canvas = null;
 };
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var CONST = require('../../../const');
 
 /**
  * A set of functions used by the canvas renderer to draw the primitive graphics data.
  * @static
- * @class
  * @memberof PIXI
  */
-var CanvasGraphics = {};
-module.exports = CanvasGraphics;
+var CanvasGraphics = module.exports = {};
 
 /*
  * Renders a Graphics object to a canvas.
@@ -41068,7 +33975,7 @@ CanvasGraphics.updateGraphicsTint = function (graphics)
 };
 
 
-},{"../../../const":23}],47:[function(require,module,exports){
+},{"../../../const":22}],46:[function(require,module,exports){
 var CanvasGraphics = require('./CanvasGraphics');
 
 /**
@@ -41128,19 +34035,15 @@ CanvasMaskManager.prototype.popMask = function (renderer)
     renderer.context.restore();
 };
 
-CanvasMaskManager.prototype.destroy = function () {};
-
-},{"./CanvasGraphics":46}],48:[function(require,module,exports){
+},{"./CanvasGraphics":45}],47:[function(require,module,exports){
 var utils = require('../../../utils');
 
 /**
  * Utility methods for Sprite/Texture tinting.
  * @static
- * @class
  * @memberof PIXI
  */
-var CanvasTinter = {};
-module.exports = CanvasTinter;
+var CanvasTinter = module.exports = {};
 
 /**
  * Basically this method just needs a sprite and a color and tints the sprite with the given color.
@@ -41364,7 +34267,7 @@ CanvasTinter.canUseMultiply = utils.canUseNewCanvasBlendModes();
  */
 CanvasTinter.tintMethod = CanvasTinter.canUseMultiply ? CanvasTinter.tintWithMultiply :  CanvasTinter.tintWithPerPixel;
 
-},{"../../../utils":77}],49:[function(require,module,exports){
+},{"../../../utils":75}],48:[function(require,module,exports){
 var SystemRenderer = require('../SystemRenderer'),
     ShaderManager = require('./managers/ShaderManager'),
     MaskManager = require('./managers/MaskManager'),
@@ -41385,7 +34288,7 @@ var SystemRenderer = require('../SystemRenderer'),
  *
  * @class
  * @memberof PIXI
- * @extends PIXI.SystemRenderer
+ * @extends SystemRenderer
  * @param [width=0] {number} the width of the canvas view
  * @param [height=0] {number} the height of the canvas view
  * @param [options] {object} The optional renderer parameters
@@ -41507,8 +34410,7 @@ function WebGLRenderer(width, height, options)
 
     this.initPlugins();
 
-    // initialize the context so it is ready for the managers.
-    this._createContext();
+     // initialize the context so it is ready for the managers.
     this._initContext();
 
     // map some webGL blend modes..
@@ -41530,7 +34432,12 @@ utils.pluginTarget.mixin(WebGLRenderer);
 
 WebGLRenderer.glContextId = 0;
 
-WebGLRenderer.prototype._createContext = function () {
+/**
+ * Creates the WebGL context
+ * @private
+ */
+WebGLRenderer.prototype._initContext = function ()
+{
     var gl = this.view.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
     this.gl = gl;
 
@@ -41543,22 +34450,13 @@ WebGLRenderer.prototype._createContext = function () {
     this.glContextId = WebGLRenderer.glContextId++;
     gl.id = this.glContextId;
     gl.renderer = this;
-};
-
-/**
- * Creates the WebGL context
- * @private
- */
-WebGLRenderer.prototype._initContext = function ()
-{
-    var gl = this.gl;
 
     // set up the default pixi settings..
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
 
-    this.renderTarget = new RenderTarget(gl, this.width, this.height, null, this.resolution, true);
+    this.renderTarget = new RenderTarget(this.gl, this.width, this.height, null, this.resolution, true);
 
     this.setRenderTarget(this.renderTarget);
 
@@ -41569,7 +34467,7 @@ WebGLRenderer.prototype._initContext = function ()
 
     if(!this._useFXAA)
     {
-        this._useFXAA = (this._contextOptions.antialias && ! gl.getContextAttributes().antialias);
+        this._useFXAA = ( this._contextOptions.antialias && ! gl.getContextAttributes().antialias );
     }
 
 
@@ -41710,13 +34608,14 @@ WebGLRenderer.prototype.resize = function (width, height)
 {
     SystemRenderer.prototype.resize.call(this, width, height);
 
+    this.gl.viewport(0, 0, this.width, this.height);
+
     this.filterManager.resize(width, height);
     this.renderTarget.resize(width, height);
 
     if(this.currentRenderTarget === this.renderTarget)
     {
         this.renderTarget.activate();
-        this.gl.viewport(0, 0, this.width, this.height);
     }
 };
 
@@ -41896,7 +34795,7 @@ WebGLRenderer.prototype._mapBlendModes = function ()
     }
 };
 
-},{"../../const":23,"../../utils":77,"../SystemRenderer":43,"./filters/FXAAFilter":51,"./managers/BlendModeManager":53,"./managers/FilterManager":54,"./managers/MaskManager":55,"./managers/ShaderManager":56,"./managers/StencilManager":57,"./utils/ObjectRenderer":63,"./utils/RenderTarget":65}],50:[function(require,module,exports){
+},{"../../const":22,"../../utils":75,"../SystemRenderer":42,"./filters/FXAAFilter":50,"./managers/BlendModeManager":52,"./managers/FilterManager":53,"./managers/MaskManager":54,"./managers/ShaderManager":55,"./managers/StencilManager":56,"./utils/ObjectRenderer":62,"./utils/RenderTarget":64}],49:[function(require,module,exports){
 var DefaultShader = require('../shaders/TextureShader');
 
 /**
@@ -41928,6 +34827,7 @@ function AbstractFilter(vertexSrc, fragmentSrc, uniforms)
     /**
      * The uniforms as an object
      * @member {object}
+     * @private
      */
     this.uniforms = uniforms || {};
 
@@ -42014,7 +34914,7 @@ AbstractFilter.prototype.apply = function (frameBuffer)
 };
 */
 
-},{"../shaders/TextureShader":62}],51:[function(require,module,exports){
+},{"../shaders/TextureShader":61}],50:[function(require,module,exports){
 var AbstractFilter = require('./AbstractFilter');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -42030,7 +34930,7 @@ var AbstractFilter = require('./AbstractFilter');
  * https://github.com/mitsuhiko/webgl-meincraft
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI
  *
  */
@@ -42062,7 +34962,7 @@ FXAAFilter.prototype.applyFilter = function (renderer, input, output)
     filterManager.applyFilter(shader, input, output);
 };
 
-},{"./AbstractFilter":50}],52:[function(require,module,exports){
+},{"./AbstractFilter":49}],51:[function(require,module,exports){
 var AbstractFilter = require('./AbstractFilter'),
     math =  require('../../../math');
 
@@ -42073,7 +34973,7 @@ var AbstractFilter = require('./AbstractFilter'),
  * The SpriteMaskFilter class
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI
  * @param sprite {Sprite} the target sprite
  */
@@ -42159,13 +35059,13 @@ Object.defineProperties(SpriteMaskFilter.prototype, {
     }
 });
 
-},{"../../../math":33,"./AbstractFilter":50}],53:[function(require,module,exports){
+},{"../../../math":32,"./AbstractFilter":49}],52:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager');
 
 /**
  * @class
  * @memberof PIXI
- * @extends PIXI.WebGlManager
+ * @extends WebGlManager
  * @param renderer {WebGLRenderer} The renderer this manager works for.
  */
 function BlendModeManager(renderer)
@@ -42202,7 +35102,7 @@ BlendModeManager.prototype.setBlendMode = function (blendMode)
     return true;
 };
 
-},{"./WebGLManager":58}],54:[function(require,module,exports){
+},{"./WebGLManager":57}],53:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     RenderTarget = require('../utils/RenderTarget'),
     CONST = require('../../../const'),
@@ -42212,7 +35112,7 @@ var WebGLManager = require('./WebGLManager'),
 /**
  * @class
  * @memberof PIXI
- * @extends PIXI.WebGLManager
+ * @extends WebGLManager
  * @param renderer {WebGLRenderer} The renderer this manager works for.
  */
 function FilterManager(renderer)
@@ -42638,7 +35538,7 @@ FilterManager.prototype.destroy = function ()
     this.texturePool = null;
 };
 
-},{"../../../const":23,"../../../math":33,"../utils/Quad":64,"../utils/RenderTarget":65,"./WebGLManager":58}],55:[function(require,module,exports){
+},{"../../../const":22,"../../../math":32,"../utils/Quad":63,"../utils/RenderTarget":64,"./WebGLManager":57}],54:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     AlphaMaskFilter = require('../filters/SpriteMaskFilter');
 
@@ -42752,7 +35652,7 @@ MaskManager.prototype.popStencilMask = function (target, maskData)
 };
 
 
-},{"../filters/SpriteMaskFilter":52,"./WebGLManager":58}],56:[function(require,module,exports){
+},{"../filters/SpriteMaskFilter":51,"./WebGLManager":57}],55:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     TextureShader = require('../shaders/TextureShader'),
     ComplexPrimitiveShader = require('../shaders/ComplexPrimitiveShader'),
@@ -42762,7 +35662,7 @@ var WebGLManager = require('./WebGLManager'),
 /**
  * @class
  * @memberof PIXI
- * @extends PIXI.WebGLManager
+ * @extends WebGLManager
  * @param renderer {WebGLRenderer} The renderer this manager works for.
  */
 function ShaderManager(renderer)
@@ -42919,7 +35819,7 @@ ShaderManager.prototype.destroy = function ()
     this.tempAttribState = null;
 };
 
-},{"../../../utils":77,"../shaders/ComplexPrimitiveShader":59,"../shaders/PrimitiveShader":60,"../shaders/TextureShader":62,"./WebGLManager":58}],57:[function(require,module,exports){
+},{"../../../utils":75,"../shaders/ComplexPrimitiveShader":58,"../shaders/PrimitiveShader":59,"../shaders/TextureShader":61,"./WebGLManager":57}],56:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     utils = require('../../../utils');
 
@@ -43263,7 +36163,7 @@ WebGLMaskManager.prototype.popMask = function (maskData)
 };
 
 
-},{"../../../utils":77,"./WebGLManager":58}],58:[function(require,module,exports){
+},{"../../../utils":75,"./WebGLManager":57}],57:[function(require,module,exports){
 /**
  * @class
  * @memberof PIXI
@@ -43299,18 +36199,18 @@ WebGLManager.prototype.onContextChange = function ()
  */
 WebGLManager.prototype.destroy = function ()
 {
-    this.renderer.off('context', this.onContextChange, this);
+    this.renderer.off('context', this.onContextChange);
 
     this.renderer = null;
 };
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 var Shader = require('./Shader');
 
 /**
  * @class
  * @memberof PIXI
- * @extends PIXI.Shader
+ * @extends Shader
  * @param shaderManager {ShaderManager} The webgl shader manager this shader works for.
  */
 function ComplexPrimitiveShader(shaderManager)
@@ -43364,13 +36264,13 @@ ComplexPrimitiveShader.prototype = Object.create(Shader.prototype);
 ComplexPrimitiveShader.prototype.constructor = ComplexPrimitiveShader;
 module.exports = ComplexPrimitiveShader;
 
-},{"./Shader":61}],60:[function(require,module,exports){
+},{"./Shader":60}],59:[function(require,module,exports){
 var Shader = require('./Shader');
 
 /**
  * @class
  * @memberof PIXI
- * @extends PIXI.Shader
+ * @extends Shader
  * @param shaderManager {ShaderManager} The webgl shader manager this shader works for.
  */
 function PrimitiveShader(shaderManager)
@@ -43425,7 +36325,7 @@ PrimitiveShader.prototype = Object.create(Shader.prototype);
 PrimitiveShader.prototype.constructor = PrimitiveShader;
 module.exports = PrimitiveShader;
 
-},{"./Shader":61}],61:[function(require,module,exports){
+},{"./Shader":60}],60:[function(require,module,exports){
 /*global console */
 var utils = require('../../../utils');
 
@@ -43858,9 +36758,6 @@ Shader.prototype.syncUniform = function (uniform)
             if (!texture)
             {
                 this.initSampler2D(uniform);
-
-                // set the textur to the newly created one..
-                texture = uniform.value.baseTexture._glTextures[gl.id];
             }
 
             // bind the texture
@@ -43977,13 +36874,13 @@ Shader.prototype._glCompile = function (type, src)
     return shader;
 };
 
-},{"../../../utils":77}],62:[function(require,module,exports){
+},{"../../../utils":75}],61:[function(require,module,exports){
 var Shader = require('./Shader');
 
 /**
  * @class
  * @memberof PIXI
- * @extends PIXI.Shader
+ * @extends Shader
  * @param shaderManager {ShaderManager} The webgl shader manager this shader works for.
  * @param [vertexSrc] {string} The source of the vertex shader.
  * @param [fragmentSrc] {string} The source of the fragment shader.
@@ -43995,9 +36892,9 @@ function TextureShader(shaderManager, vertexSrc, fragmentSrc, customUniforms, cu
     var uniforms = {
 
         uSampler:           { type: 'sampler2D', value: 0 },
-        projectionMatrix:   { type: 'mat3', value: new Float32Array([1, 0, 0,
-                                                                     0, 1, 0,
-                                                                     0, 0, 1]) }
+        projectionMatrix:   { type: 'mat3', value: new Float32Array(1, 0, 0,
+                                                                    0, 1, 0,
+                                                                    0, 0, 1) }
     };
 
     if (customUniforms)
@@ -44074,14 +36971,14 @@ TextureShader.defaultFragmentSrc = [
     '}'
 ].join('\n');
 
-},{"./Shader":61}],63:[function(require,module,exports){
+},{"./Shader":60}],62:[function(require,module,exports){
 var WebGLManager = require('../managers/WebGLManager');
 
 /**
  * Base for a common object renderer that can be used as a system renderer plugin.
  *
  * @class
- * @extends PIXI.WebGLManager
+ * @extends WebGLManager
  * @memberof PIXI
  * @param renderer {WebGLRenderer} The renderer this object renderer works for.
  */
@@ -44131,7 +37028,7 @@ ObjectRenderer.prototype.render = function (object) // jshint unused:false
     // render the object
 };
 
-},{"../managers/WebGLManager":58}],64:[function(require,module,exports){
+},{"../managers/WebGLManager":57}],63:[function(require,module,exports){
 /**
  * Helper class to create a quad
  * @class
@@ -44277,7 +37174,7 @@ module.exports = Quad;
 
 
 
-},{}],65:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 var math = require('../../../math'),
     utils = require('../../../utils'),
     CONST = require('../../../const'),
@@ -44583,7 +37480,7 @@ RenderTarget.prototype.destroy = function()
     this.texture = null;
 };
 
-},{"../../../const":23,"../../../math":33,"../../../utils":77,"./StencilMaskStack":66}],66:[function(require,module,exports){
+},{"../../../const":22,"../../../math":32,"../../../utils":75,"./StencilMaskStack":65}],65:[function(require,module,exports){
 /**
  * Generic Mask Stack data structure
  * @class
@@ -44617,7 +37514,7 @@ function StencilMaskStack()
 StencilMaskStack.prototype.constructor = StencilMaskStack;
 module.exports = StencilMaskStack;
 
-},{}],67:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var math = require('../math'),
     Texture = require('../textures/Texture'),
     Container = require('../display/Container'),
@@ -44636,7 +37533,7 @@ var math = require('../math'),
  * ```
  *
  * @class
- * @extends PIXI.Container
+ * @extends Container
  * @memberof PIXI
  * @param texture {Texture} The texture for this sprite
  */
@@ -44722,8 +37619,8 @@ Object.defineProperties(Sprite.prototype, {
     /**
      * The width of the sprite, setting this will actually modify the scale to achieve the value set
      *
-     * @member {number}
-     * @memberof PIXI.Sprite#
+     * @member
+     * @memberof Sprite#
      */
     width: {
         get: function ()
@@ -44740,8 +37637,8 @@ Object.defineProperties(Sprite.prototype, {
     /**
      * The height of the sprite, setting this will actually modify the scale to achieve the value set
      *
-     * @member {number}
-     * @memberof PIXI.Sprite#
+     * @member
+     * @memberof Sprite#
      */
     height: {
         get: function ()
@@ -44756,10 +37653,10 @@ Object.defineProperties(Sprite.prototype, {
     },
 
     /**
-     * The texture that the sprite is using
+     * The height of the sprite, setting this will actually modify the scale to achieve the value set
      *
-     * @member {PIXI.Texture}
-     * @memberof PIXI.Sprite#
+     * @member
+     * @memberof Sprite#
      */
     texture: {
         get: function ()
@@ -45012,6 +37909,8 @@ Sprite.prototype._renderCanvas = function (renderer)
             width,
             height;
 
+        var resolution = texture.baseTexture.resolution / renderer.resolution;
+
         renderer.context.globalAlpha = this.worldAlpha;
 
         // If smoothingEnabled is supported and we need to change the smoothing property for this texture
@@ -45082,8 +37981,6 @@ Sprite.prototype._renderCanvas = function (renderer)
 
         }
 
-        var resolution = texture.baseTexture.resolution;
-
         if (this.tint !== 0xFFFFFF)
         {
             if (this.cachedTint !== this.tint)
@@ -45098,10 +37995,10 @@ Sprite.prototype._renderCanvas = function (renderer)
                 this.tintedTexture,
                 0,
                 0,
-                width * resolution,
-                height * resolution,
-                dx * renderer.resolution,
-                dy * renderer.resolution,
+                width * resolution * renderer.resolution,
+                height * resolution * renderer.resolution,
+                dx,
+                dy,
                 width * renderer.resolution,
                 height * renderer.resolution
             );
@@ -45112,10 +38009,10 @@ Sprite.prototype._renderCanvas = function (renderer)
                 texture.baseTexture.source,
                 texture.crop.x * resolution,
                 texture.crop.y * resolution,
-                width * resolution,
-                height * resolution,
-                dx  * renderer.resolution,
-                dy  * renderer.resolution,
+                width * resolution * renderer.resolution,
+                height * resolution * renderer.resolution,
+                dx,
+                dy,
                 width * renderer.resolution,
                 height * renderer.resolution
             );
@@ -45181,7 +38078,7 @@ Sprite.fromImage = function (imageId, crossorigin, scaleMode)
     return new Sprite(Texture.fromImage(imageId, crossorigin, scaleMode));
 };
 
-},{"../const":23,"../display/Container":24,"../math":33,"../renderers/canvas/utils/CanvasTinter":48,"../textures/Texture":72,"../utils":77}],68:[function(require,module,exports){
+},{"../const":22,"../display/Container":23,"../math":32,"../renderers/canvas/utils/CanvasTinter":47,"../textures/Texture":71,"../utils":75}],67:[function(require,module,exports){
 var ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
     WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
     CONST = require('../../const');
@@ -45202,7 +38099,7 @@ var ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
  * @class
  * @private
  * @memberof PIXI
- * @extends PIXI.ObjectRenderer
+ * @extends ObjectRenderer
  * @param renderer {WebGLRenderer} The renderer this sprite batch works for.
  */
 function SpriteRenderer(renderer)
@@ -45698,11 +38595,10 @@ SpriteRenderer.prototype.destroy = function ()
     this.shader = null;
 };
 
-},{"../../const":23,"../../renderers/webgl/WebGLRenderer":49,"../../renderers/webgl/utils/ObjectRenderer":63}],69:[function(require,module,exports){
+},{"../../const":22,"../../renderers/webgl/WebGLRenderer":48,"../../renderers/webgl/utils/ObjectRenderer":62}],68:[function(require,module,exports){
 var Sprite = require('../sprites/Sprite'),
     Texture = require('../textures/Texture'),
     math = require('../math'),
-    utils = require('../utils'),
     CONST = require('../const');
 
 /**
@@ -45716,7 +38612,7 @@ var Sprite = require('../sprites/Sprite'),
  * ```
  *
  * @class
- * @extends PIXI.Sprite
+ * @extends Sprite
  * @memberof PIXI
  * @param text {string} The copy that you would like the text to display
  * @param [style] {object} The style parameters
@@ -45732,8 +38628,7 @@ var Sprite = require('../sprites/Sprite'),
  * @param [style.dropShadowColor='#000000'] {string} A fill style to be used on the dropshadow e.g 'red', '#00FF00'
  * @param [style.dropShadowAngle=Math.PI/4] {number} Set a angle of the drop shadow
  * @param [style.dropShadowDistance=5] {number} Set a distance of the drop shadow
- * @param [style.padding=0] {number} Occasionally some fonts are cropped on top or bottom. Adding some padding will
- *      prevent this from happening by adding padding to the top and bottom of text height.
+ * @param [style.padding=0] {number} Occasionally some fonts are cropped. Adding some padding will prevent this from happening
  * @param [style.textBaseline='alphabetic'] {string} The baseline of the text that is rendered.
  * @param [style.lineJoin='miter'] {string} The lineJoin property sets the type of corner created, it can resolve
  *      spiked text issues. Default is 'miter' (creates a sharp corner).
@@ -45846,19 +38741,18 @@ Object.defineProperties(Text.prototype, {
      *
      * @param [style] {object} The style parameters
      * @param [style.font='bold 20pt Arial'] {string} The style and size of the font
-     * @param [style.fill='black'] {string|number} A canvas fillstyle that will be used on the text eg 'red', '#00FF00'
+     * @param [style.fill='black'] {object} A canvas fillstyle that will be used on the text eg 'red', '#00FF00'
      * @param [style.align='left'] {string} Alignment for multiline text ('left', 'center' or 'right'), does not affect single line text
-     * @param [style.stroke='black'] {string|number} A canvas fillstyle that will be used on the text stroke eg 'blue', '#FCFF00'
+     * @param [style.stroke='black'] {string} A canvas fillstyle that will be used on the text stroke eg 'blue', '#FCFF00'
      * @param [style.strokeThickness=0] {number} A number that represents the thickness of the stroke. Default is 0 (no stroke)
      * @param [style.wordWrap=false] {boolean} Indicates if word wrap should be used
      * @param [style.wordWrapWidth=100] {number} The width at which text will wrap
      * @param [style.lineHeight] {number} The line height, a number that represents the vertical space that a letter uses
      * @param [style.dropShadow=false] {boolean} Set a drop shadow for the text
-     * @param [style.dropShadowColor='#000000'] {string|number} A fill style to be used on the dropshadow e.g 'red', '#00FF00'
+     * @param [style.dropShadowColor='#000000'] {string} A fill style to be used on the dropshadow e.g 'red', '#00FF00'
      * @param [style.dropShadowAngle=Math.PI/6] {number} Set a angle of the drop shadow
      * @param [style.dropShadowDistance=5] {number} Set a distance of the drop shadow
-     * @param [style.padding=0] {number} Occasionally some fonts are cropped on top or bottom. Adding some padding will
-     *      prevent this from happening by adding padding to the top and bottom of text height.
+     * @param [style.padding=0] {number} Occasionally some fonts are cropped. Adding some padding will prevent this from happening
      * @param [style.textBaseline='alphabetic'] {string} The baseline of the text that is rendered.
      * @param [style.lineJoin='miter'] {string} The lineJoin property sets the type of corner created, it can resolve
      *      spiked text issues. Default is 'miter' (creates a sharp corner).
@@ -45874,19 +38768,6 @@ Object.defineProperties(Text.prototype, {
         set: function (style)
         {
             style = style || {};
-
-            if (typeof style.fill === 'number') {
-                style.fill = utils.hex2string(style.fill);
-            }
-
-            if (typeof style.stroke === 'number') {
-                style.stroke = utils.hex2string(style.stroke);
-            }
-
-            if (typeof style.dropShadowColor === 'number') {
-                style.dropShadowColor = utils.hex2string(style.dropShadowColor);
-            }
-
             style.font = style.font || 'bold 20pt Arial';
             style.fill = style.fill || 'black';
             style.align = style.align || 'left';
@@ -46311,7 +39192,7 @@ Text.prototype.destroy = function (destroyBaseTexture)
     this._texture.destroy(destroyBaseTexture === undefined ? true : destroyBaseTexture);
 };
 
-},{"../const":23,"../math":33,"../sprites/Sprite":67,"../textures/Texture":72,"../utils":77}],70:[function(require,module,exports){
+},{"../const":22,"../math":32,"../sprites/Sprite":66,"../textures/Texture":71}],69:[function(require,module,exports){
 var utils = require('../utils'),
     CONST = require('../const'),
     EventEmitter = require('eventemitter3');
@@ -46460,7 +39341,7 @@ function BaseTexture(source, scaleMode, resolution)
      * Fired when a not-immediately-available source finishes loading.
      *
      * @event loaded
-     * @memberof PIXI.BaseTexture#
+     * @memberof BaseTexture#
      * @protected
      */
 
@@ -46468,7 +39349,7 @@ function BaseTexture(source, scaleMode, resolution)
      * Fired when a not-immediately-available source fails to load.
      *
      * @event error
-     * @memberof PIXI.BaseTexture#
+     * @memberof BaseTexture#
      * @protected
      */
 }
@@ -46744,7 +39625,7 @@ BaseTexture.fromCanvas = function (canvas, scaleMode)
     return baseTexture;
 };
 
-},{"../const":23,"../utils":77,"eventemitter3":14}],71:[function(require,module,exports){
+},{"../const":22,"../utils":75,"eventemitter3":13}],70:[function(require,module,exports){
 var BaseTexture = require('./BaseTexture'),
     Texture = require('./Texture'),
     RenderTarget = require('../renderers/webgl/utils/RenderTarget'),
@@ -46787,7 +39668,7 @@ var BaseTexture = require('./BaseTexture'),
  * ```
  *
  * @class
- * @extends PIXI.Texture
+ * @extends Texture
  * @memberof PIXI
  * @param renderer {CanvasRenderer|WebGLRenderer} The renderer used for this RenderTexture
  * @param [width=100] {number} The width of the render texture
@@ -46954,7 +39835,7 @@ RenderTexture.prototype.resize = function (width, height, updateBase)
         return;
     }
 
-    this.textureBuffer.resize(this.width, this.height);
+    this.textureBuffer.resize(this.width * this.resolution, this.height * this.resolution);
 
     if(this.filterManager)
     {
@@ -47235,7 +40116,7 @@ RenderTexture.prototype.getPixel = function (x, y)
     }
 };
 
-},{"../const":23,"../math":33,"../renderers/canvas/utils/CanvasBuffer":45,"../renderers/webgl/managers/FilterManager":54,"../renderers/webgl/utils/RenderTarget":65,"./BaseTexture":70,"./Texture":72}],72:[function(require,module,exports){
+},{"../const":22,"../math":32,"../renderers/canvas/utils/CanvasBuffer":44,"../renderers/webgl/managers/FilterManager":53,"../renderers/webgl/utils/RenderTarget":64,"./BaseTexture":69,"./Texture":71}],71:[function(require,module,exports){
 var BaseTexture = require('./BaseTexture'),
     VideoBaseTexture = require('./VideoBaseTexture'),
     TextureUvs = require('./TextureUvs'),
@@ -47376,14 +40257,6 @@ function Texture(baseTexture, frame, crop, trim, rotate)
     {
         baseTexture.once('loaded', this.onBaseTextureLoaded, this);
     }
-
-    /**
-     * Fired when the texture is updated. This happens if the frame or the baseTexture is updated.
-     *
-     * @event update
-     * @memberof PIXI.Texture#
-     * @protected
-     */
 }
 
 Texture.prototype = Object.create(EventEmitter.prototype);
@@ -47428,7 +40301,7 @@ Object.defineProperties(Texture.prototype, {
                 this.crop = frame;
             }
 
-            if (this.valid)
+             if (this.valid)
             {
                 this._updateUvs();
             }
@@ -47462,7 +40335,7 @@ Texture.prototype.onBaseTextureLoaded = function (baseTexture)
         this.frame = this._frame;
     }
 
-    this.emit('update', this);
+    this.emit( 'update', this );
 };
 
 Texture.prototype.onBaseTextureUpdated = function (baseTexture)
@@ -47470,7 +40343,7 @@ Texture.prototype.onBaseTextureUpdated = function (baseTexture)
     this._frame.width = baseTexture.width;
     this._frame.height = baseTexture.height;
 
-    this.emit('update', this);
+    this.emit( 'update', this );
 };
 
 /**
@@ -47487,8 +40360,8 @@ Texture.prototype.destroy = function (destroyBase)
             this.baseTexture.destroy();
         }
 
-        this.baseTexture.off('update', this.onBaseTextureUpdated, this);
-        this.baseTexture.off('loaded', this.onBaseTextureLoaded, this);
+        this.baseTexture.off('update', this.onBaseTextureUpdated);
+        this.baseTexture.off('loaded', this.onBaseTextureLoaded);
 
         this.baseTexture = null;
     }
@@ -47641,7 +40514,7 @@ Texture.removeTextureFromCache = function (id)
 
 Texture.EMPTY = new Texture(new BaseTexture());
 
-},{"../math":33,"../utils":77,"./BaseTexture":70,"./TextureUvs":73,"./VideoBaseTexture":74,"eventemitter3":14}],73:[function(require,module,exports){
+},{"../math":32,"../utils":75,"./BaseTexture":69,"./TextureUvs":72,"./VideoBaseTexture":73,"eventemitter3":13}],72:[function(require,module,exports){
 
 /**
  * A standard object to store the Uvs of a texture
@@ -47709,7 +40582,7 @@ TextureUvs.prototype.set = function (frame, baseFrame, rotate)
     }
 };
 
-},{}],74:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 var BaseTexture = require('./BaseTexture'),
     utils = require('../utils');
 
@@ -47736,7 +40609,7 @@ var BaseTexture = require('./BaseTexture'),
  * See the ["deus" demo](http://www.goodboydigital.com/pixijs/examples/deus/).
  *
  * @class
- * @extends PIXI.BaseTexture
+ * @extends BaseTexture
  * @memberof PIXI
  * @param source {HTMLVideoElement}
  * @param [scaleMode] {number} See {@link SCALE_MODES} for possible values
@@ -47942,420 +40815,179 @@ function createSource(path, type)
     return source;
 }
 
-},{"../utils":77,"./BaseTexture":70}],75:[function(require,module,exports){
-var CONST = require('../const'),
-    EventEmitter = require('eventemitter3'),
-    // Internal event used by composed emitter
-    TICK = 'tick';
+},{"../utils":75,"./BaseTexture":69}],74:[function(require,module,exports){
+//TODO: Have Graphics use https://github.com/mattdesl/shape2d
+// and https://github.com/mattdesl/shape2d-triangulate instead of custom code.
+
+/*
+    PolyK library
+    url: http://polyk.ivank.net
+    Released under MIT licence.
+
+    Copyright (c) 2012 Ivan Kuckir
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+    This is an amazing lib!
+
+    Slightly modified by Mat Groves (matgroves.com);
+*/
 
 /**
- * A Ticker class that runs an update loop that other objects listen to.
- * This class is composed around an EventEmitter object to add listeners
- * meant for execution on the next requested animation frame.
- * Animation frames are requested only when necessary,
- * e.g. When the ticker is started and the emitter has listeners.
+ * Based on the Polyk library http://polyk.ivank.net released under MIT licence.
+ * This is an amazing lib!
+ * Slightly modified by Mat Groves (matgroves.com);
  *
- * @class
- * @memberof PIXI.ticker
+ * @memberof PIXI.utils
  */
-function Ticker()
+var PolyK = module.exports = {};
+
+/**
+ * Triangulates shapes for webGL graphic fills.
+ *
+ */
+PolyK.Triangulate = function (p)
 {
-    var _this = this;
-    /**
-     * Internal tick method bound to ticker instance.
-     * This is because in early 2015, Function.bind
-     * is still 60% slower in high performance scenarios.
-     * Also separating frame requests from update method
-     * so listeners may be called at any time and with
-     * any animation API, just invoke ticker.update(time).
-     *
-     * @private
-     */
-    this._tick = function _tick(time) {
+    var sign = true;
 
-        _this._requestId = null;
+    var n = p.length >> 1;
+    if (n < 3) return [];
 
-        if (_this.started)
+    var tgs = [];
+    var avl = [];
+    for (var i = 0; i < n; i++) avl.push(i);
+
+    i = 0;
+    var al = n;
+    while (al > 3)
+    {
+        var i0 = avl[(i+0)%al];
+        var i1 = avl[(i+1)%al];
+        var i2 = avl[(i+2)%al];
+
+        var ax = p[2*i0],  ay = p[2*i0+1];
+        var bx = p[2*i1],  by = p[2*i1+1];
+        var cx = p[2*i2],  cy = p[2*i2+1];
+
+        var earFound = false;
+        if (PolyK._convex(ax, ay, bx, by, cx, cy, sign))
         {
-            // Invoke listeners now
-            _this.update(time);
-            // Listener side effects may have modified ticker state.
-            if (_this.started && _this._requestId === null && _this._emitter.listeners(TICK, true))
+            earFound = true;
+            for (var j = 0; j < al; j++)
             {
-                _this._requestId = requestAnimationFrame(_this._tick);
+                var vi = avl[j];
+                if (vi === i0 || vi === i1 || vi === i2) continue;
+
+                if (PolyK._PointInTriangle(p[2*vi], p[2*vi+1], ax, ay, bx, by, cx, cy))
+                {
+                    earFound = false;
+                    break;
+                }
             }
         }
-    };
-    /**
-     * Internal emitter used to fire 'tick' event
-     * @private
-     */
-    this._emitter = new EventEmitter();
-    /**
-     * Internal current frame request ID
-     * @private
-     */
-    this._requestId = null;
-    /**
-     * Internal value managed by minFPS property setter and getter.
-     * This is the maximum allowed milliseconds between updates.
-     * @private
-     */
-    this._maxElapsedMS = 100;
 
-    /**
-     * Whether or not this ticker should invoke the method
-     * {@link PIXI.ticker.Ticker#start} automatically
-     * when a listener is added.
-     *
-     * @member {boolean}
-     * @default false
-     */
-    this.autoStart = false;
-
-    /**
-     * Scalar time value from last frame to this frame.
-     * This value is capped by setting {@link PIXI.ticker.Ticker#minFPS}
-     * and is scaled with {@link PIXI.ticker.Ticker#speed}.
-     * **Note:** The cap may be exceeded by scaling.
-     *
-     * @member {number}
-     * @default 1
-     */
-    this.deltaTime = 1;
-
-    /**
-     * Time elapsed in milliseconds from last frame to this frame.
-     * Opposed to what the scalar {@link PIXI.ticker.Ticker#deltaTime}
-     * is based, this value is neither capped nor scaled.
-     * If the platform supports DOMHighResTimeStamp,
-     * this value will have a precision of 1 µs.
-     *
-     * @member {DOMHighResTimeStamp|number}
-     * @default 1 / TARGET_FPMS
-     */
-    this.elapsedMS = 1 / CONST.TARGET_FPMS; // default to target frame time
-
-    /**
-     * The last time {@link PIXI.ticker.Ticker#update} was invoked.
-     * This value is also reset internally outside of invoking
-     * update, but only when a new animation frame is requested.
-     * If the platform supports DOMHighResTimeStamp,
-     * this value will have a precision of 1 µs.
-     *
-     * @member {DOMHighResTimeStamp|number}
-     * @default 0
-     */
-    this.lastTime = 0;
-
-    /**
-     * Factor of current {@link PIXI.ticker.Ticker#deltaTime}.
-     * @example
-     *     // Scales ticker.deltaTime to what would be
-     *     // the equivalent of approximately 120 FPS
-     *     ticker.speed = 2;
-     *
-     * @member {number}
-     * @default 1
-     */
-    this.speed = 1;
-
-    /**
-     * Whether or not this ticker has been started.
-     * `true` if {@link PIXI.ticker.Ticker#start} has been called.
-     * `false` if {@link PIXI.ticker.Ticker#stop} has been called.
-     * While `false`, this value may change to `true` in the
-     * event of {@link PIXI.ticker.Ticker#autoStart} being `true`
-     * and a listener is added.
-     *
-     * @member {boolean}
-     * @default false
-     */
-    this.started = false;
-}
-
-Object.defineProperties(Ticker.prototype, {
-    /**
-     * The frames per second at which this ticker is running.
-     * The default is approximately 60 in most modern browsers.
-     * **Note:** This does not factor in the value of
-     * {@link PIXI.ticker.Ticker#speed}, which is specific
-     * to scaling {@link PIXI.ticker.Ticker#deltaTime}.
-     *
-     * @member
-     * @memberof PIXI.ticker.Ticker#
-     * @readonly
-     */
-    FPS: {
-        get: function()
+        if (earFound)
         {
-            return 1000 / this.elapsedMS;
+            tgs.push(i0, i1, i2);
+            avl.splice((i+1)%al, 1);
+            al--;
+            i = 0;
         }
-    },
+        else if (i++ > 3*al)
+        {
+            // need to flip flip reverse it!
+            // reset!
+            if (sign)
+            {
+                tgs = [];
+                avl = [];
+                for (i = 0; i < n; i++) avl.push(i);
 
-    /**
-     * Manages the maximum amount of milliseconds allowed to
-     * elapse between invoking {@link PIXI.ticker.Ticker#update}.
-     * This value is used to cap {@link PIXI.ticker.Ticker#deltaTime},
-     * but does not effect the measured value of {@link PIXI.ticker.Ticker#FPS}.
-     * When setting this property it is clamped to a value between
-     * `0` and `PIXI.TARGET_FPMS * 1000`.
-     *
-     * @member
-     * @memberof PIXI.ticker.Ticker#
-     * @default 10
-     */
-    minFPS: {
-        get: function()
-        {
-            return 1000 / this._maxElapsedMS;
-        },
-        set: function(fps)
-        {
-            // Clamp: 0 to TARGET_FPMS
-            var minFPMS = Math.min(Math.max(0, fps) / 1000, CONST.TARGET_FPMS);
-            this._maxElapsedMS = 1 / minFPMS;
+                i = 0;
+                al = n;
+
+                sign = false;
+            }
+            else
+            {
+             //   window.console.log("PIXI Warning: shape too complex to fill");
+                return null;
+            }
         }
     }
-});
+
+    tgs.push(avl[0], avl[1], avl[2]);
+    return tgs;
+};
 
 /**
- * Conditionally requests a new animation frame.
- * If a frame has not already been requested, and if the internal
- * emitter has listeners, a new frame is requested.
+ * Checks whether a point is within a triangle
+ *
+ * @param px {number} x coordinate of the point to test
+ * @param py {number} y coordinate of the point to test
+ * @param ax {number} x coordinate of the a point of the triangle
+ * @param ay {number} y coordinate of the a point of the triangle
+ * @param bx {number} x coordinate of the b point of the triangle
+ * @param by {number} y coordinate of the b point of the triangle
+ * @param cx {number} x coordinate of the c point of the triangle
+ * @param cy {number} y coordinate of the c point of the triangle
+ * @private
+ * @return {boolean}
+ */
+PolyK._PointInTriangle = function (px, py, ax, ay, bx, by, cx, cy)
+{
+    var v0x = cx-ax;
+    var v0y = cy-ay;
+    var v1x = bx-ax;
+    var v1y = by-ay;
+    var v2x = px-ax;
+    var v2y = py-ay;
+
+    var dot00 = v0x*v0x+v0y*v0y;
+    var dot01 = v0x*v1x+v0y*v1y;
+    var dot02 = v0x*v2x+v0y*v2y;
+    var dot11 = v1x*v1x+v1y*v1y;
+    var dot12 = v1x*v2x+v1y*v2y;
+
+    var invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+    var u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    var v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    // Check if point is in triangle
+    return (u >= 0) && (v >= 0) && (u + v < 1);
+};
+
+/**
+ * Checks whether a shape is convex
  *
  * @private
+ * @return {boolean}
  */
-Ticker.prototype._requestIfNeeded = function _requestIfNeeded()
+PolyK._convex = function (ax, ay, bx, by, cx, cy, sign)
 {
-    if (this._requestId === null && this._emitter.listeners(TICK, true))
-    {
-        // ensure callbacks get correct delta
-        this.lastTime = performance.now();
-        this._requestId = requestAnimationFrame(this._tick);
-    }
+    return ((ay-by)*(cx-bx) + (bx-ax)*(cy-by) >= 0) === sign;
 };
 
-/**
- * Conditionally cancels a pending animation frame.
- *
- * @private
- */
-Ticker.prototype._cancelIfNeeded = function _cancelIfNeeded()
-{
-    if (this._requestId !== null)
-    {
-        cancelAnimationFrame(this._requestId);
-        this._requestId = null;
-    }
-};
-
-/**
- * Conditionally requests a new animation frame.
- * If the ticker has been started it checks if a frame has not already
- * been requested, and if the internal emitter has listeners. If these
- * conditions are met, a new frame is requested. If the ticker has not
- * been started, but autoStart is `true`, then the ticker starts now,
- * and continues with the previous conditions to request a new frame.
- *
- * @private
- */
-Ticker.prototype._startIfPossible = function _startIfPossible()
-{
-    if (this.started)
-    {
-        this._requestIfNeeded();
-    }
-    else if (this.autoStart)
-    {
-        this.start();
-    }
-};
-
-/**
- * Calls {@link module:eventemitter3.EventEmitter#on} internally for the
- * internal 'tick' event. It checks if the emitter has listeners,
- * and if so it requests a new animation frame at this point.
- *
- * @param fn {Function} The listener function to be added for updates
- * @param [context] {Function} The listener context
- * @returns {PIXI.ticker.Ticker} this
- */
-Ticker.prototype.add = function add(fn, context)
-{
-    this._emitter.on(TICK, fn, context);
-
-    this._startIfPossible();
-
-    return this;
-};
-
-/**
- * Calls {@link module:eventemitter3.EventEmitter#once} internally for the
- * internal 'tick' event. It checks if the emitter has listeners,
- * and if so it requests a new animation frame at this point.
- *
- * @param fn {Function} The listener function to be added for one update
- * @param [context] {Function} The listener context
- * @returns {PIXI.ticker.Ticker} this
- */
-Ticker.prototype.addOnce = function addOnce(fn, context)
-{
-    this._emitter.once(TICK, fn, context);
-
-    this._startIfPossible();
-
-    return this;
-};
-
-/**
- * Calls {@link module:eventemitter3.EventEmitter#off} internally for 'tick' event.
- * It checks if the emitter has listeners for 'tick' event.
- * If it does, then it cancels the animation frame.
- *
- * @param [fn] {Function} The listener function to be removed
- * @param [context] {Function} The listener context to be removed
- * @returns {PIXI.ticker.Ticker} this
- */
-Ticker.prototype.remove = function remove(fn, context)
-{
-    this._emitter.off(TICK, fn, context);
-
-    if (!this._emitter.listeners(TICK, true))
-    {
-        this._cancelIfNeeded();
-    }
-
-    return this;
-};
-
-/**
- * Starts the ticker. If the ticker has listeners
- * a new animation frame is requested at this point.
- */
-Ticker.prototype.start = function start()
-{
-    if (!this.started)
-    {
-        this.started = true;
-        this._requestIfNeeded();
-    }
-};
-
-/**
- * Stops the ticker. If the ticker has requested
- * an animation frame it is canceled at this point.
- */
-Ticker.prototype.stop = function stop()
-{
-    if (this.started)
-    {
-        this.started = false;
-        this._cancelIfNeeded();
-    }
-};
-
-/**
- * Triggers an update. An update entails setting the
- * current {@link PIXI.ticker.Ticker#elapsedMS},
- * the current {@link PIXI.ticker.Ticker#deltaTime},
- * invoking all listeners with current deltaTime,
- * and then finally setting {@link PIXI.ticker.Ticker#lastTime}
- * with the value of currentTime that was provided.
- * This method will be called automatically by animation
- * frame callbacks if the ticker instance has been started
- * and listeners are added.
- *
- * @param [currentTime=performance.now()] {DOMHighResTimeStamp|number} the current time of execution
- */
-Ticker.prototype.update = function update(currentTime)
-{
-    var elapsedMS;
-
-    // Allow calling update directly with default currentTime.
-    currentTime = currentTime || performance.now();
-    // Save uncapped elapsedMS for measurement
-    elapsedMS = this.elapsedMS = currentTime - this.lastTime;
-
-    // cap the milliseconds elapsed used for deltaTime
-    if (elapsedMS > this._maxElapsedMS)
-    {
-        elapsedMS = this._maxElapsedMS;
-    }
-
-    this.deltaTime = elapsedMS * CONST.TARGET_FPMS * this.speed;
-
-    // Invoke listeners added to internal emitter
-    this._emitter.emit(TICK, this.deltaTime);
-
-    this.lastTime = currentTime;
-};
-
-module.exports = Ticker;
-
-},{"../const":23,"eventemitter3":14}],76:[function(require,module,exports){
-/**
- * @file        Main export of the PIXI extras library
- * @author      Mat Groves <mat@goodboydigital.com>
- * @copyright   2013-2015 GoodBoyDigital
- * @license     {@link https://github.com/GoodBoyDigital/pixi.js/blob/master/LICENSE|MIT License}
- */
-var Ticker = require('./Ticker');
-
-/**
- * The shared ticker instance used by {@link PIXI.extras.MovieClip}.
- * and by {@link PIXI.interaction.InteractionManager}.
- * The property {@link PIXI.ticker.Ticker#autoStart} is set to `true`
- * for this instance. Please follow the examples for usage, including
- * how to opt-out of auto-starting the shared ticker.
- *
- * @example
- *     var ticker = PIXI.ticker.shared;
- *     // Set this to prevent starting this ticker when listeners are added.
- *     // By default this is true only for the PIXI.ticker.shared instance.
- *     ticker.autoStart = false;
- *     // FYI, call this to ensure the ticker is stopped. It should be stopped
- *     // if you have not attempted to render anything yet.
- *     ticker.stop();
- *     // Call this when you are ready for a running shared ticker.
- *     ticker.start();
- *
- * @example
- *     // You may use the shared ticker to render...
- *     var renderer = PIXI.autoDetectRenderer(800, 600);
- *     var stage = new PIXI.Container();
- *     var interactionManager = PIXI.interaction.InteractionManager(renderer);
- *     document.body.appendChild(renderer.view);
- *     ticker.add(function (time) {
- *         renderer.render(stage);
- *     });
- *
- * @example
- *     // Or you can just update it manually.
- *     ticker.autoStart = false;
- *     ticker.stop();
- *     function animate(time) {
- *         ticker.update(time);
- *         renderer.render(stage);
- *         requestAnimationFrame(animate);
- *     }
- *     animate(performance.now());
- *
- * @type {PIXI.ticker.Ticker}
- * @memberof PIXI.ticker
- */
-var shared = new Ticker();
-shared.autoStart = true;
-
-/**
- * @namespace PIXI.ticker
- */
-module.exports = {
-    shared: shared,
-    Ticker: Ticker
-};
-
-},{"./Ticker":75}],77:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 var CONST = require('../const');
 
 /**
@@ -48366,6 +40998,7 @@ var utils = module.exports = {
     _saidHello: false,
 
     pluginTarget:   require('./pluginTarget'),
+    PolyK:          require('./PolyK'),
     async:          require('async'),
 
     /**
@@ -48585,7 +41218,7 @@ var utils = module.exports = {
     BaseTextureCache: {}
 };
 
-},{"../const":23,"./pluginTarget":78,"async":12}],78:[function(require,module,exports){
+},{"../const":22,"./PolyK":74,"./pluginTarget":76,"async":12}],76:[function(require,module,exports){
 /**
  * Mixins functionality to make an object have "plugins".
  *
@@ -48655,7 +41288,7 @@ module.exports = {
     }
 };
 
-},{}],79:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 /*global console */
 var core = require('./core'),
     mesh = require('./mesh'),
@@ -48664,7 +41297,6 @@ var core = require('./core'),
 
 /**
  * @class
- * @private
  * @name PIXI.SpriteBatch
  * @see {@link PIXI.ParticleContainer}
  * @throws {ReferenceError} SpriteBatch does not exist any more, please use the new ParticleContainer instead.
@@ -48675,7 +41307,6 @@ core.SpriteBatch = function() {
 
 /**
  * @class
- * @private
  * @name PIXI.AssetLoader
  * @see {@link PIXI.loaders.Loader}
  * @throws {ReferenceError} The loader system was overhauled in pixi v3, please see the new PIXI.loaders.Loader class.
@@ -48688,7 +41319,6 @@ Object.defineProperties(core, {
 
     /**
      * @class
-     * @private
      * @name PIXI.Stage
      * @see {@link PIXI.Container}
      * @deprecated since version 3.0
@@ -48702,7 +41332,6 @@ Object.defineProperties(core, {
 
     /**
      * @class
-     * @private
      * @name PIXI.DisplayObjectContainer
      * @see {@link PIXI.Container}
      * @deprecated since version 3.0
@@ -48716,7 +41345,6 @@ Object.defineProperties(core, {
 
     /**
      * @class
-     * @private
      * @name PIXI.Strip
      * @see {@link PIXI.mesh.Mesh}
      * @deprecated since version 3.0
@@ -48730,7 +41358,6 @@ Object.defineProperties(core, {
 
     /**
      * @class
-     * @private
      * @name PIXI.Rope
      * @see {@link PIXI.mesh.Rope}
      * @deprecated since version 3.0
@@ -48744,7 +41371,6 @@ Object.defineProperties(core, {
 
     /**
      * @class
-     * @private
      * @name PIXI.MovieClip
      * @see {@link PIXI.MovieClip}
      * @deprecated since version 3.0
@@ -48757,7 +41383,6 @@ Object.defineProperties(core, {
     },
     /**
      * @class
-     * @private
      * @name PIXI.TilingSprite
      * @see {@link PIXI.TilingSprite}
      * @deprecated since version 3.0
@@ -48770,7 +41395,6 @@ Object.defineProperties(core, {
     },
     /**
      * @class
-     * @private
      * @name PIXI.BitmapText
      * @see {@link PIXI.extras.BitmapText}
      * @deprecated since version 3.0
@@ -48783,7 +41407,6 @@ Object.defineProperties(core, {
     },
     /**
      * @class
-     * @private
      * @name PIXI.blendModes
      * @see {@link PIXI.BLEND_MODES}
      * @deprecated since version 3.0
@@ -48796,7 +41419,6 @@ Object.defineProperties(core, {
     },
     /**
      * @class
-     * @private
      * @name PIXI.scaleModes
      * @see {@link PIXI.SCALE_MODES}
      * @deprecated since version 3.0
@@ -48809,7 +41431,6 @@ Object.defineProperties(core, {
     },
     /**
      * @class
-     * @private
      * @name PIXI.BaseTextureCache
      * @see {@link PIXI.utils.BaseTextureCache}
      * @deprecated since version 3.0
@@ -48822,7 +41443,6 @@ Object.defineProperties(core, {
     },
     /**
      * @class
-     * @private
      * @name PIXI.TextureCache
      * @see {@link PIXI.utils.TextureCache}
      * @deprecated since version 3.0
@@ -48837,7 +41457,6 @@ Object.defineProperties(core, {
 
 /**
  * @method
- * @private
  * @name PIXI.Sprite#setTexture
  * @see {@link PIXI.Sprite#texture}
  * @deprecated since version 3.0
@@ -48891,7 +41510,7 @@ core.Texture.prototype.setFrame = function(frame) {
     console.warn('setFrame is now deprecated, please use the frame property, e.g : myTexture.frame = frame;');
 };
 
-},{"./core":30,"./core/utils":77,"./extras":86,"./mesh":128}],80:[function(require,module,exports){
+},{"./core":29,"./core/utils":75,"./extras":84,"./mesh":126}],78:[function(require,module,exports){
 var core = require('../core');
 
 /**
@@ -48910,7 +41529,7 @@ var core = require('../core');
  * http://www.bmglyph.com/ for mac.
  *
  * @class
- * @extends PIXI.Container
+ * @extends Container
  * @memberof PIXI.extras
  * @param text {string} The copy that you would like the text to display
  * @param style {object} The style parameters
@@ -49238,40 +41857,20 @@ BitmapText.prototype.updateText = function ()
  */
 BitmapText.prototype.updateTransform = function ()
 {
-    this.validate();
-    this.containerUpdateTransform();
-};
-
-/**
- * Validates text before calling parent's getLocalBounds
- *
- * @return {Rectangle} The rectangular bounding area
- */
-
-BitmapText.prototype.getLocalBounds = function()
-{
-    this.validate();
-    return core.Container.prototype.getLocalBounds.call(this);
-};
-
-/**
- * Updates text when needed
- *
- * @private
- */
-BitmapText.prototype.validate = function()
-{
     if (this.dirty)
     {
         this.updateText();
         this.dirty = false;
     }
+
+    this.containerUpdateTransform();
 };
 
 BitmapText.fonts = {};
 
-},{"../core":30}],81:[function(require,module,exports){
-var core = require('../core');
+},{"../core":29}],79:[function(require,module,exports){
+var core    = require('../core'),
+    ticker  = require('../ticker');
 
 /**
  * A MovieClip is a simple way to display an animation depicted by a list of textures.
@@ -49290,7 +41889,7 @@ var core = require('../core');
  * ```
  *
  * @class
- * @extends PIXI.Sprite
+ * @extends Sprite
  * @memberof PIXI.extras
  * @param textures {Texture[]} an array of {Texture} objects that make up the animation
  */
@@ -49354,8 +41953,8 @@ Object.defineProperties(MovieClip.prototype, {
      * totalFrames is the total number of frames in the MovieClip. This is the same as number of textures
      * assigned to the MovieClip.
      *
-     * @member {number}
-     * @memberof PIXI.MovieClip#
+     * @member
+     * @memberof MovieClip#
      * @default 0
      * @readonly
      */
@@ -49369,8 +41968,8 @@ Object.defineProperties(MovieClip.prototype, {
     /**
      * The array of textures used for this MovieClip
      *
-     * @member {PIXI.Texture[]}
-     * @memberof PIXI.MovieClip#
+     * @member {Texture[]}
+     * @memberof MovieClip#
      *
      */
     textures: {
@@ -49390,7 +41989,6 @@ Object.defineProperties(MovieClip.prototype, {
     * The MovieClips current frame index
     *
     * @member {number}
-    * @memberof PIXI.MovieClip#
     * @readonly
     */
     currentFrame: {
@@ -49414,7 +42012,7 @@ MovieClip.prototype.stop = function ()
     }
 
     this.playing = false;
-    core.ticker.shared.remove(this.update, this);
+    ticker.shared.remove(this.update, this);
 };
 
 /**
@@ -49429,7 +42027,7 @@ MovieClip.prototype.play = function ()
     }
 
     this.playing = true;
-    core.ticker.shared.add(this.update, this);
+    ticker.shared.add(this.update, this);
 };
 
 /**
@@ -49473,7 +42071,8 @@ MovieClip.prototype.update = function (deltaTime)
     {
         if (this.loop)
         {
-            this._texture = this._textures[this._textures.length - 1 + floor % this._textures.length];
+            this._currentTime += this._textures.length;
+            this._texture = this._textures[this._currentTime];
         }
         else
         {
@@ -49546,7 +42145,7 @@ MovieClip.fromImages = function (images)
     return new MovieClip(textures);
 };
 
-},{"../core":30}],82:[function(require,module,exports){
+},{"../core":29,"../ticker":133}],80:[function(require,module,exports){
 var core = require('../core'),
     // a sprite use dfor rendering textures..
     tempPoint = new core.Point();
@@ -49555,7 +42154,7 @@ var core = require('../core'),
  * A tiling sprite is a fast way of rendering a tiling image
  *
  * @class
- * @extends PIXI.Sprite
+ * @extends Sprite
  * @memberof PIXI.extras
  * @param texture {Texture} the texture of the tiling sprite
  * @param width {number}  the width of the tiling sprite
@@ -49618,7 +42217,7 @@ function TilingSprite(texture, width, height)
         'attribute vec4 aColor;',
 
         'uniform mat3 projectionMatrix;',
-
+        
         'uniform vec4 uFrame;',
         'uniform vec4 uTransform;',
 
@@ -49645,7 +42244,7 @@ function TilingSprite(texture, width, height)
 
         'uniform sampler2D uSampler;',
         'uniform vec4 uFrame;',
-
+                
         'void main(void){',
 
         '   vec2 coord = fract(vTextureCoord);',
@@ -49739,15 +42338,15 @@ TilingSprite.prototype._renderWebGL = function (renderer)
     texture._frame.height = this.height;
 
     //PADDING
-
+    
     // apply padding to stop gaps in the tile when numbers are not rounded
-    this.shader.uniforms.uFrame.value[0] = tempUvs.x0;
-    this.shader.uniforms.uFrame.value[1] = tempUvs.y0;
-    this.shader.uniforms.uFrame.value[2] = tempUvs.x1 - tempUvs.x0;
-    this.shader.uniforms.uFrame.value[3] = tempUvs.y2 - tempUvs.y0;
+    this.shader.uniforms.uFrame.value[0] = tempUvs.x0 + (0.5 / tw); // the 0.5 is padding
+    this.shader.uniforms.uFrame.value[1] = tempUvs.y0 + (0.5 / th); // the 0.5 is padding
+    this.shader.uniforms.uFrame.value[2] = tempUvs.x1 - tempUvs.x0 + (-1 / tw); // the -1 is padding offset
+    this.shader.uniforms.uFrame.value[3] = tempUvs.y2 - tempUvs.y0 + (-1 / th); // the -1 is padding offset
 
-    this.shader.uniforms.uTransform.value[0] = (this.tilePosition.x % (tempWidth * this.tileScale.x)) / this._width;
-    this.shader.uniforms.uTransform.value[1] = (this.tilePosition.y % (tempHeight * this.tileScale.y)) / this._height;
+    this.shader.uniforms.uTransform.value[0] = (this.tilePosition.x % tw) / this._width;
+    this.shader.uniforms.uTransform.value[1] = (this.tilePosition.y % th) / this._height;
     this.shader.uniforms.uTransform.value[2] = ( tw / this._width ) * this.tileScale.x;
     this.shader.uniforms.uTransform.value[3] = ( th / this._height ) * this.tileScale.y;
 
@@ -49778,8 +42377,8 @@ TilingSprite.prototype._renderCanvas = function (renderer)
         transform = this.worldTransform,
         resolution = renderer.resolution,
         baseTexture = texture.baseTexture,
-        modX = this.tilePosition.x % (texture._frame.width * this.tileScale.x),
-        modY = this.tilePosition.y % (texture._frame.height * this.tileScale.y);
+        modX = this.tilePosition.x % baseTexture.width,
+        modY = this.tilePosition.y % baseTexture.height;
 
     // create a nice shiny pattern!
     // TODO this needs to be refreshed if texture changes..
@@ -49803,8 +42402,8 @@ TilingSprite.prototype._renderCanvas = function (renderer)
     // TODO - this should be rolled into the setTransform above..
     context.scale(this.tileScale.x,this.tileScale.y);
 
-
-    context.translate(modX + (this.anchor.x * -this._width ),
+    
+    context.translate(modX + (this.anchor.x * -this._width ), 
                       modY + (this.anchor.y * -this._height));
 
     // check blend mode
@@ -49983,7 +42582,7 @@ TilingSprite.fromImage = function (imageId, width, height, crossorigin, scaleMod
     return new TilingSprite(core.Texture.fromImage(imageId, crossorigin, scaleMode),width,height);
 };
 
-},{"../core":30}],83:[function(require,module,exports){
+},{"../core":29}],81:[function(require,module,exports){
 var core = require('../core'),
     DisplayObject = core.DisplayObject,
     _tempMatrix = new core.Matrix();
@@ -50031,7 +42630,7 @@ Object.defineProperties(DisplayObject.prototype, {
 
                 this._originalDestroy = this.destroy;
 
-                this._originalContainsPoint = this.containsPoint;
+                this._originalContainesPoint = this.containsPoint;
 
                 this.renderWebGL = this._renderCachedWebGL;
                 this.renderCanvas = this._renderCachedCanvas;
@@ -50066,12 +42665,9 @@ Object.defineProperties(DisplayObject.prototype, {
 */
 DisplayObject.prototype._renderCachedWebGL = function (renderer)
 {
-    if (!this.visible || this.worldAlpha <= 0 || !this.renderable)
-    {
-        return;
-    }
-    
     this._initCachedDisplayObject( renderer );
+
+    this._cachedSprite.worldAlpha = this.worldAlpha;
 
     renderer.setObjectRenderer(renderer.plugins.sprite);
     renderer.plugins.sprite.render( this._cachedSprite );
@@ -50161,11 +42757,6 @@ DisplayObject.prototype._initCachedDisplayObject = function (renderer)
 */
 DisplayObject.prototype._renderCachedCanvas = function (renderer)
 {
-    if (!this.visible || this.worldAlpha <= 0 || !this.renderable)
-    {
-        return;
-    }
-    
     this._initCachedDisplayObjectCanvas( renderer );
 
     this._cachedSprite.worldAlpha = this.worldAlpha;
@@ -50253,7 +42844,7 @@ DisplayObject.prototype._cacheAsBitmapDestroy = function ()
     this._originalDestroy();
 };
 
-},{"../core":30}],84:[function(require,module,exports){
+},{"../core":29}],82:[function(require,module,exports){
 var core = require('../core');
 
 /**
@@ -50281,7 +42872,7 @@ core.Container.prototype.getChildByName = function (name)
     return null;
 };
 
-},{"../core":30}],85:[function(require,module,exports){
+},{"../core":29}],83:[function(require,module,exports){
 var core = require('../core');
 
 /**
@@ -50310,7 +42901,7 @@ core.DisplayObject.prototype.getGlobalPosition = function (point)
     return point;
 };
 
-},{"../core":30}],86:[function(require,module,exports){
+},{"../core":29}],84:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI extras library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -50331,7 +42922,7 @@ module.exports = {
     BitmapText:     require('./BitmapText')
 };
 
-},{"./BitmapText":80,"./MovieClip":81,"./TilingSprite":82,"./cacheAsBitmap":83,"./getChildByName":84,"./getGlobalPosition":85}],87:[function(require,module,exports){
+},{"./BitmapText":78,"./MovieClip":79,"./TilingSprite":80,"./cacheAsBitmap":81,"./getChildByName":82,"./getGlobalPosition":83}],85:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -50347,7 +42938,7 @@ var core = require('../../core');
  * An ASCII filter.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function AsciiFilter()
@@ -50388,7 +42979,7 @@ Object.defineProperties(AsciiFilter.prototype, {
     }
 });
 
-},{"../../core":30}],88:[function(require,module,exports){
+},{"../../core":29}],86:[function(require,module,exports){
 var core = require('../../core'),
     BlurXFilter = require('../blur/BlurXFilter'),
     BlurYFilter = require('../blur/BlurYFilter');
@@ -50398,7 +42989,7 @@ var core = require('../../core'),
  * The strength of the blur can be set for x- and y-axis separately.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function BloomFilter()
@@ -50489,7 +43080,7 @@ Object.defineProperties(BloomFilter.prototype, {
     }
 });
 
-},{"../../core":30,"../blur/BlurXFilter":91,"../blur/BlurYFilter":92}],89:[function(require,module,exports){
+},{"../../core":29,"../blur/BlurXFilter":89,"../blur/BlurYFilter":90}],87:[function(require,module,exports){
 var core = require('../../core');
 
 
@@ -50499,7 +43090,7 @@ var core = require('../../core');
  * @class
  * @param {number} dirX
  * @param {number} dirY
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function BlurDirFilter(dirX, dirY)
@@ -50634,25 +43225,34 @@ Object.defineProperties(BlurDirFilter.prototype, {
     }
 });
 
-},{"../../core":30}],90:[function(require,module,exports){
+},{"../../core":29}],88:[function(require,module,exports){
 var core = require('../../core'),
-    BlurXFilter = require('./BlurXFilter'),
-    BlurYFilter = require('./BlurYFilter');
+    BlurDirFilter = require('./BlurDirFilter');
 
 /**
  * The BlurFilter applies a Gaussian blur to an object.
  * The strength of the blur can be set for x- and y-axis separately.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function BlurFilter()
 {
     core.AbstractFilter.call(this);
+    this.defaultFilter = new core.AbstractFilter();
 
-    this.blurXFilter = new BlurXFilter();
-    this.blurYFilter = new BlurYFilter();
+    this.blurFilters = [
+        new BlurDirFilter( 1, 0),
+        new BlurDirFilter(-1, 0),
+        new BlurDirFilter( 0, 1),
+        new BlurDirFilter( 0,-1),
+        new BlurDirFilter( 0.7, 0.7),
+        new BlurDirFilter(-0.7, 0.7),
+        new BlurDirFilter( 0.7,-0.7),
+        new BlurDirFilter(-0.7,-0.7)
+    ];
+
 }
 
 BlurFilter.prototype = Object.create(core.AbstractFilter.prototype);
@@ -50663,10 +43263,14 @@ BlurFilter.prototype.applyFilter = function (renderer, input, output)
 {
     var renderTarget = renderer.filterManager.getRenderTarget(true);
 
-    this.blurXFilter.applyFilter(renderer, input, renderTarget);
-    this.blurYFilter.applyFilter(renderer, renderTarget, output);
+    for (var e = 0; e < this.blurFilters.length; e++) {
+        this.blurFilters[e].applyFilter(renderer, input, renderTarget);
+    }
+
+    this.defaultFilter.applyFilter(renderer, renderTarget, output);
 
     renderer.filterManager.returnRenderTarget(renderTarget);
+
 };
 
 Object.defineProperties(BlurFilter.prototype, {
@@ -50680,12 +43284,14 @@ Object.defineProperties(BlurFilter.prototype, {
     blur: {
         get: function ()
         {
-            return this.blurXFilter.blur;
+            return this.blurFilters[0].blur;
         },
         set: function (value)
         {
-            this.padding = Math.abs(value) * 0.5;
-            this.blurXFilter.blur = this.blurYFilter.blur = value;
+            this.padding = value * 0.5;
+            for (var i = 0; i < this.blurFilters.length; i++) {
+                this.blurFilters[i].blur = value;
+            }
         }
     },
 
@@ -50699,11 +43305,13 @@ Object.defineProperties(BlurFilter.prototype, {
     passes: {
         get: function ()
         {
-            return  this.blurXFilter.passes;
+            return this.blurFilters[0].passes;
         },
         set: function (value)
         {
-            this.blurXFilter.passes = this.blurYFilter.passes = value;
+            for (var i = 0; i < this.blurFilters.length; i++) {
+                this.blurFilters[i].passes = value;
+            }
         }
     },
 
@@ -50717,11 +43325,18 @@ Object.defineProperties(BlurFilter.prototype, {
     blurX: {
         get: function ()
         {
-            return this.blurXFilter.blur;
+            return this.blurFilters[0].blur;
         },
         set: function (value)
         {
-            this.blurXFilter.blur = value;
+            this.blurFilters[0].blur = value;
+            this.blurFilters[1].blur = value;
+
+            this.blurFilters[4].blur = value * this.blurFilters[2].blur;
+            this.blurFilters[5].blur = value * this.blurFilters[2].blur;
+
+            this.blurFilters[6].blur = value * this.blurFilters[3].blur;
+            this.blurFilters[7].blur = value * this.blurFilters[3].blur;
         }
     },
 
@@ -50739,12 +43354,19 @@ Object.defineProperties(BlurFilter.prototype, {
         },
         set: function (value)
         {
-            this.blurYFilter.blur = value;
+            this.blurFilters[2].blur = value;
+            this.blurFilters[3].blur = value;
+
+            this.blurFilters[4].blur = value * this.blurFilters[0].blur;
+            this.blurFilters[5].blur = value * this.blurFilters[0].blur;
+
+            this.blurFilters[6].blur = value * this.blurFilters[1].blur;
+            this.blurFilters[7].blur = value * this.blurFilters[1].blur;
         }
     }
 });
 
-},{"../../core":30,"./BlurXFilter":91,"./BlurYFilter":92}],91:[function(require,module,exports){
+},{"../../core":29,"./BlurDirFilter":87}],89:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -50753,7 +43375,7 @@ var core = require('../../core');
  * The BlurXFilter applies a horizontal Gaussian blur to an object.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function BlurXFilter()
@@ -50803,7 +43425,7 @@ BlurXFilter.prototype.applyFilter = function (renderer, input, output, clear)
 
         for(var i = 0; i < this.passes-1; i++)
         {
-            renderer.filterManager.applyFilter(shader, flip, flop, true);
+            renderer.filterManager.applyFilter(shader, flip, flop, clear);
 
            var temp = flop;
            flop = flip;
@@ -50832,13 +43454,13 @@ Object.defineProperties(BlurXFilter.prototype, {
         },
         set: function (value)
         {
-            this.padding =  Math.abs(value) * 0.5;
+            this.padding = value * 0.5;
             this.strength = value;
         }
     }
 });
 
-},{"../../core":30}],92:[function(require,module,exports){
+},{"../../core":29}],90:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -50847,7 +43469,7 @@ var core = require('../../core');
  * The BlurYFilter applies a horizontal Gaussian blur to an object.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function BlurYFilter()
@@ -50875,7 +43497,7 @@ BlurYFilter.prototype.applyFilter = function (renderer, input, output, clear)
 {
     var shader = this.getShader(renderer);
 
-    this.uniforms.strength.value = Math.abs(this.strength) / 4 / this.passes * (input.frame.height / input.size.height);
+    this.uniforms.strength.value = this.strength / 4 / this.passes * (input.frame.height / input.size.height);
 
     if(this.passes === 1)
     {
@@ -50889,7 +43511,7 @@ BlurYFilter.prototype.applyFilter = function (renderer, input, output, clear)
 
         for(var i = 0; i < this.passes-1; i++)
         {
-            renderer.filterManager.applyFilter(shader, flip, flop, true);
+            renderer.filterManager.applyFilter(shader, flip, flop, clear);
 
            var temp = flop;
            flop = flip;
@@ -50918,13 +43540,13 @@ Object.defineProperties(BlurYFilter.prototype, {
         },
         set: function (value)
         {
-            this.padding = Math.abs(value) * 0.5;
+            this.padding = value * 0.5;
             this.strength = value;
         }
     }
 });
 
-},{"../../core":30}],93:[function(require,module,exports){
+},{"../../core":29}],91:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -50933,7 +43555,7 @@ var core = require('../../core');
  * A Smart Blur Filter.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function SmartBlurFilter()
@@ -50954,13 +43576,13 @@ SmartBlurFilter.prototype = Object.create(core.AbstractFilter.prototype);
 SmartBlurFilter.prototype.constructor = SmartBlurFilter;
 module.exports = SmartBlurFilter;
 
-},{"../../core":30}],94:[function(require,module,exports){
+},{"../../core":29}],92:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
 
 /**
- * The ColorMatrixFilter class lets you apply a 5x4 matrix transformation on the RGBA
+ * The ColorMatrixFilter class lets you apply a 5x5 matrix transformation on the RGBA
  * color and alpha values of every pixel on your displayObject to produce a result
  * with a new set of RGBA color and alpha values. It's pretty powerful!
  *
@@ -50971,7 +43593,7 @@ var core = require('../../core');
  * ```
  * @author Clément Chenebault <clement@goodboydigital.com>
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function ColorMatrixFilter()
@@ -50980,17 +43602,14 @@ function ColorMatrixFilter()
         // vertex shader
         null,
         // fragment shader
-        "precision mediump float;\n\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform float m[25];\n\nvoid main(void)\n{\n\n    vec4 c = texture2D(uSampler, vTextureCoord);\n\n    gl_FragColor.r = (m[0] * c.r);\n        gl_FragColor.r += (m[1] * c.g);\n        gl_FragColor.r += (m[2] * c.b);\n        gl_FragColor.r += (m[3] * c.a);\n        gl_FragColor.r += m[4];\n\n    gl_FragColor.g = (m[5] * c.r);\n        gl_FragColor.g += (m[6] * c.g);\n        gl_FragColor.g += (m[7] * c.b);\n        gl_FragColor.g += (m[8] * c.a);\n        gl_FragColor.g += m[9];\n\n     gl_FragColor.b = (m[10] * c.r);\n        gl_FragColor.b += (m[11] * c.g);\n        gl_FragColor.b += (m[12] * c.b);\n        gl_FragColor.b += (m[13] * c.a);\n        gl_FragColor.b += m[14];\n\n     gl_FragColor.a = (m[15] * c.r);\n        gl_FragColor.a += (m[16] * c.g);\n        gl_FragColor.a += (m[17] * c.b);\n        gl_FragColor.a += (m[18] * c.a);\n        gl_FragColor.a += m[19];\n\n}\n",
+        "precision mediump float;\n\nvarying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform float m[24];\n\nuniform vec4 d;\n\nvoid main(void)\n{\n    \n    vec4 c = texture2D(uSampler, vTextureCoord);\n\n\tgl_FragColor.r = m[0] * c.r + m[1] * c.g + m[2] * c.b + m[3] * c.a + m[4];\n\tgl_FragColor.g = m[5] * c.r + m[6] * c.g + m[7] * c.b + m[8] * c.a + m[9];\n\tgl_FragColor.b = m[10] * c.r + m[11] * c.g + m[12] * c.b + m[13] * c.a + m[14];\n\tgl_FragColor.a = c.a;\n}\n",
         // custom uniforms
         {
-            m: {
-                type: '1fv', value: [
-                    1, 0, 0, 0, 0,
-                    0, 1, 0, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 0, 1, 0
-                ]
-            }
+            m: { type: '1fv', value: [1, 0, 0, 0, 0,
+                                    0, 1, 0, 0, 0,
+                                    0, 0, 1, 0, 0,
+                                    0, 0, 0, 1, 0,
+                                    0, 0, 0, 0, 1] }
         }
     );
 }
@@ -51003,16 +43622,17 @@ module.exports = ColorMatrixFilter;
 /**
  * Transforms current matrix and set the new one
  *
- * @param matrix {number[]} (mat 5x4)
+ * @param matrix {array} (mat 5x5)
  * @param multiply {boolean} if true, current matrix and matrix are multiplied. If false, just set the current matrix with @param matrix
  */
-ColorMatrixFilter.prototype._loadMatrix = function (matrix, multiply)
+ColorMatrixFilter.prototype._loadMatrix = function(matrix, multiply)
 {
     multiply = !!multiply;
 
     var newMatrix = matrix;
 
-    if (multiply) {
+    if(multiply)
+    {
         this._multiply(newMatrix, this.uniforms.m.value, matrix);
         newMatrix = this._colorMatrix(newMatrix);
     }
@@ -51024,41 +43644,47 @@ ColorMatrixFilter.prototype._loadMatrix = function (matrix, multiply)
 /**
  * Multiplies two mat5's
  *
- * @param out {array} (mat 5x4) the receiving matrix
- * @param a {array} (mat 5x4) the first operand
- * @param b {array} (mat 5x4) the second operand
- * @returns out {array} (mat 5x4)
+ * @param out {array} (mat 5x5) the receiving matrix
+ * @param a {array} (mat 5x5) the first operand
+ * @param b {array} (mat 5x5) the second operand
+ * @returns out {array} (mat 5x5)
  */
-ColorMatrixFilter.prototype._multiply = function (out, a, b)
-{
+ColorMatrixFilter.prototype._multiply = function (out, a, b) {
 
-    // Red Channel
-    out[0] = (a[0] * b[0]) + (a[1] * b[5]) + (a[2] * b[10]) + (a[3] * b[15]);
-    out[1] = (a[0] * b[1]) + (a[1] * b[6]) + (a[2] * b[11]) + (a[3] * b[16]);
-    out[2] = (a[0] * b[2]) + (a[1] * b[7]) + (a[2] * b[12]) + (a[3] * b[17]);
-    out[3] = (a[0] * b[3]) + (a[1] * b[8]) + (a[2] * b[13]) + (a[3] * b[18]);
-    out[4] = (a[0] * b[4]) + (a[1] * b[9]) + (a[2] * b[14]) + (a[3] * b[19]);
+    // first line
+    out[0] = a[0]*b[0] + a[1]*b[5] + a[2]*b[10] + a[3]*b[15] + a[4]*b[20];
+    out[1] = a[0]*b[1] + a[1]*b[6] + a[2]*b[11] + a[3]*b[16] +a[4]*b[21];
+    out[2] = a[0]*b[2] + a[1]*b[7] + a[2]*b[12] + a[3]*b[17] +a[4]*b[22];
+    out[3] = a[0]*b[3] + a[1]*b[8] + a[2]*b[13] + a[3]*b[18] +a[4]*b[23];
+    out[4] = a[0]*b[4] + a[1]*b[9] + a[2]*b[14] + a[3]*b[19]+a[4]*b[24];
 
-    // Green Channel
-    out[5] = (a[5] * b[0]) + (a[6] * b[5]) + (a[7] * b[10]) + (a[8] * b[15]);
-    out[6] = (a[5] * b[1]) + (a[6] * b[6]) + (a[7] * b[11]) + (a[8] * b[16]);
-    out[7] = (a[5] * b[2]) + (a[6] * b[7]) + (a[7] * b[12]) + (a[8] * b[17]);
-    out[8] = (a[5] * b[3]) + (a[6] * b[8]) + (a[7] * b[13]) + (a[8] * b[18]);
-    out[9] = (a[5] * b[4]) + (a[6] * b[9]) + (a[7] * b[14]) + (a[8] * b[19]);
+    // second line
+    out[5] = a[5]*b[0] + a[6]*b[5] + a[7]*b[10]+ a[8]*b[15]+a[9]*b[20];
+    out[6] = a[5]*b[1] + a[6]*b[6] + a[7]*b[11]+ a[8]*b[16]+a[9]*b[21];
+    out[7] = a[5]*b[2] + a[6]*b[7] + a[7]*b[12]+ a[8]*b[17]+a[9]*b[22];
+    out[8] = a[5]*b[3] + a[6]*b[8] + a[7]*b[13]+ a[8]*b[18]+a[9]*b[23];
+    out[9] = a[5]*b[4] + a[6]*b[9] + a[7]*b[14]+ a[8]*b[19]+a[9]*b[24];
 
-    // Blue Channel
-    out[10] = (a[10] * b[0]) + (a[11] * b[5]) + (a[12] * b[10]) + (a[13] * b[15]);
-    out[11] = (a[10] * b[1]) + (a[11] * b[6]) + (a[12] * b[11]) + (a[13] * b[16]);
-    out[12] = (a[10] * b[2]) + (a[11] * b[7]) + (a[12] * b[12]) + (a[13] * b[17]);
-    out[13] = (a[10] * b[3]) + (a[11] * b[8]) + (a[12] * b[13]) + (a[13] * b[18]);
-    out[14] = (a[10] * b[4]) + (a[11] * b[9]) + (a[12] * b[14]) + (a[13] * b[19]);
+    // third line
+    out[10] = a[10]*b[0] + a[11]*b[5] + a[12]*b[10]+ a[13]*b[15]+a[14]*b[20];
+    out[11] = a[10]*b[1] + a[11]*b[6] + a[12]*b[11]+ a[13]*b[16]+a[14]*b[21];
+    out[12] = a[10]*b[2] + a[11]*b[7] + a[12]*b[12]+ a[13]*b[17]+a[14]*b[22];
+    out[13] = a[10]*b[3] + a[11]*b[8] + a[12]*b[13]+ a[13]*b[18]+a[14]*b[23];
+    out[14] = a[10]*b[4] + a[11]*b[9] + a[12]*b[14]+ a[13]*b[19]+a[14]*b[24];
 
-    // Alpha Channel
-    out[15] = (a[15] * b[0]) + (a[16] * b[5]) + (a[17] * b[10]) + (a[18] * b[15]);
-    out[16] = (a[15] * b[1]) + (a[16] * b[6]) + (a[17] * b[11]) + (a[18] * b[16]);
-    out[17] = (a[15] * b[2]) + (a[16] * b[7]) + (a[17] * b[12]) + (a[18] * b[17]);
-    out[18] = (a[15] * b[3]) + (a[16] * b[8]) + (a[17] * b[13]) + (a[18] * b[18]);
-    out[19] = (a[15] * b[4]) + (a[16] * b[9]) + (a[17] * b[14]) + (a[18] * b[19]);
+    // fourth line
+    out[15] = a[15]*b[0] + a[16]*b[5] + a[17]*b[10]+ a[18]*b[15]+a[19]*b[20];
+    out[16] = a[15]*b[1] + a[16]*b[6] + a[17]*b[11]+ a[18]*b[16]+a[19]*b[21];
+    out[17] = a[15]*b[2] + a[16]*b[7] + a[17]*b[12]+ a[18]*b[17]+a[19]*b[22];
+    out[18] = a[15]*b[3] + a[16]*b[8] + a[17]*b[13]+ a[18]*b[18]+a[19]*b[23];
+    out[19] = a[15]*b[4] + a[16]*b[9] + a[17]*b[14]+ a[18]*b[19]+a[19]*b[24];
+
+    // fifth line
+    out[20] = a[20]*b[0] + a[21]*b[5] + a[22]*b[10]+ a[23]*b[15]+a[24]*b[20];
+    out[21] = a[20]*b[1] + a[21]*b[6] + a[22]*b[11]+ a[23]*b[16]+a[24]*b[21];
+    out[22] = a[20]*b[2] + a[21]*b[7] + a[22]*b[12]+ a[23]*b[17]+a[24]*b[22];
+    out[23] = a[20]*b[3] + a[21]*b[8] + a[22]*b[13]+ a[23]*b[18]+a[24]*b[23];
+    out[24] = a[20]*b[4] + a[21]*b[9] + a[22]*b[14]+ a[23]*b[19]+a[24]*b[24];
 
     return out;
 };
@@ -51066,10 +43692,10 @@ ColorMatrixFilter.prototype._multiply = function (out, a, b)
 /**
  * Create a Float32 Array and normalize the offset component to 0-1
  *
- * @param matrix {number[]} (mat 5x4)
- * @return m {number[]} (mat 5x4) with all values between 0-1
+ * @param matrix {array} (mat 5x5)
+ * @return m { array } (mat 5x5) with all values between 0-1
  */
-ColorMatrixFilter.prototype._colorMatrix = function (matrix)
+ColorMatrixFilter.prototype._colorMatrix = function( matrix )
 {
     // Create a Float32 Array and normalize the offset component to 0-1
     var m = new Float32Array(matrix);
@@ -51088,14 +43714,16 @@ ColorMatrixFilter.prototype._colorMatrix = function (matrix)
  * @param b {number} value of the brigthness (0 is black)
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.brightness = function (b, multiply)
+ColorMatrixFilter.prototype.brightness = function(b, multiply)
 {
     var matrix = [
         b, 0, 0, 0, 0,
         0, b, 0, 0, 0,
         0, 0, b, 0, 0,
-        0, 0, 0, 1, 0
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
     ];
+
 
     this._loadMatrix(matrix, multiply);
 };
@@ -51107,19 +43735,18 @@ ColorMatrixFilter.prototype.brightness = function (b, multiply)
  * @param scale {number} value of the grey (0 is black)
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.greyscale = function (scale, multiply)
+ColorMatrixFilter.prototype.greyscale = function(scale, multiply)
 {
     var matrix = [
         scale, scale, scale, 0, 0,
         scale, scale, scale, 0, 0,
         scale, scale, scale, 0, 0,
-        0, 0, 0, 1, 0
+        0,0,0,1,0,
+        0,0,0,0,1
     ];
 
     this._loadMatrix(matrix, multiply);
 };
-//Americanized alias
-ColorMatrixFilter.prototype.grayscale = ColorMatrixFilter.prototype.greyscale;
 
 /**
  * Set the black and white matrice
@@ -51127,28 +43754,29 @@ ColorMatrixFilter.prototype.grayscale = ColorMatrixFilter.prototype.greyscale;
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.blackAndWhite = function (multiply)
+ColorMatrixFilter.prototype.blackAndWhite = function(multiply)
 {
     var matrix = [
         0.3, 0.6, 0.1, 0, 0,
         0.3, 0.6, 0.1, 0, 0,
         0.3, 0.6, 0.1, 0, 0,
-        0, 0, 0, 1, 0
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
     ];
 
     this._loadMatrix(matrix, multiply);
 };
 
 /**
- * Set the hue property of the color
+ * Set the hue propertie of the color
  *
  * Multiply the current matrix
  * @param rotation {number} in degrees
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.hue = function (rotation, multiply)
+ColorMatrixFilter.prototype.hue = function(rotation, multiply)
 {
-    rotation = (rotation || 0) / 180 * Math.PI;
+    rotation = (rotation || 0)/180 * Math.PI;
     var cos = Math.cos(rotation),
         sin = Math.sin(rotation);
 
@@ -51158,10 +43786,11 @@ ColorMatrixFilter.prototype.hue = function (rotation, multiply)
         lumB = 0.072; // or 0.0820
 
     var matrix = [
-        lumR + cos * (1 - lumR) + sin * (-lumR), lumG + cos * (-lumG) + sin * (-lumG), lumB + cos * (-lumB) + sin * (1 - lumB), 0, 0,
-        lumR + cos * (-lumR) + sin * (0.143), lumG + cos * (1 - lumG) + sin * (0.140), lumB + cos * (-lumB) + sin * (-0.283), 0, 0,
-        lumR + cos * (-lumR) + sin * (-(1 - lumR)), lumG + cos * (-lumG) + sin * (lumG), lumB + cos * (1 - lumB) + sin * (lumB), 0, 0,
-        0, 0, 0, 1, 0
+        lumR+cos*(1-lumR)+sin*(-lumR), lumG+cos*(-lumG)+sin*(-lumG), lumB+cos*(-lumB)+sin*(1-lumB), 0, 0,
+        lumR+cos*(-lumR)+sin*(0.143), lumG+cos*(1-lumG)+sin*(0.140), lumB+cos*(-lumB)+sin*(-0.283), 0, 0,
+        lumR+cos*(-lumR)+sin*(-(1-lumR)), lumG+cos*(-lumG)+sin*(lumG), lumB+cos*(1-lumB)+sin*(lumB), 0, 0,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51176,16 +43805,17 @@ ColorMatrixFilter.prototype.hue = function (rotation, multiply)
  * @param amount {number} value of the contrast
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.contrast = function (amount, multiply)
+ColorMatrixFilter.prototype.contrast = function(amount, multiply)
 {
     var v = (amount || 0) + 1;
-    var o = -128 * (v - 1);
+    var o = -128 * (v-1);
 
     var matrix = [
         v, 0, 0, 0, o,
         0, v, 0, 0, o,
         0, 0, v, 0, o,
-        0, 0, 0, 1, 0
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51197,16 +43827,17 @@ ColorMatrixFilter.prototype.contrast = function (amount, multiply)
  * @param amount {number}
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.saturate = function (amount, multiply)
+ColorMatrixFilter.prototype.saturation = function(amount, multiply)
 {
-    var x = (amount || 0) * 2 / 3 + 1;
-    var y = ((x - 1) * -0.5);
+    var x = (amount || 0) * 2/3 + 1;
+    var y = ((x-1) *-0.5);
 
     var matrix = [
         x, y, y, 0, 0,
         y, x, y, 0, 0,
         y, y, x, 0, 0,
-        0, 0, 0, 1, 0
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51219,9 +43850,9 @@ ColorMatrixFilter.prototype.saturate = function (amount, multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.desaturate = function (multiply) // jshint unused:false
+ColorMatrixFilter.prototype.desaturate = function(multiply) // jshint unused:false
 {
-    this.saturate(-1);
+    this.saturation(-1);
 };
 
 /**
@@ -51229,13 +43860,14 @@ ColorMatrixFilter.prototype.desaturate = function (multiply) // jshint unused:fa
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.negative = function (multiply)
+ColorMatrixFilter.prototype.negative = function(multiply)
 {
     var matrix = [
         0, 1, 1, 0, 0,
         1, 0, 1, 0, 0,
         1, 1, 0, 0, 0,
-        0, 0, 0, 1, 0
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51246,16 +43878,16 @@ ColorMatrixFilter.prototype.negative = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.sepia = function (multiply)
+ColorMatrixFilter.prototype.sepia = function(multiply)
 {
-    var matrix = [
-        0.393, 0.7689999, 0.18899999, 0, 0,
-        0.349, 0.6859999, 0.16799999, 0, 0,
-        0.272, 0.5339999, 0.13099999, 0, 0,
-        0, 0, 0, 1, 0
-    ];
+  var matrix = [
+      0.393, 0.7689999, 0.18899999, 0, 0,
+      0.349, 0.6859999, 0.16799999, 0, 0,
+      0.272, 0.5339999, 0.13099999, 0, 0,
+      0, 0, 0, 1, 0,
+      0, 0, 0, 0, 1];
 
-    this._loadMatrix(matrix, multiply);
+  this._loadMatrix(matrix, multiply);
 };
 
 /**
@@ -51263,16 +43895,16 @@ ColorMatrixFilter.prototype.sepia = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.technicolor = function (multiply)
+ColorMatrixFilter.prototype.technicolor = function(multiply)
 {
-    var matrix = [
-        1.9125277891456083, -0.8545344976951645, -0.09155508482755585, 0, 11.793603434377337,
-        -0.3087833385928097, 1.7658908555458428, -0.10601743074722245, 0, -70.35205161461398,
-        -0.231103377548616, -0.7501899197440212, 1.847597816108189, 0, 30.950940869491138,
-        0, 0, 0, 1, 0
-    ];
+  var matrix = [
+      1.9125277891456083,-0.8545344976951645,-0.09155508482755585,0,11.793603434377337,
+      -0.3087833385928097,1.7658908555458428,-0.10601743074722245,0,-70.35205161461398,
+      -0.231103377548616,-0.7501899197440212,1.847597816108189,0,30.950940869491138,
+      0, 0, 0, 1, 0,
+      0, 0, 0, 0, 0];
 
-    this._loadMatrix(matrix, multiply);
+  this._loadMatrix(matrix, multiply);
 };
 
 /**
@@ -51280,16 +43912,16 @@ ColorMatrixFilter.prototype.technicolor = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.polaroid = function (multiply)
+ColorMatrixFilter.prototype.polaroid = function(multiply)
 {
-    var matrix = [
-        1.438, -0.062, -0.062, 0, 0,
-        -0.122, 1.378, -0.122, 0, 0,
-        -0.016, -0.016, 1.483, 0, 0,
-        0, 0, 0, 1, 0
-    ];
+  var matrix = [
+      1.438,-0.062,-0.062,0,0,
+      -0.122,1.378,-0.122,0,0,
+      -0.016,-0.016,1.483,0,0,
+      0,0,0,1,0,
+      0,0,0,0,1];
 
-    this._loadMatrix(matrix, multiply);
+  this._loadMatrix(matrix, multiply);
 };
 
 /**
@@ -51297,13 +43929,14 @@ ColorMatrixFilter.prototype.polaroid = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.toBGR = function (multiply)
+ColorMatrixFilter.prototype.toBGR = function(multiply)
 {
     var matrix = [
-        0, 0, 1, 0, 0,
-        0, 1, 0, 0, 0,
-        1, 0, 0, 0, 0,
-        0, 0, 0, 1, 0
+        0,0,1,0,0,
+        0,1,0,0,0,
+        1,0,0,0,0,
+        0,0,0,1,0,
+        0,0,0,0,1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51314,13 +43947,14 @@ ColorMatrixFilter.prototype.toBGR = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.kodachrome = function (multiply)
+ColorMatrixFilter.prototype.kodachrome = function(multiply)
 {
     var matrix = [
-        1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
-        -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
-        -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 35.62982807460946,
-        0, 0, 0, 1, 0
+        1.1285582396593525,-0.3967382283601348,-0.03992559172921793,0,63.72958762196502,
+        -0.16404339962244616,1.0835251566291304,-0.05498805115633132,0,24.732407896706203,
+        -0.16786010706155763,-0.5603416277695248,1.6014850761964943,0,35.62982807460946,
+        0,0,0,1,0,
+        0,0,0,0,1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51331,13 +43965,14 @@ ColorMatrixFilter.prototype.kodachrome = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.browni = function (multiply)
+ColorMatrixFilter.prototype.browni = function(multiply)
 {
     var matrix = [
-        0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, 47.43192855600873,
-        -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, -36.96841498319127,
-        0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, -7.562075277591283,
-        0, 0, 0, 1, 0
+        0.5997023498159715,0.34553243048391263,-0.2708298674538042,0,47.43192855600873,
+        -0.037703249837783157,0.8609577587992641,0.15059552388459913,0,-36.96841498319127,
+        0.24113635128153335,-0.07441037908422492,0.44972182064877153,0,-7.562075277591283,
+        0,0,0,1,0,
+        0,0,0,0,1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51348,13 +43983,14 @@ ColorMatrixFilter.prototype.browni = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.vintage = function (multiply)
+ColorMatrixFilter.prototype.vintage = function(multiply)
 {
     var matrix = [
-        0.6279345635605994, 0.3202183420819367, -0.03965408211312453, 0, 9.651285835294123,
-        0.02578397704808868, 0.6441188644374771, 0.03259127616149294, 0, 7.462829176470591,
-        0.0466055556782719, -0.0851232987247891, 0.5241648018700465, 0, 5.159190588235296,
-        0, 0, 0, 1, 0
+        0.6279345635605994,0.3202183420819367,-0.03965408211312453,0,9.651285835294123,
+        0.02578397704808868,0.6441188644374771,0.03259127616149294,0,7.462829176470591,
+        0.0466055556782719,-0.0851232987247891,0.5241648018700465,0,5.159190588235296,
+        0,0,0,1,0,
+        0,0,0,0,1,
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51370,7 +44006,7 @@ ColorMatrixFilter.prototype.vintage = function (multiply)
  *
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.colorTone = function (desaturation, toned, lightColor, darkColor, multiply)
+ColorMatrixFilter.prototype.colorTone = function(desaturation, toned, lightColor, darkColor, multiply)
 {
     desaturation = desaturation || 0.2;
     toned = toned || 0.15;
@@ -51389,7 +44025,8 @@ ColorMatrixFilter.prototype.colorTone = function (desaturation, toned, lightColo
         0.3, 0.59, 0.11, 0, 0,
         lR, lG, lB, desaturation, 0,
         dR, dG, dB, toned, 0,
-        lR - dR, lG - dG, lB - dB, 0, 0
+        lR-dR, lG-dG, lB-dB, 0, 0,
+        0, 0, 0, 0, 1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51401,14 +44038,15 @@ ColorMatrixFilter.prototype.colorTone = function (desaturation, toned, lightColo
  * @param intensity {number}
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.night = function (intensity, multiply)
+ColorMatrixFilter.prototype.night = function(intensity, multiply)
 {
     intensity = intensity || 0.1;
     var matrix = [
-        intensity * ( -2.0), -intensity, 0, 0, 0,
-        -intensity, 0, intensity, 0, 0,
+        intensity * ( -2.0), -intensity,  0, 0, 0,
+        -intensity, 0,  intensity, 0, 0,
         0, intensity, intensity * 2.0, 0, 0,
-        0, 0, 0, 1, 0
+        0,0,0,1,0,
+        0,0,0,0,1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51423,13 +44061,14 @@ ColorMatrixFilter.prototype.night = function (intensity, multiply)
  * @param amount {number} how much the predator feels his future victim
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.predator = function (amount, multiply)
+ColorMatrixFilter.prototype.predator = function(amount, multiply)
 {
     var matrix = [
-        11.224130630493164 * amount, -4.794486999511719 * amount, -2.8746118545532227 * amount, 0 * amount, 0.40342438220977783 * amount,
-        -3.6330697536468506 * amount, 9.193157196044922 * amount, -2.951810836791992 * amount, 0 * amount, -1.316135048866272 * amount,
-        -3.2184197902679443 * amount, -4.2375030517578125 * amount, 7.476448059082031 * amount, 0 * amount, 0.8044459223747253 * amount,
-        0, 0, 0, 1, 0
+        11.224130630493164*amount, -4.794486999511719*amount, -2.8746118545532227*amount, 0*amount, 0.40342438220977783*amount,
+        -3.6330697536468506*amount, 9.193157196044922*amount, -2.951810836791992*amount, 0*amount, -1.316135048866272*amount,
+        -3.2184197902679443*amount, -4.2375030517578125*amount, 7.476448059082031*amount, 0*amount, 0.8044459223747253*amount,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51443,13 +44082,14 @@ ColorMatrixFilter.prototype.predator = function (amount, multiply)
  * @param amount {number} How crazy is your effect
  * @param multiply {boolean} refer to ._loadMatrix() method
  */
-ColorMatrixFilter.prototype.lsd = function (multiply)
+ColorMatrixFilter.prototype.lsd = function(multiply)
 {
     var matrix = [
         2, -0.4, 0.5, 0, 0,
         -0.5, 2, -0.4, 0, 0,
         -0.4, -0.5, 3, 0, 0,
-        0, 0, 0, 1, 0
+        0,0,0,1,0,
+        0,0,0,0,1
     ];
 
     this._loadMatrix(matrix, multiply);
@@ -51461,16 +44101,17 @@ ColorMatrixFilter.prototype.lsd = function (multiply)
  * Erase the current matrix by setting the default one
  *
  */
-ColorMatrixFilter.prototype.reset = function ()
+ColorMatrixFilter.prototype.reset = function()
 {
-    var matrix = [
-        1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        0, 0, 0, 1, 0
-    ];
+  var matrix = [
+    1,0,0,0,0,
+    0,1,0,0,0,
+    0,0,1,0,0,
+    0,0,0,1,0,
+    0,0,0,0,1
+  ];
 
-    this._loadMatrix(matrix, false);
+  this._loadMatrix(matrix, false);
 };
 
 
@@ -51480,7 +44121,7 @@ Object.defineProperties(ColorMatrixFilter.prototype, {
      *
      * @member {number[]}
      * @memberof ColorMatrixFilter#
-     * @default [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
+     * @default [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
      */
     matrix: {
         get: function ()
@@ -51494,7 +44135,7 @@ Object.defineProperties(ColorMatrixFilter.prototype, {
     }
 });
 
-},{"../../core":30}],95:[function(require,module,exports){
+},{"../../core":29}],93:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -51503,7 +44144,7 @@ var core = require('../../core');
  * This lowers the color depth of your image by the given amount, producing an image with a smaller palette.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function ColorStepFilter()
@@ -51543,7 +44184,7 @@ Object.defineProperties(ColorStepFilter.prototype, {
     }
 });
 
-},{"../../core":30}],96:[function(require,module,exports){
+},{"../../core":29}],94:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -51556,7 +44197,7 @@ var core = require('../../core');
  * See http://docs.gimp.org/en/plug-in-convmatrix.html for more info.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  * @param matrix {number[]} An array of values used for matrix transformation. Specified as a 9 point Array.
  * @param width {number} Width of the object you are transforming
@@ -51572,7 +44213,7 @@ function ConvolutionFilter(matrix, width, height)
         // custom uniforms
         {
             matrix:     { type: '1fv', value: new Float32Array(matrix) },
-            texelSize:  { type: 'v2', value: { x: 1 / width, y: 1 / height } }
+            texelSize:  { type: '2v', value: { x: 1 / width, y: 1 / height } }
         }
     );
 }
@@ -51634,7 +44275,7 @@ Object.defineProperties(ConvolutionFilter.prototype, {
     }
 });
 
-},{"../../core":30}],97:[function(require,module,exports){
+},{"../../core":29}],95:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -51643,7 +44284,7 @@ var core = require('../../core');
  * A Cross Hatch effect filter.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function CrossHatchFilter()
@@ -51660,7 +44301,7 @@ CrossHatchFilter.prototype = Object.create(core.AbstractFilter.prototype);
 CrossHatchFilter.prototype.constructor = CrossHatchFilter;
 module.exports = CrossHatchFilter;
 
-},{"../../core":30}],98:[function(require,module,exports){
+},{"../../core":29}],96:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -51671,8 +44312,8 @@ var core = require('../../core');
  * Currently the r property of the texture is used to offset the x and the g property of the texture is used to offset the y.
  *
  * @class
- * @extends PIXI.AbstractFilter
- * @memberof PIXI.filters
+ * @extends AbstractFilter
+ * @namespace PIXI
  * @param sprite {Sprite} the sprite used for the displacement map. (make sure its added to the scene!)
  */
 function DisplacementFilter(sprite)
@@ -51741,7 +44382,7 @@ Object.defineProperties(DisplacementFilter.prototype, {
     }
 });
 
-},{"../../core":30}],99:[function(require,module,exports){
+},{"../../core":29}],97:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -51756,7 +44397,7 @@ var core = require('../../core');
  * black and white halftone dots like an old printer.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function DotScreenFilter()
@@ -51813,7 +44454,7 @@ Object.defineProperties(DotScreenFilter.prototype, {
     }
 });
 
-},{"../../core":30}],100:[function(require,module,exports){
+},{"../../core":29}],98:[function(require,module,exports){
 var core = require('../../core');
 
 // @see https://github.com/substack/brfs/issues/25
@@ -51823,7 +44464,7 @@ var core = require('../../core');
  * The BlurYTintFilter applies a vertical Gaussian blur to an object.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function BlurYTintFilter()
@@ -51904,7 +44545,7 @@ Object.defineProperties(BlurYTintFilter.prototype, {
     }
 });
 
-},{"../../core":30}],101:[function(require,module,exports){
+},{"../../core":29}],99:[function(require,module,exports){
 var core = require('../../core'),
     BlurXFilter = require('../blur/BlurXFilter'),
     BlurYTintFilter = require('./BlurYTintFilter');
@@ -51914,7 +44555,7 @@ var core = require('../../core'),
  * The strength of the blur can be set for x- and y-axis separately.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function DropShadowFilter()
@@ -52073,7 +44714,7 @@ Object.defineProperties(DropShadowFilter.prototype, {
     }
 });
 
-},{"../../core":30,"../blur/BlurXFilter":91,"./BlurYTintFilter":100}],102:[function(require,module,exports){
+},{"../../core":29,"../blur/BlurXFilter":89,"./BlurYTintFilter":98}],100:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52082,7 +44723,7 @@ var core = require('../../core');
  * This greyscales the palette of your Display Objects.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function GrayFilter()
@@ -52122,7 +44763,7 @@ Object.defineProperties(GrayFilter.prototype, {
     }
 });
 
-},{"../../core":30}],103:[function(require,module,exports){
+},{"../../core":29}],101:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI filters library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -52167,7 +44808,7 @@ module.exports = {
     TwistFilter:        require('./twist/TwistFilter')
 };
 
-},{"../core/renderers/webgl/filters/AbstractFilter":50,"../core/renderers/webgl/filters/FXAAFilter":51,"../core/renderers/webgl/filters/SpriteMaskFilter":52,"./ascii/AsciiFilter":87,"./bloom/BloomFilter":88,"./blur/BlurDirFilter":89,"./blur/BlurFilter":90,"./blur/BlurXFilter":91,"./blur/BlurYFilter":92,"./blur/SmartBlurFilter":93,"./color/ColorMatrixFilter":94,"./color/ColorStepFilter":95,"./convolution/ConvolutionFilter":96,"./crosshatch/CrossHatchFilter":97,"./displacement/DisplacementFilter":98,"./dot/DotScreenFilter":99,"./dropshadow/DropShadowFilter":101,"./gray/GrayFilter":102,"./invert/InvertFilter":104,"./noise/NoiseFilter":105,"./normal/NormalMapFilter":106,"./pixelate/PixelateFilter":107,"./rgb/RGBSplitFilter":108,"./sepia/SepiaFilter":109,"./shockwave/ShockwaveFilter":110,"./tiltshift/TiltShiftFilter":112,"./tiltshift/TiltShiftXFilter":113,"./tiltshift/TiltShiftYFilter":114,"./twist/TwistFilter":115}],104:[function(require,module,exports){
+},{"../core/renderers/webgl/filters/AbstractFilter":49,"../core/renderers/webgl/filters/FXAAFilter":50,"../core/renderers/webgl/filters/SpriteMaskFilter":51,"./ascii/AsciiFilter":85,"./bloom/BloomFilter":86,"./blur/BlurDirFilter":87,"./blur/BlurFilter":88,"./blur/BlurXFilter":89,"./blur/BlurYFilter":90,"./blur/SmartBlurFilter":91,"./color/ColorMatrixFilter":92,"./color/ColorStepFilter":93,"./convolution/ConvolutionFilter":94,"./crosshatch/CrossHatchFilter":95,"./displacement/DisplacementFilter":96,"./dot/DotScreenFilter":97,"./dropshadow/DropShadowFilter":99,"./gray/GrayFilter":100,"./invert/InvertFilter":102,"./noise/NoiseFilter":103,"./normal/NormalMapFilter":104,"./pixelate/PixelateFilter":105,"./rgb/RGBSplitFilter":106,"./sepia/SepiaFilter":107,"./shockwave/ShockwaveFilter":108,"./tiltshift/TiltShiftFilter":110,"./tiltshift/TiltShiftXFilter":111,"./tiltshift/TiltShiftYFilter":112,"./twist/TwistFilter":113}],102:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52176,7 +44817,7 @@ var core = require('../../core');
  * This inverts your Display Objects colors.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function InvertFilter()
@@ -52217,7 +44858,7 @@ Object.defineProperties(InvertFilter.prototype, {
     }
 });
 
-},{"../../core":30}],105:[function(require,module,exports){
+},{"../../core":29}],103:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52231,7 +44872,7 @@ var core = require('../../core');
  * A Noise effect filter.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function NoiseFilter()
@@ -52272,7 +44913,7 @@ Object.defineProperties(NoiseFilter.prototype, {
     }
 });
 
-},{"../../core":30}],106:[function(require,module,exports){
+},{"../../core":29}],104:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52282,7 +44923,7 @@ var core = require('../../core');
  * to project lighting onto an object.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  * @param texture {Texture} The texture used for the normal map, must be power of 2 texture at the moment
  */
@@ -52292,7 +44933,7 @@ function NormalMapFilter(texture)
         // vertex shader
         null,
         // fragment shader
-        "precision mediump float;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\n\nuniform sampler2D displacementMap;\nuniform sampler2D uSampler;\n\nuniform vec4 dimensions;\n\nconst vec2 Resolution = vec2(1.0,1.0);      //resolution of screen\nuniform vec3 LightPos;    //light position, normalized\nconst vec4 LightColor = vec4(1.0, 1.0, 1.0, 1.0);      //light RGBA -- alpha is intensity\nconst vec4 AmbientColor = vec4(1.0, 1.0, 1.0, 0.5);    //ambient RGBA -- alpha is intensity\nconst vec3 Falloff = vec3(0.0, 1.0, 0.2);         //attenuation coefficients\n\nuniform vec3 LightDir; // = vec3(1.0, 0.0, 1.0);\n\nuniform vec2 mapDimensions; // = vec2(256.0, 256.0);\n\n\nvoid main(void)\n{\n    vec2 mapCords = vTextureCoord.xy;\n\n    vec4 color = texture2D(uSampler, vTextureCoord.st);\n    vec3 nColor = texture2D(displacementMap, vTextureCoord.st).rgb;\n\n\n    mapCords *= vec2(dimensions.x/512.0, dimensions.y/512.0);\n\n    mapCords.y *= -1.0;\n    mapCords.y += 1.0;\n\n    // RGBA of our diffuse color\n    vec4 DiffuseColor = texture2D(uSampler, vTextureCoord);\n\n    // RGB of our normal map\n    vec3 NormalMap = texture2D(displacementMap, mapCords).rgb;\n\n    // The delta position of light\n    // vec3 LightDir = vec3(LightPos.xy - (gl_FragCoord.xy / Resolution.xy), LightPos.z);\n    vec3 LightDir = vec3(LightPos.xy - (mapCords.xy), LightPos.z);\n\n    // Correct for aspect ratio\n    // LightDir.x *= Resolution.x / Resolution.y;\n\n    // Determine distance (used for attenuation) BEFORE we normalize our LightDir\n    float D = length(LightDir);\n\n    // normalize our vectors\n    vec3 N = normalize(NormalMap * 2.0 - 1.0);\n    vec3 L = normalize(LightDir);\n\n    // Pre-multiply light color with intensity\n    // Then perform 'N dot L' to determine our diffuse term\n    vec3 Diffuse = (LightColor.rgb * LightColor.a) * max(dot(N, L), 0.0);\n\n    // pre-multiply ambient color with intensity\n    vec3 Ambient = AmbientColor.rgb * AmbientColor.a;\n\n    // calculate attenuation\n    float Attenuation = 1.0 / ( Falloff.x + (Falloff.y*D) + (Falloff.z*D*D) );\n\n    // the calculation which brings it all together\n    vec3 Intensity = Ambient + Diffuse * Attenuation;\n    vec3 FinalColor = DiffuseColor.rgb * Intensity;\n    gl_FragColor = vColor * vec4(FinalColor, DiffuseColor.a);\n\n    // gl_FragColor = vec4(1.0, 0.0, 0.0, Attenuation); // vColor * vec4(FinalColor, DiffuseColor.a);\n\n/*\n    // normalise color\n    vec3 normal = normalize(nColor * 2.0 - 1.0);\n\n    vec3 deltaPos = vec3( (light.xy - gl_FragCoord.xy) / resolution.xy, light.z );\n\n    float lambert = clamp(dot(normal, lightDir), 0.0, 1.0);\n\n    float d = sqrt(dot(deltaPos, deltaPos));\n    float att = 1.0 / ( attenuation.x + (attenuation.y*d) + (attenuation.z*d*d) );\n\n    vec3 result = (ambientColor * ambientIntensity) + (lightColor.rgb * lambert) * att;\n    result *= color.rgb;\n\n    gl_FragColor = vec4(result, 1.0);\n*/\n}\n",
+        "precision mediump float;\n\nvarying vec2 vTextureCoord;\nvarying float vColor;\n\nuniform sampler2D displacementMap;\nuniform sampler2D uSampler;\n\nuniform vec4 dimensions;\n\nconst vec2 Resolution = vec2(1.0,1.0);      //resolution of screen\nuniform vec3 LightPos;    //light position, normalized\nconst vec4 LightColor = vec4(1.0, 1.0, 1.0, 1.0);      //light RGBA -- alpha is intensity\nconst vec4 AmbientColor = vec4(1.0, 1.0, 1.0, 0.5);    //ambient RGBA -- alpha is intensity\nconst vec3 Falloff = vec3(0.0, 1.0, 0.2);         //attenuation coefficients\n\nuniform vec3 LightDir; // = vec3(1.0, 0.0, 1.0);\n\nuniform vec2 mapDimensions; // = vec2(256.0, 256.0);\n\n\nvoid main(void)\n{\n    vec2 mapCords = vTextureCoord.xy;\n\n    vec4 color = texture2D(uSampler, vTextureCoord.st);\n    vec3 nColor = texture2D(displacementMap, vTextureCoord.st).rgb;\n\n\n    mapCords *= vec2(dimensions.x/512.0, dimensions.y/512.0);\n\n    mapCords.y *= -1.0;\n    mapCords.y += 1.0;\n\n    // RGBA of our diffuse color\n    vec4 DiffuseColor = texture2D(uSampler, vTextureCoord);\n\n    // RGB of our normal map\n    vec3 NormalMap = texture2D(displacementMap, mapCords).rgb;\n\n    // The delta position of light\n    // vec3 LightDir = vec3(LightPos.xy - (gl_FragCoord.xy / Resolution.xy), LightPos.z);\n    vec3 LightDir = vec3(LightPos.xy - (mapCords.xy), LightPos.z);\n\n    // Correct for aspect ratio\n    // LightDir.x *= Resolution.x / Resolution.y;\n\n    // Determine distance (used for attenuation) BEFORE we normalize our LightDir\n    float D = length(LightDir);\n\n    // normalize our vectors\n    vec3 N = normalize(NormalMap * 2.0 - 1.0);\n    vec3 L = normalize(LightDir);\n\n    // Pre-multiply light color with intensity\n    // Then perform 'N dot L' to determine our diffuse term\n    vec3 Diffuse = (LightColor.rgb * LightColor.a) * max(dot(N, L), 0.0);\n\n    // pre-multiply ambient color with intensity\n    vec3 Ambient = AmbientColor.rgb * AmbientColor.a;\n\n    // calculate attenuation\n    float Attenuation = 1.0 / ( Falloff.x + (Falloff.y*D) + (Falloff.z*D*D) );\n\n    // the calculation which brings it all together\n    vec3 Intensity = Ambient + Diffuse * Attenuation;\n    vec3 FinalColor = DiffuseColor.rgb * Intensity;\n    gl_FragColor = vColor * vec4(FinalColor, DiffuseColor.a);\n\n    // gl_FragColor = vec4(1.0, 0.0, 0.0, Attenuation); // vColor * vec4(FinalColor, DiffuseColor.a);\n\n/*\n    // normalise color\n    vec3 normal = normalize(nColor * 2.0 - 1.0);\n\n    vec3 deltaPos = vec3( (light.xy - gl_FragCoord.xy) / resolution.xy, light.z );\n\n    float lambert = clamp(dot(normal, lightDir), 0.0, 1.0);\n\n    float d = sqrt(dot(deltaPos, deltaPos));\n    float att = 1.0 / ( attenuation.x + (attenuation.y*d) + (attenuation.z*d*d) );\n\n    vec3 result = (ambientColor * ambientIntensity) + (lightColor.rgb * lambert) * att;\n    result *= color.rgb;\n\n    gl_FragColor = vec4(result, 1.0);\n*/\n}\n",
         // custom uniforms
         {
             displacementMap:  { type: 'sampler2D', value: texture },
@@ -52385,7 +45026,7 @@ Object.defineProperties(NormalMapFilter.prototype, {
     }
 });
 
-},{"../../core":30}],107:[function(require,module,exports){
+},{"../../core":29}],105:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52394,7 +45035,7 @@ var core = require('../../core');
  * This filter applies a pixelate effect making display objects appear 'blocky'.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function PixelateFilter()
@@ -52436,7 +45077,7 @@ Object.defineProperties(PixelateFilter.prototype, {
     }
 });
 
-},{"../../core":30}],108:[function(require,module,exports){
+},{"../../core":29}],106:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52445,8 +45086,8 @@ var core = require('../../core');
  * An RGB Split Filter.
  *
  * @class
- * @extends PIXI.AbstractFilter
- * @memberof PIXI.filters
+ * @extends AbstractFilter
+ * @namespace PIXI
  */
 function RGBSplitFilter()
 {
@@ -52522,7 +45163,7 @@ Object.defineProperties(RGBSplitFilter.prototype, {
     }
 });
 
-},{"../../core":30}],109:[function(require,module,exports){
+},{"../../core":29}],107:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52531,7 +45172,7 @@ var core = require('../../core');
  * This applies a sepia effect to your Display Objects.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function SepiaFilter()
@@ -52572,7 +45213,7 @@ Object.defineProperties(SepiaFilter.prototype, {
     }
 });
 
-},{"../../core":30}],110:[function(require,module,exports){
+},{"../../core":29}],108:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52583,7 +45224,7 @@ var core = require('../../core');
  * with a new set of RGBA color and alpha values. It's pretty powerful!
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function ShockwaveFilter()
@@ -52660,7 +45301,7 @@ Object.defineProperties(ShockwaveFilter.prototype, {
     }
 });
 
-},{"../../core":30}],111:[function(require,module,exports){
+},{"../../core":29}],109:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52674,7 +45315,7 @@ var core = require('../../core');
  * A TiltShiftAxisFilter.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function TiltShiftAxisFilter()
@@ -52785,7 +45426,7 @@ Object.defineProperties(TiltShiftAxisFilter.prototype, {
     }
 });
 
-},{"../../core":30}],112:[function(require,module,exports){
+},{"../../core":29}],110:[function(require,module,exports){
 var core = require('../../core'),
     TiltShiftXFilter = require('./TiltShiftXFilter'),
     TiltShiftYFilter = require('./TiltShiftYFilter');
@@ -52799,7 +45440,7 @@ var core = require('../../core'),
  * A TiltShift Filter. Manages the pass of both a TiltShiftXFilter and TiltShiftYFilter.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function TiltShiftFilter()
@@ -52895,7 +45536,7 @@ Object.defineProperties(TiltShiftFilter.prototype, {
     }
 });
 
-},{"../../core":30,"./TiltShiftXFilter":113,"./TiltShiftYFilter":114}],113:[function(require,module,exports){
+},{"../../core":29,"./TiltShiftXFilter":111,"./TiltShiftYFilter":112}],111:[function(require,module,exports){
 var TiltShiftAxisFilter = require('./TiltShiftAxisFilter');
 
 /**
@@ -52907,7 +45548,7 @@ var TiltShiftAxisFilter = require('./TiltShiftAxisFilter');
  * A TiltShiftXFilter.
  *
  * @class
- * @extends PIXI.TiltShiftAxisFilter
+ * @extends TiltShiftAxisFilter
  * @memberof PIXI.filters
  */
 function TiltShiftXFilter()
@@ -52933,7 +45574,7 @@ TiltShiftXFilter.prototype.updateDelta = function ()
     this.uniforms.delta.value.y = dy / d;
 };
 
-},{"./TiltShiftAxisFilter":111}],114:[function(require,module,exports){
+},{"./TiltShiftAxisFilter":109}],112:[function(require,module,exports){
 var TiltShiftAxisFilter = require('./TiltShiftAxisFilter');
 
 /**
@@ -52945,7 +45586,7 @@ var TiltShiftAxisFilter = require('./TiltShiftAxisFilter');
  * A TiltShiftYFilter.
  *
  * @class
- * @extends PIXI.TiltShiftAxisFilter
+ * @extends TiltShiftAxisFilter
  * @memberof PIXI.filters
  */
 function TiltShiftYFilter()
@@ -52971,7 +45612,7 @@ TiltShiftYFilter.prototype.updateDelta = function ()
     this.uniforms.delta.value.y = dx / d;
 };
 
-},{"./TiltShiftAxisFilter":111}],115:[function(require,module,exports){
+},{"./TiltShiftAxisFilter":109}],113:[function(require,module,exports){
 var core = require('../../core');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -52980,7 +45621,7 @@ var core = require('../../core');
  * This filter applies a twist effect making display objects appear twisted in the given direction.
  *
  * @class
- * @extends PIXI.AbstractFilter
+ * @extends AbstractFilter
  * @memberof PIXI.filters
  */
 function TwistFilter()
@@ -53056,7 +45697,7 @@ Object.defineProperties(TwistFilter.prototype, {
     }
 });
 
-},{"../../core":30}],116:[function(require,module,exports){
+},{"../../core":29}],114:[function(require,module,exports){
 (function (global){
 // run the polyfills
 require('./polyfill');
@@ -53069,15 +45710,9 @@ core.filters        = require('./filters');
 core.interaction    = require('./interaction');
 core.loaders        = require('./loaders');
 core.mesh           = require('./mesh');
+core.ticker         = require('./ticker');
 
 // export a premade loader instance
-/**
- * A premade instance of the loader that can be used to loader resources.
- *
- * @name loader
- * @memberof PIXI
- * @property {PIXI.loaders.Loader}
- */
 core.loader = new core.loaders.Loader();
 
 // mixin the deprecation features.
@@ -53087,7 +45722,7 @@ Object.assign(core, require('./deprecation'));
 global.PIXI = core;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./core":30,"./deprecation":79,"./extras":86,"./filters":103,"./interaction":119,"./loaders":122,"./mesh":128,"./polyfill":132}],117:[function(require,module,exports){
+},{"./core":29,"./deprecation":77,"./extras":84,"./filters":101,"./interaction":117,"./loaders":120,"./mesh":126,"./polyfill":130,"./ticker":133}],115:[function(require,module,exports){
 var core = require('../core');
 
 /**
@@ -53143,14 +45778,14 @@ InteractionData.prototype.getLocalPosition = function (displayObject, point, glo
 
     point = point || new core.math.Point();
 
-    point.x = a11 * id * global.x + -a01 * id * global.x + (a12 * a01 - a02 * a11) * id;
-    point.y = a00 * id * global.y + -a10 * id * global.y + (-a12 * a00 + a02 * a10) * id;
+    point.x = a11 * id * global.x + -a01 * id * global.y + (a12 * a01 - a02 * a11) * id;
+    point.y = a00 * id * global.y + -a10 * id * global.x + (-a12 * a00 + a02 * a10) * id;
 
     // set the mouse coords...
     return point;
 };
 
-},{"../core":30}],118:[function(require,module,exports){
+},{"../core":29}],116:[function(require,module,exports){
 var core = require('../core'),
     InteractionData = require('./InteractionData');
 
@@ -53932,12 +46567,6 @@ InteractionManager.prototype.getTouchData = function (touchEvent)
     touchData.identifier = touchEvent.identifier;
     this.mapPositionToPoint( touchData.global, touchEvent.clientX, touchEvent.clientY );
 
-    if(navigator.isCocoonJS)
-    {
-        touchData.global.x = touchData.global.x / this.resolution;
-        touchData.global.y = touchData.global.y / this.resolution;
-    }
-
     touchEvent.globalX = touchData.global.x;
     touchEvent.globalY = touchData.global.y;
 
@@ -54001,7 +46630,7 @@ InteractionManager.prototype.destroy = function () {
 core.WebGLRenderer.registerPlugin('interaction', InteractionManager);
 core.CanvasRenderer.registerPlugin('interaction', InteractionManager);
 
-},{"../core":30,"./InteractionData":117,"./interactiveTarget":120}],119:[function(require,module,exports){
+},{"../core":29,"./InteractionData":115,"./interactiveTarget":118}],117:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI interactions library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -54015,10 +46644,10 @@ core.CanvasRenderer.registerPlugin('interaction', InteractionManager);
 module.exports = {
     InteractionData:    require('./InteractionData'),
     InteractionManager: require('./InteractionManager'),
-    interactiveTarget:  require('./interactiveTarget')
+    interactiveTarget: require('./interactiveTarget')
 };
 
-},{"./InteractionData":117,"./InteractionManager":118,"./interactiveTarget":120}],120:[function(require,module,exports){
+},{"./InteractionData":115,"./InteractionManager":116,"./interactiveTarget":118}],118:[function(require,module,exports){
 /**
  * Default property values of interactive objects
  * used by {@link PIXI.interaction.InteractionManager}.
@@ -54030,10 +46659,11 @@ module.exports = {
  *
  *      Object.assign(
  *          MyObject.prototype,
- *          PIXI.interaction.interactiveTarget
+ *          PIXI.interaction.interactiveTarget)
  *      );
  */
-var interactiveTarget = {
+
+module.exports = {
     /**
      * @todo Needs docs.
      */
@@ -54065,9 +46695,7 @@ var interactiveTarget = {
     _touchDown: false
 };
 
-module.exports = interactiveTarget;
-
-},{}],121:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 var Resource = require('resource-loader').Resource,
     core = require('../core'),
     utils = require('../core/utils'),
@@ -54188,7 +46816,7 @@ module.exports = function ()
     };
 };
 
-},{"../core":30,"../core/utils":77,"../extras":86,"path":1,"resource-loader":19}],122:[function(require,module,exports){
+},{"../core":29,"../core/utils":75,"../extras":84,"path":1,"resource-loader":18}],120:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI loaders library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -54209,7 +46837,7 @@ module.exports = {
     Resource:           require('resource-loader').Resource
 };
 
-},{"./bitmapFontParser":121,"./loader":123,"./spritesheetParser":124,"./textureParser":125,"resource-loader":19}],123:[function(require,module,exports){
+},{"./bitmapFontParser":119,"./loader":121,"./spritesheetParser":122,"./textureParser":123,"resource-loader":18}],121:[function(require,module,exports){
 var ResourceLoader = require('resource-loader'),
     textureParser = require('./textureParser'),
     spritesheetParser = require('./spritesheetParser'),
@@ -54232,7 +46860,7 @@ var ResourceLoader = require('resource-loader'),
  * ```
  *
  * @class
- * @extends PIXI.ResourceLoader
+ * @extends ResourceLoader
  * @memberof PIXI.loaders
  * @param [baseUrl=''] {string} The base url for all resources loaded by this loader.
  * @param [concurrency=10] {number} The number of resources to load concurrently.
@@ -54271,7 +46899,7 @@ var Resource = ResourceLoader.Resource;
 
 Resource.setExtensionXhrType('fnt', Resource.XHR_RESPONSE_TYPE.DOCUMENT);
 
-},{"./bitmapFontParser":121,"./spritesheetParser":124,"./textureParser":125,"resource-loader":19}],124:[function(require,module,exports){
+},{"./bitmapFontParser":119,"./spritesheetParser":122,"./textureParser":123,"resource-loader":18}],122:[function(require,module,exports){
 var Resource = require('resource-loader').Resource,
     path = require('path'),
     core = require('../core');
@@ -54354,7 +46982,7 @@ module.exports = function ()
     };
 };
 
-},{"../core":30,"path":1,"resource-loader":19}],125:[function(require,module,exports){
+},{"../core":29,"path":1,"resource-loader":18}],123:[function(require,module,exports){
 var core = require('../core');
 
 module.exports = function ()
@@ -54373,13 +47001,13 @@ module.exports = function ()
     };
 };
 
-},{"../core":30}],126:[function(require,module,exports){
+},{"../core":29}],124:[function(require,module,exports){
 var core = require('../core');
 
 /**
  * Base mesh class
  * @class
- * @extends PIXI.Container
+ * @extends Container
  * @memberof PIXI.mesh
  * @param texture {Texture} The texture to use
  * @param [vertices] {Float32Arrif you want to specify the vertices
@@ -54395,9 +47023,8 @@ function Mesh(texture, vertices, uvs, indices, drawMode)
      * The texture of the Mesh
      *
      * @member {Texture}
-     * @private
      */
-    this._texture = null;
+    this.texture = texture;
 
     /**
      * The Uvs of the Mesh
@@ -54453,52 +47080,12 @@ function Mesh(texture, vertices, uvs, indices, drawMode)
      * @member {number}
      */
     this.drawMode = drawMode || Mesh.DRAW_MODES.TRIANGLE_MESH;
-
-    // run texture setter;
-    this.texture = texture;
 }
 
 // constructor
 Mesh.prototype = Object.create(core.Container.prototype);
 Mesh.prototype.constructor = Mesh;
 module.exports = Mesh;
-
-Object.defineProperties(Mesh.prototype, {
-    /**
-     * The texture that the sprite is using
-     *
-     * @member {PIXI.Texture}
-     * @memberof PIXI.mesh.Mesh#
-     */
-    texture: {
-        get: function ()
-        {
-            return  this._texture;
-        },
-        set: function (value)
-        {
-            if (this._texture === value)
-            {
-                return;
-            }
-
-            this._texture = value;
-
-            if (value)
-            {
-                // wait for the texture to load
-                if (value.baseTexture.hasLoaded)
-                {
-                    this._onTextureUpdate();
-                }
-                else
-                {
-                    value.once('update', this._onTextureUpdate, this);
-                }
-            }
-        }
-    }
-});
 
 /**
  * Renders the object using the WebGL renderer
@@ -54603,9 +47190,9 @@ Mesh.prototype._renderCanvasTriangles = function (context)
  */
 Mesh.prototype._renderCanvasDrawTriangle = function (context, vertices, uvs, index0, index1, index2)
 {
-    var textureSource = this._texture.baseTexture.source;
-    var textureWidth = this._texture.baseTexture.width;
-    var textureHeight = this._texture.baseTexture.height;
+    var textureSource = this.texture.baseTexture.source;
+    var textureWidth = this.texture.width;
+    var textureHeight = this.texture.height;
 
     var x0 = vertices[index0], x1 = vertices[index1], x2 = vertices[index2];
     var y0 = vertices[index0 + 1], y1 = vertices[index1 + 1], y2 = vertices[index2 + 1];
@@ -54729,7 +47316,8 @@ Mesh.prototype.setTexture = function (texture)
  * @param event
  * @private
  */
-Mesh.prototype._onTextureUpdate = function ()
+
+Mesh.prototype.onTextureUpdate = function ()
 {
     this.updateFrame = true;
 };
@@ -54804,9 +47392,8 @@ Mesh.DRAW_MODES = {
     TRIANGLES: 1
 };
 
-},{"../core":30}],127:[function(require,module,exports){
+},{"../core":29}],125:[function(require,module,exports){
 var Mesh = require('./Mesh');
-var core = require('../core');
 
 /**
  * The rope allows you to draw a texture across several points and them manipulate these points
@@ -54819,7 +47406,7 @@ var core = require('../core');
  *  ```
  *
  * @class
- * @extends PIXI.Mesh
+ * @extends Mesh
  * @memberof PIXI.mesh
  * @param {Texture} texture - The texture to use on the rope.
  * @param {Array} points - An array of {Point} objects to construct this rope.
@@ -54854,16 +47441,7 @@ function Rope(texture, points)
      */
     this.indices = new Uint16Array(points.length * 2);
 
-    /**
-     * Tracker for if the rope is ready to be drawn. Needed because Mesh ctor can
-     * call _onTextureUpdated which could call refresh too early.
-     *
-     * @member {boolean}
-     * @private
-     */
-     this._ready = true;
-
-     this.refresh();
+    this.refresh();
 }
 
 
@@ -54880,8 +47458,7 @@ Rope.prototype.refresh = function ()
 {
     var points = this.points;
 
-    // if too little points, or texture hasn't got UVs set yet just move on.
-    if (points.length < 1 || !this._texture._uvs)
+    if (points.length < 1)
     {
         return;
     }
@@ -54891,14 +47468,12 @@ Rope.prototype.refresh = function ()
     var indices = this.indices;
     var colors = this.colors;
 
-    var textureUvs = this._texture._uvs;
-    var offset = new core.math.Point(textureUvs.x0, textureUvs.y0);
-    var factor = new core.math.Point(textureUvs.x2 - textureUvs.x0, textureUvs.y2 - textureUvs.y0);
+    // this.count -= 0.2;
 
-    uvs[0] = 0 + offset.x;
-    uvs[1] = 0 + offset.y;
-    uvs[2] = 0 + offset.x;
-    uvs[3] = 1 * factor.y + offset.y;
+    uvs[0] = 0;
+    uvs[1] = 0;
+    uvs[2] = 0;
+    uvs[3] = 1;
 
     colors[0] = 1;
     colors[1] = 1;
@@ -54916,11 +47491,22 @@ Rope.prototype.refresh = function ()
         // time to do some smart drawing!
         amount = i / (total-1);
 
-        uvs[index] = amount * factor.x + offset.x;
-        uvs[index+1] = 0 + offset.y;
+        if (i%2)
+        {
+            uvs[index] = amount;
+            uvs[index+1] = 0;
 
-        uvs[index+2] = amount * factor.x + offset.x;
-        uvs[index+3] = 1 * factor.y + offset.y;
+            uvs[index+2] = amount;
+            uvs[index+3] = 1;
+        }
+        else
+        {
+            uvs[index] = amount;
+            uvs[index+1] = 0;
+
+            uvs[index+2] = amount;
+            uvs[index+3] = 1;
+        }
 
         index = i * 2;
         colors[index] = 1;
@@ -54930,26 +47516,9 @@ Rope.prototype.refresh = function ()
         indices[index] = index;
         indices[index + 1] = index + 1;
     }
-
-    this.dirty = true;
 };
 
-/**
- * Clear texture UVs when new texture is set
- *
- * @private
- */
-Rope.prototype._onTextureUpdate = function ()
-{
-    Mesh.prototype._onTextureUpdate.call(this);
-
-    // wait for the Rope ctor to finish before calling refresh
-    if (this._ready) {
-        this.refresh();
-    }
-};
-
-/**
+/*
  * Updates the object transform for rendering
  *
  * @private
@@ -54999,7 +47568,7 @@ Rope.prototype.updateTransform = function ()
         }
 
         perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
-        num = this._texture.height / 2; //(20 + Math.abs(Math.sin((i + this.count) * 0.3) * 50) )* ratio;
+        num = this.texture.height / 2; //(20 + Math.abs(Math.sin((i + this.count) * 0.3) * 50) )* ratio;
         perpX /= perpLength;
         perpY /= perpLength;
 
@@ -55017,7 +47586,7 @@ Rope.prototype.updateTransform = function ()
     this.containerUpdateTransform();
 };
 
-},{"../core":30,"./Mesh":126}],128:[function(require,module,exports){
+},{"./Mesh":124}],126:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI extras library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -55035,10 +47604,9 @@ module.exports = {
     MeshShader:     require('./webgl/MeshShader')
 };
 
-},{"./Mesh":126,"./Rope":127,"./webgl/MeshRenderer":129,"./webgl/MeshShader":130}],129:[function(require,module,exports){
+},{"./Mesh":124,"./Rope":125,"./webgl/MeshRenderer":127,"./webgl/MeshShader":128}],127:[function(require,module,exports){
 var ObjectRenderer = require('../../core/renderers/webgl/utils/ObjectRenderer'),
-    WebGLRenderer = require('../../core/renderers/webgl/WebGLRenderer'),
-    Mesh = require('../Mesh');
+    WebGLRenderer = require('../../core/renderers/webgl/WebGLRenderer');
 
 /**
  * @author Mat Groves
@@ -55056,7 +47624,7 @@ var ObjectRenderer = require('../../core/renderers/webgl/utils/ObjectRenderer'),
  * @class
  * @private
  * @memberof PIXI.mesh
- * @extends PIXI.ObjectRenderer
+ * @extends ObjectRenderer
  * @param renderer {WebGLRenderer} The renderer this sprite batch works for.
  */
 function MeshRenderer(renderer)
@@ -55115,10 +47683,11 @@ MeshRenderer.prototype.render = function (mesh)
 
     var renderer = this.renderer,
         gl = renderer.gl,
-        texture = mesh._texture.baseTexture,
+        texture = mesh.texture.baseTexture,
         shader = renderer.shaderManager.plugins.meshShader;
 
-    var drawMode = mesh.drawMode === Mesh.DRAW_MODES.TRIANGLE_MESH ? gl.TRIANGLE_STRIP : gl.TRIANGLES;
+//    var drawMode = mesh.drawMode === Strip.DRAW_MODES.TRIANGLE_STRIP ? gl.TRIANGLE_STRIP : gl.TRIANGLES;
+    var drawMode =  gl.TRIANGLE_STRIP;
 
     renderer.blendModeManager.setBlendMode(mesh.blendMode);
 
@@ -55136,6 +47705,7 @@ MeshRenderer.prototype.render = function (mesh)
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, mesh.vertices);
         gl.vertexAttribPointer(shader.attributes.aVertexPosition, 2, gl.FLOAT, false, 0, 0);
 
+
         // update the uvs
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh._uvBuffer);
         gl.vertexAttribPointer(shader.attributes.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
@@ -55152,9 +47722,6 @@ MeshRenderer.prototype.render = function (mesh)
             // bind the current texture
             gl.bindTexture(gl.TEXTURE_2D, texture._glTextures[gl.id]);
         }
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh._indexBuffer);
-        gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, mesh.indices);
     }
     else
     {
@@ -55167,11 +47734,11 @@ MeshRenderer.prototype.render = function (mesh)
         // update the uvs
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh._uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, mesh.uvs, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(shader.attributes.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
+         gl.vertexAttribPointer(shader.attributes.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
 
          gl.activeTexture(gl.TEXTURE0);
 
-        if (!texture._glTextures[gl.id])
+       if (!texture._glTextures[gl.id])
         {
             this.renderer.updateTexture(texture);
         }
@@ -55203,8 +47770,7 @@ MeshRenderer.prototype._initWebGL = function (mesh)
     mesh._vertexBuffer = gl.createBuffer();
     mesh._indexBuffer = gl.createBuffer();
     mesh._uvBuffer = gl.createBuffer();
-
-
+    mesh._colorBuffer = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, mesh._vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, mesh.vertices, gl.DYNAMIC_DRAW);
@@ -55212,11 +47778,8 @@ MeshRenderer.prototype._initWebGL = function (mesh)
     gl.bindBuffer(gl.ARRAY_BUFFER, mesh._uvBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,  mesh.uvs, gl.STATIC_DRAW);
 
-    if(mesh.colors){
-        mesh._colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, mesh._colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mesh.colors, gl.STATIC_DRAW);
-    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, mesh._colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, mesh.colors, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh._indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.indices, gl.STATIC_DRAW);
@@ -55251,12 +47814,12 @@ MeshRenderer.prototype.destroy = function ()
 {
 };
 
-},{"../../core/renderers/webgl/WebGLRenderer":49,"../../core/renderers/webgl/utils/ObjectRenderer":63,"../Mesh":126}],130:[function(require,module,exports){
+},{"../../core/renderers/webgl/WebGLRenderer":48,"../../core/renderers/webgl/utils/ObjectRenderer":62}],128:[function(require,module,exports){
 var core = require('../../core');
 
 /**
  * @class
- * @extends PIXI.Shader
+ * @extends Shader
  * @memberof PIXI.mesh
  * @param shaderManager {ShaderManager} The WebGL shader manager this shader works for.
  */
@@ -55312,7 +47875,7 @@ module.exports = StripShader;
 
 core.ShaderManager.registerPlugin('meshShader', StripShader);
 
-},{"../../core":30}],131:[function(require,module,exports){
+},{"../../core":29}],129:[function(require,module,exports){
 // References:
 // https://github.com/sindresorhus/object-assign
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
@@ -55322,11 +47885,11 @@ if (!Object.assign)
     Object.assign = require('object-assign');
 }
 
-},{"object-assign":15}],132:[function(require,module,exports){
+},{"object-assign":14}],130:[function(require,module,exports){
 require('./Object.assign');
 require('./requestAnimationFrame');
 
-},{"./Object.assign":131,"./requestAnimationFrame":133}],133:[function(require,module,exports){
+},{"./Object.assign":129,"./requestAnimationFrame":131}],131:[function(require,module,exports){
 (function (global){
 // References:
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -55396,7 +47959,417 @@ if (!global.cancelAnimationFrame) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],134:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
+var core = require('../core'),
+    EventEmitter = require('eventemitter3'),
+    // Internal event used by composed emitter
+    TICK = 'tick';
+
+/**
+ * A Ticker class that runs an update loop that other objects listen to.
+ * This class is composed around an EventEmitter object to add listeners
+ * meant for execution on the next requested animation frame.
+ * Animation frames are requested only when necessary,
+ * e.g. When the ticker is started and the emitter has listeners.
+ *
+ * @class
+ * @memberof PIXI.ticker
+ */
+function Ticker()
+{
+    var _this = this;
+    /**
+     * Internal tick method bound to ticker instance.
+     * This is because in early 2015, Function.bind
+     * is still 60% slower in high performance scenarios.
+     * Also separating frame requests from update method
+     * so listeners may be called at any time and with
+     * any animation API, just invoke ticker.update(time).
+     *
+     * @private
+     */
+    this._tick = function _tick(time) {
+
+        _this._requestId = null;
+
+        if (_this.started)
+        {
+            // Invoke listeners now
+            _this.update(time);
+            // Listener side effects may have modified ticker state.
+            if (_this.started && _this._requestId === null && _this._emitter.listeners(TICK, true))
+            {
+                _this._requestId = requestAnimationFrame(_this._tick);
+            }
+        }
+    };
+    /**
+     * Internal emitter used to fire 'tick' event
+     * @private
+     */
+    this._emitter = new EventEmitter();
+    /**
+     * Internal current frame request ID
+     * @private
+     */
+    this._requestId = null;
+    /**
+     * Internal value managed by minFPS property setter and getter.
+     * This is the maximum allowed milliseconds between updates.
+     * @private
+     */
+    this._maxElapsedMS = 100;
+
+    /**
+     * Whether or not this ticker should invoke the method
+     * {@link PIXI.ticker.Ticker#start} automatically
+     * when a listener is added.
+     *
+     * @member {boolean}
+     * @default false
+     */
+    this.autoStart = false;
+
+    /**
+     * Scalar time value from last frame to this frame.
+     * This value is capped by setting {@link PIXI.ticker.Ticker#minFPS}
+     * and is scaled with {@link PIXI.ticker.Ticker#speed}.
+     * **Note:** The cap may be exceeded by scaling.
+     *
+     * @member {number}
+     * @default 1
+     */
+    this.deltaTime = 1;
+
+    /**
+     * Time elapsed in milliseconds from last frame to this frame.
+     * Opposed to what the scalar {@link PIXI.ticker.Ticker#deltaTime}
+     * is based, this value is neither capped nor scaled.
+     * If the platform supports DOMHighResTimeStamp,
+     * this value will have a precision of 1 µs.
+     *
+     * @member {DOMHighResTimeStamp|number}
+     * @default 1 / TARGET_FPMS
+     */
+    this.elapsedMS = 1 / core.TARGET_FPMS; // default to target frame time
+
+    /**
+     * The last time {@link PIXI.ticker.Ticker#update} was invoked.
+     * This value is also reset internally outside of invoking
+     * update, but only when a new animation frame is requested.
+     * If the platform supports DOMHighResTimeStamp,
+     * this value will have a precision of 1 µs.
+     *
+     * @member {DOMHighResTimeStamp|number}
+     * @default 0
+     */
+    this.lastTime = 0;
+
+    /**
+     * Factor of current {@link PIXI.ticker.Ticker#deltaTime}.
+     * @example
+     *     // Scales ticker.deltaTime to what would be
+     *     // the equivalent of approximately 120 FPS
+     *     ticker.speed = 2;
+     *
+     * @member {number}
+     * @default 1
+     */
+    this.speed = 1;
+
+    /**
+     * Whether or not this ticker has been started.
+     * `true` if {@link PIXI.ticker.Ticker#start} has been called.
+     * `false` if {@link PIXI.ticker.Ticker#stop} has been called.
+     * While `false`, this value may change to `true` in the
+     * event of {@link PIXI.ticker.Ticker#autoStart} being `true`
+     * and a listener is added.
+     *
+     * @member {boolean}
+     * @default false
+     */
+    this.started = false;
+}
+
+Object.defineProperties(Ticker.prototype, {
+    /**
+     * The frames per second at which this ticker is running.
+     * The default is approximately 60 in most modern browsers.
+     * **Note:** This does not factor in the value of
+     * {@link PIXI.ticker.Ticker#speed}, which is specific
+     * to scaling {@link PIXI.ticker.Ticker#deltaTime}.
+     *
+     * @member
+     * @memberof PIXI.ticker.Ticker#
+     * @readonly
+     */
+    FPS: {
+        get: function()
+        {
+            return 1000 / this.elapsedMS;
+        }
+    },
+
+    /**
+     * Manages the maximum amount of milliseconds allowed to
+     * elapse between invoking {@link PIXI.ticker.Ticker#update}.
+     * This value is used to cap {@link PIXI.ticker.Ticker#deltaTime},
+     * but does not effect the measured value of {@link PIXI.ticker.Ticker#FPS}.
+     * When setting this property it is clamped to a value between
+     * `0` and `PIXI.TARGET_FPMS * 1000`.
+     *
+     * @member
+     * @memberof PIXI.ticker.Ticker#
+     * @default 10
+     */
+    minFPS: {
+        get: function()
+        {
+            return 1000 / this._maxElapsedMS;
+        },
+        set: function(fps)
+        {
+            // Clamp: 0 to TARGET_FPMS
+            var minFPMS = Math.min(Math.max(0, fps) / 1000, core.TARGET_FPMS);
+            this._maxElapsedMS = 1 / minFPMS;
+        }
+    }
+});
+
+/**
+ * Conditionally requests a new animation frame.
+ * If a frame has not already been requested, and if the internal
+ * emitter has listeners, a new frame is requested.
+ *
+ * @private
+ */
+Ticker.prototype._requestIfNeeded = function _requestIfNeeded()
+{
+    if (this._requestId === null && this._emitter.listeners(TICK, true))
+    {
+        // ensure callbacks get correct delta
+        this.lastTime = performance.now();
+        this._requestId = requestAnimationFrame(this._tick);
+    }
+};
+
+/**
+ * Conditionally cancels a pending animation frame.
+ *
+ * @private
+ */
+Ticker.prototype._cancelIfNeeded = function _cancelIfNeeded()
+{
+    if (this._requestId !== null)
+    {
+        cancelAnimationFrame(this._requestId);
+        this._requestId = null;
+    }
+};
+
+/**
+ * Conditionally requests a new animation frame.
+ * If the ticker has been started it checks if a frame has not already
+ * been requested, and if the internal emitter has listeners. If these
+ * conditions are met, a new frame is requested. If the ticker has not
+ * been started, but autoStart is `true`, then the ticker starts now,
+ * and continues with the previous conditions to request a new frame.
+ *
+ * @private
+ */
+Ticker.prototype._startIfPossible = function _startIfPossible()
+{
+    if (this.started)
+    {
+        this._requestIfNeeded();
+    }
+    else if (this.autoStart)
+    {
+        this.start();
+    }
+};
+
+/**
+ * Calls {@link module:eventemitter3.EventEmitter#on} internally for the
+ * internal 'tick' event. It checks if the emitter has listeners,
+ * and if so it requests a new animation frame at this point.
+ *
+ * @param fn {Function} The listener function to be added for updates
+ * @param [context] {Function} The listener context
+ * @returns {PIXI.ticker.Ticker} this
+ */
+Ticker.prototype.add = function add(fn, context)
+{
+    this._emitter.on(TICK, fn, context);
+
+    this._startIfPossible();
+
+    return this;
+};
+
+/**
+ * Calls {@link module:eventemitter3.EventEmitter#once} internally for the
+ * internal 'tick' event. It checks if the emitter has listeners,
+ * and if so it requests a new animation frame at this point.
+ *
+ * @param fn {Function} The listener function to be added for one update
+ * @param [context] {Function} The listener context
+ * @returns {PIXI.ticker.Ticker} this
+ */
+Ticker.prototype.addOnce = function addOnce(fn, context)
+{
+    this._emitter.once(TICK, fn, context);
+
+    this._startIfPossible();
+
+    return this;
+};
+
+/**
+ * Calls {@link module:eventemitter3.EventEmitter#off} internally for 'tick' event.
+ * It checks if the emitter has listeners for 'tick' event.
+ * If it does, then it cancels the animation frame.
+ *
+ * @param [fn] {Function} The listener function to be removed
+ * @param [context] {Function} The listener context to be removed
+ * @returns {PIXI.ticker.Ticker} this
+ */
+Ticker.prototype.remove = function remove(fn, context)
+{
+    this._emitter.off(TICK, fn, context);
+
+    if (!this._emitter.listeners(TICK, true))
+    {
+        this._cancelIfNeeded();
+    }
+
+    return this;
+};
+
+/**
+ * Starts the ticker. If the ticker has listeners
+ * a new animation frame is requested at this point.
+ */
+Ticker.prototype.start = function start()
+{
+    if (!this.started)
+    {
+        this.started = true;
+        this._requestIfNeeded();
+    }
+};
+
+/**
+ * Stops the ticker. If the ticker has requested
+ * an animation frame it is canceled at this point.
+ */
+Ticker.prototype.stop = function stop()
+{
+    if (this.started)
+    {
+        this.started = false;
+        this._cancelIfNeeded();
+    }
+};
+
+/**
+ * Triggers an update. An update entails setting the
+ * current {@link PIXI.ticker.Ticker#elapsedMS},
+ * the current {@link PIXI.ticker.Ticker#deltaTime},
+ * invoking all listeners with current deltaTime,
+ * and then finally setting {@link PIXI.ticker.Ticker#lastTime}
+ * with the value of currentTime that was provided.
+ * This method will be called automatically by animation
+ * frame callbacks if the ticker instance has been started
+ * and listeners are added.
+ *
+ * @param [currentTime=performance.now()] {DOMHighResTimeStamp|number} the current time of execution
+ */
+Ticker.prototype.update = function update(currentTime)
+{
+    var elapsedMS;
+
+    // Allow calling update directly with default currentTime.
+    currentTime = currentTime || performance.now();
+    // Save uncapped elapsedMS for measurement
+    elapsedMS = this.elapsedMS = currentTime - this.lastTime;
+
+    // cap the milliseconds elapsed used for deltaTime
+    if (elapsedMS > this._maxElapsedMS)
+    {
+        elapsedMS = this._maxElapsedMS;
+    }
+
+    this.deltaTime = elapsedMS * core.TARGET_FPMS * this.speed;
+
+    // Invoke listeners added to internal emitter
+    this._emitter.emit(TICK, this.deltaTime);
+
+    this.lastTime = currentTime;
+};
+
+module.exports = Ticker;
+
+},{"../core":29,"eventemitter3":13}],133:[function(require,module,exports){
+/**
+ * @file        Main export of the PIXI extras library
+ * @author      Mat Groves <mat@goodboydigital.com>
+ * @copyright   2013-2015 GoodBoyDigital
+ * @license     {@link https://github.com/GoodBoyDigital/pixi.js/blob/master/LICENSE|MIT License}
+ */
+var Ticker = require('./Ticker');
+
+/**
+ * The shared ticker instance used by {@link PIXI.extras.MovieClip}.
+ * and by {@link PIXI.interaction.InteractionManager}.
+ * The property {@link PIXI.ticker.Ticker#autoStart} is set to `true`
+ * for this instance. Please follow the examples for usage, including
+ * how to opt-out of auto-starting the shared ticker.
+ *
+ * @example
+ *     var ticker = PIXI.ticker.shared;
+ *     // Set this to prevent starting this ticker when listeners are added.
+ *     // By default this is true only for the PIXI.ticker.shared instance.
+ *     ticker.autoStart = false;
+ *     // FYI, call this to ensure the ticker is stopped. It should be stopped
+ *     // if you have not attempted to render anything yet.
+ *     ticker.stop();
+ *     // Call this when you are ready for a running shared ticker.
+ *     ticker.start();
+ *
+ * @example
+ *     // You may use the shared ticker to render...
+ *     var renderer = PIXI.autoDetectRenderer(800, 600);
+ *     var stage = new PIXI.Container();
+ *     var interactionManager = PIXI.interaction.InteractionManager(renderer);
+ *     document.body.appendChild(renderer.view);
+ *     ticker.add(function (time) {
+ *         renderer.render(stage);
+ *     });
+ *
+ * @example
+ *     // Or you can just update it manually.
+ *     ticker.autoStart = false;
+ *     ticker.stop();
+ *     function animate(time) {
+ *         ticker.update(time);
+ *         renderer.render(stage);
+ *         requestAnimationFrame(animate);
+ *     }
+ *     animate(performance.now());
+ *
+ * @type {PIXI.ticker.Ticker}
+ * @memberof PIXI.ticker
+ */
+var shared = new Ticker();
+shared.autoStart = true;
+
+module.exports = {
+    shared: shared,
+    Ticker: Ticker
+};
+
+},{"./Ticker":132}],134:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -56298,7 +49271,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":149,"lodash":10,"pixi.js":116}],147:[function(require,module,exports){
+},{"../utils.js":149,"lodash":10,"pixi.js":114}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -56443,6 +49416,7 @@ global.hitagi = require('./main.js');
             entity.world = this;
             entities[entity.uid] = entity;
             this.build(entity);
+            this.track(entity);
             return entity;
         };
 
@@ -56507,6 +49481,17 @@ global.hitagi = require('./main.js');
                 system.priority = -Infinity;
             }
 
+            // Set up entity tracking.
+            if (_.has(system, 'tracking')) {
+                system.tracked = {};
+                _.each(
+                    system.tracking,
+                    function (id) {
+                        system.tracked[id] = {};
+                    }
+                );
+            }
+
             systems.push(system);
             systems = _.sortByOrder(systems, ['priority'], [false]);
 
@@ -56567,6 +49552,22 @@ global.hitagi = require('./main.js');
         this.rebuild = function (entity, trackID) {
             that.destroy(entity, trackID);
             that.build(entity, trackID);
+        };
+
+        // Add entities to systems that want to track them.
+        this.track = function (entity) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'tracking')) {
+                        _.each(system.tracking, function (id) {
+                            if (entity.has(id)){
+                                system.tracked[id][entity.uid] = entity;
+                            }
+                        });
+                    }
+                }
+            );
         };
 
         // Clear all entities from the world and systems.

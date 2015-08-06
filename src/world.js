@@ -22,6 +22,7 @@
             entity.world = this;
             entities[entity.uid] = entity;
             this.build(entity);
+            this.track(entity);
             return entity;
         };
 
@@ -86,6 +87,17 @@
                 system.priority = -Infinity;
             }
 
+            // Set up entity tracking.
+            if (_.has(system, 'tracking')) {
+                system.tracked = {};
+                _.each(
+                    system.tracking,
+                    function (id) {
+                        system.tracked[id] = {};
+                    }
+                );
+            }
+
             systems.push(system);
             systems = _.sortByOrder(systems, ['priority'], [false]);
 
@@ -146,6 +158,22 @@
         this.rebuild = function (entity, trackID) {
             that.destroy(entity, trackID);
             that.build(entity, trackID);
+        };
+
+        // Add entities to systems that want to track them.
+        this.track = function (entity) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'tracking')) {
+                        _.each(system.tracking, function (id) {
+                            if (entity.has(id)){
+                                system.tracked[id][entity.uid] = entity;
+                            }
+                        });
+                    }
+                }
+            );
         };
 
         // Clear all entities from the world and systems.
