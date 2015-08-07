@@ -89,12 +89,21 @@
             }
 
             // Set up entity tracking.
-            if (_.has(system, 'tracking')) {
-                system.tracked = {};
+            if (_.has(system, '$tracking')) {
+                system.$tracked = {};
                 _.each(
-                    system.tracking,
-                    function (id) {
-                        system.tracked[id] = {};
+                    system.$tracking,
+                    function (trackingType, id) {
+                        switch (trackingType) {
+                            case 'many':
+                                system.$tracked[id] = {};
+                                break;
+                            case 'single':
+                                system.$tracked[id] = null;
+                                break;
+                            default:
+                                throw new Error('UnknownTrackingType');
+                        }
                     }
                 );
             }
@@ -158,7 +167,10 @@
         // Rebuild an entity with all registered systems.
         this.rebuild = function (entity, trackID) {
             that.destroy(entity, trackID);
+            this.untrack(entity);
+
             that.build(entity, trackID);
+            this.track(entity);
         };
 
         // Track entities that systems want to.
@@ -166,10 +178,23 @@
             _.each(
                 systems,
                 function (system) {
-                    if (_.has(system, 'tracking')) {
-                        _.each(system.tracking, function (id) {
+                    if (_.has(system, '$tracking')) {
+                        _.each(system.$tracking, function (trackingType, id) {
                             if (entity.has(id)){
-                                system.tracked[id][entity.uid] = entity;
+                                switch (trackingType) {
+                                    case 'many':
+                                        system.$tracked[id][entity.uid] = entity;
+                                        break;
+                                    case 'single':
+                                        if (system.$tracked[id] === null) {
+                                            system.$tracked[id] = entity;
+                                        } else {
+                                            throw new Error('ExpectedSingleEntity');
+                                        }
+                                        break;
+                                    default:
+                                        throw new Error('UnknownTrackingType');
+                                }
                             }
                         });
                     }
@@ -182,10 +207,19 @@
             _.each(
                 systems,
                 function (system) {
-                    if (_.has(system, 'tracking')) {
-                        _.each(system.tracking, function (id) {
+                    if (_.has(system, '$tracking')) {
+                        _.each(system.$tracking, function (trackingType, id) {
                             if (entity.has(id)){
-                                delete system.tracked[id][entity.uid];
+                                switch (trackingType) {
+                                    case 'many':
+                                        delete system.$tracked[id][entity.uid];
+                                        break;
+                                    case 'single':
+                                        system.$tracked[id] = null;
+                                        break;
+                                    default:
+                                        throw new Error('UnknownTrackingType');
+                                }
                             }
                         });
                     }
@@ -199,6 +233,7 @@
                 entities,
                 function (entity) {
                     that.destroy(entity);
+                    that.untrack(entity);
                 }
             );
             entities = {};

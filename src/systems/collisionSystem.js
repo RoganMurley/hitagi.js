@@ -6,26 +6,8 @@
     var CollisionSystem = function () {
         var that = this;
 
-        var entities = {};
-
-        this.add = function (entity) {
-            entities[entity.uid] = entity;
-            return entity;
-        };
-
-        // Build the system, called by world on every entity.
-        this.build = {
-            collision: function (entity) {
-                that.add(entity);
-            }
-        };
-
-        // Destroy an entity from the system.
-        this.destroy = {
-            collision: function (entity) {
-                var id = entity.uid;
-                delete entities[id];
-            }
+        this.$tracking = {
+            'collision': 'many'
         };
 
         var hitTestRectangle = function (entity, other, x1, y1) {
@@ -59,7 +41,7 @@
         // If x and y is given, we pretend our entity is at that pos
         // Returns {hit: bool, entity: object}
         this.collide = function (entity, otherComponent, x, y) {
-            var others = entities,
+            var others = that.$tracked.collision,
                 hitEntity = null;
 
             var hit = _.some(

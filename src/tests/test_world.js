@@ -287,7 +287,7 @@
         });
 
         it('tracking should function as expected.', function () {
-            mockSystem.tracking = ['testing'];
+            mockSystem.$tracking = {'testing': 'many'};
             world.register(mockSystem);
 
             // Test tracking.
@@ -297,7 +297,7 @@
                 })
             );
             assert.deepEqual(
-                mockSystem.tracked.testing[testEntity.uid],
+                mockSystem.$tracked.testing[testEntity.uid],
                 testEntity
             );
 
@@ -308,14 +308,14 @@
                 })
             );
             assert.equal(
-                _.isUndefined(mockSystem.tracked.testing[testEntity2.uid]),
+                _.isUndefined(mockSystem.$tracked.testing[testEntity2.uid]),
                 true
             );
 
             // Test untracking.
             world.remove(testEntity);
             assert.equal(
-                _.isUndefined(mockSystem.tracked.testing[testEntity.uid]),
+                _.isUndefined(mockSystem.$tracked.testing[testEntity.uid]),
                 true
             );
         });

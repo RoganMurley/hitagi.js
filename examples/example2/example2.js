@@ -81,26 +81,13 @@
     world.register(new PlayerSystem(paddleSystem));
 
     var AISystem = function () {
-        var ai = null;
-
-        this.build = {
-            ai: function (entity) {
-                ai = entity;
-            }
-        };
-
-        this.destroy = {
-            ai: function () {
-                ai = null;
-            }
+        var that = this;
+        this.$tracking = {
+            'ai': 'single'
         };
 
         this.update = {
             ai: function (entity) {
-                if (!ai) {
-                    return;
-                }
-
                 var distance = Math.abs(entity.c.position.y - entity.c.ai.lastKnownY);
 
                 if (distance > entity.c.ai.sensitivity + (Math.random()*20 - 10)) {
@@ -113,10 +100,7 @@
             },
 
             ball: function (entity) {
-                if (!ai) {
-                    return;
-                }
-
+                var ai = that.$tracked.ai;
                 ai.c.ai.lastKnownY = entity.c.position.y;
             }
         };
@@ -171,25 +155,14 @@
     var ballSystem = world.register(new BallSystem(collisionSystem));
 
     var ScoreSystem = function (ballSystem) {
-        var scores = null;
-
-        this.build = {
-            scorecard: function (entity)  {
-                scores = entity;
-            }
-        };
-
-        this.destroy = {
-            scorecard: function (entity)  {
-                scores = null;
-            }
+        var that = this;
+        this.$tracking = {
+            'score': 'single'
         };
 
         this.update = {
             ball: function (entity) {
-                if (!ball) {
-                    return;
-                }
+                var scores = that.$tracked.score;
 
                 if (entity.c.position.x < 0) {
                     ballSystem.resetBall(entity);

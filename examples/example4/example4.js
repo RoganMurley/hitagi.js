@@ -74,30 +74,17 @@
     var ScoreSystem = function (soundSystem) {
         var that = this;
 
-        var best = null,
-            score = null;
-
         var BEST_SCORE_KEY = 'hitagiFlappyBirdExampleBestScore';
 
-        this.build = {
-            best: function (entity) {
-                best = entity;
-            },
-            score: function (entity) {
-                score = entity;
-            }
-        };
-
-        this.destroy = {
-            best: function (entity) {
-                best = null;
-            },
-            score: function (entity) {
-                score = null;
-            }
+        this.$tracking = {
+            'best': 'single',
+            'score': 'single'
         };
 
         this.updateScore = function (newScore) {
+            var score = that.$tracked.score;
+            var best = that.$tracked.best;
+
             /// Update score.
             score.c.score.cleared = newScore;
             score.c.graphic.copy = 'SCORE: ' + score.c.score.cleared;
@@ -123,25 +110,31 @@
         };
 
         this.saveBestScore = function () {
+            var best = that.$tracked.best;
             localStorage.setItem(BEST_SCORE_KEY, best.c.best.cleared);
         };
 
         this.clearBestScore = function () {
+            var best = that.$tracked.best;
             best.c.best.cleared = 0;
             that.saveBestScore();
         };
     };
 
     var DeathSystem = function (world, rooms, collisionSystem, soundSystem, scoreSystem) {
-        var scrollers = {};
-        var generator = null;
+        var that = this;
+        this.$tracking = {
+            'pipeGenerator': 'single',
+            'scroll': 'many'
+        };
 
         var stopGame = function () {
             // Stop screen scroll.
-            _.each(scrollers, function (scroller) {
+            _.each(that.$tracked.scroll, function (scroller) {
                 scroller.c.scroll.speed = 0;
             });
             // Stop generating pipes.
+            var generator = that.$tracked.pipeGenerator;
             generator.c.pipeGenerator.period = Infinity;
             generator.c.pipeGenerator.timer = Infinity;
         };
@@ -152,24 +145,6 @@
             world.add(
                 new Best({cleared: scoreSystem.loadBestScore()})
             );
-        };
-
-        this.build = {
-            pipeGenerator: function (entity) {
-                generator = entity;
-            },
-            scroll: function (entity) {
-                scrollers[entity.uid] = entity;
-            }
-        };
-
-        this.destroy = {
-            pipeGenerator: function (entity) {
-                generator = null;
-            },
-            scroll: function (entity) {
-                delete scrollers[entity.uid];
-            }
         };
 
         this.update = {
@@ -271,35 +246,18 @@
     };
 
     var StartSystem = function (controls) {
-        var bird = null,
-            generator = null,
-            start = null;
-
-        this.build = {
-            bird: function (entity) {
-                bird = entity;
-            },
-            pipeGenerator: function (entity) {
-                generator = entity;
-            },
-            start: function (entity) {
-                start = entity;
-            }
-        };
-
-        this.destroy = {
-            bird: function () {
-                bird = null;
-            },
-            pipeGenerator: function () {
-                generator = null;
-            },
-            start: function () {
-                start = null;
-            }
+        var that = this;
+        this.$tracking = {
+            'bird': 'single',
+            'pipeGenerator': 'single',
+            'start': 'single'
         };
 
         this.tickStart = function () {
+            var start = that.$tracked.start;
+            var bird = that.$tracked.bird;
+            var generator = that.$tracked.pipeGenerator;
+
             if (!start.c.started) {
                 if (controls.check('start')) {
                     // Hide text.
@@ -626,6 +584,6 @@
             // Next frame.
             requestAnimationFrame(animate);
         }
-}
+    }
 
 } ());
