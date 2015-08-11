@@ -25,6 +25,7 @@
                     entity.c.body.height,
                     {
                         angle: entity.c.body.angle,
+                        density: entity.c.body.density,
                         isStatic: entity.c.body.static
                     }
                 );
@@ -35,6 +36,11 @@
 
                 proxy(entity.c.body, 'width', body, 'width');
                 proxy(entity.c.body, 'height', body, 'height');
+
+                body.force = entity.c.body.force;
+                proxy(entity.c.body, 'force', body, 'force');
+
+                proxy(entity.c.body, 'density', body, 'density');
 
 
                 body.position.x = entity.c.body.x;
@@ -67,6 +73,10 @@
                 entity.c.body.velocity = body.velocity;
 
                 entity.c.body.angle = body.angle;
+
+                if (entity.has('player')) {
+                    console.log(body.angle);
+                }
             },
             graphic: function (entity) {
                 if (entity.has('body')) {
@@ -88,6 +98,20 @@
 
             Matter.Events.on(engine, "afterTick",  event);
             Matter.Events.on(engine, "afterRender",  event);
+        };
+
+       this.rayQuery = function (entities, startPoint, endPoint) {
+            var queryBodies = [];
+            _.each(
+                entities,
+                function (entity) {
+                    queryBodies.push(bodies[entity.uid]);
+                }
+            );
+
+            return _.any(
+                Matter.Query.ray(queryBodies, startPoint, endPoint)
+            );
         };
     };
 

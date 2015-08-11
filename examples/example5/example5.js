@@ -20,7 +20,10 @@
     var controls = new hitagi.Controls();
     controls.bind('m1', 'spawn');
     controls.bind(82, 'reload');
-    controls.bind('m2', 'spin');
+
+    controls.bind(32, 'jump');
+    controls.bind(37, 'left');
+    controls.bind(39, 'right');
 
 
     // Define systems.
@@ -47,12 +50,42 @@
                 rooms.loadRoom('start');
             }
         };
+    };
+
+    var PlayerSystem = function (controls, physicsSystem) {
+        var that = this;
+        this.$tracking = {
+            'floor': 'single'
+        };
 
         this.update = {
-            spinner: function (entity) {
-                if (controls.check('spin')) {
-                    entity.c.body.angle += 0.1;
-                }
+            player: function (entity) {
+                var start = {
+                    x: entity.c.body.x,
+                    y: entity.c.body.y
+                };
+                var end = {
+                    x: entity.c.body.x,
+                    y: entity.c.body.y + 23
+                };
+                var floor = that.$tracked.floor;
+                var grounded = physicsSystem.rayQuery([floor], start, end);
+
+                if (grounded) {
+                    if (controls.check('jump')) {
+                        entity.c.body.force.y -= 0.03;
+                    }
+
+                    if (controls.check('left')) {
+                        entity.c.body.force.x -= 0.001;
+                    }
+
+                    if (controls.check('right')) {
+                        entity.c.body.force.x += 0.001;
+                    }
+                };
+
+                entity.c.body.angle = 0;
             }
         };
     };
@@ -75,6 +108,9 @@
 
     var reloadSystem = new ReloadSystem(rooms, controls);
     world.register(reloadSystem);
+
+    var playerSystem = new PlayerSystem(controls, physicsSystem);
+    world.register(playerSystem);
 
     // Define components.
     'components';
@@ -105,12 +141,12 @@
             }))
             .attach(new hitagi.components.Body({
                 angle: params.angle,
+                density: 0.0001,
                 width: params.width,
                 height: params.height,
                 x: params.x,
                 y: params.y
-            }))
-            .attach({id: 'spinner'});
+            }));
     };
 
     var Floor = function (params) {
@@ -127,7 +163,27 @@
                 static: true,
                 x: params.x,
                 y: params.y
-            }));
+            }))
+            .attach({id: 'floor'});
+    };
+
+    var Player = function (params) {
+        return new hitagi.Entity()
+            .attach(new hitagi.components.Graphic({
+                type: 'sprite',
+                path: 'block.png',
+                width: params.width,
+                height: params.height
+            }))
+            .attach(new hitagi.components.Body({
+                angle: 0,
+                width: params.width,
+                height: params.height,
+                x: params.x,
+                y: params.y
+            })).attach({
+                id: 'player'
+            });
     };
 
     // Load assets, then run game.
@@ -145,6 +201,12 @@
                 width: levelWidth,
                 x: levelWidth/2,
                 y: levelHeight - 16
+            }),
+            new Player({
+                height: 32,
+                width: 32,
+                x: levelWidth/2,
+                y: levelHeight - 128
             })
         ];
 

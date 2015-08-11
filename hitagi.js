@@ -49232,6 +49232,11 @@ if (!global.cancelAnimationFrame) {
     var Body = function (params) {
         params = defaultParams({
             angle: 0,
+            density: 0.001,
+            force: {
+                x: 0,
+                y: 0
+            },
             static: false,
             velocity: {
                 xspeed: 0,
@@ -49244,6 +49249,8 @@ if (!global.cancelAnimationFrame) {
         this.deps = [];
 
         this.angle = params.angle;
+        this.density = params.density;
+        this.force = params.force;
         this.height = params.height;
         this.width = params.width;
         this.static = params.static;
@@ -49748,6 +49755,7 @@ global.hitagi = require('./main.js');
                     entity.c.body.height,
                     {
                         angle: entity.c.body.angle,
+                        density: entity.c.body.density,
                         isStatic: entity.c.body.static
                     }
                 );
@@ -49758,6 +49766,11 @@ global.hitagi = require('./main.js');
 
                 proxy(entity.c.body, 'width', body, 'width');
                 proxy(entity.c.body, 'height', body, 'height');
+
+                body.force = entity.c.body.force;
+                proxy(entity.c.body, 'force', body, 'force');
+
+                proxy(entity.c.body, 'density', body, 'density');
 
 
                 body.position.x = entity.c.body.x;
@@ -49790,6 +49803,10 @@ global.hitagi = require('./main.js');
                 entity.c.body.velocity = body.velocity;
 
                 entity.c.body.angle = body.angle;
+
+                if (entity.has('player')) {
+                    console.log(body.angle);
+                }
             },
             graphic: function (entity) {
                 if (entity.has('body')) {
@@ -49811,6 +49828,20 @@ global.hitagi = require('./main.js');
 
             Matter.Events.on(engine, "afterTick",  event);
             Matter.Events.on(engine, "afterRender",  event);
+        };
+
+       this.rayQuery = function (entities, startPoint, endPoint) {
+            var queryBodies = [];
+            _.each(
+                entities,
+                function (entity) {
+                    queryBodies.push(bodies[entity.uid]);
+                }
+            );
+
+            return _.any(
+                Matter.Query.ray(queryBodies, startPoint, endPoint)
+            );
         };
     };
 

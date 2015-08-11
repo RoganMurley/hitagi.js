@@ -6,6 +6,11 @@
     var Body = function (params) {
         params = defaultParams({
             angle: 0,
+            density: 0.001,
+            force: {
+                x: 0,
+                y: 0
+            },
             static: false,
             velocity: {
                 xspeed: 0,
@@ -18,6 +23,8 @@
         this.deps = [];
 
         this.angle = params.angle;
+        this.density = params.density;
+        this.force = params.force;
         this.height = params.height;
         this.width = params.width;
         this.static = params.static;
