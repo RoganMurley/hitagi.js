@@ -69,7 +69,8 @@
                     entity.c.position.y += test.displacement.y;
 
                     // Stop moving.
-                    entity.c.velocity.xspeed = 0;
+                    //entity.c.velocity.xspeed = 0;
+                    //entity.c.velocity.yspeed = 0;
                 }
             }
         };
@@ -221,6 +222,15 @@
                 })
             );
         });
+
+        startRoomEntities.push(
+            new Block({
+                height: 64,
+                width: 200,
+                x: levelWidth/2,
+                y: levelHeight -202
+            })
+        );
 
         // Load starting room.
         rooms.saveRoom('start', startRoomEntities);

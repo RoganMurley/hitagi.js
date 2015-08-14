@@ -50754,6 +50754,18 @@ global.hitagi = require('./main.js');
                 .clone()
                 .normalize();
 
+            var dirX, dirY;
+            if (direction.x < 0) {
+                dirX = -1;
+            } else {
+                dirX = 1;
+            }
+            if (direction.y < 0) {
+                dirY = -1;
+            } else {
+                dirY = 1;
+            }
+
             var minApart = {
                 x: entity.c.collision.width/2 + other.c.collision.width/2,
                 y: entity.c.collision.height/2 + other.c.collision.height/2
@@ -50771,20 +50783,20 @@ global.hitagi = require('./main.js');
 
             if (overlap.x > overlap.y ) {
                 return {
-                    x: direction.x * overlap.x,
+                    x: dirX * overlap.x,
                     y: 0
                 };
             }
             else if (overlap.x < overlap.y ) {
                 return {
                     x: 0,
-                    y: direction.y * overlap.y
+                    y: dirY * overlap.y
                 };
             }
             else {//if(overlap.x == overlap.y)
                 return {
-                    x: Math.round(direction.x + overlap.x),
-                    y: Math.round(direction.y * overlap.y)
+                    x: dirX + overlap.x,
+                    y: dirY * overlap.y
                 };
             }
         };
