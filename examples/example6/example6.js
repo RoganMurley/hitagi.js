@@ -21,65 +21,70 @@
     controls.bind(82, 'reload');
 
     controls.bind(32, 'jump');
+
     controls.bind(37, 'left');
     controls.bind(39, 'right');
+    controls.bind(38, 'up');
+    controls.bind(40, 'down');
+
+    controls.bind('m1', 'spawn');
 
 
     // Define systems.
-    var GravitySystem = function (collisionSystem) {
-        this.update = {
-            gravity: function (entity) {
-                entity.c.velocity.yspeed += entity.c.gravity.magnitude;
-                entity.c.gravity.grounded = false;
-
-                var x = entity.c.position.x;
-                var y = entity.c.position.y;
-                var test = collisionSystem.collide(entity, 'block', x, y);
-                if (test.hit) {
-                    var other = test.entity;
-                    var yDisplacement = y - other.c.position.y;
-                    var move = -(entity.c.collision.height + yDisplacement)
-                    
-                    entity.c.position.y += move;
-                    entity.c.velocity.yspeed = 0;
-                    entity.c.gravity.grounded = true;
-                }
-            }
-        };
-    };
-
     var PlayerSystem = function (controls) {
         this.update = {
             player: function (entity) {
                 // Controls.
-                if (controls.check('jump')) {
-                    if (entity.c.gravity.grounded) {
-                        entity.c.velocity.yspeed = -500;
-                    }
-                }
+                var moveSpeed = 200;
 
+                // Horizontal movement.
                 if (controls.check('left')) {
-                    entity.c.velocity.xspeed = -600;
+                    entity.c.velocity.xspeed = -moveSpeed;
                 }
                 else if (controls.check('right')) {
-                    entity.c.velocity.xspeed = 600;
+                    entity.c.velocity.xspeed = moveSpeed;
                 }
                 else {
                     entity.c.velocity.xspeed = 0;
+                }
+
+                // Vertical movement.
+                if (controls.check('up')) {
+                    entity.c.velocity.yspeed = -moveSpeed;
+                }
+                else if (controls.check('down')) {
+                    entity.c.velocity.yspeed = moveSpeed;
+                }
+                else {
+                    entity.c.velocity.yspeed = 0;
                 }
 
                 // Collisions.
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
                 var test = collisionSystem.collide(entity, 'block', x, y);
+
                 if (test.hit) {
-                    var other = test.entity;
-                    var xDisplacement = x - other.c.position.x;
-                    var move = -(entity.c.collision.width + xDisplacement)
-                    
-                    entity.c.position.x += move;
+                    entity.c.position.x += test.displacement.x;
+                    entity.c.position.y += test.displacement.y;
+
+                    // Stop moving.
                     entity.c.velocity.xspeed = 0;
                 }
+            }
+        };
+    };
+
+    var SpawnSystem = function (world, controls) {
+        this.tickStart = function () {
+            if (controls.check('spawn', true)) {
+                var mousePos = controls.getMousePos();
+                world.add(new Block({
+                    width: 32,
+                    height: 32,
+                    x: mousePos.x,
+                    y: mousePos.y
+                }));
             }
         };
     };
@@ -97,11 +102,11 @@
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
 
-    var gravitySystem = new GravitySystem(collisionSystem);
-    world.register(gravitySystem);
-
     var playerSystem = new PlayerSystem(controls);
     world.register(playerSystem);
+
+    var spawnSystem = new SpawnSystem(world, controls);
+    world.register(spawnSystem);
 
     // Define components.
     'components';
@@ -163,10 +168,6 @@
                 height: params.height
             }))
             .attach({
-                id: 'gravity',
-                magnitude: 10
-            })
-            .attach({
                 id: 'player'
             });
     };
@@ -185,27 +186,41 @@
                 height: 32,
                 width: 32,
                 x: levelWidth/2,
-                y: levelHeight - 128
+                y: levelHeight/2
             }),
             new Block({
                 height: 32,
-                width: levelWidth,
-                x: levelWidth/2,
-                y: levelHeight - 16
-            }),
-            new Block({
-                height: levelHeight,
                 width: 32,
-                x: 16,
+                x: levelWidth/2 + 128,
                 y: levelHeight/2
             }),
             new Block({
-                height: levelHeight,
+                height: 32,
                 width: 32,
-                x: levelWidth - 16,
+                x: levelWidth/2 - 128,
                 y: levelHeight/2
             })
         ];
+
+        _.times(20, function (i) {
+            startRoomEntities.push(
+                new Block({
+                    height: 32,
+                    width: 32,
+                    x: i * 32,
+                    y: levelHeight/2 + 64
+                })
+            );
+
+            startRoomEntities.push(
+                new Block({
+                    height: 32,
+                    width: 32,
+                    x: levelWidth/2 + 300,
+                    y: i * 32
+                })
+            );
+        });
 
         // Load starting room.
         rooms.saveRoom('start', startRoomEntities);

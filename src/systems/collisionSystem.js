@@ -2,6 +2,7 @@
     'use strict';
 
     var _ = require('lodash');
+    var Victor = require('victor');
 
     var CollisionSystem = function () {
         var that = this;
@@ -35,6 +36,51 @@
             return false;
         };
 
+        var minimumDisplacementVector = function (entity, other) {
+            var entityPos = Victor.fromObject(entity.c.position);
+            var otherPos = Victor.fromObject(other.c.position);
+
+            var direction = otherPos
+                .clone()
+                .subtract(entityPos)
+                .clone()
+                .normalize();
+
+            var minApart = {
+                x: entity.c.collision.width/2 + other.c.collision.width/2,
+                y: entity.c.collision.height/2 + other.c.collision.height/2
+            };
+
+            var actualDisplacement = {
+                x: Math.abs(entityPos.x - otherPos.x),
+                y: Math.abs(entityPos.y - otherPos.y)
+            };
+
+            var overlap = {
+                x: actualDisplacement.x - minApart.x,
+                y: actualDisplacement.y - minApart.y
+            };
+
+            if (overlap.x > overlap.y ) {
+                return {
+                    x: direction.x * overlap.x,
+                    y: 0
+                };
+            }
+            else if (overlap.x < overlap.y ) {
+                return {
+                    x: 0,
+                    y: direction.y * overlap.y
+                };
+            }
+            else {//if(overlap.x == overlap.y)
+                return {
+                    x: Math.round(direction.x + overlap.x),
+                    y: Math.round(direction.y * overlap.y)
+                };
+            }
+        };
+
         // Prospective collision test.
         // Tests for a collision between entity and any
         // entity with otherComponent.
@@ -42,7 +88,8 @@
         // Returns {hit: bool, entity: object}
         this.collide = function (entity, otherComponent, x, y) {
             var others = that.$tracked.collision,
-                hitEntity = null;
+                hitEntity = null,
+                displacementVector = null;
 
             var hit = _.some(
                 others,
@@ -53,7 +100,12 @@
                         return false;
                     }
                     if (other.has(otherComponent) || !otherComponent) {
-                        return hitTestRectangle(entity, other, x, y);
+                        var hitTest = hitTestRectangle(entity, other, x, y);
+                        if (hitTest) {
+                            displacementVector = minimumDisplacementVector(entity, other);
+                            console.log(displacementVector);
+                            return true;
+                        }
                     }
                     return false;
                 }
@@ -61,7 +113,8 @@
 
             return {
                 hit: hit,
-                entity: hit ? hitEntity : null
+                entity: hit ? hitEntity : null,
+                displacement: hit ? displacementVector : null
             };
         };
     };
