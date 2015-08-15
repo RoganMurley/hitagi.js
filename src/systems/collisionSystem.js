@@ -64,22 +64,20 @@
             };
 
             if (overlap.x > overlap.y ) {
-                //console.log('overlap x');
                 return {
                     x: dirX * overlap.x,
                     y: 0
                 };
             }
             else if (overlap.x < overlap.y ) {
-                //console.log('overlap y');
                 return {
                     x: 0,
                     y: dirY * overlap.y
                 };
             }
-            else {//if(overlap.x == overlap.y)
+            else { //if(overlap.x == overlap.y)
                 return {
-                    x: dirX + overlap.x,
+                    x: dirX * overlap.x,
                     y: dirY * overlap.y
                 };
             }
@@ -88,8 +86,6 @@
         // Prospective collision test.
         // Tests for a collision between entity and any
         // entity with otherComponent.
-        // If x and y is given, we pretend our entity is at that pos
-        // Returns {hit: bool, entity: object}
         this.collide = function (entity, otherComponent, x, y) {
             var others = that.$tracked.collision,
                 hitEntity = null,
@@ -118,8 +114,32 @@
             return {
                 hit: hit,
                 entity: hit ? hitEntity : null,
-                displacement: hit ? displacementVector : null
+                resolution: hit ? displacementVector : null
             };
+        };
+
+        // New collision test function.
+        this.collideNew = function (entity, otherComponent, x, y) {
+            var others = that.$tracked.collision;
+
+            var hitEntities = _.filter(
+                others,
+                function (other) {
+                    return (other.uid !== entity.uid) &&
+                        other.has(otherComponent) &&
+                        hitTestRectangle(entity, other, x, y);
+                }
+            );
+
+            return _.map(
+                hitEntities,
+                function (other) {
+                    return {
+                        entity: other,
+                        resolution: minimumDisplacementVector(entity, other)
+                    }
+                }
+            );
         };
     };
 

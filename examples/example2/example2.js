@@ -157,12 +157,12 @@
     var ScoreSystem = function (ballSystem) {
         var that = this;
         this.$tracking = {
-            'score': 'single'
+            'scorecard': 'single'
         };
 
         this.update = {
             ball: function (entity) {
-                var scores = that.$tracked.score;
+                var scores = that.$tracked.scorecard;
 
                 if (entity.c.position.x < 0) {
                     ballSystem.resetBall(entity);
