@@ -2,7 +2,6 @@
     'use strict';
 
     var _ = require('lodash');
-    var Victor = require('victor');
 
     var CollisionSystem = function () {
         var that = this;
@@ -37,22 +36,13 @@
         };
 
         var minimumDisplacementVector = function (entity, other) {
-            var entityPos = Victor.fromObject(entity.c.position);
-            var otherPos = Victor.fromObject(other.c.position);
-
-            var direction = otherPos
-                .clone()
-                .subtract(entityPos)
-                .clone()
-                .normalize();
-
             var dirX, dirY;
-            if (direction.x < 0) {
+            if (other.c.position.x - entity.c.position.x < 0) {
                 dirX = -1;
             } else {
                 dirX = 1;
             }
-            if (direction.y < 0) {
+            if (other.c.position.y - entity.c.position.y < 0) {
                 dirY = -1;
             } else {
                 dirY = 1;
@@ -64,8 +54,8 @@
             };
 
             var actualDisplacement = {
-                x: Math.abs(entityPos.x - otherPos.x),
-                y: Math.abs(entityPos.y - otherPos.y)
+                x: Math.abs(entity.c.position.x - other.c.position.x),
+                y: Math.abs(entity.c.position.y - other.c.position.y)
             };
 
             var overlap = {
@@ -74,12 +64,14 @@
             };
 
             if (overlap.x > overlap.y ) {
+                //console.log('overlap x');
                 return {
                     x: dirX * overlap.x,
                     y: 0
                 };
             }
             else if (overlap.x < overlap.y ) {
+                //console.log('overlap y');
                 return {
                     x: 0,
                     y: dirY * overlap.y

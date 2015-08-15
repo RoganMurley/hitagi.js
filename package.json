@@ -28,8 +28,7 @@
     "jquery": "^2.1.4",
     "lodash": "^3.8.0",
     "matter-js": "^0.8.0",
-    "pixi.js": "^3.0.7",
-    "victor": "^0.2.6"
+    "pixi.js": "^3.0.7"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
