@@ -123,17 +123,18 @@
                 var y = entity.c.position.y;
 
                 var test = collisionSystem.collide(entity, 'paddle', x, y);
-                if (test.hit) {
+                if (test.length) {
+                    var other = test[0].entity;
                     entity.c.velocity.xspeed *= -1.01;
 
-                    if (entity.c.position.y < test.entity.c.position.y) {
+                    if (entity.c.position.y < other.c.position.y) {
                         entity.c.velocity.yspeed +=
-                            (entity.c.position.y - test.entity.c.position.y) / 50;
+                            (entity.c.position.y - other.c.position.y) / 50;
                         entity.c.ball.cooldown = 10;
                     }
-                    if (entity.c.position.y > test.entity.c.position.y) {
+                    if (entity.c.position.y > other.c.position.y) {
                         entity.c.velocity.yspeed -=
-                            (entity.c.position.y - test.entity.c.position.y) / 50;
+                            (entity.c.position.y - other.c.position.y) / 50;
                         entity.c.ball.cooldown = 10;
                     }
                 }

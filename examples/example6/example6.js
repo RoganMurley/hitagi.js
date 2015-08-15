@@ -63,7 +63,7 @@
                 entity.c.position.x += hitagi.utils.delta(entity.c.velocity.xspeed, dt);
 
                 // Collisions.
-                var test = collisionSystem.collideNew(entity, 'block', entity.c.position.x, entity.c.position.y);
+                var test = collisionSystem.collide(entity, 'block', entity.c.position.x, entity.c.position.y);
 
                 // Get the maximum horizontal resolution from our collisions.
                 var maxRes = {
@@ -87,7 +87,7 @@
                 entity.c.position.y += hitagi.utils.delta(entity.c.velocity.yspeed, dt);
 
                 // Check for collisions again.
-                test = collisionSystem.collideNew(entity, 'block', entity.c.position.x, entity.c.position.y);
+                test = collisionSystem.collide(entity, 'block', entity.c.position.x, entity.c.position.y);
 
                 // Get the maximum vertical resolution velocity from our collisions.
                 maxRes = {

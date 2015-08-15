@@ -49745,43 +49745,8 @@ global.hitagi = require('./main.js');
         // Tests for a collision between entity and any
         // entity with otherComponent.
         this.collide = function (entity, otherComponent, x, y) {
-            var others = that.$tracked.collision,
-                hitEntity = null,
-                displacementVector = null;
-
-            var hit = _.some(
-                others,
-                function (other) {
-                    hitEntity = other;
-
-                    if (other === entity) {
-                        return false;
-                    }
-                    if (other.has(otherComponent) || !otherComponent) {
-                        var hitTest = hitTestRectangle(entity, other, x, y);
-                        if (hitTest) {
-                            displacementVector = minimumDisplacementVector(entity, other);
-                            console.log(displacementVector);
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            );
-
-            return {
-                hit: hit,
-                entity: hit ? hitEntity : null,
-                resolution: hit ? displacementVector : null
-            };
-        };
-
-        // New collision test function.
-        this.collideNew = function (entity, otherComponent, x, y) {
-            var others = that.$tracked.collision;
-
             var hitEntities = _.filter(
-                others,
+                that.$tracked.collision,
                 function (other) {
                     return (other.uid !== entity.uid) &&
                         other.has(otherComponent) &&

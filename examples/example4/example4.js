@@ -63,9 +63,9 @@
 
                 var test = collisionSystem.collide(entity, 'goal', x, y);
 
-                if (test.hit && !test.entity.c.goal.done) {
-                    test.entity.c.goal.done = true;
-                    scoreSystem.updateScore(test.entity.c.goal.n);
+                if (test.length && !test[0].entity.c.goal.done) {
+                    test[0].entity.c.goal.done = true;
+                    scoreSystem.updateScore(test[0].entity.c.goal.n);
                 }
             }
         };
@@ -154,7 +154,7 @@
                 var y = entity.c.position.y;
 
                 var test = collisionSystem.collide(entity, 'kill', x, y);
-                if (test.hit) {
+                if (test.length) {
                     stopGame();
 
                     soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/die.ogg');
