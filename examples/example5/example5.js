@@ -83,7 +83,7 @@
                     if (controls.check('right')) {
                         entity.c.body.force.x += 0.001;
                     }
-                };
+                }
 
                 entity.c.body.angle = 0;
             }

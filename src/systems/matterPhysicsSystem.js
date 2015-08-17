@@ -17,7 +17,7 @@
         var bodies = {};
 
         this.build = {
-            body: function (entity) {
+            physicsBody: function (entity) {
                 var body = Matter.Bodies.rectangle(
                     entity.c.body.x,
                     entity.c.body.y,

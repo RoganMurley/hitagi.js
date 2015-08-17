@@ -84,8 +84,8 @@
         // Systems with higher priority will be updated first.
         this.register = function (system) {
             // No priority is the lowest priority.
-            if (!_.has(system, 'priority')) {
-                system.priority = -Infinity;
+            if (!_.has(system, '$priority')) {
+                system.$priority = -Infinity;
             }
 
             // Set up entity tracking.
@@ -109,7 +109,7 @@
             }
 
             systems.push(system);
-            systems = _.sortByOrder(systems, ['priority'], [false]);
+            systems = _.sortByOrder(systems, ['$priority'], [false]);
 
             return system;
         };

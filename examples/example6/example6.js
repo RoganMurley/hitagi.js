@@ -31,44 +31,81 @@
 
 
     // Define systems.
-    var PlayerSystem = function (controls) {
+
+    // We need to update horizontal and vertical velocity seperately for our collision resolution technique.
+    // The default hitagi VelocitySystem doesn't support this, but it's easy to make our own.
+    var HorizontalVelocitySystem = function () {
+        this.$priority = 4;
+        this.update = {
+            velocity: function (entity, dt) {
+                entity.c.position.x += hitagi.utils.delta(entity.c.velocity.xspeed, dt);
+            }
+        };
+    };
+
+    var VerticalVelocitySystem = function () {
+        this.$priority = 2;
+        this.update = {
+            velocity: function (entity, dt) {
+                entity.c.position.y += hitagi.utils.delta(entity.c.velocity.yspeed, dt);
+            }
+        };
+    };
+
+    var PlayerControlsSystem = function (controls) {
         var moveSpeed = 200;
 
         this.update = {
-            player: function (entity, dt) {
-                var test,
-                    potentialResolutions,
-                    maxResolution;
-
+            player: function (entity) {
                 // Horizontal movement.
                 if (controls.check('left')) {
-                    entity.c.position.x -= hitagi.utils.delta(moveSpeed, dt);
+                    entity.c.velocity.xspeed = -moveSpeed;
                 }
-                if (controls.check('right')) {
-                    entity.c.position.x += hitagi.utils.delta(moveSpeed, dt);
+                else if (controls.check('right')) {
+                    entity.c.velocity.xspeed = moveSpeed;
+                } else {
+                    entity.c.velocity.xspeed = 0;
                 }
-
-                // Check for collisions, resolving horizontally.
-                test = collisionSystem.collide(entity, 'block');
-                potentialResolutions = [0].concat(_.pluck(test, 'resolution.x'));
-                maxResolution = _.max(potentialResolutions, Math.abs);
-
-                entity.c.position.x += maxResolution;
 
                 // Vertical movement.
                 if (controls.check('up')) {
-                    entity.c.position.y -= hitagi.utils.delta(moveSpeed, dt);
+                    entity.c.velocity.yspeed = -moveSpeed;
                 }
-                if (controls.check('down')) {
-                    entity.c.position.y += hitagi.utils.delta(moveSpeed, dt);
+                else if (controls.check('down')) {
+                    entity.c.velocity.yspeed = moveSpeed;
+                } else {
+                    entity.c.velocity.yspeed = 0;
                 }
+            }
+        };
+    };
 
-                // Check for collisions, resolving vertically.
-                test = collisionSystem.collide(entity, 'block');
-                potentialResolutions = [0].concat(_.pluck(test, 'resolution.y'));
-                maxResolution = _.max(potentialResolutions, Math.abs);
+    var HorizontalBodySystem = function () {
+        this.$priority = 3;
+        this.update = {
+            body: function (entity, dt) {
+                var test = collisionSystem.collide(entity, 'solid');
+                if (test.length) {
+                    var potentialResolutions = _.pluck(test, 'resolution.x');
+                    var maxResolution = _.max(potentialResolutions, Math.abs);
 
-                entity.c.position.y += maxResolution;
+                    entity.c.position.x += maxResolution;
+                }
+            }
+        };
+    };
+
+    var VerticalBodySystem = function () {
+        this.$priority = 1;
+        this.update = {
+            body: function (entity, dt) {
+                var test = collisionSystem.collide(entity, 'solid');
+                if (test.length) {
+                    var potentialResolutions = _.pluck(test, 'resolution.y');
+                    var maxResolution = _.max(potentialResolutions, Math.abs);
+
+                    entity.c.position.y += maxResolution;
+                }
             }
         };
     };
@@ -94,16 +131,23 @@
     var soundSystem = new hitagi.systems.SoundSystem();
     world.register(soundSystem);
 
-    /*
-    var velocitySystem = new hitagi.systems.VelocitySystem();
-    world.register(velocitySystem);
-    */
-
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
 
-    var playerSystem = new PlayerSystem(controls);
-    world.register(playerSystem);
+    var horizontalVelocitySystem = new HorizontalVelocitySystem();
+    world.register(horizontalVelocitySystem);
+
+    var verticalVelocitySystem = new VerticalVelocitySystem();
+    world.register(verticalVelocitySystem);
+
+    var playerControlsSystem = new PlayerControlsSystem(controls);
+    world.register(playerControlsSystem);
+
+    var horizontalBodySystem = new HorizontalBodySystem();
+    world.register(horizontalBodySystem);
+
+    var verticalBodySystem = new VerticalBodySystem();
+    world.register(verticalBodySystem);
 
     var spawnSystem = new SpawnSystem(world, controls);
     world.register(spawnSystem);
@@ -144,6 +188,9 @@
             }))
             .attach({
                 id: 'block'
+            })
+            .attach({
+                id: 'solid'
             });
     };
 
@@ -159,7 +206,7 @@
                 x: params.x,
                 y: params.y
             }))
-            .attach(new hitagi.components.Velocity({
+            .attach (new hitagi.components.Velocity({
                 xspeed: 0,
                 yspeed: 0
             }))
@@ -169,12 +216,15 @@
             }))
             .attach({
                 id: 'player'
+            })
+            .attach({
+                id: 'body'
             });
     };
 
     // Load assets, then run game.
-    //renderSystem.load([], main);
-    main();
+    renderSystem.load(['block.png'], main);
+    //main();
 
     function main () {
         // Create starting room.

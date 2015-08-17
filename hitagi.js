@@ -49760,7 +49760,7 @@ global.hitagi = require('./main.js');
                     return {
                         entity: other,
                         resolution: minimumDisplacementVector(entity, other)
-                    }
+                    };
                 }
             );
         };
@@ -49789,7 +49789,7 @@ global.hitagi = require('./main.js');
         var bodies = {};
 
         this.build = {
-            body: function (entity) {
+            physicsBody: function (entity) {
                 var body = Matter.Bodies.rectangle(
                     entity.c.body.x,
                     entity.c.body.y,
@@ -50144,10 +50144,12 @@ global.hitagi = require('./main.js');
                         x = entity.c.position.x;
                         y = entity.c.position.y;
                     }
+                    /*
                     if (entity.has('body')) {
                         x = entity.c.body.x;
                         y = entity.c.body.y;
                     }
+                    */
 
                     x += offset.x;
                     y += offset.y;
@@ -50387,8 +50389,8 @@ global.hitagi = require('./main.js');
         // Systems with higher priority will be updated first.
         this.register = function (system) {
             // No priority is the lowest priority.
-            if (!_.has(system, 'priority')) {
-                system.priority = -Infinity;
+            if (!_.has(system, '$priority')) {
+                system.$priority = -Infinity;
             }
 
             // Set up entity tracking.
@@ -50412,7 +50414,7 @@ global.hitagi = require('./main.js');
             }
 
             systems.push(system);
-            systems = _.sortByOrder(systems, ['priority'], [false]);
+            systems = _.sortByOrder(systems, ['$priority'], [false]);
 
             return system;
         };

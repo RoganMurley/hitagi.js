@@ -251,10 +251,12 @@
                         x = entity.c.position.x;
                         y = entity.c.position.y;
                     }
+                    /*
                     if (entity.has('body')) {
                         x = entity.c.body.x;
                         y = entity.c.body.y;
                     }
+                    */
 
                     x += offset.x;
                     y += offset.y;

@@ -100,7 +100,7 @@
                             calls.push(1);
                         }
                     },
-                    priority: 1
+                    $priority: 1
                 },
                 {
                     update: {
@@ -108,7 +108,7 @@
                             calls.push(2);
                         }
                     },
-                    priority: 0
+                    $priority: 0
                 }
             ];
 
@@ -136,7 +136,7 @@
                             calls.push(1);
                         }
                     },
-                    priority: 0
+                    $priority: 0
                 },
                 {
                     update: {
@@ -144,7 +144,7 @@
                             calls.push(2);
                         }
                     },
-                    priority: 1
+                    $priority: 1
                 }
             ];
 
@@ -172,7 +172,7 @@
                             calls.push(1);
                         }
                     },
-                    priority: 0
+                    $priority: 0
                 },
                 {
                     update: {
@@ -180,7 +180,7 @@
                             calls.push(2);
                         }
                     },
-                    priority: 0
+                    $priority: 0
                 },
                 {
                     update: {
@@ -188,7 +188,7 @@
                             calls.push(3);
                         }
                     },
-                    priority: 1
+                    $priority: 1
                 },
                 {
                     update: {
@@ -196,7 +196,7 @@
                             calls.push(4);
                         }
                     },
-                    priority: 1
+                    $priority: 1
                 }
             ];
 
@@ -224,7 +224,7 @@
                             calls.push(1);
                         }
                     },
-                    priority: -999999
+                    $priority: -999999
                 },
                 {
                     update: {

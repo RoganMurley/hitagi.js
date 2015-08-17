@@ -102,7 +102,7 @@
                     return {
                         entity: other,
                         resolution: minimumDisplacementVector(entity, other)
-                    }
+                    };
                 }
             );
         };
