@@ -32,80 +32,43 @@
 
     // Define systems.
     var PlayerSystem = function (controls) {
+        var moveSpeed = 200;
+
         this.update = {
             player: function (entity, dt) {
-                // Controls.
-                var moveSpeed = 200;
+                var test,
+                    potentialResolutions,
+                    maxResolution;
 
                 // Horizontal movement.
                 if (controls.check('left')) {
-                    entity.c.velocity.xspeed = -moveSpeed;
+                    entity.c.position.x -= hitagi.utils.delta(moveSpeed, dt);
                 }
-                else if (controls.check('right')) {
-                    entity.c.velocity.xspeed = moveSpeed;
+                if (controls.check('right')) {
+                    entity.c.position.x += hitagi.utils.delta(moveSpeed, dt);
                 }
-                else {
-                    entity.c.velocity.xspeed = 0;
-                }
+
+                // Check for collisions, resolving horizontally.
+                test = collisionSystem.collide(entity, 'block');
+                potentialResolutions = [0].concat(_.pluck(test, 'resolution.x'));
+                maxResolution = _.max(potentialResolutions, Math.abs);
+
+                entity.c.position.x += maxResolution;
 
                 // Vertical movement.
                 if (controls.check('up')) {
-                    entity.c.velocity.yspeed = -moveSpeed;
+                    entity.c.position.y -= hitagi.utils.delta(moveSpeed, dt);
                 }
-                else if (controls.check('down')) {
-                    entity.c.velocity.yspeed = moveSpeed;
-                }
-                else {
-                    entity.c.velocity.yspeed = 0;
+                if (controls.check('down')) {
+                    entity.c.position.y += hitagi.utils.delta(moveSpeed, dt);
                 }
 
-                // Update x position with velocity.
-                entity.c.position.x += hitagi.utils.delta(entity.c.velocity.xspeed, dt);
+                // Check for collisions, resolving vertically.
+                test = collisionSystem.collide(entity, 'block');
+                potentialResolutions = [0].concat(_.pluck(test, 'resolution.y'));
+                maxResolution = _.max(potentialResolutions, Math.abs);
 
-                // Collisions.
-                var test = collisionSystem.collide(entity, 'block', entity.c.position.x, entity.c.position.y);
-
-                // Get the maximum horizontal resolution from our collisions.
-                var maxRes = {
-                    x: 0,
-                    y: 0
-                };
-
-                _.each(
-                    test,
-                    function (other) {
-                        if (Math.abs(other.resolution.x) > Math.abs(maxRes.x)) {
-                            maxRes.x = other.resolution.x;
-                        }
-                    }
-                );
-
-                // Resolve the collision horizontally.
-                entity.c.position.x += maxRes.x;
-
-                // Update y position with velocity.
-                entity.c.position.y += hitagi.utils.delta(entity.c.velocity.yspeed, dt);
-
-                // Check for collisions again.
-                test = collisionSystem.collide(entity, 'block', entity.c.position.x, entity.c.position.y);
-
-                // Get the maximum vertical resolution velocity from our collisions.
-                maxRes = {
-                    x: 0,
-                    y: 0
-                };
-
-                _.each(
-                    test,
-                    function (other) {
-                        if (Math.abs(other.resolution.y) > Math.abs(maxRes.y)) {
-                            maxRes.y = other.resolution.y;
-                        }
-                    }
-                );
-
-                // Resolve the collisions vertically.
-                entity.c.position.y += maxRes.y;
+                entity.c.position.y += maxResolution;
             }
         };
     };
