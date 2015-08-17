@@ -53,6 +53,8 @@
     };
 
     var PlayerControlsSystem = function (controls) {
+        this.$priority = 10;
+
         var moveSpeed = 200;
 
         this.update = {
@@ -67,14 +69,38 @@
                     entity.c.velocity.xspeed = 0;
                 }
 
-                // Vertical movement.
                 if (controls.check('up')) {
-                    entity.c.velocity.yspeed = -moveSpeed;
+                    if (entity.c.gravity.grounded) {
+                        entity.c.velocity.yspeed = -600;
+                    }
                 }
-                else if (controls.check('down')) {
-                    entity.c.velocity.yspeed = moveSpeed;
-                } else {
-                    entity.c.velocity.yspeed = 0;
+            }
+        };
+    };
+
+    var GravitySystem = function (collisionSystem) {
+        this.$priority = -Infinity;
+        this.update = {
+            gravity: function (entity, dt) {
+                if (entity.c.velocity.yspeed < 1000) {
+                    entity.c.velocity.yspeed += 35;
+                }
+
+                var test = collisionSystem.collide(entity, 'solid');
+
+                if (!test.length) {
+                    test = collisionSystem.collide(entity, 'solid', entity.c.position.x, entity.c.position.y + 1);
+                    if (test.length) {
+                        entity.c.velocity.yspeed = 0;
+                        entity.c.gravity.grounded = true;
+                    } else {
+                        entity.c.gravity.grounded = false;
+                    }
+
+                    test = collisionSystem.collide(entity, 'solid', entity.c.position.x, entity.c.position.y - 1);
+                    if (test.length) {
+                        entity.c.velocity.yspeed *= -0.3;
+                    }
                 }
             }
         };
@@ -149,6 +175,9 @@
     var verticalBodySystem = new VerticalBodySystem();
     world.register(verticalBodySystem);
 
+    var gravitySystem = new GravitySystem(collisionSystem);
+    world.register(gravitySystem);
+
     var spawnSystem = new SpawnSystem(world, controls);
     world.register(spawnSystem);
 
@@ -197,8 +226,7 @@
     var Player = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Graphic({
-                type: 'sprite',
-                path: 'block.png',
+                type: 'rectangle',
                 width: params.width,
                 height: params.height
             }))
@@ -219,6 +247,10 @@
             })
             .attach({
                 id: 'body'
+            })
+            .attach({
+                id: 'gravity',
+                grounded: false
             });
     };
 
@@ -248,7 +280,7 @@
                 height: 32,
                 width: 32,
                 x: levelWidth/2 - 128,
-                y: levelHeight/2
+                y: levelHeight/2 - 32
             })
         ];
 

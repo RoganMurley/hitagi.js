@@ -214,7 +214,7 @@
             assert.deepEqual(calls, [3, 4, 1, 2]);
         });
 
-        it('systems with no priority are always updated last.', function () {
+        it('systems with no priority have priority 0.', function () {
             var calls = [];
 
             var mockSystems = [
@@ -246,7 +246,7 @@
             );
 
             world.update();
-            assert.deepEqual(calls, [1, 2]);
+            assert.deepEqual(calls, [2, 1]);
         });
 
         it('world tick should call tickStart, update and tickEnd once each', function () {

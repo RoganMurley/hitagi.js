@@ -50390,7 +50390,7 @@ global.hitagi = require('./main.js');
         this.register = function (system) {
             // No priority is the lowest priority.
             if (!_.has(system, '$priority')) {
-                system.$priority = -Infinity;
+                system.$priority = 0;
             }
 
             // Set up entity tracking.
