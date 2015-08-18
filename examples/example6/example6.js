@@ -204,6 +204,7 @@
         return new hitagi.Entity()
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
+                color: 0XF0433A,
                 width: params.width,
                 height: params.height
             }))
@@ -262,10 +263,10 @@
         // Create starting room.
         var startRoomEntities = [
             new Background({
-                color:0X139BC9
+                color: 0X2E112D
             }),
             new Player({
-                height: 32,
+                height: 48,
                 width: 32,
                 x: levelWidth/2,
                 y: levelHeight/2

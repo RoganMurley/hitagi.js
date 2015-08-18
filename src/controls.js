@@ -2,7 +2,6 @@
     'use strict';
 
     var _ = require('lodash');
-    var $ = require('jquery');
 
     var Controls = function () {
         var keys = {};
@@ -14,15 +13,15 @@
         var bindings = {};
 
         // Listen for input.
-        $(document).keydown(function (e) {
+        document.onkeydown = function (e) {
             keys[e.which] = true;
-        });
+        };
 
-        $(document).keyup(function (e) {
+        document.onkeyup = function (e) {
             delete keys[e.which];
-        });
+        };
 
-        $(document).mousedown(function(e) {
+        document.onmousedown = function(e) {
             switch (e.which) {
                 case 1:
                     keys.m1 = true;
@@ -34,9 +33,9 @@
                     keys.m2 = true;
                     break;
             }
-        });
+        };
 
-        $(document).mouseup(function(e) {
+        document.onmouseup = function(e) {
             switch (e.which) {
                 case 1:
                     delete keys.m1;
@@ -48,13 +47,13 @@
                     delete keys.m2;
                     break;
             }
-        });
+        };
 
         // Update mouse position.
-        $(document).mousemove(function(e) {
+        document.onmousemove = function(e) {
             mousePos.x = e.offsetX;
             mousePos.y = e.offsetY;
-        });
+        };
 
         this.getMousePos = function () {
             return mousePos;
