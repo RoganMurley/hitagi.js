@@ -96,7 +96,7 @@
 
                     test = collisionSystem.collide(entity, 'solid', x, y - 1);
                     if (test.length) {
-                        entity.c.velocity.yspeed *= -0.3;
+                        entity.c.velocity.yspeed = Math.abs(entity.c.velocity.yspeed*0.3);
                     }
                 }
             }
