@@ -185,6 +185,10 @@
                         x: 0,
                         y: 0
                     };
+                    newBlock.c.collision.anchor = {
+                        x: 0,
+                        y: 0
+                    };
                     world.remove(box);
                 }
             }

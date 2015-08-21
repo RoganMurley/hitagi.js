@@ -20,6 +20,13 @@
             var x2 = other.c.position.x,
                 y2 = other.c.position.y;
 
+            // Collision anchor stuff.
+            x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
+            y1 -= (entity.c.collision.anchor.y - 0.5) * entity.c.collision.height;
+
+            x2 -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
+            y2 -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
+
             var width = (entity.c.collision.width + other.c.collision.width) / 2,
                 height = (entity.c.collision.height + other.c.collision.height) / 2;
 
@@ -36,13 +43,25 @@
         };
 
         var minimumDisplacementVector = function (entity, other) {
+            var entityX = entity.c.position.x;
+            var entityY = entity.c.position.y;
+            var otherX = other.c.position.x;
+            var otherY = other.c.position.y;
+
+            // Collision anchor stuff.
+            entityX -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
+            entityY -= (entity.c.collision.anchor.y - 0.5) * entity.c.collision.height;
+
+            otherX -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
+            otherY -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
+
             var dirX, dirY;
-            if (other.c.position.x - entity.c.position.x < 0) {
+            if (otherX - entityX < 0) {
                 dirX = -1;
             } else {
                 dirX = 1;
             }
-            if (other.c.position.y - entity.c.position.y < 0) {
+            if (otherY - entityY < 0) {
                 dirY = -1;
             } else {
                 dirY = 1;
@@ -54,8 +73,8 @@
             };
 
             var actualDisplacement = {
-                x: Math.abs(entity.c.position.x - other.c.position.x),
-                y: Math.abs(entity.c.position.y - other.c.position.y)
+                x: Math.abs(entityX - otherX),
+                y: Math.abs(entityY - otherY)
             };
 
             var overlap = {

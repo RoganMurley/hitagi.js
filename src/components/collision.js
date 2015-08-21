@@ -14,13 +14,13 @@
                 y: 0.5
             }
         }, params);
-        console.log(params);
 
         this.id = 'collision';
         this.deps = ['position'];
 
         this.width = params.width;
         this.height = params.height;
+        this.anchor = params.anchor;
     };
 
     module.exports = Collision;
