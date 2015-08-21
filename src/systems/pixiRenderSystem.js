@@ -75,7 +75,7 @@
                             entity.c.graphic.y2
                         );
 
-                        // Look for changes to line params, redrawing if necessary.
+                        // Look for changes to params, redrawing if necessary.
                         look(entity.c.graphic, 'thickness', redraw, entity);
                         look(entity.c.graphic, 'x1', redraw, entity);
                         look(entity.c.graphic, 'y1', redraw, entity);
@@ -90,7 +90,7 @@
                         graphics[entity.uid].drawPolygon(entity.c.graphic.points);
                         graphics[entity.uid].endFill();
 
-                        // Look for changes to line params, redrawing if necessary.
+                        // Look for changes to params, redrawing if necessary.
                         look(entity.c.graphic, 'points', redraw, entity);
 
                         break;
@@ -99,15 +99,16 @@
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawRect(
-                            -entity.c.graphic.width/2,
-                            -entity.c.graphic.height/2,
+                            -entity.c.graphic.width * entity.c.graphic.anchor.x,
+                            -entity.c.graphic.height * entity.c.graphic.anchor.y,
                             entity.c.graphic.width,
                             entity.c.graphic.height
                         );
 
-                        // Look for changes to line params, redrawing if necessary.
+                        // Look for changes to params, redrawing if necessary.
                         look(entity.c.graphic, 'width', redraw, entity);
                         look(entity.c.graphic, 'height', redraw, entity);
+                        look(entity.c.graphic, 'anchor', redraw, entity);
 
                         break;
 

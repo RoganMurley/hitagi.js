@@ -132,15 +132,73 @@
     };
 
     var SpawnSystem = function (world, controls) {
+        var dragging = false;
+        var mousePos = controls.getMousePos();
+
+        this.$tracking = {
+            dragBoxUI: 'single'
+        };
+
         this.tickStart = function () {
+            mousePos = controls.getMousePos();
+
             if (controls.check('spawn', true)) {
-                var mousePos = controls.getMousePos();
-                world.add(new Block({
-                    width: 32,
-                    height: 32,
-                    x: mousePos.x,
-                    y: mousePos.y
-                }));
+                if (!dragging) {
+                    dragging = true;
+                    world.add(
+                        new hitagi.Entity()
+                            .attach(new hitagi.components.Position({
+                                x: mousePos.x,
+                                y: mousePos.y
+                            }))
+                            .attach(new hitagi.components.Graphic({
+                                type: 'rectangle',
+                                width: 0,
+                                height: 0,
+                                alpha: 0.7,
+                                color: 0XC9283E,
+                                anchor: {
+                                    x: 0,
+                                    y: 0
+                                }
+                            }))
+                            .attach({
+                                id: 'dragBoxUI',
+                                width: 0,
+                                height: 0,
+                                origin: {
+                                    x: mousePos.x,
+                                    y: mousePos.y
+                                }
+                            })
+                    );
+                } else {
+                    dragging = false;
+                    var box = this.$tracked.dragBoxUI;
+                    var newBlock = world.add(new Block({
+                        x: box.c.dragBoxUI.origin.x,
+                        y: box.c.dragBoxUI.origin.y,
+                        width: box.c.dragBoxUI.width,
+                        height: box.c.dragBoxUI.height
+                    }));
+                    newBlock.c.graphic.anchor = {
+                        x: 0,
+                        y: 0
+                    };
+                    world.remove(box);
+                }
+            }
+        };
+
+        this.update = {
+            dragBoxUI: function (entity) {
+                // Get box dimensions.
+               entity.c.dragBoxUI.width = mousePos.x - entity.c.dragBoxUI.origin.x;
+               entity.c.dragBoxUI.height = mousePos.y - entity.c.dragBoxUI.origin.y;
+
+                // Update graphic.
+                entity.c.graphic.width = entity.c.dragBoxUI.width;
+                entity.c.graphic.height = entity.c.dragBoxUI.height;
             }
         };
     };

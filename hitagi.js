@@ -40006,11 +40006,21 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    var defaultParams = require('../utils').defaultParams;
+
     // Represents the collision boundaries of an entity.
     // PARAMS:
     //      width - width of collision hitbox.
     //      height - height of collision hitbox.
     var Collision = function (params) {
+        params = defaultParams({
+            anchor: {
+                x: 0.5,
+                y: 0.5
+            }
+        }, params);
+        console.log(params);
+
         this.id = 'collision';
         this.deps = ['position'];
 
@@ -40021,7 +40031,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Collision;
 } ());
 
-},{}],133:[function(require,module,exports){
+},{"../utils":145}],133:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40415,8 +40425,8 @@ global.hitagi = require('./main.js');
             var x2 = other.c.position.x,
                 y2 = other.c.position.y;
 
-            var width = (entity.c.collision.width + other.c.collision.width) / 2,
-                height = (entity.c.collision.height + other.c.collision.height) / 2;
+            var width = entity.c.collision.width - (entity.c.collision.width * entity.c.collision.anchor.x) + other.c.collision.width  - (other.c.collision.width * other.c.collision.anchor.x),
+                height = entity.c.collision.height - (entity.c.collision.height * entity.c.collision.anchor.y) + other.c.collision.height - (other.c.collision.height * entity.c.collision.anchor.x);
 
             if (x1 + width > x2) {
                 if (x1 < x2 + width) {
@@ -40444,8 +40454,8 @@ global.hitagi = require('./main.js');
             }
 
             var minApart = {
-                x: entity.c.collision.width/2 + other.c.collision.width/2,
-                y: entity.c.collision.height/2 + other.c.collision.height/2
+                x: entity.c.collision.width - (entity.c.collision.width * entity.c.collision.anchor.x) + other.c.collision.width  - (other.c.collision.width * other.c.collision.anchor.x),
+                y: entity.c.collision.height - (entity.c.collision.height * entity.c.collision.anchor.y) + other.c.collision.height - (other.c.collision.height * entity.c.collision.anchor.x)
             };
 
             var actualDisplacement = {
@@ -40584,7 +40594,7 @@ global.hitagi = require('./main.js');
                             entity.c.graphic.y2
                         );
 
-                        // Look for changes to line params, redrawing if necessary.
+                        // Look for changes to params, redrawing if necessary.
                         look(entity.c.graphic, 'thickness', redraw, entity);
                         look(entity.c.graphic, 'x1', redraw, entity);
                         look(entity.c.graphic, 'y1', redraw, entity);
@@ -40599,7 +40609,7 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid].drawPolygon(entity.c.graphic.points);
                         graphics[entity.uid].endFill();
 
-                        // Look for changes to line params, redrawing if necessary.
+                        // Look for changes to params, redrawing if necessary.
                         look(entity.c.graphic, 'points', redraw, entity);
 
                         break;
@@ -40608,15 +40618,16 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid] = new pixi.Graphics();
                         graphics[entity.uid].beginFill(entity.c.graphic.color);
                         graphics[entity.uid].drawRect(
-                            -entity.c.graphic.width/2,
-                            -entity.c.graphic.height/2,
+                            -entity.c.graphic.width * entity.c.graphic.anchor.x,
+                            -entity.c.graphic.height * entity.c.graphic.anchor.y,
                             entity.c.graphic.width,
                             entity.c.graphic.height
                         );
 
-                        // Look for changes to line params, redrawing if necessary.
+                        // Look for changes to params, redrawing if necessary.
                         look(entity.c.graphic, 'width', redraw, entity);
                         look(entity.c.graphic, 'height', redraw, entity);
+                        look(entity.c.graphic, 'anchor', redraw, entity);
 
                         break;
 
