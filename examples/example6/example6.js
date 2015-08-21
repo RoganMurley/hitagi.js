@@ -142,56 +142,73 @@
         this.tickStart = function () {
             mousePos = controls.getMousePos();
 
-            if (controls.check('spawn', true)) {
-                if (!dragging) {
-                    dragging = true;
-                    world.add(
-                        new hitagi.Entity()
-                            .attach(new hitagi.components.Position({
+            if (!dragging && controls.check('spawn')) {
+                world.add(
+                    new hitagi.Entity()
+                        .attach(new hitagi.components.Position({
+                            x: mousePos.x,
+                            y: mousePos.y
+                        }))
+                        .attach(new hitagi.components.Graphic({
+                            type: 'rectangle',
+                            width: 0,
+                            height: 0,
+                            alpha: 0.7,
+                            color: 0XC9283E,
+                            anchor: {
+                                x: 0,
+                                y: 0
+                            }
+                        }))
+                        .attach({
+                            id: 'dragBoxUI',
+                            width: 0,
+                            height: 0,
+                            origin: {
                                 x: mousePos.x,
                                 y: mousePos.y
-                            }))
-                            .attach(new hitagi.components.Graphic({
-                                type: 'rectangle',
-                                width: 0,
-                                height: 0,
-                                alpha: 0.7,
-                                color: 0XC9283E,
-                                anchor: {
-                                    x: 0,
-                                    y: 0
-                                }
-                            }))
-                            .attach({
-                                id: 'dragBoxUI',
-                                width: 0,
-                                height: 0,
-                                origin: {
-                                    x: mousePos.x,
-                                    y: mousePos.y
-                                }
-                            })
-                    );
-                } else {
-                    dragging = false;
-                    var box = this.$tracked.dragBoxUI;
-                    var newBlock = world.add(new Block({
-                        x: box.c.dragBoxUI.origin.x,
-                        y: box.c.dragBoxUI.origin.y,
-                        width: box.c.dragBoxUI.width,
-                        height: box.c.dragBoxUI.height
-                    }));
-                    newBlock.c.graphic.anchor = {
-                        x: 0,
-                        y: 0
-                    };
-                    newBlock.c.collision.anchor = {
-                        x: 0,
-                        y: 0
-                    };
-                    world.remove(box);
-                }
+                            }
+                        })
+                );
             }
+
+            if (dragging && !controls.check('spawn')) {
+                var box = this.$tracked.dragBoxUI;
+
+                var x = box.c.position.x;
+                var y = box.c.position.y;
+                var width = box.c.dragBoxUI.width;
+                var height = box.c.dragBoxUI.height;
+
+                if (width < 0) {
+                    width = Math.abs(width)
+                    x -= width;
+                }
+
+                if (height < 0) {
+                    height = Math.abs(height)
+                    y -= height;
+                }
+
+                var newBlock = world.add(
+                    new Block({
+                        x: x,
+                        y: y,
+                        width: width,
+                        height: height,
+                        anchor: {
+                            x: 0,
+                            y: 0
+                        }
+                    }
+                ));
+
+
+
+                world.remove(box);
+            }
+
+            dragging = controls.check('spawn');
         };
 
         this.update = {
@@ -254,12 +271,20 @@
     };
 
     var Block = function (params) {
+        params = hitagi.utils.defaultParams({
+            anchor: {
+                x: 0.5,
+                y: 0.5
+            }
+        }, params);
+
         return new hitagi.Entity()
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
                 color: 0XF0433A,
                 width: params.width,
-                height: params.height
+                height: params.height,
+                anchor: params.anchor
             }))
             .attach(new hitagi.components.Position({
                 x: params.x,
@@ -267,7 +292,8 @@
             }))
             .attach(new hitagi.components.Collision({
                 width: params.width,
-                height: params.height
+                height: params.height,
+                anchor: params.anchor
             }))
             .attach({
                 id: 'block'
@@ -354,7 +380,7 @@
                     y: levelHeight * 0.3
                 }))
                 .attach(new hitagi.components.Graphic({
-                    copy: 'click to spawn blocks',
+                    copy: 'drag to spawn blocks',
                     style: {
                         font: '72px monospace',
                         fill: 0XC9283E
