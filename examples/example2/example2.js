@@ -317,7 +317,7 @@
             font: '16px monospace',
             score1: 0,
             score2: 0,
-            x: levelWidth/2 - 16/2,
+            x: levelWidth/2,
             y: 16
         })
     );

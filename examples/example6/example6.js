@@ -187,7 +187,7 @@
                 color: params.color,
                 height: levelHeight,
                 width: levelWidth,
-                z: -Infinity
+                z: -1000
             }));
     };
 
@@ -247,8 +247,8 @@
     };
 
     // Load assets, then run game.
-    renderSystem.load(['block.png'], main);
-    //main();
+    //renderSystem.load([], main);
+    main();
 
     function main () {
         // Create starting room.
@@ -264,37 +264,43 @@
             }),
             new Block({
                 height: 32,
-                width: 32,
-                x: levelWidth/2 + 128,
-                y: levelHeight/2
+                width: levelWidth,
+                x: levelWidth/2,
+                y: levelHeight - 16
             }),
             new Block({
                 height: 32,
+                width: levelWidth,
+                x: levelWidth/2,
+                y: 16
+            }),
+            new Block({
+                height: levelHeight,
                 width: 32,
-                x: levelWidth/2 - 128,
-                y: levelHeight/2 - 32
-            })
+                x: 16,
+                y: levelHeight/2
+            }),
+            new Block({
+                height: levelHeight,
+                width: 32,
+                x: levelWidth - 16,
+                y: levelHeight/2
+            }),
+            new hitagi.Entity()
+                .attach(new hitagi.components.Position({
+                    x: levelWidth/2,
+                    y: levelHeight * 0.3
+                }))
+                .attach(new hitagi.components.Graphic({
+                    copy: 'click to spawn blocks',
+                    style: {
+                        font: '72px monospace',
+                        fill: 0XC9283E
+                    },
+                    type: 'text',
+                    z: -500
+                }))
         ];
-
-        _.times(20, function (i) {
-            startRoomEntities.push(
-                new Block({
-                    height: 32,
-                    width: 32,
-                    x: i * 32,
-                    y: levelHeight/2 + 64
-                })
-            );
-
-            startRoomEntities.push(
-                new Block({
-                    height: 32,
-                    width: 32,
-                    x: levelWidth/2 + 300,
-                    y: i * 32
-                })
-            );
-        });
 
         startRoomEntities.push(
             new Block({

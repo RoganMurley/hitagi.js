@@ -17,7 +17,7 @@
     // Add entities.
     world.add(
         new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 20, y: 20}))
+            .attach(new hitagi.components.Position({x: 300, y: 200}))
             .attach(new hitagi.components.Graphic({
                 copy: 'Hello, World!',
                 style: {

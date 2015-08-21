@@ -185,6 +185,9 @@
                         }
                         proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
                         proxy(entity.c.graphic, 'style', graphics[entity.uid], 'style');
+
+                        graphics[entity.uid].anchor = entity.c.graphic.anchor;
+                        proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
                         break;
 
                     default:
