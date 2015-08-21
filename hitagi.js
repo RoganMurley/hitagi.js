@@ -41173,13 +41173,7 @@ global.hitagi = require('./main.js');
         };
 
         // Register a system to the world.
-        // Systems with higher priority will be updated first.
         this.register = function (system) {
-            // No priority is the lowest priority.
-            if (!_.has(system, '$priority')) {
-                system.$priority = 0;
-            }
-
             // Set up entity tracking.
             if (_.has(system, '$tracking')) {
                 system.$tracked = {};
@@ -41201,7 +41195,6 @@ global.hitagi = require('./main.js');
             }
 
             systems.push(system);
-            systems = _.sortByOrder(systems, ['$priority'], [false]);
 
             return system;
         };

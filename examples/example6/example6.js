@@ -35,7 +35,6 @@
     // We need to update horizontal and vertical velocity seperately for our collision resolution technique.
     // The default hitagi VelocitySystem doesn't support this, but it's easy to make our own.
     var HorizontalVelocitySystem = function () {
-        this.$priority = 4;
         this.update = {
             velocity: function (entity, dt) {
                 entity.c.position.x += hitagi.utils.delta(entity.c.velocity.xspeed, dt);
@@ -44,7 +43,6 @@
     };
 
     var VerticalVelocitySystem = function () {
-        this.$priority = 2;
         this.update = {
             velocity: function (entity, dt) {
                 entity.c.position.y += hitagi.utils.delta(entity.c.velocity.yspeed, dt);
@@ -53,8 +51,6 @@
     };
 
     var PlayerControlsSystem = function (controls) {
-        this.$priority = 10;
-
         var moveSpeed = 200;
 
         this.update = {
@@ -69,7 +65,7 @@
                     entity.c.velocity.xspeed = 0;
                 }
 
-                if (controls.check('up')) {
+                if (controls.check('jump')) {
                     if (entity.c.gravity.grounded) {
                         entity.c.velocity.yspeed = -600;
                     }
@@ -79,17 +75,18 @@
     };
 
     var GravitySystem = function (collisionSystem) {
-        this.$priority = -Infinity;
         this.update = {
             gravity: function (entity, dt) {
                 if (entity.c.velocity.yspeed < 1000) {
                     entity.c.velocity.yspeed += 35;
                 }
 
-                var test = collisionSystem.collide(entity, 'solid');
+                var test = collisionSystem.collide(entity, 'solid'),
+                    x = entity.c.position.x,
+                    y = entity.c.position.y;
 
                 if (!test.length) {
-                    test = collisionSystem.collide(entity, 'solid', entity.c.position.x, entity.c.position.y + 1);
+                    test = collisionSystem.collide(entity, 'solid', x, y + 1);
                     if (test.length) {
                         entity.c.velocity.yspeed = 0;
                         entity.c.gravity.grounded = true;
@@ -97,7 +94,7 @@
                         entity.c.gravity.grounded = false;
                     }
 
-                    test = collisionSystem.collide(entity, 'solid', entity.c.position.x, entity.c.position.y - 1);
+                    test = collisionSystem.collide(entity, 'solid', x, y - 1);
                     if (test.length) {
                         entity.c.velocity.yspeed *= -0.3;
                     }
@@ -107,7 +104,6 @@
     };
 
     var HorizontalBodySystem = function () {
-        this.$priority = 3;
         this.update = {
             body: function (entity, dt) {
                 var test = collisionSystem.collide(entity, 'solid');
@@ -122,7 +118,6 @@
     };
 
     var VerticalBodySystem = function () {
-        this.$priority = 1;
         this.update = {
             body: function (entity, dt) {
                 var test = collisionSystem.collide(entity, 'solid');
@@ -150,36 +145,32 @@
         };
     };
 
-    // Register systems.
+    // Create systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
-    world.register(renderSystem);
-
     var soundSystem = new hitagi.systems.SoundSystem();
-    world.register(soundSystem);
-
     var collisionSystem = new hitagi.systems.CollisionSystem();
+    var horizontalVelocitySystem = new HorizontalVelocitySystem();
+    var verticalVelocitySystem = new VerticalVelocitySystem();
+    var playerControlsSystem = new PlayerControlsSystem(controls);
+    var horizontalBodySystem = new HorizontalBodySystem();
+    var verticalBodySystem = new VerticalBodySystem();
+    var gravitySystem = new GravitySystem(collisionSystem);
+    var spawnSystem = new SpawnSystem(world, controls);
+
+    // Register systems (order matters).
+    world.register(renderSystem);
+    world.register(soundSystem);
     world.register(collisionSystem);
 
-    var horizontalVelocitySystem = new HorizontalVelocitySystem();
-    world.register(horizontalVelocitySystem);
-
-    var verticalVelocitySystem = new VerticalVelocitySystem();
-    world.register(verticalVelocitySystem);
-
-    var playerControlsSystem = new PlayerControlsSystem(controls);
     world.register(playerControlsSystem);
+    world.register(spawnSystem);
 
-    var horizontalBodySystem = new HorizontalBodySystem();
+    world.register(horizontalVelocitySystem);
     world.register(horizontalBodySystem);
-
-    var verticalBodySystem = new VerticalBodySystem();
+    world.register(verticalVelocitySystem);
     world.register(verticalBodySystem);
 
-    var gravitySystem = new GravitySystem(collisionSystem);
     world.register(gravitySystem);
-
-    var spawnSystem = new SpawnSystem(world, controls);
-    world.register(spawnSystem);
 
     // Define components.
     'components';
