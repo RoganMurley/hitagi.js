@@ -10,6 +10,7 @@ Hitagi is a JavaScript game development framework that loves to keep your code a
 * [Hello, world!](http://codepen.io/Purpwood/pen/dozPJw?editors=001)
 * [Pong](http://codepen.io/Purpwood/pen/LVBdod?editors=001)
 * [Flappy Bird](http://codepen.io/Purpwood/pen/xGmOLo?editors=001)
+* [Platformer](http://codepen.io/Purpwood/pen/OVeodX?editors=001)
 
 # Contributing
 We're currently early in development, so any issues or pull requests are welcome!
