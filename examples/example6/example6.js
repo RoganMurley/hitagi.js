@@ -66,7 +66,7 @@
                 }
 
                 if (controls.check('jump')) {
-                    if (entity.c.gravity.grounded) {
+                    if (entity.c.gravity.grounded > 4) {
                         entity.c.velocity.yspeed = -600;
                     }
                 }
@@ -89,9 +89,9 @@
                     test = collisionSystem.collide(entity, 'solid', {y1: y + 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = 0;
-                        entity.c.gravity.grounded = true;
+                        entity.c.gravity.grounded++;
                     } else {
-                        entity.c.gravity.grounded = false;
+                        entity.c.gravity.grounded = 0;
                     }
 
                     test = collisionSystem.collide(entity, 'solid', {y1: y - 1});
@@ -343,7 +343,7 @@
             })
             .attach({
                 id: 'gravity',
-                grounded: false
+                grounded: 0
             });
     };
 
