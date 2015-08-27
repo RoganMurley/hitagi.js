@@ -86,7 +86,7 @@
                     y = entity.c.position.y;
 
                 if (!test.length) {
-                    test = collisionSystem.collide(entity, 'solid', x, y + 1);
+                    test = collisionSystem.collide(entity, 'solid', {y: y + 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = 0;
                         entity.c.gravity.grounded = true;
@@ -94,7 +94,7 @@
                         entity.c.gravity.grounded = false;
                     }
 
-                    test = collisionSystem.collide(entity, 'solid', x, y - 1);
+                    test = collisionSystem.collide(entity, 'solid', {y: y - 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = Math.abs(entity.c.velocity.yspeed*0.3);
                     }
@@ -272,7 +272,7 @@
     };
 
     var Block = function (params) {
-        params = hitagi.utils.defaultParams({
+        params = _.extend({
             anchor: {
                 x: 0.5,
                 y: 0.5

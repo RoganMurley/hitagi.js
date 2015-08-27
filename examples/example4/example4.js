@@ -61,7 +61,7 @@
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 
-                var test = collisionSystem.collide(entity, 'goal', x, y);
+                var test = collisionSystem.collide(entity, 'goal');
 
                 if (test.length && !test[0].entity.c.goal.done) {
                     test[0].entity.c.goal.done = true;
@@ -74,7 +74,7 @@
     var ScoreSystem = function (soundSystem) {
         var that = this;
 
-        var BEST_SCORE_KEY = 'hitagiFlappyBirdExampleBestScore';
+        var BEST_SCORE_KEY = 'BestScore';
 
         this.$tracking = {
             'best': 'single',
@@ -153,7 +153,7 @@
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 
-                var test = collisionSystem.collide(entity, 'kill', x, y);
+                var test = collisionSystem.collide(entity, 'kill');
                 if (test.length) {
                     stopGame();
 

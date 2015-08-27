@@ -10,15 +10,16 @@
             'collision': 'many'
         };
 
-        var hitTestRectangle = function (entity, other, x1, y1) {
-            // Check for default args.
-            if (typeof x1 === 'undefined' && typeof y1 === 'undefined') {
-                x1 = entity.c.position.x;
-                y1 = entity.c.position.y;
-            }
+        var hitTestRectangle = function (entity, other, params) {
+            params = _.extend({
+                x: entity.c.position.x,
+                y: entity.c.position.y
+            }, params);
 
-            var x2 = other.c.position.x,
-                y2 = other.c.position.y;
+            var x1 = params.x;
+            var y1 = params.y;
+            var x2 = other.c.position.x;
+            var y2 = other.c.position.y;
 
             // Collision anchor stuff.
             x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
@@ -27,8 +28,8 @@
             x2 -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
             y2 -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
 
-            var width = (entity.c.collision.width + other.c.collision.width) / 2,
-                height = (entity.c.collision.height + other.c.collision.height) / 2;
+            var width = (entity.c.collision.width + other.c.collision.width) / 2;
+            var height = (entity.c.collision.height + other.c.collision.height) / 2;
 
             if (x1 + width > x2) {
                 if (x1 < x2 + width) {
@@ -105,13 +106,13 @@
         // Prospective collision test.
         // Tests for a collision between entity and any
         // entity with otherComponent.
-        this.collide = function (entity, otherComponent, x, y) {
+        this.collide = function (entity, otherComponent, params) {
             var hitEntities = _.filter(
                 that.$tracked.collision,
                 function (other) {
                     return (other.uid !== entity.uid) &&
                         other.has(otherComponent) &&
-                        hitTestRectangle(entity, other, x, y);
+                        hitTestRectangle(entity, other, params);
                 }
             );
 

@@ -122,7 +122,7 @@
                 var x = entity.c.position.x;
                 var y = entity.c.position.y;
 
-                var test = collisionSystem.collide(entity, 'paddle', x, y);
+                var test = collisionSystem.collide(entity, 'paddle');
                 if (test.length) {
                     var other = test[0].entity;
                     entity.c.velocity.xspeed *= -1.01;
