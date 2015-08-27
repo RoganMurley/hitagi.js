@@ -131,7 +131,7 @@
         };
     };
 
-    var SpawnSystem = function (world, controls) {
+    var SpawnSystem = function (world, controls, collisionSystem) {
         var dragging = false;
         var mousePos = controls.getMousePos();
 
@@ -160,6 +160,10 @@
                                 y: 0
                             },
                             z: 100
+                        }))
+                        .attach(new hitagi.components.Collision({
+                            width: 0,
+                            height: 0
                         }))
                         .attach({
                             id: 'dragBoxUI',
@@ -191,20 +195,24 @@
                     y -= height;
                 }
 
-                var newBlock = world.add(
-                    new Block({
-                        x: x,
-                        y: y,
-                        width: width,
-                        height: height,
-                        anchor: {
-                            x: 0,
-                            y: 0
+                box.c.collision.width = width;
+                box.c.collision.height = height;
+
+                var test = collisionSystem.collide(box, 'player');
+                if (!test.length) {
+                    var newBlock = world.add(
+                        new Block({
+                            x: x,
+                            y: y,
+                            width: width,
+                            height: height,
+                            anchor: {
+                                x: 0,
+                                y: 0
+                            }
                         }
-                    }
-                ));
-
-
+                    ));
+                }
 
                 world.remove(box);
             }
@@ -235,7 +243,7 @@
     var horizontalBodySystem = new HorizontalBodySystem();
     var verticalBodySystem = new VerticalBodySystem();
     var gravitySystem = new GravitySystem(collisionSystem);
-    var spawnSystem = new SpawnSystem(world, controls);
+    var spawnSystem = new SpawnSystem(world, controls, collisionSystem);
 
     // Register systems (order matters).
     world.register(renderSystem);
