@@ -215,15 +215,7 @@
                 stage.addChild(graphics[entity.uid]);
 
                 // Sort by depth.
-                stage.children.sort(function (a,b) {
-                    if (a.z < b.z) {
-                        return -1;
-                    }
-                    if (a.z > b.z) {
-                        return 1;
-                    }
-                    return 0;
-                });
+                stage.children = _.sortBy(stage.children, 'z');
 
                 // Move to correct position.
                 that.update.graphic(entity);
