@@ -5,20 +5,6 @@
 
     var Utils = {
 
-        // Assign default params.
-        defaultParams:
-            function (defaultParams, inputParams) {
-                var outputParams = inputParams;
-
-                _.each(defaultParams, function (value, key) {
-                    if (!_.has(outputParams, key)) {
-                        outputParams[key] = value;
-                    }
-                });
-
-                return outputParams;
-            },
-
         // Transform a speed by our delta time.
         delta:
             function (speed, dt) {

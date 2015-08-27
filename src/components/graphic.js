@@ -3,11 +3,9 @@
 
     var _ = require('lodash');
 
-    var defaultParams = require('../utils').defaultParams;
-
     // Represents a graphic to draw.
     var Graphic = function (params) {
-        params = defaultParams({
+        params = _.extend({
             alpha: 1,
             anchor: {
                 x: 0.5,
@@ -51,7 +49,7 @@
                 break;
 
             case 'line':
-                params = defaultParams({thickness: 1}, params);
+                params = _.extend({thickness: 1}, params);
 
                 this.thickness = params.thickness;
                 this.x1 = params.x1;
@@ -70,7 +68,7 @@
                 break;
 
             case 'sprite':
-                params = defaultParams({
+                params = _.extend({
                     rotation: 0,
                     sheet: false
                 }, params);
@@ -82,7 +80,7 @@
 
                 // Animation.
                 if (_.isArray(params.path) || params.sheet) {
-                    params = defaultParams({
+                    params = _.extend({
                         animationSpeed: 1,
                         currentFrame: 0,
                         loop: true
@@ -95,7 +93,7 @@
                 break;
 
             case 'text':
-                params = defaultParams({
+                params = _.extend({
                     bitmapFont: false
                 }, params);
                 this.bitmapFont = params.bitmapFont;

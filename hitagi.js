@@ -40155,14 +40155,14 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
-    var defaultParams = require('../utils').defaultParams;
+    var _ = require('lodash');
 
     // Represents the collision boundaries of an entity.
     // PARAMS:
     //      width - width of collision hitbox.
     //      height - height of collision hitbox.
     var Collision = function (params) {
-        params = defaultParams({
+        params = _.extend({
             anchor: {
                 x: 0.5,
                 y: 0.5
@@ -40180,17 +40180,15 @@ if (!global.cancelAnimationFrame) {
     module.exports = Collision;
 } ());
 
-},{"../utils":145}],133:[function(require,module,exports){
+},{"lodash":9}],133:[function(require,module,exports){
 (function () {
     'use strict';
 
     var _ = require('lodash');
 
-    var defaultParams = require('../utils').defaultParams;
-
     // Represents a graphic to draw.
     var Graphic = function (params) {
-        params = defaultParams({
+        params = _.extend({
             alpha: 1,
             anchor: {
                 x: 0.5,
@@ -40234,7 +40232,7 @@ if (!global.cancelAnimationFrame) {
                 break;
 
             case 'line':
-                params = defaultParams({thickness: 1}, params);
+                params = _.extend({thickness: 1}, params);
 
                 this.thickness = params.thickness;
                 this.x1 = params.x1;
@@ -40253,7 +40251,7 @@ if (!global.cancelAnimationFrame) {
                 break;
 
             case 'sprite':
-                params = defaultParams({
+                params = _.extend({
                     rotation: 0,
                     sheet: false
                 }, params);
@@ -40265,7 +40263,7 @@ if (!global.cancelAnimationFrame) {
 
                 // Animation.
                 if (_.isArray(params.path) || params.sheet) {
-                    params = defaultParams({
+                    params = _.extend({
                         animationSpeed: 1,
                         currentFrame: 0,
                         loop: true
@@ -40278,7 +40276,7 @@ if (!global.cancelAnimationFrame) {
                 break;
 
             case 'text':
-                params = defaultParams({
+                params = _.extend({
                     bitmapFont: false
                 }, params);
                 this.bitmapFont = params.bitmapFont;
@@ -40294,7 +40292,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Graphic;
 } ());
 
-},{"../utils":145,"lodash":9}],134:[function(require,module,exports){
+},{"lodash":9}],134:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41028,20 +41026,6 @@ global.hitagi = require('./main.js');
     var _ = require('lodash');
 
     var Utils = {
-
-        // Assign default params.
-        defaultParams:
-            function (defaultParams, inputParams) {
-                var outputParams = inputParams;
-
-                _.each(defaultParams, function (value, key) {
-                    if (!_.has(outputParams, key)) {
-                        outputParams[key] = value;
-                    }
-                });
-
-                return outputParams;
-            },
 
         // Transform a speed by our delta time.
         delta:
