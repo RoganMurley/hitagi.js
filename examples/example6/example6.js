@@ -86,7 +86,7 @@
                     y = entity.c.position.y;
 
                 if (!test.length) {
-                    test = collisionSystem.collide(entity, 'solid', {y1: y + 1});
+                    test = collisionSystem.collide(entity, 'solid', {y: y + 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = 0;
                         entity.c.gravity.grounded++;
@@ -94,7 +94,7 @@
                         entity.c.gravity.grounded = 0;
                     }
 
-                    test = collisionSystem.collide(entity, 'solid', {y1: y - 1});
+                    test = collisionSystem.collide(entity, 'solid', {y: y - 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = Math.abs(entity.c.velocity.yspeed*0.3);
                     }

@@ -40200,6 +40200,7 @@ if (!global.cancelAnimationFrame) {
                 x: 1,
                 y: 1
             },
+            tint: 0xFFFFFF,
             visible: true,
             z: 0
         }, params);
@@ -40217,6 +40218,7 @@ if (!global.cancelAnimationFrame) {
         this.color = params.color;
         this.relative = params.relative;
         this.scale = params.scale;
+        this.tint = params.tint;
         this.type = params.type;
         this.visible = params.visible;
         this.z = params.z;
@@ -40564,16 +40566,14 @@ global.hitagi = require('./main.js');
 
         var hitTestRectangle = function (entity, other, params) {
             params = _.extend({
-                x1: entity.c.position.x,
-                y1: entity.c.position.y,
-                x2: other.c.position.x,
-                y2: other.c.position.y
+                x: entity.c.position.x,
+                y: entity.c.position.y
             }, params);
 
-            var x1 = params.x1;
-            var y1 = params.y1;
-            var x2 = params.x2;
-            var y2 = params.y2;
+            var x1 = params.x;
+            var y1 = params.y;
+            var x2 = other.c.position.x;
+            var y2 = other.c.position.y;
 
             // Collision anchor stuff.
             x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
@@ -40889,6 +40889,9 @@ global.hitagi = require('./main.js');
 
                 graphics[entity.uid].scale = entity.c.graphic.scale;
                 proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
+
+                graphics[entity.uid].tint = entity.c.graphic.tint;
+                proxy(entity.c.graphic, 'tint', graphics[entity.uid], 'tint');
 
                 graphics[entity.uid].visible = entity.c.graphic.visible;
                 proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');

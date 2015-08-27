@@ -202,6 +202,9 @@
                 graphics[entity.uid].scale = entity.c.graphic.scale;
                 proxy(entity.c.graphic, 'scale', graphics[entity.uid], 'scale');
 
+                graphics[entity.uid].tint = entity.c.graphic.tint;
+                proxy(entity.c.graphic, 'tint', graphics[entity.uid], 'tint');
+
                 graphics[entity.uid].visible = entity.c.graphic.visible;
                 proxy(entity.c.graphic, 'visible', graphics[entity.uid], 'visible');
 

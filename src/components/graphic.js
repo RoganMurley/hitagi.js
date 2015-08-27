@@ -17,6 +17,7 @@
                 x: 1,
                 y: 1
             },
+            tint: 0xFFFFFF,
             visible: true,
             z: 0
         }, params);
@@ -34,6 +35,7 @@
         this.color = params.color;
         this.relative = params.relative;
         this.scale = params.scale;
+        this.tint = params.tint;
         this.type = params.type;
         this.visible = params.visible;
         this.z = params.z;

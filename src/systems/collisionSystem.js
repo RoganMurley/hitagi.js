@@ -12,16 +12,14 @@
 
         var hitTestRectangle = function (entity, other, params) {
             params = _.extend({
-                x1: entity.c.position.x,
-                y1: entity.c.position.y,
-                x2: other.c.position.x,
-                y2: other.c.position.y
+                x: entity.c.position.x,
+                y: entity.c.position.y
             }, params);
 
-            var x1 = params.x1;
-            var y1 = params.y1;
-            var x2 = params.x2;
-            var y2 = params.y2;
+            var x1 = params.x;
+            var y1 = params.y;
+            var x2 = other.c.position.x;
+            var y2 = other.c.position.y;
 
             // Collision anchor stuff.
             x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
