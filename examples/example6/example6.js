@@ -86,7 +86,7 @@
                     y = entity.c.position.y;
 
                 if (!test.length) {
-                    test = collisionSystem.collide(entity, 'solid', {y: y + 1});
+                    test = collisionSystem.collide(entity, 'solid', {y1: y + 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = 0;
                         entity.c.gravity.grounded = true;
@@ -94,7 +94,7 @@
                         entity.c.gravity.grounded = false;
                     }
 
-                    test = collisionSystem.collide(entity, 'solid', {y: y - 1});
+                    test = collisionSystem.collide(entity, 'solid', {y1: y - 1});
                     if (test.length) {
                         entity.c.velocity.yspeed = Math.abs(entity.c.velocity.yspeed*0.3);
                     }
@@ -163,7 +163,11 @@
                         }))
                         .attach(new hitagi.components.Collision({
                             width: 0,
-                            height: 0
+                            height: 0,
+                            anchor: {
+                                x: 0,
+                                y: 0
+                            }
                         }))
                         .attach({
                             id: 'dragBoxUI',
@@ -198,7 +202,7 @@
                 box.c.collision.width = width;
                 box.c.collision.height = height;
 
-                var test = collisionSystem.collide(box, 'player');
+                var test = collisionSystem.collide(box, 'player', {x1: x, y1: y});
                 if (!test.length) {
                     var newBlock = world.add(
                         new Block({
