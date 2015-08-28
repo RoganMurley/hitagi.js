@@ -113,7 +113,7 @@
     world.register(playerSystem);
 
     // Define components.
-    'components';
+    //'components';
 
     // Define entities.
     var Background = function (params) {

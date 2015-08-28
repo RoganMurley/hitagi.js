@@ -190,12 +190,12 @@
                 var height = box.c.dragBoxUI.height;
 
                 if (width < 0) {
-                    width = Math.abs(width)
+                    width = Math.abs(width);
                     x -= width;
                 }
 
                 if (height < 0) {
-                    height = Math.abs(height)
+                    height = Math.abs(height);
                     y -= height;
                 }
 
@@ -265,7 +265,7 @@
     world.register(gravitySystem);
 
     // Define components.
-    'components';
+    //'components';
 
     // Define entities.
     var Background = function (params) {

@@ -10,23 +10,36 @@
             'collision': 'many'
         };
 
-        var hitTestRectangle = function (entity, other, params) {
-            params = _.extend({
-                x: entity.c.position.x,
-                y: entity.c.position.y
-            }, params);
+        // Prospective collision test.
+        // Tests for a collision between entity and any
+        // entity with otherComponent.
+        this.collide = function (entity, otherComponent, params) {
+            var hitEntities = _.filter(
+                that.$tracked.collision,
+                function (other) {
+                    return (other.uid !== entity.uid) &&
+                        other.has(otherComponent) &&
+                        hitTestAABB(entity, other, params);
+                }
+            );
 
-            var x1 = params.x;
-            var y1 = params.y;
-            var x2 = other.c.position.x;
-            var y2 = other.c.position.y;
+            return _.map(
+                hitEntities,
+                function (other) {
+                    return {
+                        entity: other,
+                        resolution: minimumDisplacementVectorAABB(entity, other, params)
+                    };
+                }
+            );
+        };
 
-            // Collision anchor stuff.
-            x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
-            y1 -= (entity.c.collision.anchor.y - 0.5) * entity.c.collision.height;
-
-            x2 -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
-            y2 -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
+        var hitTestAABB = function (entity, other, params) {
+            var positions = anchoredPositions(entity, other, params);
+            var x1 = positions.x1,
+                y1 = positions.y1,
+                x2 = positions.x2,
+                y2 = positions.y2;
 
             var width = (entity.c.collision.width + other.c.collision.width) / 2;
             var height = (entity.c.collision.height + other.c.collision.height) / 2;
@@ -43,39 +56,33 @@
             return false;
         };
 
-        var minimumDisplacementVector = function (entity, other) {
-            var entityX = entity.c.position.x;
-            var entityY = entity.c.position.y;
-            var otherX = other.c.position.x;
-            var otherY = other.c.position.y;
-
-            // Collision anchor stuff.
-            entityX -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
-            entityY -= (entity.c.collision.anchor.y - 0.5) * entity.c.collision.height;
-
-            otherX -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
-            otherY -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
+        var minimumDisplacementVectorAABB = function (entity, other, params) {
+            var positions = anchoredPositions(entity, other, params);
+            var x1 = positions.x1,
+                y1 = positions.y1,
+                x2 = positions.x2,
+                y2 = positions.y2;
 
             var dirX, dirY;
-            if (otherX - entityX < 0) {
+            if (x2 - x1 < 0) {
                 dirX = -1;
             } else {
                 dirX = 1;
             }
-            if (otherY - entityY < 0) {
+            if (y2 - y1 < 0) {
                 dirY = -1;
             } else {
                 dirY = 1;
             }
 
             var minApart = {
-                x: entity.c.collision.width/2 + other.c.collision.width/2,
-                y: entity.c.collision.height/2 + other.c.collision.height/2
+                x: (entity.c.collision.width + other.c.collision.width) / 2,
+                y: (entity.c.collision.height + other.c.collision.height) / 2
             };
 
             var actualDisplacement = {
-                x: Math.abs(entityX - otherX),
-                y: Math.abs(entityY - otherY)
+                x: Math.abs(x1 - x2),
+                y: Math.abs(y1 - y2)
             };
 
             var overlap = {
@@ -103,29 +110,28 @@
             }
         };
 
-        // Prospective collision test.
-        // Tests for a collision between entity and any
-        // entity with otherComponent.
-        this.collide = function (entity, otherComponent, params) {
-            var hitEntities = _.filter(
-                that.$tracked.collision,
-                function (other) {
-                    return (other.uid !== entity.uid) &&
-                        other.has(otherComponent) &&
-                        hitTestRectangle(entity, other, params);
-                }
-            );
+        var anchoredPositions = function (entity, other, params) {
+            params = _.extend({
+                x: entity.c.position.x,
+                y: entity.c.position.y
+            }, params);
 
-            return _.map(
-                hitEntities,
-                function (other) {
-                    return {
-                        entity: other,
-                        resolution: minimumDisplacementVector(entity, other)
-                    };
-                }
-            );
+            var result = {
+                x1: params.x,
+                y1: params.y,
+                x2: other.c.position.x,
+                y2: other.c.position.y
+            };
+
+            result.x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
+            result.y1 -= (entity.c.collision.anchor.y - 0.5) * entity.c.collision.height;
+
+            result.x2 -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
+            result.y2 -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
+
+            return result;
         };
+
     };
 
     module.exports = CollisionSystem;
