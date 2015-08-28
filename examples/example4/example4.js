@@ -419,11 +419,15 @@
 
     var Background = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
                 color: params.color,
                 height: levelHeight,
+                relative: false,
+                translate: {
+                    x: levelWidth/2,
+                    y: levelHeight/2
+                },
                 width: levelWidth,
                 z: -100
             }));

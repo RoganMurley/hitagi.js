@@ -270,14 +270,15 @@
     // Define entities.
     var Background = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: levelWidth/2,
-                y: levelHeight/2
-            }))
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
                 color: params.color,
                 height: levelHeight,
+                relative: false,
+                translate: {
+                    x: levelWidth/2,
+                    y: levelHeight/2
+                },
                 width: levelWidth,
                 z: -1000
             }));
@@ -292,16 +293,16 @@
         }, params);
 
         return new hitagi.Entity()
+            .attach(new hitagi.components.Position({
+                x: params.x,
+                y: params.y
+            }))
             .attach(new hitagi.components.Graphic({
                 type: 'rectangle',
                 color: 0XF0433A,
                 width: params.width,
                 height: params.height,
                 anchor: params.anchor
-            }))
-            .attach(new hitagi.components.Position({
-                x: params.x,
-                y: params.y
             }))
             .attach(new hitagi.components.Collision({
                 width: params.width,
@@ -318,11 +319,6 @@
 
     var Player = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
-                width: params.width,
-                height: params.height
-            }))
             .attach(new hitagi.components.Position({
                 x: params.x,
                 y: params.y
@@ -330,6 +326,11 @@
             .attach (new hitagi.components.Velocity({
                 xspeed: 0,
                 yspeed: 0
+            }))
+            .attach(new hitagi.components.Graphic({
+                type: 'rectangle',
+                width: params.width,
+                height: params.height
             }))
             .attach(new hitagi.components.Collision({
                 width: params.width,
@@ -388,15 +389,16 @@
                 y: levelHeight/2
             }),
             new hitagi.Entity()
-                .attach(new hitagi.components.Position({
-                    x: levelWidth/2,
-                    y: levelHeight * 0.3
-                }))
                 .attach(new hitagi.components.Graphic({
                     copy: 'drag to spawn blocks',
                     style: {
                         font: '72px monospace',
                         fill: 0XC9283E
+                    },
+                    relative: false,
+                    translate: {
+                        x: levelWidth/2,
+                        y: levelHeight * 0.3
                     },
                     type: 'text',
                     z: -500

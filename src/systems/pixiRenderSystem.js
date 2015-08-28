@@ -236,23 +236,12 @@
             graphic: function (entity)  {
                 var graphic = graphics[entity.uid];
 
-                var x = 0;
-                var y = 0;
+                var x = entity.c.graphic.translate.x;
+                var y = entity.c.graphic.translate.y;
 
                 if (entity.c.graphic.relative) {
-                    if (entity.has('position')) {
-                        x = entity.c.position.x;
-                        y = entity.c.position.y;
-                    }
-                    /*
-                    if (entity.has('body')) {
-                        x = entity.c.body.x;
-                        y = entity.c.body.y;
-                    }
-                    */
-
-                    x += offset.x;
-                    y += offset.y;
+                    x += entity.c.position.x;
+                    y += entity.c.position.y;
                 }
 
                 graphic.position.x = Math.floor(x);

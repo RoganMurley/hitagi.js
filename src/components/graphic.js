@@ -18,6 +18,10 @@
                 y: 1
             },
             tint: 0xFFFFFF,
+            translate: {
+                x: 0,
+                y: 0
+            },
             visible: true,
             z: 0
         }, params);
@@ -26,8 +30,7 @@
 
         this.deps = [];
         if (params.relative) {
-            // BODY V POSITION THING FIX ME.
-            //this.deps.push('position');
+            this.deps.push('position');
         }
 
         this.alpha = params.alpha;
@@ -36,6 +39,7 @@
         this.relative = params.relative;
         this.scale = params.scale;
         this.tint = params.tint;
+        this.translate = params.translate;
         this.type = params.type;
         this.visible = params.visible;
         this.z = params.z;

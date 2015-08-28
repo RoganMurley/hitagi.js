@@ -40201,6 +40201,10 @@ if (!global.cancelAnimationFrame) {
                 y: 1
             },
             tint: 0xFFFFFF,
+            translate: {
+                x: 0,
+                y: 0
+            },
             visible: true,
             z: 0
         }, params);
@@ -40209,8 +40213,7 @@ if (!global.cancelAnimationFrame) {
 
         this.deps = [];
         if (params.relative) {
-            // BODY V POSITION THING FIX ME.
-            //this.deps.push('position');
+            this.deps.push('position');
         }
 
         this.alpha = params.alpha;
@@ -40219,6 +40222,7 @@ if (!global.cancelAnimationFrame) {
         this.relative = params.relative;
         this.scale = params.scale;
         this.tint = params.tint;
+        this.translate = params.translate;
         this.type = params.type;
         this.visible = params.visible;
         this.z = params.z;
@@ -40924,23 +40928,12 @@ global.hitagi = require('./main.js');
             graphic: function (entity)  {
                 var graphic = graphics[entity.uid];
 
-                var x = 0;
-                var y = 0;
+                var x = entity.c.graphic.translate.x;
+                var y = entity.c.graphic.translate.y;
 
                 if (entity.c.graphic.relative) {
-                    if (entity.has('position')) {
-                        x = entity.c.position.x;
-                        y = entity.c.position.y;
-                    }
-                    /*
-                    if (entity.has('body')) {
-                        x = entity.c.body.x;
-                        y = entity.c.body.y;
-                    }
-                    */
-
-                    x += offset.x;
-                    y += offset.y;
+                    x += entity.c.position.x;
+                    y += entity.c.position.y;
                 }
 
                 graphic.position.x = Math.floor(x);
