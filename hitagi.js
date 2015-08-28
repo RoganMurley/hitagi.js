@@ -40302,6 +40302,80 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    var _ = require('lodash');
+
+    // Represents a graphic to draw.
+    var Graphic = function (params) {
+        this.id = 'graphic';
+        this.deps = []; // Position dependency added later is relative positioning is true.
+
+        // REMOVED COlOUR
+        params = _.extend({
+            alpha: 1,
+            anchor: {
+                x: 0.5,
+                y: 0.5
+            },
+            relative: true,
+            scale: {
+                x: 1,
+                y: 1
+            },
+            tint: 0xffffff,
+            translate: {
+                x: 0,
+                y: 0
+            },
+            visible: true,
+            z: 0
+        }, params);
+
+        if (params.relative) {
+            this.deps.push('position');
+        }
+
+        this.alpha = params.alpha;
+        this.anchor = params.anchor;
+        this.relative = params.relative;
+        this.scale = params.scale;
+        this.tint = params.tint;
+        this.translate = params.translate;
+        this.type = params.type;
+        this.visible = params.visible;
+        this.z = params.z;
+
+    };
+
+    module.exports = Graphic;
+} ());
+
+},{"lodash":9}],135:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var _ = require('lodash');
+
+    // Represents a graphic to draw.
+    var Text = function (params) {
+        this.id = 'text';
+        this.deps = ['graphic'];
+
+        params = _.extend({
+            bitmapFont: false
+        }, params);
+
+        this.bitmapFont = params.bitmapFont;
+        this.copy = params.copy;
+        this.style = params.style;
+    };
+
+    module.exports = Text;
+} ());
+
+},{"lodash":9}],136:[function(require,module,exports){
+(function () {
+    'use strict';
+
     // Represents an entity's position in 2D space.
     // PARAMS:
     //      x - x Cartesian coordinate.
@@ -40317,7 +40391,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Position;
 } ());
 
-},{}],135:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40336,7 +40410,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],136:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40439,7 +40513,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"lodash":9}],137:[function(require,module,exports){
+},{"lodash":9}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40500,7 +40574,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":9}],138:[function(require,module,exports){
+},{"lodash":9}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40514,7 +40588,12 @@ if (!global.cancelAnimationFrame) {
             'Collision': require('./components/collision.js'),
             'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
-            'Velocity': require('./components/velocity.js')
+            'Velocity': require('./components/velocity.js'),
+
+            'graphics': {
+                'Graphic': require('./components/graphics/graphic.js'),
+                'Text': require('./components/graphics/text.js')
+            }
         },
         'systems': {
             'CollisionSystem': require('./systems/collisionSystem.js'),
@@ -40527,12 +40606,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":132,"./components/graphic.js":133,"./components/position.js":134,"./components/velocity.js":135,"./controls.js":136,"./entity.js":137,"./rooms.js":140,"./systems/collisionSystem.js":141,"./systems/pixiRenderSystem.js":142,"./systems/soundSystem.js":143,"./systems/velocitySystem.js":144,"./utils.js":145,"./world.js":146}],139:[function(require,module,exports){
+},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/graphic.js":134,"./components/graphics/text.js":135,"./components/position.js":136,"./components/velocity.js":137,"./controls.js":138,"./entity.js":139,"./rooms.js":142,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],141:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":138}],140:[function(require,module,exports){
+},{"./main.js":140}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40555,7 +40634,7 @@ global.hitagi = require('./main.js');
     module.exports = Rooms;
 } ());
 
-},{"lodash":9}],141:[function(require,module,exports){
+},{"lodash":9}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40685,7 +40764,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":9}],142:[function(require,module,exports){
+},{"lodash":9}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40718,173 +40797,26 @@ global.hitagi = require('./main.js');
 
         // Build the system, called by world on every entity.
         this.build = {
-            graphic: function (entity) {
-                switch (entity.c.graphic.type) {
-
-                    case 'circle':
-                        graphics[entity.uid] = new pixi.Graphics();
-                        graphics[entity.uid].beginFill(entity.c.graphic.color);
-                        graphics[entity.uid].drawCircle(0, 0, entity.c.graphic.radius);
-
-                        // Look for changes to redrawing if necessary.
-                        look(entity.c.graphic, 'radius', redraw, entity);
-
-                        break;
-
-                    case 'ellipse':
-                        graphics[entity.uid] = new pixi.Graphics();
-                        graphics[entity.uid].beginFill(entity.c.graphic.color);
-                        graphics[entity.uid].drawEllipse(
-                            0,
-                            0,
-                            entity.c.graphic.width,
-                            entity.c.graphic.height
-                        );
-
-                        // Look for changes to line params, redrawing if necessary.
-                        look(entity.c.graphic, 'width', redraw, entity);
-                        look(entity.c.graphic, 'height', redraw, entity);
-
-                        break;
-
-                    case 'line':
-                        graphics[entity.uid] = new pixi.Graphics();
-                        graphics[entity.uid].lineStyle(
-                            entity.c.graphic.thickness,
-                            entity.c.graphic.color,
-                            1
-                        );
-                        graphics[entity.uid].moveTo(
-                            entity.c.graphic.x1,
-                            entity.c.graphic.y1
-                        );
-                        graphics[entity.uid].lineTo(
-                            entity.c.graphic.x2,
-                            entity.c.graphic.y2
-                        );
-
-                        // Look for changes to params, redrawing if necessary.
-                        look(entity.c.graphic, 'thickness', redraw, entity);
-                        look(entity.c.graphic, 'x1', redraw, entity);
-                        look(entity.c.graphic, 'y1', redraw, entity);
-                        look(entity.c.graphic, 'x2', redraw, entity);
-                        look(entity.c.graphic, 'y2', redraw, entity);
-
-                        break;
-
-                    case 'polygon':
-                        graphics[entity.uid] = new pixi.Graphics();
-                        graphics[entity.uid].beginFill(entity.c.graphic.color);
-                        graphics[entity.uid].drawPolygon(entity.c.graphic.points);
-                        graphics[entity.uid].endFill();
-
-                        // Look for changes to params, redrawing if necessary.
-                        look(entity.c.graphic, 'points', redraw, entity);
-
-                        break;
-
-                    case 'rectangle':
-                        graphics[entity.uid] = new pixi.Graphics();
-                        graphics[entity.uid].beginFill(entity.c.graphic.color);
-                        graphics[entity.uid].drawRect(
-                            -entity.c.graphic.width * entity.c.graphic.anchor.x,
-                            -entity.c.graphic.height * entity.c.graphic.anchor.y,
-                            entity.c.graphic.width,
-                            entity.c.graphic.height
-                        );
-
-                        // Look for changes to params, redrawing if necessary.
-                        look(entity.c.graphic, 'width', redraw, entity);
-                        look(entity.c.graphic, 'height', redraw, entity);
-                        look(entity.c.graphic, 'anchor', redraw, entity);
-
-                        break;
-
-                    case 'sprite':
-                        if (_.isArray(entity.c.graphic.path) || entity.c.graphic.sheet) {
-                            // Animation.
-                            var frames;
-
-                            if (entity.c.graphic.sheet) {
-                                frames = _.map(entity.c.graphic.path, function (framePath) {
-                                    return pixi.Texture.fromFrame(framePath);
-                                });
-                            } else {
-                                frames = _.map(entity.c.graphic.path, function (framePath) {
-                                    return pixi.Texture.fromImage(framePath);
-                                });
-                            }
-
-                            graphics[entity.uid] = new pixi.extras.MovieClip(frames);
-
-                            // Set and proxy framespeed.
-                            graphics[entity.uid].animationSpeed = entity.c.graphic.animationSpeed;
-                            proxy(
-                                entity.c.graphic, 'animationSpeed',
-                                graphics[entity.uid], 'animationSpeed'
-                            );
-
-                            // Set and proxy loop.
-                            graphics[entity.uid].loop = entity.c.graphic.loop;
-                            proxy(
-                                entity.c.graphic, 'loop',
-                                graphics[entity.uid], 'loop'
-                            );
-
-                            graphics[entity.uid].gotoAndPlay(entity.c.graphic.currentFrame);
-                        } else {
-                            // Static sprite.
-                            var texture = pixi.Texture.fromImage(entity.c.graphic.path);
-                            graphics[entity.uid] = new pixi.Sprite(texture);
-                        }
-
-                        // Set anchor.
-                        graphics[entity.uid].anchor = entity.c.graphic.anchor;
-                        proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
-
-                        // Set and proxy rotation.
-                        graphics[entity.uid].rotation = entity.c.graphic.rotation;
-                        proxy( entity.c.graphic, 'rotation', graphics[entity.uid], 'rotation');
-
-                        // Redraw on path change.
-                        look(entity.c.graphic, 'path', redraw, entity);
-
-                        // Change animation frame on frame change.
-                        look(
-                            entity.c.graphic,
-                            'currentFrame',
-                            function (currentFrame, entity) {
-                                graphics[entity.uid].gotoAndPlay(currentFrame);
-                            },
-                            entity
-                        );
-                        break;
-
-                    case 'text':
-                        if (entity.c.graphic.bitmapFont) {
-                            graphics[entity.uid] = new pixi.extras.BitmapText(
-                                entity.c.graphic.copy,
-                                entity.c.graphic.style
-                            );
-                        } else {
-                            graphics[entity.uid] = new pixi.Text(
-                                entity.c.graphic.copy,
-                                entity.c.graphic.style
-                            );
-                        }
-                        proxy(entity.c.graphic, 'copy', graphics[entity.uid], 'text');
-                        proxy(entity.c.graphic, 'style', graphics[entity.uid], 'style');
-
-                        graphics[entity.uid].anchor = entity.c.graphic.anchor;
-                        proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
-                        break;
-
-                    default:
-                        throw new Error('InvalidGraphicType');
+            text: function (entity) {
+                if (entity.c.text.bitmapFont) {
+                    graphics[entity.uid] = new pixi.extras.BitmapText(
+                        entity.c.text.copy,
+                        entity.c.text.style
+                    );
+                } else {
+                    graphics[entity.uid] = new pixi.Text(
+                        entity.c.text.copy,
+                        entity.c.text.style
+                    );
                 }
 
-                // Set and proxy stuff.
-                var propertiesToProxy = ['alpha', 'scale', 'tint', 'visible', 'z'];
+                proxy(entity.c.text, 'copy', graphics[entity.uid], 'text');
+                proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
+            },
+
+            graphic: function (entity) {
+                // Proxy graphic properties.
+                var propertiesToProxy = ['alpha', 'anchor', 'scale', 'tint', 'visible', 'z'];
                 _.each(
                     propertiesToProxy,
                     function (property) {
@@ -40893,16 +40825,13 @@ global.hitagi = require('./main.js');
                     }
                 );
 
-                // Look for changes, redrawing if necessary.
-                look(entity.c.graphic, 'color', redraw, entity);
-                look(entity.c.graphic, 'type', redraw, entity);
-
+                // Add child to stage.
                 stage.addChild(graphics[entity.uid]);
 
-                // Sort by depth.
+                // Sort stage by depth.
                 stage.children = _.sortBy(stage.children, 'z');
 
-                // Move to correct position.
+                // Refresh screen.
                 that.update.graphic(entity);
             }
         };
@@ -40959,7 +40888,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":145,"lodash":9,"pixi.js":114}],143:[function(require,module,exports){
+},{"../utils.js":147,"lodash":9,"pixi.js":114}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40989,7 +40918,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":9}],144:[function(require,module,exports){
+},{"howler":8,"lodash":9}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41008,7 +40937,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":145}],145:[function(require,module,exports){
+},{"../utils.js":147}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41065,7 +40994,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{"lodash":9}],146:[function(require,module,exports){
+},{"lodash":9}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41346,4 +41275,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":137,"lodash":9}]},{},[139]);
+},{"./entity.js":139,"lodash":9}]},{},[141]);

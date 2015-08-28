@@ -11,7 +11,12 @@
             'Collision': require('./components/collision.js'),
             'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
-            'Velocity': require('./components/velocity.js')
+            'Velocity': require('./components/velocity.js'),
+
+            'graphics': {
+                'Graphic': require('./components/graphics/graphic.js'),
+                'Text': require('./components/graphics/text.js')
+            }
         },
         'systems': {
             'CollisionSystem': require('./systems/collisionSystem.js'),

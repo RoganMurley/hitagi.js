@@ -17,14 +17,17 @@
     // Add entities.
     world.add(
         new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: 300, y: 200}))
-            .attach(new hitagi.components.Graphic({
+            .attach(new hitagi.components.Position({
+                x: 300,
+                y: 200
+            }))
+            .attach(new hitagi.components.graphics.Graphic())
+            .attach(new hitagi.components.graphics.Text({
                 copy: 'Hello, World!',
                 style: {
                     font: '32px monospace',
                     fill: 'white'
-                },
-                type: 'text'
+                }
             }))
     );
 
