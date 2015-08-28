@@ -202,7 +202,7 @@
                 box.c.collision.width = width;
                 box.c.collision.height = height;
 
-                var test = collisionSystem.collide(box, 'player', {x1: x, y1: y});
+                var test = collisionSystem.collide(box, 'player', {x: x, y: y});
                 if (!test.length) {
                     var newBlock = world.add(
                         new Block({
