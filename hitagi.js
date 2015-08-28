@@ -40302,6 +40302,21 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    var Circle = function (params) {
+        this.id = 'circle';
+        this.deps = ['graphic'];
+
+        this.color = params.color;
+        this.radius = params.radius;
+    };
+
+    module.exports = Circle;
+} ());
+
+},{}],135:[function(require,module,exports){
+(function () {
+    'use strict';
+
     var _ = require('lodash');
 
     // Represents a graphic to draw.
@@ -40349,13 +40364,28 @@ if (!global.cancelAnimationFrame) {
     module.exports = Graphic;
 } ());
 
-},{"lodash":9}],135:[function(require,module,exports){
+},{"lodash":9}],136:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var Rectangle = function (params) {
+        this.id = 'rectangle';
+        this.deps = ['graphic'];
+
+        this.color = params.color;
+        this.width = params.width;
+        this.height = params.height;
+    };
+
+    module.exports = Rectangle;
+} ());
+
+},{}],137:[function(require,module,exports){
 (function () {
     'use strict';
 
     var _ = require('lodash');
 
-    // Represents a graphic to draw.
     var Text = function (params) {
         this.id = 'text';
         this.deps = ['graphic'];
@@ -40372,7 +40402,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Text;
 } ());
 
-},{"lodash":9}],136:[function(require,module,exports){
+},{"lodash":9}],138:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40391,7 +40421,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Position;
 } ());
 
-},{}],137:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40410,7 +40440,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],138:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40513,7 +40543,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"lodash":9}],139:[function(require,module,exports){
+},{"lodash":9}],141:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40574,7 +40604,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":9}],140:[function(require,module,exports){
+},{"lodash":9}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40591,7 +40621,9 @@ if (!global.cancelAnimationFrame) {
             'Velocity': require('./components/velocity.js'),
 
             'graphics': {
+                'Circle': require('./components/graphics/circle.js'),
                 'Graphic': require('./components/graphics/graphic.js'),
+                'Rectangle': require('./components/graphics/rectangle.js'),
                 'Text': require('./components/graphics/text.js')
             }
         },
@@ -40606,12 +40638,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/graphic.js":134,"./components/graphics/text.js":135,"./components/position.js":136,"./components/velocity.js":137,"./controls.js":138,"./entity.js":139,"./rooms.js":142,"./systems/collisionSystem.js":143,"./systems/pixiRenderSystem.js":144,"./systems/soundSystem.js":145,"./systems/velocitySystem.js":146,"./utils.js":147,"./world.js":148}],141:[function(require,module,exports){
+},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/circle.js":134,"./components/graphics/graphic.js":135,"./components/graphics/rectangle.js":136,"./components/graphics/text.js":137,"./components/position.js":138,"./components/velocity.js":139,"./controls.js":140,"./entity.js":141,"./rooms.js":144,"./systems/collisionSystem.js":145,"./systems/pixiRenderSystem.js":146,"./systems/soundSystem.js":147,"./systems/velocitySystem.js":148,"./utils.js":149,"./world.js":150}],143:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":140}],142:[function(require,module,exports){
+},{"./main.js":142}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40634,7 +40666,7 @@ global.hitagi = require('./main.js');
     module.exports = Rooms;
 } ());
 
-},{"lodash":9}],143:[function(require,module,exports){
+},{"lodash":9}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40764,7 +40796,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":9}],144:[function(require,module,exports){
+},{"lodash":9}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40797,7 +40829,43 @@ global.hitagi = require('./main.js');
 
         // Build the system, called by world on every entity.
         this.build = {
+
+            circle: function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.circle.color);
+
+                graphics[entity.uid].drawCircle(
+                    -entity.c.circle.radius * entity.c.graphic.anchor.x,
+                    -entity.c.circle.radius * entity.c.graphic.anchor.y,
+                    entity.c.circle.radius
+                );
+
+                // Look for changes to radius, redrawing if necessary.
+                look(entity.c.circle, 'radius', redraw, entity);
+            },
+
+            rectangle : function (entity) {
+                // Create a rectangle graphic.
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.rectangle.color);
+
+                graphics[entity.uid].drawRect(
+                    -entity.c.rectangle.width * entity.c.graphic.anchor.x,
+                    -entity.c.rectangle.height * entity.c.graphic.anchor.y,
+                    entity.c.rectangle.width,
+                    entity.c.rectangle.height
+                );
+
+                // Look for changes to params, redrawing if necessary.
+                look(entity.c.rectangle, 'width', redraw, entity);
+                look(entity.c.rectangle, 'height', redraw, entity);
+
+                // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
+                look(entity.c.graphic, 'anchor', redraw, entity);
+            },
+
             text: function (entity) {
+                // Create the appropriate graphic.
                 if (entity.c.text.bitmapFont) {
                     graphics[entity.uid] = new pixi.extras.BitmapText(
                         entity.c.text.copy,
@@ -40810,13 +40878,18 @@ global.hitagi = require('./main.js');
                     );
                 }
 
+                // Proxy text properties.
                 proxy(entity.c.text, 'copy', graphics[entity.uid], 'text');
                 proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
+
+                // Anchor is a Pixi property on text, so is proxied here.
+                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
             },
 
             graphic: function (entity) {
                 // Proxy graphic properties.
-                var propertiesToProxy = ['alpha', 'anchor', 'scale', 'tint', 'visible', 'z'];
+                // Anchor is handled elsewhere.
+                var propertiesToProxy = ['alpha', 'scale', 'tint', 'visible', 'z'];
                 _.each(
                     propertiesToProxy,
                     function (property) {
@@ -40888,7 +40961,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":147,"lodash":9,"pixi.js":114}],145:[function(require,module,exports){
+},{"../utils.js":149,"lodash":9,"pixi.js":114}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40918,7 +40991,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":9}],146:[function(require,module,exports){
+},{"howler":8,"lodash":9}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40937,7 +41010,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":147}],147:[function(require,module,exports){
+},{"../utils.js":149}],149:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40994,7 +41067,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{"lodash":9}],148:[function(require,module,exports){
+},{"lodash":9}],150:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41275,4 +41348,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":139,"lodash":9}]},{},[141]);
+},{"./entity.js":141,"lodash":9}]},{},[143]);

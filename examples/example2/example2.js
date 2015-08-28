@@ -124,7 +124,7 @@
 
                 var test = collisionSystem.collide(entity, 'paddle');
                 if (test.length) {
-                    var other = test[0].entity;
+                    var other = test[0];
                     entity.c.velocity.xspeed *= -1.01;
 
                     if (entity.c.position.y < other.c.position.y) {
@@ -177,7 +177,7 @@
             },
 
             scorecard: function (entity) {
-                entity.c.graphic.copy =
+                entity.c.text.copy =
                     entity.c.scorecard.score1 + ' - ' + entity.c.scorecard.score2;
             }
         };
@@ -197,10 +197,10 @@
                 xspeed: 0,
                 yspeed: 0
             }))
-            .attach(new hitagi.components.Graphic({
+            .attach(new hitagi.components.graphics.Graphic())
+            .attach(new hitagi.components.graphics.Rectangle({
                 color: params.color,
                 height: params.height,
-                type: 'rectangle',
                 width: params.width
             }))
             .attach({
@@ -228,10 +228,10 @@
                 xspeed: params.xspeed,
                 yspeed: params.yspeed
             }))
-            .attach(new hitagi.components.Graphic({
+            .attach(new hitagi.components.graphics.Graphic())
+            .attach(new hitagi.components.graphics.Circle({
                 color: params.color,
-                radius: params.radius,
-                type: 'circle'
+                radius: params.radius
             }))
             .attach(new hitagi.components.Collision({
                 height: params.radius*2,
@@ -250,13 +250,13 @@
                 x: params.x,
                 y: params.y
             }))
-            .attach(new hitagi.components.Graphic({
+            .attach(new hitagi.components.graphics.Graphic())
+            .attach(new hitagi.components.graphics.Text({
                 copy: '',
                 style: {
                     font: params.font,
                     fill: params.color
-                },
-                type: 'text'
+                }
             }))
             .attach({
                 id: 'scorecard',

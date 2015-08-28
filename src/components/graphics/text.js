@@ -3,7 +3,6 @@
 
     var _ = require('lodash');
 
-    // Represents a graphic to draw.
     var Text = function (params) {
         this.id = 'text';
         this.deps = ['graphic'];

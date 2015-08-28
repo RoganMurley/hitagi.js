@@ -14,7 +14,9 @@
             'Velocity': require('./components/velocity.js'),
 
             'graphics': {
+                'Circle': require('./components/graphics/circle.js'),
                 'Graphic': require('./components/graphics/graphic.js'),
+                'Rectangle': require('./components/graphics/rectangle.js'),
                 'Text': require('./components/graphics/text.js')
             }
         },

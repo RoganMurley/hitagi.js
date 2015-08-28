@@ -30,7 +30,43 @@
 
         // Build the system, called by world on every entity.
         this.build = {
+
+            circle: function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.circle.color);
+
+                graphics[entity.uid].drawCircle(
+                    -entity.c.circle.radius * entity.c.graphic.anchor.x,
+                    -entity.c.circle.radius * entity.c.graphic.anchor.y,
+                    entity.c.circle.radius
+                );
+
+                // Look for changes to radius, redrawing if necessary.
+                look(entity.c.circle, 'radius', redraw, entity);
+            },
+
+            rectangle : function (entity) {
+                // Create a rectangle graphic.
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.rectangle.color);
+
+                graphics[entity.uid].drawRect(
+                    -entity.c.rectangle.width * entity.c.graphic.anchor.x,
+                    -entity.c.rectangle.height * entity.c.graphic.anchor.y,
+                    entity.c.rectangle.width,
+                    entity.c.rectangle.height
+                );
+
+                // Look for changes to params, redrawing if necessary.
+                look(entity.c.rectangle, 'width', redraw, entity);
+                look(entity.c.rectangle, 'height', redraw, entity);
+
+                // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
+                look(entity.c.graphic, 'anchor', redraw, entity);
+            },
+
             text: function (entity) {
+                // Create the appropriate graphic.
                 if (entity.c.text.bitmapFont) {
                     graphics[entity.uid] = new pixi.extras.BitmapText(
                         entity.c.text.copy,
@@ -43,13 +79,18 @@
                     );
                 }
 
+                // Proxy text properties.
                 proxy(entity.c.text, 'copy', graphics[entity.uid], 'text');
                 proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
+
+                // Anchor is a Pixi property on text, so is proxied here.
+                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
             },
 
             graphic: function (entity) {
                 // Proxy graphic properties.
-                var propertiesToProxy = ['alpha', 'anchor', 'scale', 'tint', 'visible', 'z'];
+                // Anchor is handled elsewhere.
+                var propertiesToProxy = ['alpha', 'scale', 'tint', 'visible', 'z'];
                 _.each(
                     propertiesToProxy,
                     function (property) {
