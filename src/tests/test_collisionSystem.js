@@ -52,7 +52,7 @@
             );
 
             var test = collisionSystem.collide(entity1, 'collision');
-            assert.deepEqual(test[0].entity, entity2);
+            assert.deepEqual(test[0], entity2);
         });
 
         it('two 1 unit entities both positioned adjacent at the origin should NOT collide', function () {
@@ -104,7 +104,7 @@
             );
 
             var test = collisionSystem.collide(entity1, 'collision');
-            assert.deepEqual(test[0].entity, entity2);
+            assert.deepEqual(test[0], entity2);
         });
 
     });

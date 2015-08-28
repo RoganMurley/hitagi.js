@@ -40572,7 +40572,7 @@ global.hitagi = require('./main.js');
         // Tests for a collision between entity and any
         // entity with otherComponent.
         this.collide = function (entity, otherComponent, params) {
-            var hitEntities = _.filter(
+            return _.filter(
                 that.$tracked.collision,
                 function (other) {
                     return (other.uid !== entity.uid) &&
@@ -40580,41 +40580,9 @@ global.hitagi = require('./main.js');
                         hitTestAABB(entity, other, params);
                 }
             );
-
-            return _.map(
-                hitEntities,
-                function (other) {
-                    return {
-                        entity: other,
-                        resolution: minimumDisplacementVectorAABB(entity, other, params)
-                    };
-                }
-            );
         };
 
-        var hitTestAABB = function (entity, other, params) {
-            var positions = anchoredPositions(entity, other, params);
-            var x1 = positions.x1,
-                y1 = positions.y1,
-                x2 = positions.x2,
-                y2 = positions.y2;
-
-            var width = (entity.c.collision.width + other.c.collision.width) / 2;
-            var height = (entity.c.collision.height + other.c.collision.height) / 2;
-
-            if (x1 + width > x2) {
-                if (x1 < x2 + width) {
-                    if (y1 + height > y2) {
-                        if (y1 < y2 + height) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        };
-
-        var minimumDisplacementVectorAABB = function (entity, other, params) {
+        this.resolutionVector = function (entity, other, params) {
             var positions = anchoredPositions(entity, other, params);
             var x1 = positions.x1,
                 y1 = positions.y1,
@@ -40666,6 +40634,28 @@ global.hitagi = require('./main.js');
                     y: dirY * overlap.y
                 };
             }
+        };
+
+        var hitTestAABB = function (entity, other, params) {
+            var positions = anchoredPositions(entity, other, params);
+            var x1 = positions.x1,
+                y1 = positions.y1,
+                x2 = positions.x2,
+                y2 = positions.y2;
+
+            var width = (entity.c.collision.width + other.c.collision.width) / 2;
+            var height = (entity.c.collision.height + other.c.collision.height) / 2;
+
+            if (x1 + width > x2) {
+                if (x1 < x2 + width) {
+                    if (y1 + height > y2) {
+                        if (y1 < y2 + height) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         };
 
         var anchoredPositions = function (entity, other, params) {

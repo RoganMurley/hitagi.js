@@ -108,7 +108,12 @@
             body: function (entity, dt) {
                 var test = collisionSystem.collide(entity, 'solid');
                 if (test.length) {
-                    var potentialResolutions = _.pluck(test, 'resolution.x');
+                    var potentialResolutions = _.map(
+                        test,
+                        function (hitEntity) {
+                            return collisionSystem.resolutionVector(entity, hitEntity).x;
+                        }
+                    );
                     var maxResolution = _.max(potentialResolutions, Math.abs);
 
                     entity.c.position.x += maxResolution;
@@ -122,7 +127,12 @@
             body: function (entity, dt) {
                 var test = collisionSystem.collide(entity, 'solid');
                 if (test.length) {
-                    var potentialResolutions = _.pluck(test, 'resolution.y');
+                    var potentialResolutions = _.map(
+                        test,
+                        function (hitEntity) {
+                            return collisionSystem.resolutionVector(entity, hitEntity).y;
+                        }
+                    );
                     var maxResolution = _.max(potentialResolutions, Math.abs);
 
                     entity.c.position.y += maxResolution;

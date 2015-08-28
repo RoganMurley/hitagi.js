@@ -1,5 +1,5 @@
 # About
-Hitagi is a JavaScript game development framework that loves to keep your code and data separate. It uses an [Entity Component System](http://en.wikipedia.org/wiki/Entity_component_system) architecture.
+Hitagi is a JavaScript/HTML5 game development framework that loves to keep your code and data separate. It uses an [Entity Component System](http://en.wikipedia.org/wiki/Entity_component_system) architecture.
 
 # How does it work?
 * The **World** contains **Entities** and **Systems**.

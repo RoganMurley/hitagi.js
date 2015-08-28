@@ -63,9 +63,9 @@
 
                 var test = collisionSystem.collide(entity, 'goal');
 
-                if (test.length && !test[0].entity.c.goal.done) {
-                    test[0].entity.c.goal.done = true;
-                    scoreSystem.updateScore(test[0].entity.c.goal.n);
+                if (test.length && !test[0].c.goal.done) {
+                    test[0].c.goal.done = true;
+                    scoreSystem.updateScore(test[0].c.goal.n);
                 }
             }
         };
