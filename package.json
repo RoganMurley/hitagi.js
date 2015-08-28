@@ -1,6 +1,6 @@
 {
   "name": "hitagi.js",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Simple game development framework",
   "main": "src/main.js",
   "scripts": {
