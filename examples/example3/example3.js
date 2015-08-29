@@ -32,11 +32,8 @@
     var BorderSystem = function (collisionSystem) {
         this.update = {
             ghost: function (entity) {
-                var x = entity.c.position.x;
-                var y = entity.c.position.y;
-
-                var test = collisionSystem.collide(entity, 'border', x, y);
-                if (test.hit) {
+                var test = collisionSystem.collide(entity, 'border');
+                if (test.length) {
                     entity.c.velocity.xspeed = Math.random()*10 - 5;
                     entity.c.velocity.yspeed = Math.random()*10 - 5;
                 }
@@ -65,7 +62,6 @@
     world.register(new BorderSystem(collisionSystem));
 
     // Add entities.
-    /*
     world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -76,16 +72,16 @@
                 xspeed: Math.random()*10 - 5,
                 yspeed: Math.random()*10 - 5
             }))
-            .attach(new hitagi.components.Graphic({
-                animationSpeed: 0.01,
-                path: ['ghost.png', 'ghost2.png'],
+            .attach(new hitagi.components.graphics.Graphic({
                 scale: {
                     x: 0.6,
                     y: 0.6
                 },
-                sheet: true,
-                type: 'sprite',
                 z: 1000
+            }))
+            .attach(new hitagi.components.graphics.Sprite({
+                animationSpeed: 0.01,
+                path: ['ghost.png', 'ghost2.png']
             }))
             .attach(new hitagi.components.Collision({
                 height: 73,
@@ -93,7 +89,6 @@
             }))
             .attach({id: 'ghost'})
     );
-*/
 
     world.add(
         new hitagi.Entity()
@@ -150,11 +145,7 @@
     world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.graphics.Graphic({
-                relative: false,
-                translate: {
-                    x: levelWidth/2,
-                    y: levelHeight/2
-                }
+                relative: false
             }))
             .attach(new hitagi.components.graphics.Polygon({
                 points: [

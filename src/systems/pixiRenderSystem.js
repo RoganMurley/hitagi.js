@@ -128,6 +128,70 @@
                 look(entity.c.graphic, 'anchor', redraw, entity);
             },
 
+            sprite: function (entity) {
+                var frames;
+
+                // If spritesheet.
+                if (_.isArray(entity.c.sprite.path)) {
+                    frames = _.map(entity.c.sprite.path, function (framePath) {
+                        return pixi.Texture.fromFrame(framePath);
+                    });
+                }
+                // If array of frames.
+                else {
+                    frames = _.map(entity.c.sprite.path, function (framePath) {
+                        return pixi.Texture.fromImage(framePath);
+                    });
+                }
+
+                graphics[entity.uid] = new pixi.extras.MovieClip(frames);
+
+                // Set and proxy framespeed.
+                graphics[entity.uid].animationSpeed = entity.c.sprite.animationSpeed;
+                proxy(
+                    entity.c.sprite, 'animationSpeed',
+                    graphics[entity.uid], 'animationSpeed'
+                );
+
+                // Set and proxy loop.
+                graphics[entity.uid].loop = entity.c.sprite.loop;
+                proxy(
+                    entity.c.sprite, 'loop',
+                    graphics[entity.uid], 'loop'
+                );
+
+                graphics[entity.uid].gotoAndPlay(entity.c.sprite.currentFrame);
+
+                // Set and proxy rotation.
+                graphics[entity.uid].rotation = entity.c.sprite.rotation;
+                proxy(entity.c.sprite, 'rotation', graphics[entity.uid], 'rotation');
+
+                // Redraw on path change.
+                look(entity.c.sprite, 'path', redraw, entity);
+
+                // Change animation frame on frame change.
+                look(
+                    entity.c.sprite,
+                    'currentFrame',
+                    function (currentFrame, entity) {
+                        graphics[entity.uid].gotoAndPlay(currentFrame);
+                    },
+                    entity
+                );
+            },
+
+            staticSprite: function (entity) {
+                var texture = pixi.Texture.fromImage(entity.c.graphic.path);
+                graphics[entity.uid] = new pixi.Sprite(texture);
+
+                // Set and proxy rotation.
+                graphics[entity.uid].rotation = entity.c.staticSprite.rotation;
+                proxy(entity.c.staticSprite, 'rotation', graphics[entity.uid], 'rotation');
+
+                // Redraw on path change.
+                look(entity.c.staticSprite, 'path', redraw, entity);
+            },
+
             text: function (entity) {
                 // Create the appropriate graphic.
                 if (entity.c.text.bitmapFont) {

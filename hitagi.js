@@ -40440,6 +40440,54 @@ if (!global.cancelAnimationFrame) {
 
     var _ = require('lodash');
 
+    var Sprite = function (params) {
+        this.id = 'sprite';
+        this.deps = ['graphic'];
+
+        params = _.extend({
+            animationSpeed: 1,
+            currentFrame: 1,
+            loop: true,
+            rotation: 0
+        }, params);
+
+        this.animationSpeed = params.animationSpeed;
+        this.currentFrame = params.currentFrame;
+        this.loop = params.loop;
+        this.path = params.path;
+        this.rotation = params.rotation;
+    };
+
+    module.exports = Sprite;
+} ());
+
+},{"lodash":9}],141:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var _ = require('lodash');
+
+    var StaticSprite = function (params) {
+        this.id = 'staticSprite';
+        this.deps = ['graphic'];
+
+        params = _.extend({
+            rotation: 0
+        }, params);
+
+        this.path = params.path;
+        this.rotation = params.rotation;
+    };
+
+    module.exports = StaticSprite;
+} ());
+
+},{"lodash":9}],142:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var _ = require('lodash');
+
     var Text = function (params) {
         this.id = 'text';
         this.deps = ['graphic'];
@@ -40456,7 +40504,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Text;
 } ());
 
-},{"lodash":9}],141:[function(require,module,exports){
+},{"lodash":9}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40475,7 +40523,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Position;
 } ());
 
-},{}],142:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40494,7 +40542,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],143:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40597,7 +40645,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"lodash":9}],144:[function(require,module,exports){
+},{"lodash":9}],146:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40658,7 +40706,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":9}],145:[function(require,module,exports){
+},{"lodash":9}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40681,6 +40729,8 @@ if (!global.cancelAnimationFrame) {
                 'Line': require('./components/graphics/line.js'),
                 'Polygon': require('./components/graphics/polygon.js'),
                 'Rectangle': require('./components/graphics/rectangle.js'),
+                'StaticSprite': require('./components/graphics/staticSprite.js'),
+                'Sprite': require('./components/graphics/sprite.js'),
                 'Text': require('./components/graphics/text.js')
             }
         },
@@ -40695,12 +40745,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/circle.js":134,"./components/graphics/ellipse.js":135,"./components/graphics/graphic.js":136,"./components/graphics/line.js":137,"./components/graphics/polygon.js":138,"./components/graphics/rectangle.js":139,"./components/graphics/text.js":140,"./components/position.js":141,"./components/velocity.js":142,"./controls.js":143,"./entity.js":144,"./rooms.js":147,"./systems/collisionSystem.js":148,"./systems/pixiRenderSystem.js":149,"./systems/soundSystem.js":150,"./systems/velocitySystem.js":151,"./utils.js":152,"./world.js":153}],146:[function(require,module,exports){
+},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/circle.js":134,"./components/graphics/ellipse.js":135,"./components/graphics/graphic.js":136,"./components/graphics/line.js":137,"./components/graphics/polygon.js":138,"./components/graphics/rectangle.js":139,"./components/graphics/sprite.js":140,"./components/graphics/staticSprite.js":141,"./components/graphics/text.js":142,"./components/position.js":143,"./components/velocity.js":144,"./controls.js":145,"./entity.js":146,"./rooms.js":149,"./systems/collisionSystem.js":150,"./systems/pixiRenderSystem.js":151,"./systems/soundSystem.js":152,"./systems/velocitySystem.js":153,"./utils.js":154,"./world.js":155}],148:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":145}],147:[function(require,module,exports){
+},{"./main.js":147}],149:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40723,7 +40773,7 @@ global.hitagi = require('./main.js');
     module.exports = Rooms;
 } ());
 
-},{"lodash":9}],148:[function(require,module,exports){
+},{"lodash":9}],150:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40853,7 +40903,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":9}],149:[function(require,module,exports){
+},{"lodash":9}],151:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40984,6 +41034,70 @@ global.hitagi = require('./main.js');
                 look(entity.c.graphic, 'anchor', redraw, entity);
             },
 
+            sprite: function (entity) {
+                var frames;
+
+                // If spritesheet.
+                if (_.isArray(entity.c.sprite.path)) {
+                    frames = _.map(entity.c.sprite.path, function (framePath) {
+                        return pixi.Texture.fromFrame(framePath);
+                    });
+                }
+                // If array of frames.
+                else {
+                    frames = _.map(entity.c.sprite.path, function (framePath) {
+                        return pixi.Texture.fromImage(framePath);
+                    });
+                }
+
+                graphics[entity.uid] = new pixi.extras.MovieClip(frames);
+
+                // Set and proxy framespeed.
+                graphics[entity.uid].animationSpeed = entity.c.sprite.animationSpeed;
+                proxy(
+                    entity.c.sprite, 'animationSpeed',
+                    graphics[entity.uid], 'animationSpeed'
+                );
+
+                // Set and proxy loop.
+                graphics[entity.uid].loop = entity.c.sprite.loop;
+                proxy(
+                    entity.c.sprite, 'loop',
+                    graphics[entity.uid], 'loop'
+                );
+
+                graphics[entity.uid].gotoAndPlay(entity.c.sprite.currentFrame);
+
+                // Set and proxy rotation.
+                graphics[entity.uid].rotation = entity.c.sprite.rotation;
+                proxy(entity.c.sprite, 'rotation', graphics[entity.uid], 'rotation');
+
+                // Redraw on path change.
+                look(entity.c.sprite, 'path', redraw, entity);
+
+                // Change animation frame on frame change.
+                look(
+                    entity.c.sprite,
+                    'currentFrame',
+                    function (currentFrame, entity) {
+                        graphics[entity.uid].gotoAndPlay(currentFrame);
+                    },
+                    entity
+                );
+            },
+
+            staticSprite: function (entity) {
+                var texture = pixi.Texture.fromImage(entity.c.graphic.path);
+                graphics[entity.uid] = new pixi.Sprite(texture);
+
+                // Set and proxy rotation.
+                graphics[entity.uid].rotation = entity.c.staticSprite.rotation;
+                proxy(entity.c.staticSprite, 'rotation', graphics[entity.uid], 'rotation');
+
+                // Redraw on path change.
+                look(entity.c.staticSprite, 'path', redraw, entity);
+            },
+
             text: function (entity) {
                 // Create the appropriate graphic.
                 if (entity.c.text.bitmapFont) {
@@ -41081,7 +41195,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":152,"lodash":9,"pixi.js":114}],150:[function(require,module,exports){
+},{"../utils.js":154,"lodash":9,"pixi.js":114}],152:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41111,7 +41225,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":9}],151:[function(require,module,exports){
+},{"howler":8,"lodash":9}],153:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41130,7 +41244,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":152}],152:[function(require,module,exports){
+},{"../utils.js":154}],154:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41187,7 +41301,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{"lodash":9}],153:[function(require,module,exports){
+},{"lodash":9}],155:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41468,4 +41582,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":144,"lodash":9}]},{},[146]);
+},{"./entity.js":146,"lodash":9}]},{},[148]);

@@ -20,6 +20,8 @@
                 'Line': require('./components/graphics/line.js'),
                 'Polygon': require('./components/graphics/polygon.js'),
                 'Rectangle': require('./components/graphics/rectangle.js'),
+                'StaticSprite': require('./components/graphics/staticSprite.js'),
+                'Sprite': require('./components/graphics/sprite.js'),
                 'Text': require('./components/graphics/text.js')
             }
         },
