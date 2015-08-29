@@ -159,17 +159,18 @@
                             x: mousePos.x,
                             y: mousePos.y
                         }))
-                        .attach(new hitagi.components.Graphic({
-                            type: 'rectangle',
-                            width: 0,
-                            height: 0,
+                        .attach(new hitagi.components.graphics.Graphic({
                             alpha: 0.7,
-                            color: 0XC9283E,
                             anchor: {
                                 x: 0,
                                 y: 0
                             },
                             z: 100
+                        }))
+                        .attach(new hitagi.components.graphics.Rectangle({
+                            width: 0,
+                            height: 0,
+                            color: 0xc9283e,
                         }))
                         .attach(new hitagi.components.Collision({
                             width: 0,
@@ -241,8 +242,8 @@
                entity.c.dragBoxUI.height = mousePos.y - entity.c.dragBoxUI.origin.y;
 
                 // Update graphic.
-                entity.c.graphic.width = entity.c.dragBoxUI.width;
-                entity.c.graphic.height = entity.c.dragBoxUI.height;
+                entity.c.rectangle.width = entity.c.dragBoxUI.width;
+                entity.c.rectangle.height = entity.c.dragBoxUI.height;
             }
         };
     };
@@ -280,17 +281,18 @@
     // Define entities.
     var Background = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
+            .attach(new hitagi.components.graphics.Graphic({
+                anchor: {
+                    x: 0,
+                    y: 0
+                },
+                relative: false,
+                z: -1000
+            }))
+            .attach(new hitagi.components.graphics.Rectangle({
                 color: params.color,
                 height: levelHeight,
-                relative: false,
-                translate: {
-                    x: levelWidth/2,
-                    y: levelHeight/2
-                },
-                width: levelWidth,
-                z: -1000
+                width: levelWidth
             }));
     };
 
@@ -307,12 +309,13 @@
                 x: params.x,
                 y: params.y
             }))
-            .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
-                color: 0XF0433A,
-                width: params.width,
-                height: params.height,
+            .attach(new hitagi.components.graphics.Graphic({
                 anchor: params.anchor
+            }))
+            .attach(new hitagi.components.graphics.Rectangle({
+                color: 0xf0433a,
+                width: params.width,
+                height: params.height
             }))
             .attach(new hitagi.components.Collision({
                 width: params.width,
@@ -337,8 +340,9 @@
                 xspeed: 0,
                 yspeed: 0
             }))
-            .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
+            .attach(new hitagi.components.graphics.Graphic())
+            .attach(new hitagi.components.graphics.Rectangle({
+                color: 0xffffff,
                 width: params.width,
                 height: params.height
             }))
@@ -399,19 +403,20 @@
                 y: levelHeight/2
             }),
             new hitagi.Entity()
-                .attach(new hitagi.components.Graphic({
+                .attach(new hitagi.components.graphics.Graphic({
+                    relative: false,
+                    translate: {
+                        x: levelWidth/2,
+                        y: levelHeight*0.2
+                    },
+                    z: -500
+                }))
+                .attach(new hitagi.components.graphics.Text({
                     copy: 'drag to spawn blocks',
                     style: {
                         font: '72px monospace',
                         fill: 0XC9283E
-                    },
-                    relative: false,
-                    translate: {
-                        x: levelWidth/2,
-                        y: levelHeight * 0.3
-                    },
-                    type: 'text',
-                    z: -500
+                    }
                 }))
         ];
 
