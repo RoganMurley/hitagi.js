@@ -15,7 +15,10 @@
 
             'graphics': {
                 'Circle': require('./components/graphics/circle.js'),
+                'Ellipse': require('./components/graphics/ellipse.js'),
                 'Graphic': require('./components/graphics/graphic.js'),
+                'Line': require('./components/graphics/line.js'),
+                'Polygon': require('./components/graphics/polygon.js'),
                 'Rectangle': require('./components/graphics/rectangle.js'),
                 'Text': require('./components/graphics/text.js')
             }

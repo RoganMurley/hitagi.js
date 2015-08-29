@@ -40317,6 +40317,22 @@ if (!global.cancelAnimationFrame) {
 (function () {
     'use strict';
 
+    var Ellipse = function (params) {
+        this.id = 'ellipse';
+        this.deps = ['graphic'];
+
+        this.color = params.color;
+        this.width = params.width;
+        this.height = params.height;
+    };
+
+    module.exports = Ellipse;
+} ());
+
+},{}],136:[function(require,module,exports){
+(function () {
+    'use strict';
+
     var _ = require('lodash');
 
     // Represents a graphic to draw.
@@ -40364,7 +40380,45 @@ if (!global.cancelAnimationFrame) {
     module.exports = Graphic;
 } ());
 
-},{"lodash":9}],136:[function(require,module,exports){
+},{"lodash":9}],137:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var _ = require('lodash');
+
+    var Line = function (params) {
+        this.id = 'line';
+        this.deps = ['graphic'];
+
+        params = _.extend({
+            thickness: 1
+        }, params);
+
+        this.thickness = params.thickness;
+        this.x1 = params.x1;
+        this.y1 = params.y1;
+        this.x2 = params.x2;
+        this.y2 = params.y2
+    };
+
+    module.exports = Line;
+} ());
+
+},{"lodash":9}],138:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var Polygon = function (params) {
+        this.id = 'polygon';
+        this.deps = ['graphic'];
+
+        this.points = params.points;
+    };
+
+    module.exports = Polygon;
+} ());
+
+},{}],139:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40380,7 +40434,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Rectangle;
 } ());
 
-},{}],137:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40402,7 +40456,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Text;
 } ());
 
-},{"lodash":9}],138:[function(require,module,exports){
+},{"lodash":9}],141:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40421,7 +40475,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Position;
 } ());
 
-},{}],139:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40440,7 +40494,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Velocity;
 } ());
 
-},{}],140:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40543,7 +40597,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Controls;
 } ());
 
-},{"lodash":9}],141:[function(require,module,exports){
+},{"lodash":9}],144:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40604,7 +40658,7 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":9}],142:[function(require,module,exports){
+},{"lodash":9}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40622,7 +40676,10 @@ if (!global.cancelAnimationFrame) {
 
             'graphics': {
                 'Circle': require('./components/graphics/circle.js'),
+                'Ellipse': require('./components/graphics/ellipse.js'),
                 'Graphic': require('./components/graphics/graphic.js'),
+                'Line': require('./components/graphics/line.js'),
+                'Polygon': require('./components/graphics/polygon.js'),
                 'Rectangle': require('./components/graphics/rectangle.js'),
                 'Text': require('./components/graphics/text.js')
             }
@@ -40638,12 +40695,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/circle.js":134,"./components/graphics/graphic.js":135,"./components/graphics/rectangle.js":136,"./components/graphics/text.js":137,"./components/position.js":138,"./components/velocity.js":139,"./controls.js":140,"./entity.js":141,"./rooms.js":144,"./systems/collisionSystem.js":145,"./systems/pixiRenderSystem.js":146,"./systems/soundSystem.js":147,"./systems/velocitySystem.js":148,"./utils.js":149,"./world.js":150}],143:[function(require,module,exports){
+},{"./components/collision.js":132,"./components/graphic.js":133,"./components/graphics/circle.js":134,"./components/graphics/ellipse.js":135,"./components/graphics/graphic.js":136,"./components/graphics/line.js":137,"./components/graphics/polygon.js":138,"./components/graphics/rectangle.js":139,"./components/graphics/text.js":140,"./components/position.js":141,"./components/velocity.js":142,"./controls.js":143,"./entity.js":144,"./rooms.js":147,"./systems/collisionSystem.js":148,"./systems/pixiRenderSystem.js":149,"./systems/soundSystem.js":150,"./systems/velocitySystem.js":151,"./utils.js":152,"./world.js":153}],146:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":142}],144:[function(require,module,exports){
+},{"./main.js":145}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40666,7 +40723,7 @@ global.hitagi = require('./main.js');
     module.exports = Rooms;
 } ());
 
-},{"lodash":9}],145:[function(require,module,exports){
+},{"lodash":9}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40796,7 +40853,7 @@ global.hitagi = require('./main.js');
     module.exports = CollisionSystem;
 } ());
 
-},{"lodash":9}],146:[function(require,module,exports){
+},{"lodash":9}],149:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40824,6 +40881,17 @@ global.hitagi = require('./main.js');
             delete graphics[entity.uid];
 
             // Add new sprite.
+            _.each(
+                that.build,
+                function (func, key) {
+                    if (key === 'graphic') {
+                        return;
+                    }
+                    if (entity.has(key)) {
+                        func(entity);
+                    }
+                }
+            );
             that.build.graphic(entity);
         };
 
@@ -40844,8 +40912,60 @@ global.hitagi = require('./main.js');
                 look(entity.c.circle, 'radius', redraw, entity);
             },
 
+            ellipse : function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.ellipse.color);
+
+                graphics[entity.uid].drawEllipse(
+                    -entity.c.ellipse.width * entity.c.graphic.anchor.x,
+                    -entity.c.ellipse.height * entity.c.graphic.anchor.y,
+                    entity.c.ellipse.width,
+                    entity.c.ellipse.height
+                );
+
+                // Look for changes to dimensions, redrawing if necessary.
+                look(entity.c.ellipse, 'width', redraw, entity);
+                look(entity.c.ellipse, 'height', redraw, entity);
+
+                // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
+                look(entity.c.graphic, 'anchor', redraw, entity);
+            },
+
+            line : function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].lineStyle(
+                    entity.c.line.thickness,
+                    entity.c.line.color,
+                    1
+                );
+                graphics[entity.uid].moveTo(
+                    entity.c.line.x1,
+                    entity.c.line.y1
+                );
+                graphics[entity.uid].lineTo(
+                    entity.c.line.x2,
+                    entity.c.line.y2
+                );
+
+                // Look for changes to params, redrawing if necessary.
+                look(entity.c.line, 'thickness', redraw, entity);
+                look(entity.c.line, 'x1', redraw, entity);
+                look(entity.c.line, 'y1', redraw, entity);
+                look(entity.c.line, 'x2', redraw, entity);
+                look(entity.c.line, 'y2', redraw, entity);
+            },
+
+            polygon: function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.polygon.color);
+                graphics[entity.uid].drawPolygon(entity.c.polygon.points);
+                graphics[entity.uid].endFill();
+
+                // Look for changes to params, redrawing if necessary.
+                look(entity.c.polygon, 'points', redraw, entity);
+            },
+
             rectangle : function (entity) {
-                // Create a rectangle graphic.
                 graphics[entity.uid] = new pixi.Graphics();
                 graphics[entity.uid].beginFill(entity.c.rectangle.color);
 
@@ -40961,7 +41081,7 @@ global.hitagi = require('./main.js');
     module.exports = PixiRenderSystem;
 } ());
 
-},{"../utils.js":149,"lodash":9,"pixi.js":114}],147:[function(require,module,exports){
+},{"../utils.js":152,"lodash":9,"pixi.js":114}],150:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40991,7 +41111,7 @@ global.hitagi = require('./main.js');
     module.exports = SoundSystem;
 } ());
 
-},{"howler":8,"lodash":9}],148:[function(require,module,exports){
+},{"howler":8,"lodash":9}],151:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41010,7 +41130,7 @@ global.hitagi = require('./main.js');
     module.exports = VelocitySystem;
 } ());
 
-},{"../utils.js":149}],149:[function(require,module,exports){
+},{"../utils.js":152}],152:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41067,7 +41187,7 @@ global.hitagi = require('./main.js');
     module.exports = Utils;
 } ());
 
-},{"lodash":9}],150:[function(require,module,exports){
+},{"lodash":9}],153:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -41348,4 +41468,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":141,"lodash":9}]},{},[143]);
+},{"./entity.js":144,"lodash":9}]},{},[146]);

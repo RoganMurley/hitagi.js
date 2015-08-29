@@ -25,6 +25,17 @@
             delete graphics[entity.uid];
 
             // Add new sprite.
+            _.each(
+                that.build,
+                function (func, key) {
+                    if (key === 'graphic') {
+                        return;
+                    }
+                    if (entity.has(key)) {
+                        func(entity);
+                    }
+                }
+            );
             that.build.graphic(entity);
         };
 
@@ -45,8 +56,60 @@
                 look(entity.c.circle, 'radius', redraw, entity);
             },
 
+            ellipse : function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.ellipse.color);
+
+                graphics[entity.uid].drawEllipse(
+                    -entity.c.ellipse.width * entity.c.graphic.anchor.x,
+                    -entity.c.ellipse.height * entity.c.graphic.anchor.y,
+                    entity.c.ellipse.width,
+                    entity.c.ellipse.height
+                );
+
+                // Look for changes to dimensions, redrawing if necessary.
+                look(entity.c.ellipse, 'width', redraw, entity);
+                look(entity.c.ellipse, 'height', redraw, entity);
+
+                // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
+                look(entity.c.graphic, 'anchor', redraw, entity);
+            },
+
+            line : function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].lineStyle(
+                    entity.c.line.thickness,
+                    entity.c.line.color,
+                    1
+                );
+                graphics[entity.uid].moveTo(
+                    entity.c.line.x1,
+                    entity.c.line.y1
+                );
+                graphics[entity.uid].lineTo(
+                    entity.c.line.x2,
+                    entity.c.line.y2
+                );
+
+                // Look for changes to params, redrawing if necessary.
+                look(entity.c.line, 'thickness', redraw, entity);
+                look(entity.c.line, 'x1', redraw, entity);
+                look(entity.c.line, 'y1', redraw, entity);
+                look(entity.c.line, 'x2', redraw, entity);
+                look(entity.c.line, 'y2', redraw, entity);
+            },
+
+            polygon: function (entity) {
+                graphics[entity.uid] = new pixi.Graphics();
+                graphics[entity.uid].beginFill(entity.c.polygon.color);
+                graphics[entity.uid].drawPolygon(entity.c.polygon.points);
+                graphics[entity.uid].endFill();
+
+                // Look for changes to params, redrawing if necessary.
+                look(entity.c.polygon, 'points', redraw, entity);
+            },
+
             rectangle : function (entity) {
-                // Create a rectangle graphic.
                 graphics[entity.uid] = new pixi.Graphics();
                 graphics[entity.uid].beginFill(entity.c.rectangle.color);
 

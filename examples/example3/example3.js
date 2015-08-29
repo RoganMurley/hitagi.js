@@ -42,27 +42,22 @@
                 }
 
                 if (controls.check('up')) {
-                    //entity.c.graphic.sheet = false;
-                    //entity.c.graphic.path = 'g2.png';
-                    //entity.c.graphic.animationSpeed = 1;
-                    entity.c.graphic.currentFrame = 0;
+                    entity.c.sprite.currentFrame = 0;
                 }
                 if (controls.check('down')) {
-                    //entity.c.graphic.path = 'ghost2.png';
-                    //entity.c.graphic.animationSpeed = 0.05;
-                    entity.c.graphic.currentFrame = 1;
+                    entity.c.sprite.currentFrame = 1;
                 }
 
-                entity.c.graphic.rotation += 0.01;
+                entity.c.sprite.rotation += 0.01;
             },
             rose: function (entity) {
                 if (Math.random() < entity.c.rose.activity) {
-                    entity.c.graphic.points = entity.c.graphic.points.concat([
+                    entity.c.polygon.points = entity.c.polygon.points.concat([
                         Math.random() * levelWidth,
                         Math.random() * levelHeight
                     ]);
                     entity.c.rose.activity *= 1.01;
-                    entity.c.graphic.color = 0XFFFFFF * Math.random();
+                    entity.c.polygon.color = 0xffffff * Math.random();
                 }
             }
         };
@@ -70,6 +65,7 @@
     world.register(new BorderSystem(collisionSystem));
 
     // Add entities.
+    /*
     world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({
@@ -97,6 +93,7 @@
             }))
             .attach({id: 'ghost'})
     );
+*/
 
     world.add(
         new hitagi.Entity()
@@ -138,11 +135,11 @@
     world.add(
         new hitagi.Entity()
             .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
-            .attach(new hitagi.components.Graphic({
-                alpha: 0.2,
-                relative: false,
+            .attach(new hitagi.components.graphics.Graphic({
+                alpha: 0.2
+            }))
+            .attach(new hitagi.components.graphics.Line({
                 thickness: 5,
-                type: 'line',
                 x1: 0,
                 y1: 0,
                 x2: levelWidth,
@@ -152,15 +149,19 @@
 
     world.add(
         new hitagi.Entity()
-            .attach(new hitagi.components.Position({x: levelWidth/2, y: levelHeight/2}))
-            .attach(new hitagi.components.Graphic({
+            .attach(new hitagi.components.graphics.Graphic({
+                relative: false,
+                translate: {
+                    x: levelWidth/2,
+                    y: levelHeight/2
+                }
+            }))
+            .attach(new hitagi.components.graphics.Polygon({
                 points: [
                     0, 0,
                     100, 100,
                     150, 100
-                ],
-                relative: false,
-                type: 'polygon'
+                ]
             }))
             .attach({
                 id: 'rose',
@@ -170,13 +171,18 @@
 
     world.add(
         new hitagi.Entity()
-            .attach(new hitagi.components.Graphic({
-                color: 0X910E2F,
-                height: levelHeight,
-                width: levelWidth,
+            .attach(new hitagi.components.graphics.Graphic({
                 relative: false,
-                type: 'ellipse',
+                translate: {
+                    x: levelWidth * 0.6,
+                    y: levelHeight * 0.7
+                },
                 z: -Infinity
+            }))
+            .attach(new hitagi.components.graphics.Ellipse({
+                color: 0x910e2f,
+                height: levelHeight,
+                width: levelWidth
             }))
     );
 
