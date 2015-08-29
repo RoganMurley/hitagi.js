@@ -8,7 +8,6 @@
         this.id = 'graphic';
         this.deps = []; // Position dependency added later is relative positioning is true.
 
-        // REMOVED COlOUR
         params = _.extend({
             alpha: 1,
             anchor: {

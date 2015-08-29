@@ -178,10 +178,14 @@
                     },
                     entity
                 );
+
+                // Anchor is a Pixi property on MovieClip, so is proxied here.
+                graphics[entity.uid].anchor = entity.c.graphic.anchor;
+                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
             },
 
             staticSprite: function (entity) {
-                var texture = pixi.Texture.fromImage(entity.c.graphic.path);
+                var texture = pixi.Texture.fromImage(entity.c.staticSprite.path);
                 graphics[entity.uid] = new pixi.Sprite(texture);
 
                 // Set and proxy rotation.
@@ -190,6 +194,10 @@
 
                 // Redraw on path change.
                 look(entity.c.staticSprite, 'path', redraw, entity);
+
+                // Anchor is a Pixi property on Sprite, so is proxied here.
+                graphics[entity.uid].anchor = entity.c.graphic.anchor;
+                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
             },
 
             text: function (entity) {
@@ -211,6 +219,7 @@
                 proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
 
                 // Anchor is a Pixi property on text, so is proxied here.
+                graphics[entity.uid].anchor = entity.c.graphic.anchor;
                 proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
             },
 

@@ -9,7 +9,6 @@
         'utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
-            'Graphic': require('./components/graphic.js'),
             'Position': require('./components/position.js'),
             'Velocity': require('./components/velocity.js'),
 

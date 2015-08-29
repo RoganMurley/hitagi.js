@@ -44,7 +44,7 @@
                 // Flap wings if clicking,
                 if (controls.check('flap', true)) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
-                    entity.c.graphic.currentFrame = 0;
+                    entity.c.sprite.currentFrame = 0;
                     soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/flap.ogg');
                 }
 
@@ -55,7 +55,7 @@
                 }
 
                 // Rotate bird sprite depending on velocity.
-                entity.c.graphic.rotation = entity.c.velocity.yspeed/15;
+                entity.c.sprite.rotation = entity.c.velocity.yspeed/15;
 
                 // Score if we hit a goal.
                 var x = entity.c.position.x;
@@ -87,12 +87,12 @@
 
             /// Update score.
             score.c.score.cleared = newScore;
-            score.c.graphic.copy = 'SCORE: ' + score.c.score.cleared;
+            score.c.text.copy = 'SCORE: ' + score.c.score.cleared;
 
             // Update best score.
             if (score.c.score.cleared > best.c.best.cleared) {
                 best.c.best.cleared = score.c.score.cleared;
-                best.c.graphic.copy = 'BEST: ' + best.c.best.cleared;
+                best.c.text.copy = 'BEST: ' + best.c.best.cleared;
             }
 
             soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/clear.ogg');
@@ -150,9 +150,6 @@
         this.update = {
             bird: function (entity) {
                 // Test for hitting something which kills you.
-                var x = entity.c.position.x;
-                var y = entity.c.position.y;
-
                 var test = collisionSystem.collide(entity, 'kill');
                 if (test.length) {
                     stopGame();
@@ -165,8 +162,8 @@
                     // Add corpse.
                     world.remove(entity);
                     world.add(new Corpse({
-                        x: x,
-                        y: y,
+                        x: entity.c.position.x,
+                        y: entity.c.position.y,
                         xspeed: 2,
                         yspeed: -10
                     }));
@@ -175,7 +172,7 @@
             },
             corpse: function (entity, dt) {
                 // Rotate corpse.
-                entity.c.graphic.rotation += hitagi.utils.delta(0.1, dt);
+                entity.c.staticSprite.rotation += hitagi.utils.delta(0.1, dt);
 
                 // When the corpse leaves the screen, restart.
                 if (entity.c.position.y > levelHeight) {
@@ -271,7 +268,7 @@
                     bird.c.gravity.magnitude = 0.6;
 
                     // Start flapping.
-                    bird.c.graphic.loop = false;
+                    bird.c.sprite.loop = false;
 
                     start.c.started = true;
                 }
@@ -309,18 +306,19 @@
                 y: params.y
             }))
             .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
-            .attach(new hitagi.components.Graphic({
-                type: 'sprite',
+            .attach(new hitagi.components.graphics.Graphic({
+                scale: {
+                    x: 0.45,
+                    y: 0.45
+                }
+            }))
+            .attach(new hitagi.components.graphics.Sprite({
                 animationSpeed: 0.12,
                 path: [
                     'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png',
                     'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_1.png',
                     'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_2.png'
-                ],
-                scale: {
-                    x: 0.45,
-                    y: 0.45
-                }
+                ]
             }))
             .attach({
                 id: 'gravity',
@@ -347,14 +345,15 @@
                 xspeed: params.xspeed,
                 yspeed: params.yspeed
             }))
-            .attach(new hitagi.components.Graphic({
-                type: 'sprite',
-                path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png',
+            .attach(new hitagi.components.graphics.Graphic({
                 scale: {
                     x: 0.45,
                     y: 0.45
                 },
                 z: 10000
+            }))
+            .attach(new hitagi.components.graphics.StaticSprite({
+                path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png'
             }))
             .attach({
                 id: 'gravity',
@@ -398,14 +397,15 @@
                 id: 'scroll',
                 speed: -5
             })
-            .attach(new hitagi.components.Graphic({
-                type:'sprite',
-                path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/pipe.png',
+            .attach(new hitagi.components.graphics.Graphic({
                 scale: {
                     x: 1,
                     y: params.yscale
                 },
                 z: 10
+            }))
+            .attach(new hitagi.components.graphics.StaticSprite({
+                path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/pipe.png'
             }))
             .attach(new hitagi.components.Collision({
                 height: 793,
@@ -419,17 +419,18 @@
 
     var Background = function (params) {
         return new hitagi.Entity()
-            .attach(new hitagi.components.Graphic({
-                type: 'rectangle',
+            .attach(new hitagi.components.graphics.Graphic({
+                anchor: {
+                    x: 0,
+                    y: 0
+                },
+                relative: false,
+                z: -100
+            }))
+            .attach(new hitagi.components.graphics.Rectangle({
                 color: params.color,
                 height: levelHeight,
-                relative: false,
-                translate: {
-                    x: levelWidth/2,
-                    y: levelHeight/2
-                },
-                width: levelWidth,
-                z: -100
+                width: levelWidth
             }));
     };
 
@@ -447,10 +448,11 @@
                     id: 'scroll',
                     speed: -5
                 })
-                .attach(new hitagi.components.Graphic({
-                    type: 'sprite',
-                    path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/floor.png',
+                .attach(new hitagi.components.graphics.Graphic({
                     z: 1000
+                }))
+                .attach(new hitagi.components.graphics.StaticSprite({
+                    path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/floor.png'
                 }))
                 .attach(new hitagi.components.Collision({
                     height: 108,
@@ -463,15 +465,16 @@
     var Score = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({x: 25, y: 0}))
-            .attach(new hitagi.components.Graphic({
-                type: 'text',
+            .attach(new hitagi.components.graphics.Graphic({
+                z: Infinity
+            }))
+            .attach(new hitagi.components.graphics.Text({
                 bitmapFont: true,
                 copy: 'SCORE: 0',
                 style: {
                     font: '64px VT323',
                     fill: 'white'
-                },
-                z: Infinity
+                }
             }))
             .attach({
                 id: 'score',
@@ -482,16 +485,16 @@
     var Best = function (params) {
         return new hitagi.Entity()
             .attach(new hitagi.components.Position({x: 25, y: 84}))
-            .attach(new hitagi.components.Graphic({
-                type: 'text',
+            .attach(new hitagi.components.graphics.Graphic({
+                z: Infinity
+            }))
+            .attach(new hitagi.components.graphics.Text({
                 bitmapFont: true,
                 copy: 'BEST: ' + params.cleared,
                 style: {
-                    align: 'right',
                     font: '64px VT323',
                     fill: 'white'
-                },
-                z: Infinity
+                }
             }))
             .attach({
                 id: 'best',
@@ -519,14 +522,14 @@
                 x: params.x,
                 y: params.y
             }))
-            .attach(new hitagi.components.Graphic({
-                type: 'text',
+            .attach(new hitagi.components.graphics.Graphic({}))
+            .attach(new hitagi.components.graphics.Text({
                 bitmapFont: true,
                 copy: params.copy,
                 style: {
                     font: '48px VT323',
                     fill: 'white'
-                },
+                }
             }));
     };
 
