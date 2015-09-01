@@ -65,7 +65,7 @@
                     entity.c.velocity.xspeed = 0;
                 }
 
-                if (controls.check('jump')) {
+                if (controls.check('jump', true)) {
                     if (entity.c.gravity.grounded > 4) {
                         entity.c.velocity.yspeed = -600;
                     }

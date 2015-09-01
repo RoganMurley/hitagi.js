@@ -19,14 +19,16 @@
 
         var pressKey = function (key) {
             keys[key] = {
-                active: true
-            }
+                active: true,
+                held: keys[key] && keys[key].active // Shortcircuit
+            };
         };
 
         var releaseKey = function (key) {
             keys[key] = {
-                active: false
-            }
+                active: false,
+                held: false
+            };
         };
 
         // Listen for input.
@@ -82,12 +84,12 @@
         };
 
         // Check that a key binding has been pressed.
-        // If hold is true, only check for it once.
-        this.check = function (binding, hold) {
+        // If once is true, only check for it once.
+        this.check = function (binding, once) {
             var keyCode = bindings[binding];
             var keyPressed = keys[keyCode] && keys[keyCode].active; // Shortcircuit
-            if (hold) {
-                keys[keyCode].active = false;
+            if (once && keys[keyCode]) {
+                keyPressed = keyPressed && !(keys[keyCode].held);
             }
             return keyPressed;
         };
