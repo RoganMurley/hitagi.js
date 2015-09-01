@@ -40437,42 +40437,39 @@ if (!global.cancelAnimationFrame) {
             };
 
         var bindings = {};
+        var mouseMappings = {
+            1: 'm1',
+            2: 'm2',
+            3: 'm3'
+        };
+
+        var pressKey = function (key) {
+            keys[key] = {
+                active: true
+            }
+        };
+
+        var releaseKey = function (key) {
+            keys[key] = {
+                active: false
+            }
+        };
 
         // Listen for input.
         document.onkeydown = function (e) {
-            keys[e.which] = true;
+            pressKey(e.which);
         };
 
         document.onkeyup = function (e) {
-            delete keys[e.which];
+            releaseKey(e.which);
         };
 
         document.onmousedown = function(e) {
-            switch (e.which) {
-                case 1:
-                    keys.m1 = true;
-                    break;
-                case 2:
-                    keys.m3 = true;
-                    break;
-                case 3:
-                    keys.m2 = true;
-                    break;
-            }
+            pressKey(mouseMappings[e.which]);
         };
 
         document.onmouseup = function(e) {
-            switch (e.which) {
-                case 1:
-                    delete keys.m1;
-                    break;
-                case 2:
-                    delete keys.m3;
-                    break;
-                case 3:
-                    delete keys.m2;
-                    break;
-            }
+            releaseKey(mouseMappings[e.which]);
         };
 
         // Update mouse position.
@@ -40514,9 +40511,9 @@ if (!global.cancelAnimationFrame) {
         // If hold is true, only check for it once.
         this.check = function (binding, hold) {
             var keyCode = bindings[binding];
-            var keyPressed = keys[keyCode];
+            var keyPressed = keys[keyCode] && keys[keyCode].active; // Shortcircuit
             if (hold) {
-                delete keys[keyCode];
+                keys[keyCode].active = false;
             }
             return keyPressed;
         };
