@@ -19027,7 +19027,8 @@ module.exports={
     "tarball": "http://registry.npmjs.org/pixi.js/-/pixi.js-3.0.7.tgz"
   },
   "directories": {},
-  "_resolved": "http://registry.npmjs.org/pixi.js/-/pixi.js-3.0.7.tgz"
+  "_resolved": "http://registry.npmjs.org/pixi.js/-/pixi.js-3.0.7.tgz",
+  "readme": "ERROR: No README data found!"
 }
 
 },{}],21:[function(require,module,exports){
@@ -40791,7 +40792,8 @@ global.hitagi = require('./main.js');
 
     var utils = require('../utils.js'),
         look = utils.look,
-        proxy = utils.proxy;
+        proxy = utils.proxy,
+        readOnlyProxy = utils.readOnlyProxy;
 
     var PixiRenderSystem = function (stage) {
         var that = this;
@@ -40962,6 +40964,14 @@ global.hitagi = require('./main.js');
                         graphics[entity.uid].gotoAndPlay(currentFrame);
                     },
                     entity
+                );
+
+                // Read only framecount property.
+                readOnlyProxy(
+                    entity.c.sprite,
+                    'frameCount',
+                    graphics[entity.uid],
+                    'totalFrames'
                 );
 
                 // Anchor is a Pixi property on MovieClip, so is proxied here.
@@ -41159,6 +41169,24 @@ global.hitagi = require('./main.js');
                         },
                         set: function (newValue) {
                             targetObj[targetProp] = newValue;
+                        }
+                    }
+                );
+            },
+
+        // A read-only version of proxy, see above.
+        readOnlyProxy:
+            function (originalObj, originalProp, targetObj, targetProp) {
+                Object.defineProperty(
+                    originalObj,
+                    originalProp,
+                    {
+                        get: function () {
+                            return targetObj[targetProp];
+                        },
+                        set: function (newValue) {
+                            console.error(targetProp + ' is read-only.');
+                            throw new Error('ReadOnly');
                         }
                     }
                 );

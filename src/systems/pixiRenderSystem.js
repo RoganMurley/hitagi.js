@@ -6,7 +6,8 @@
 
     var utils = require('../utils.js'),
         look = utils.look,
-        proxy = utils.proxy;
+        proxy = utils.proxy,
+        readOnlyProxy = utils.readOnlyProxy;
 
     var PixiRenderSystem = function (stage) {
         var that = this;
@@ -177,6 +178,14 @@
                         graphics[entity.uid].gotoAndPlay(currentFrame);
                     },
                     entity
+                );
+
+                // Read only framecount property.
+                readOnlyProxy(
+                    entity.c.sprite,
+                    'frameCount',
+                    graphics[entity.uid],
+                    'totalFrames'
                 );
 
                 // Anchor is a Pixi property on MovieClip, so is proxied here.

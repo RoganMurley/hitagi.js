@@ -29,6 +29,24 @@
                 );
             },
 
+        // A read-only version of proxy, see above.
+        readOnlyProxy:
+            function (originalObj, originalProp, targetObj, targetProp) {
+                Object.defineProperty(
+                    originalObj,
+                    originalProp,
+                    {
+                        get: function () {
+                            return targetObj[targetProp];
+                        },
+                        set: function (newValue) {
+                            console.error(targetProp + ' is read-only.');
+                            throw new Error('ReadOnly');
+                        }
+                    }
+                );
+            },
+
         // Watches a property, executing a callback when the property changes.
         look:
             function (obj, prop, callback, callbackParams) {
