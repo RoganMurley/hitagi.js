@@ -40576,6 +40576,10 @@ if (!global.cancelAnimationFrame) {
         // Remove a component from the entity.
         this.detach = function (componentID){
             delete this.c[componentID];
+
+            if (this.world) {
+                this.world.rebuild(this);
+            }
         };
 
         // Check if the entity has a given component.
@@ -41388,7 +41392,6 @@ global.hitagi = require('./main.js');
 
         // Track entities that systems want to.
         this.track = function (entity) {
-            debugger;
             _.each(
                 systems,
                 function (system) {

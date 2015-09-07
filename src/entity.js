@@ -47,6 +47,10 @@
         // Remove a component from the entity.
         this.detach = function (componentID){
             delete this.c[componentID];
+
+            if (this.world) {
+                this.world.rebuild(this);
+            }
         };
 
         // Check if the entity has a given component.

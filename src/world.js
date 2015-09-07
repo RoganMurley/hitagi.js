@@ -168,7 +168,6 @@
 
         // Track entities that systems want to.
         this.track = function (entity) {
-            debugger;
             _.each(
                 systems,
                 function (system) {
