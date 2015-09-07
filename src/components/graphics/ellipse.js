@@ -2,8 +2,8 @@
     'use strict';
 
     var Ellipse = function (params) {
-        this.id = 'ellipse';
-        this.deps = ['graphic'];
+        this.$id = 'ellipse';
+        this.$deps = ['graphic'];
 
         this.color = params.color;
         this.width = params.width;

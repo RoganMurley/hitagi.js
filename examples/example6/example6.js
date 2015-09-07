@@ -181,7 +181,7 @@
                             }
                         }))
                         .attach({
-                            id: 'dragBoxUI',
+                            $id: 'dragBoxUI',
                             width: 0,
                             height: 0,
                             origin: {
@@ -323,10 +323,10 @@
                 anchor: params.anchor
             }))
             .attach({
-                id: 'block'
+                $id: 'block'
             })
             .attach({
-                id: 'solid'
+                $id: 'solid'
             });
     };
 
@@ -351,13 +351,13 @@
                 height: params.height
             }))
             .attach({
-                id: 'player'
+                $id: 'player'
             })
             .attach({
-                id: 'body'
+                $id: 'body'
             })
             .attach({
-                id: 'gravity',
+                $id: 'gravity',
                 grounded: 0
             });
     };

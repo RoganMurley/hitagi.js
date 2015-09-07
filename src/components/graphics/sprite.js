@@ -4,8 +4,8 @@
     var _ = require('lodash');
 
     var Sprite = function (params) {
-        this.id = 'sprite';
-        this.deps = ['graphic'];
+        this.$id = 'sprite';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             animationSpeed: 1,

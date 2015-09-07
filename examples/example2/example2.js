@@ -204,8 +204,8 @@
                 width: params.width
             }))
             .attach({
-                id: 'paddle',
-                deps: ['velocity'],
+                $id: 'paddle',
+                $deps: ['velocity'],
                 friction: params.friction,
                 height: params.height,
                 speed: params.speed,
@@ -238,8 +238,8 @@
                 width: params.radius*2
             }))
             .attach({
-                'id': 'ball',
-                'cooldown': 0
+                $id: 'ball',
+                cooldown: 0
             });
     };
 
@@ -259,7 +259,7 @@
                 }
             }))
             .attach({
-                id: 'scorecard',
+                $id: 'scorecard',
                 score1: params.score1,
                 score2: params.score2
             });
@@ -277,8 +277,8 @@
             y: levelHeight/2
         })
         .attach({
-            id: 'player',
-            deps: ['paddle']
+            $id: 'player',
+            $deps: ['paddle']
         })
     );
 
@@ -293,8 +293,8 @@
             y: levelHeight/2
         })
         .attach({
-            id: 'ai',
-            deps: ['paddle'],
+            $id: 'ai',
+            $deps: ['paddle'],
             lastKnownY: levelHeight/2,
             sensitivity: 60
         })

@@ -4,8 +4,8 @@
     var _ = require('lodash');
 
     var StaticSprite = function (params) {
-        this.id = 'staticSprite';
-        this.deps = ['graphic'];
+        this.$id = 'staticSprite';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             rotation: 0

@@ -87,7 +87,7 @@
                 height: 73,
                 width: 51
             }))
-            .attach({id: 'ghost'})
+            .attach({$id: 'ghost'})
     );
 
     world.add(
@@ -97,7 +97,7 @@
                 height: levelHeight,
                 width: 4
             }))
-            .attach({id: 'border'})
+            .attach({$id: 'border'})
     );
     world.add(
         new hitagi.Entity()
@@ -106,7 +106,7 @@
                 height: levelHeight,
                 width: 4
             }))
-            .attach({id: 'border'})
+            .attach({$id: 'border'})
     );
     world.add(
         new hitagi.Entity()
@@ -115,7 +115,7 @@
                 height: 4,
                 width: levelWidth
             }))
-            .attach({id: 'border'})
+            .attach({$id: 'border'})
     );
     world.add(
         new hitagi.Entity()
@@ -124,7 +124,7 @@
                 height: 4,
                 width: levelWidth
             }))
-            .attach({id: 'border'})
+            .attach({$id: 'border'})
     );
 
     world.add(
@@ -155,7 +155,7 @@
                 ]
             }))
             .attach({
-                id: 'rose',
+                $id: 'rose',
                 activity: 0.01
             })
     );

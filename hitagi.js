@@ -40170,8 +40170,8 @@ if (!global.cancelAnimationFrame) {
             }
         }, params);
 
-        this.id = 'collision';
-        this.deps = ['position'];
+        this.$id = 'collision';
+        this.$deps = ['position'];
 
         this.width = params.width;
         this.height = params.height;
@@ -40186,8 +40186,8 @@ if (!global.cancelAnimationFrame) {
     'use strict';
 
     var Circle = function (params) {
-        this.id = 'circle';
-        this.deps = ['graphic'];
+        this.$id = 'circle';
+        this.$deps = ['graphic'];
 
         this.color = params.color;
         this.radius = params.radius;
@@ -40201,8 +40201,8 @@ if (!global.cancelAnimationFrame) {
     'use strict';
 
     var Ellipse = function (params) {
-        this.id = 'ellipse';
-        this.deps = ['graphic'];
+        this.$id = 'ellipse';
+        this.$deps = ['graphic'];
 
         this.color = params.color;
         this.width = params.width;
@@ -40220,8 +40220,8 @@ if (!global.cancelAnimationFrame) {
 
     // Represents a graphic to draw.
     var Graphic = function (params) {
-        this.id = 'graphic';
-        this.deps = []; // Position dependency added later is relative positioning is true.
+        this.$id = 'graphic';
+        this.$deps = []; // Position dependency added later is relative positioning is true.
 
         params = _.extend({
             alpha: 1,
@@ -40244,7 +40244,7 @@ if (!global.cancelAnimationFrame) {
         }, params);
 
         if (params.relative) {
-            this.deps.push('position');
+            this.$deps.push('position');
         }
 
         this.alpha = params.alpha;
@@ -40269,8 +40269,8 @@ if (!global.cancelAnimationFrame) {
     var _ = require('lodash');
 
     var Line = function (params) {
-        this.id = 'line';
-        this.deps = ['graphic'];
+        this.$id = 'line';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             thickness: 1
@@ -40291,8 +40291,8 @@ if (!global.cancelAnimationFrame) {
     'use strict';
 
     var Polygon = function (params) {
-        this.id = 'polygon';
-        this.deps = ['graphic'];
+        this.$id = 'polygon';
+        this.$deps = ['graphic'];
 
         this.points = params.points;
     };
@@ -40305,8 +40305,8 @@ if (!global.cancelAnimationFrame) {
     'use strict';
 
     var Rectangle = function (params) {
-        this.id = 'rectangle';
-        this.deps = ['graphic'];
+        this.$id = 'rectangle';
+        this.$deps = ['graphic'];
 
         this.color = params.color;
         this.width = params.width;
@@ -40323,8 +40323,8 @@ if (!global.cancelAnimationFrame) {
     var _ = require('lodash');
 
     var Sprite = function (params) {
-        this.id = 'sprite';
-        this.deps = ['graphic'];
+        this.$id = 'sprite';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             animationSpeed: 1,
@@ -40350,8 +40350,8 @@ if (!global.cancelAnimationFrame) {
     var _ = require('lodash');
 
     var StaticSprite = function (params) {
-        this.id = 'staticSprite';
-        this.deps = ['graphic'];
+        this.$id = 'staticSprite';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             rotation: 0
@@ -40371,8 +40371,8 @@ if (!global.cancelAnimationFrame) {
     var _ = require('lodash');
 
     var Text = function (params) {
-        this.id = 'text';
-        this.deps = ['graphic'];
+        this.$id = 'text';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             bitmapFont: false
@@ -40395,8 +40395,8 @@ if (!global.cancelAnimationFrame) {
     //      x - x Cartesian coordinate.
     //      y - y Cartesian coordinate.
     var Position = function (params) {
-        this.id = 'position';
-        this.deps = [];
+        this.$id = 'position';
+        this.$deps = [];
 
         this.x = params.x;
         this.y = params.y;
@@ -40414,8 +40414,8 @@ if (!global.cancelAnimationFrame) {
     //      xspeed - delta in x direction.
     //      yspeed - delta in y direction.
     var Velocity = function (params) {
-        this.id = 'velocity';
-        this.deps = ['position'];
+        this.$id = 'velocity';
+        this.$deps = ['position'];
 
         this.xspeed = params.xspeed;
         this.yspeed = params.yspeed;
@@ -40548,7 +40548,7 @@ if (!global.cancelAnimationFrame) {
         this.attach = function (component) {
             // Check component's dependencies are met.
             _.each(
-                component.deps,
+                component.$deps,
                 function (dependencyID) {
                     if (!that.has(dependencyID)) {
                         console.error(dependencyID + ' component missing.');
@@ -40558,16 +40558,16 @@ if (!global.cancelAnimationFrame) {
             );
 
             // Check component is not already attached.
-            if (this.has(component.id)) {
+            if (this.has(component.$id)) {
                 throw new Error('ComponentAlreadyAttached');
             }
 
             // Attach component.
-            this.c[component.id] = component;
+            this.c[component.$id] = component;
 
             // If the entity has already been added to a world, rebuild it.
             if (this.world) {
-                this.world.rebuild(this, component.id);
+                this.world.rebuild(this, component.$id);
             }
 
             return this;
@@ -41388,6 +41388,7 @@ global.hitagi = require('./main.js');
 
         // Track entities that systems want to.
         this.track = function (entity) {
+            debugger;
             _.each(
                 systems,
                 function (system) {
@@ -41464,7 +41465,7 @@ global.hitagi = require('./main.js');
                     _.each(
                         entity.c,
                         function (component) {
-                            copy[component.id] = _.clone(component);
+                            copy[component.$id] = _.clone(component);
                         }
                     );
 
@@ -41485,7 +41486,7 @@ global.hitagi = require('./main.js');
                     _.each(
                         componentBatch,
                         function (component) {
-                            newEntity.c[component.id] = _.clone(component);
+                            newEntity.c[component.$id] = _.clone(component);
                         }
                     );
 

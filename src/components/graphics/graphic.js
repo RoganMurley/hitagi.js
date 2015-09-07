@@ -5,8 +5,8 @@
 
     // Represents a graphic to draw.
     var Graphic = function (params) {
-        this.id = 'graphic';
-        this.deps = []; // Position dependency added later is relative positioning is true.
+        this.$id = 'graphic';
+        this.$deps = []; // Position dependency added later is relative positioning is true.
 
         params = _.extend({
             alpha: 1,
@@ -29,7 +29,7 @@
         }, params);
 
         if (params.relative) {
-            this.deps.push('position');
+            this.$deps.push('position');
         }
 
         this.alpha = params.alpha;

@@ -321,12 +321,12 @@
                 ]
             }))
             .attach({
-                id: 'gravity',
+                $id: 'gravity',
                 magnitude: 0,
                 terminal: 12
             })
             .attach({
-                id: 'bird',
+                $id: 'bird',
                 flapSpeed: 10
             })
             .attach(new hitagi.components.Collision({
@@ -356,11 +356,11 @@
                 path: 'http://hitagi.s3-website-eu-west-1.amazonaws.com/bird_0.png'
             }))
             .attach({
-                id: 'gravity',
+                $id: 'gravity',
                 magnitude: 1,
                 terminal: Infinity
             }).attach({
-                id: 'corpse'
+                $id: 'corpse'
             });
     };
 
@@ -375,7 +375,7 @@
                 yspeed: 0
             }))
             .attach({
-                id: 'scroll',
+                $id: 'scroll',
                 speed: -5
             })
             .attach(new hitagi.components.Collision({
@@ -383,7 +383,7 @@
                 height: params.height
             }))
             .attach({
-                id: 'goal',
+                $id: 'goal',
                 n: params.n,
                 done: false
             });
@@ -394,7 +394,7 @@
             .attach(new hitagi.components.Position({x: levelWidth + 200, y: params.y}))
             .attach(new hitagi.components.Velocity({xspeed: 0, yspeed: 0}))
             .attach({
-                id: 'scroll',
+                $id: 'scroll',
                 speed: -5
             })
             .attach(new hitagi.components.graphics.Graphic({
@@ -411,8 +411,8 @@
                 height: 793,
                 width: 138
             }))
-            .attach({id: 'pipe'})
-            .attach({id: 'kill'});
+            .attach({$id: 'pipe'})
+            .attach({$id: 'kill'});
 
         return pipe;
     };
@@ -445,7 +445,7 @@
                     yspeed: 0
                 }))
                 .attach({
-                    id: 'scroll',
+                    $id: 'scroll',
                     speed: -5
                 })
                 .attach(new hitagi.components.graphics.Graphic({
@@ -458,8 +458,8 @@
                     height: 108,
                     width: 308
                 }))
-                .attach({id: 'floor'})
-                .attach({id: 'kill'});
+                .attach({$id: 'floor'})
+                .attach({$id: 'kill'});
     };
 
     var Score = function (params) {
@@ -477,7 +477,7 @@
                 }
             }))
             .attach({
-                id: 'score',
+                $id: 'score',
                 cleared: 0
             });
     };
@@ -497,7 +497,7 @@
                 }
             }))
             .attach({
-                id: 'best',
+                $id: 'best',
                 cleared: params.cleared
             });
     };
@@ -505,7 +505,7 @@
     var PipeGenerator = function (params) {
         return new hitagi.Entity()
             .attach({
-                id: 'pipeGenerator',
+                $id: 'pipeGenerator',
                 created: 0,
                 period: params.period,
                 timer: params.period
@@ -515,7 +515,7 @@
     var Start = function (params) {
         return new hitagi.Entity()
             .attach({
-                id: 'start',
+                $id: 'start',
                 started: false
             })
             .attach(new hitagi.components.Position({

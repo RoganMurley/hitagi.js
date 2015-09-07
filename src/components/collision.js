@@ -15,8 +15,8 @@
             }
         }, params);
 
-        this.id = 'collision';
-        this.deps = ['position'];
+        this.$id = 'collision';
+        this.$deps = ['position'];
 
         this.width = params.width;
         this.height = params.height;

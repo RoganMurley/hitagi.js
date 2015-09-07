@@ -4,8 +4,8 @@
     var _ = require('lodash');
 
     var Text = function (params) {
-        this.id = 'text';
-        this.deps = ['graphic'];
+        this.$id = 'text';
+        this.$deps = ['graphic'];
 
         params = _.extend({
             bitmapFont: false

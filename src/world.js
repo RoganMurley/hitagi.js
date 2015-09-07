@@ -168,6 +168,7 @@
 
         // Track entities that systems want to.
         this.track = function (entity) {
+            debugger;
             _.each(
                 systems,
                 function (system) {
@@ -244,7 +245,7 @@
                     _.each(
                         entity.c,
                         function (component) {
-                            copy[component.id] = _.clone(component);
+                            copy[component.$id] = _.clone(component);
                         }
                     );
 
@@ -265,7 +266,7 @@
                     _.each(
                         componentBatch,
                         function (component) {
-                            newEntity.c[component.id] = _.clone(component);
+                            newEntity.c[component.$id] = _.clone(component);
                         }
                     );
 

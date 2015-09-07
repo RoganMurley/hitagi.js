@@ -19,7 +19,7 @@
         this.attach = function (component) {
             // Check component's dependencies are met.
             _.each(
-                component.deps,
+                component.$deps,
                 function (dependencyID) {
                     if (!that.has(dependencyID)) {
                         console.error(dependencyID + ' component missing.');
@@ -29,16 +29,16 @@
             );
 
             // Check component is not already attached.
-            if (this.has(component.id)) {
+            if (this.has(component.$id)) {
                 throw new Error('ComponentAlreadyAttached');
             }
 
             // Attach component.
-            this.c[component.id] = component;
+            this.c[component.$id] = component;
 
             // If the entity has already been added to a world, rebuild it.
             if (this.world) {
-                this.world.rebuild(this, component.id);
+                this.world.rebuild(this, component.$id);
             }
 
             return this;

@@ -32,7 +32,7 @@
             world.register(mockSystem);
             world.add(
                 new Entity().attach({
-                    id: 'testing'
+                    $id: 'testing'
                 })
             );
 
@@ -46,7 +46,7 @@
             _.times(4, function () {
                 world.add(
                     new Entity().attach({
-                        id: 'testing'
+                        $id: 'testing'
                     })
                 );
             });
@@ -59,7 +59,7 @@
             world.register(mockSystem);
             world.add(
                 new Entity().attach({
-                    id: 'testing'
+                    $id: 'testing'
                 })
             );
 
@@ -78,7 +78,7 @@
             _.times(4, function () {
                 world.add(
                     new Entity().attach({
-                        id: 'testing'
+                        $id: 'testing'
                     })
                 );
             });
@@ -117,11 +117,11 @@
             world.add(entity);
             assert.equal(mockSystem.build.testing.callCount, 0);
 
-            entity.attach({id: 'testing'});
+            entity.attach({$id: 'testing'});
             assert.equal(mockSystem.build.testing.callCount, 1);
             assert.equal(mockSystem.destroy.testing.callCount, 1);
 
-            entity.attach({id: 'velvet'});
+            entity.attach({$id: 'velvet'});
             assert.equal(mockSystem.build.testing.callCount, 1);
             assert.equal(mockSystem.destroy.testing.callCount, 1);
 
@@ -134,7 +134,7 @@
             // Test tracking.
             var testEntity = world.add(
                 new Entity().attach({
-                    id: 'testing'
+                    $id: 'testing'
                 })
             );
             assert.deepEqual(
@@ -145,7 +145,7 @@
             // Test for false positives.
             var testEntity2 = world.add(
                 new Entity().attach({
-                    id: 'testing2'
+                    $id: 'testing2'
                 })
             );
             assert.equal(

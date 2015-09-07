@@ -10,8 +10,8 @@
     //      yShake - magnitude of vertical camera shaking.
     //      shakeDecay - rate at which shake decays.
     var Camera = function (params) {
-        this.id = 'camera';
-        this.deps = ['position'];
+        this.$id = 'camera';
+        this.$deps = ['position'];
 
         this.speed = params.speed;
     };
