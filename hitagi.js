@@ -40430,108 +40430,6 @@ if (!global.cancelAnimationFrame) {
 
     var _ = require('lodash');
 
-    var Controls = function () {
-        var keys = {};
-        var mousePos = {
-                x: 0,
-                y: 0
-            };
-
-        var bindings = {};
-        var mouseMappings = {
-            1: 'm1',
-            2: 'm2',
-            3: 'm3'
-        };
-
-        var pressKey = function (key) {
-            keys[key] = {
-                active: true,
-                held: keys[key] && keys[key].active // Shortcircuit
-            };
-        };
-
-        var releaseKey = function (key) {
-            keys[key] = {
-                active: false,
-                held: false
-            };
-        };
-
-        // Listen for input.
-        document.onkeydown = function (e) {
-            pressKey(e.which);
-        };
-
-        document.onkeyup = function (e) {
-            releaseKey(e.which);
-        };
-
-        document.onmousedown = function(e) {
-            pressKey(mouseMappings[e.which]);
-        };
-
-        document.onmouseup = function(e) {
-            releaseKey(mouseMappings[e.which]);
-        };
-
-        // Update mouse position.
-        document.onmousemove = function(e) {
-            mousePos.x = e.offsetX;
-            mousePos.y = e.offsetY;
-        };
-
-        this.getMousePos = function () {
-            return mousePos;
-        };
-
-        // Disable context menu, so we can right click.
-        window.oncontextmenu = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        };
-
-        // Add a binding.
-        this.bind = function (code, name) {
-            if (_.has(bindings, name)) {
-                console.error(name + ' already bound.');
-                throw new Error('ControlAlreadyBound');
-            }
-            bindings[name] = code;
-        };
-
-        // Remove a binding.
-        this.unbind = function () {
-            if (!_.has(bindings, name)) {
-                console.error(name + ' not bound.');
-                throw new Error('ControlNotBound');
-            }
-            delete bindings[name];
-        };
-
-        // Check that a key binding has been pressed.
-        // If once is true, only check for it once.
-        this.check = function (binding, once) {
-            var keyCode = bindings[binding];
-            var keyPressed = keys[keyCode] && keys[keyCode].active; // Shortcircuit
-            if (once && keys[keyCode]) {
-                keyPressed = keyPressed && !(keys[keyCode].held);
-            }
-            return keyPressed;
-        };
-
-    };
-
-    module.exports = Controls;
-} ());
-
-},{"lodash":9}],145:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
     var Entity = function () {
         var that = this;
 
@@ -40591,14 +40489,13 @@ if (!global.cancelAnimationFrame) {
     module.exports = Entity;
 } ());
 
-},{"lodash":9}],146:[function(require,module,exports){
+},{"lodash":9}],145:[function(require,module,exports){
 (function () {
     'use strict';
 
     var hitagi = {
         'Entity': require('./entity.js'),
         'World': require('./world.js'),
-        'Controls': require('./controls.js'),
         'Rooms': require('./rooms.js'),
         'utils': require('./utils.js'),
         'components': {
@@ -40620,6 +40517,7 @@ if (!global.cancelAnimationFrame) {
         },
         'systems': {
             'CollisionSystem': require('./systems/collisionSystem.js'),
+            'ControlsSystem': require('./systems/controlsSystem.js'),
             'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
             'SoundSystem': require('./systems/soundSystem.js'),
             'VelocitySystem': require('./systems/velocitySystem.js')
@@ -40629,12 +40527,12 @@ if (!global.cancelAnimationFrame) {
     module.exports = hitagi;
 } ());
 
-},{"./components/collision.js":132,"./components/graphics/circle.js":133,"./components/graphics/ellipse.js":134,"./components/graphics/graphic.js":135,"./components/graphics/line.js":136,"./components/graphics/polygon.js":137,"./components/graphics/rectangle.js":138,"./components/graphics/sprite.js":139,"./components/graphics/staticSprite.js":140,"./components/graphics/text.js":141,"./components/position.js":142,"./components/velocity.js":143,"./controls.js":144,"./entity.js":145,"./rooms.js":148,"./systems/collisionSystem.js":149,"./systems/pixiRenderSystem.js":150,"./systems/soundSystem.js":151,"./systems/velocitySystem.js":152,"./utils.js":153,"./world.js":154}],147:[function(require,module,exports){
+},{"./components/collision.js":132,"./components/graphics/circle.js":133,"./components/graphics/ellipse.js":134,"./components/graphics/graphic.js":135,"./components/graphics/line.js":136,"./components/graphics/polygon.js":137,"./components/graphics/rectangle.js":138,"./components/graphics/sprite.js":139,"./components/graphics/staticSprite.js":140,"./components/graphics/text.js":141,"./components/position.js":142,"./components/velocity.js":143,"./entity.js":144,"./rooms.js":147,"./systems/collisionSystem.js":148,"./systems/controlsSystem.js":149,"./systems/pixiRenderSystem.js":150,"./systems/soundSystem.js":151,"./systems/velocitySystem.js":152,"./utils.js":153,"./world.js":154}],146:[function(require,module,exports){
 (function (global){
 global.hitagi = require('./main.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":146}],148:[function(require,module,exports){
+},{"./main.js":145}],147:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40657,7 +40555,7 @@ global.hitagi = require('./main.js');
     module.exports = Rooms;
 } ());
 
-},{"lodash":9}],149:[function(require,module,exports){
+},{"lodash":9}],148:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -40785,6 +40683,139 @@ global.hitagi = require('./main.js');
     };
 
     module.exports = CollisionSystem;
+} ());
+
+},{"lodash":9}],149:[function(require,module,exports){
+(function () {
+    'use strict';
+
+    var _ = require('lodash');
+
+    var ControlsSystem = function () {
+        var keys = {};
+        var mousePos = {
+            x: 0,
+            y: 0
+        };
+
+        var bindings = {};
+        var mouseMappings = {
+            1: 'm1',
+            2: 'm2',
+            3: 'm3'
+        };
+
+        var KeyState = function () {
+            this.active = false;
+            this.held = false;
+
+            this.updateHeld = function () {
+                if (this.active) {
+                    this.held = true;
+                }
+            };
+
+            this.press = function () {
+                this.active = true;
+            };
+
+            this.release = function () {
+                this.active = false;
+                this.held = false;
+            };
+        };
+
+        // Listen for input.
+        document.onkeydown = function (e) {
+            var code = e.which;
+            if (_.has(keys, code)) {
+                keys[code].press();
+            }
+        };
+
+        document.onkeyup = function (e) {
+            var code = e.which;
+            if (_.has(keys, code)) {
+                keys[code].release();
+            }
+        };
+
+        document.onmousedown = function(e) {
+            var code = mouseMappings[e.which];
+            if (_.has(keys, code)) {
+                keys[code].press();
+            }
+        };
+
+        document.onmouseup = function(e) {
+            var code = mouseMappings[e.which];
+            if (_.has(keys, code)) {
+                keys[code].release();
+            }
+        };
+
+        // Update mouse position.
+        document.onmousemove = function(e) {
+            mousePos.x = e.offsetX;
+            mousePos.y = e.offsetY;
+        };
+
+        this.getMousePos = function () {
+            return mousePos;
+        };
+
+        // Disable context menu, so we can right click.
+        window.oncontextmenu = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        };
+
+        // Add a binding.
+        this.bind = function (code, name) {
+            if (_.has(bindings, name)) {
+                console.error(name + ' already bound.');
+                throw new Error('ControlAlreadyBound');
+            }
+            bindings[name] = code;
+            keys[code] = new KeyState();
+        };
+
+        // Remove a binding.
+        this.unbind = function () {
+            if (!_.has(bindings, name)) {
+                console.error(name + ' not bound.');
+                throw new Error('ControlNotBound');
+            }
+            var code = bindings[name];
+            delete bindings[name];
+            delete keys[code];
+        };
+
+        // Check that a key binding has been pressed.
+        // If once is true, only check for the press..
+        this.check = function (binding, once) {
+            var keyCode = bindings[binding],
+                key = keys[keyCode];
+
+            if (once) {
+                return key.active && !key.held;
+            }
+            return key.active;
+        };
+
+        this.tickEnd = function () {
+            _.each(
+                keys,
+                function (key) {
+                    key.updateHeld();
+                }
+            );
+        };
+
+    };
+
+    module.exports = ControlsSystem;
 } ());
 
 },{"lodash":9}],150:[function(require,module,exports){
@@ -41502,4 +41533,4 @@ global.hitagi = require('./main.js');
     module.exports = World;
 } ());
 
-},{"./entity.js":145,"lodash":9}]},{},[147]);
+},{"./entity.js":144,"lodash":9}]},{},[146]);

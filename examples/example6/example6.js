@@ -16,21 +16,18 @@
     // Setup rooms.
     var rooms = new hitagi.Rooms(world);
 
-    // Setup controls.
-    var controls = new hitagi.Controls();
-    controls.bind(82, 'reload');
-
-    controls.bind(32, 'jump');
-
-    controls.bind(37, 'left');
-    controls.bind(39, 'right');
-    controls.bind(38, 'up');
-    controls.bind(40, 'down');
-
-    controls.bind('m1', 'spawn');
-
-
     // Define systems.
+    var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
+    controlsSystem.bind(82, 'reload');
+
+    controlsSystem.bind(32, 'jump');
+
+    controlsSystem.bind(37, 'left');
+    controlsSystem.bind(39, 'right');
+    controlsSystem.bind(38, 'up');
+    controlsSystem.bind(40, 'down');
+
+    controlsSystem.bind('m1', 'spawn');
 
     // We need to update horizontal and vertical velocity seperately for our collision resolution technique.
     // The default hitagi VelocitySystem doesn't support this, but it's easy to make our own.
@@ -50,22 +47,22 @@
         };
     };
 
-    var PlayerControlsSystem = function (controls) {
+    var PlayerControlsSystem = function (controlsSystem) {
         var moveSpeed = 200;
 
         this.update = {
             player: function (entity) {
                 // Horizontal movement.
-                if (controls.check('left')) {
+                if (controlsSystem.check('left')) {
                     entity.c.velocity.xspeed = -moveSpeed;
                 }
-                else if (controls.check('right')) {
+                else if (controlsSystem.check('right')) {
                     entity.c.velocity.xspeed = moveSpeed;
                 } else {
                     entity.c.velocity.xspeed = 0;
                 }
 
-                if (controls.check('jump', true)) {
+                if (controlsSystem.check('jump')) {
                     if (entity.c.gravity.grounded > 4) {
                         entity.c.velocity.yspeed = -600;
                     }
@@ -141,18 +138,18 @@
         };
     };
 
-    var SpawnSystem = function (world, controls, collisionSystem) {
+    var SpawnSystem = function (world, controlsSystem, collisionSystem) {
         var dragging = false;
-        var mousePos = controls.getMousePos();
+        var mousePos = controlsSystem.getMousePos();
 
         this.$tracking = {
             dragBoxUI: 'single'
         };
 
         this.tickStart = function () {
-            mousePos = controls.getMousePos();
+            mousePos = controlsSystem.getMousePos();
 
-            if (!dragging && controls.check('spawn')) {
+            if (!dragging && controlsSystem.check('spawn')) {
                 world.add(
                     new hitagi.Entity()
                         .attach(new hitagi.components.Position({
@@ -192,7 +189,7 @@
                 );
             }
 
-            if (dragging && !controls.check('spawn')) {
+            if (dragging && !controlsSystem.check('spawn')) {
                 var box = this.$tracked.dragBoxUI;
 
                 var x = box.c.position.x;
@@ -232,7 +229,7 @@
                 world.remove(box);
             }
 
-            dragging = controls.check('spawn');
+            dragging = controlsSystem.check('spawn');
         };
 
         this.update = {
@@ -254,11 +251,11 @@
     var collisionSystem = new hitagi.systems.CollisionSystem();
     var horizontalVelocitySystem = new HorizontalVelocitySystem();
     var verticalVelocitySystem = new VerticalVelocitySystem();
-    var playerControlsSystem = new PlayerControlsSystem(controls);
+    var playerControlsSystem = new PlayerControlsSystem(controlsSystem);
     var horizontalBodySystem = new HorizontalBodySystem();
     var verticalBodySystem = new VerticalBodySystem();
     var gravitySystem = new GravitySystem(collisionSystem);
-    var spawnSystem = new SpawnSystem(world, controls, collisionSystem);
+    var spawnSystem = new SpawnSystem(world, controlsSystem, collisionSystem);
 
     // Register systems (order matters).
     world.register(renderSystem);

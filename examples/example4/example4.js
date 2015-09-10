@@ -21,11 +21,6 @@
     // Setup rooms.
     var rooms = new hitagi.Rooms(world);
 
-    // Setup controls.
-    var controls = new hitagi.Controls();
-    controls.bind('m1', 'flap');
-    controls.bind('m1', 'start');
-
     // Define systems.
     var GravitySystem = function () {
         this.update = {
@@ -38,11 +33,11 @@
         };
     };
 
-    var BirdSystem = function (controls, collisionSystem, soundSystem, scoreSystem) {
+    var BirdSystem = function (controlsSystem, collisionSystem, soundSystem, scoreSystem) {
         this.update = {
             bird: function (entity, dt) {
                 // Flap wings if clicking,
-                if (controls.check('flap', true)) {
+                if (controlsSystem.check('flap', true)) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
                     entity.c.sprite.currentFrame = 0;
                     soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/flap.ogg');
@@ -242,7 +237,7 @@
         };
     };
 
-    var StartSystem = function (controls) {
+    var StartSystem = function (controlsSystem) {
         var that = this;
         this.$tracking = {
             'bird': 'single',
@@ -256,7 +251,7 @@
             var generator = that.$tracked.pipeGenerator;
 
             if (!start.c.started) {
-                if (controls.check('start')) {
+                if (controlsSystem.check('start')) {
                     // Hide text.
                     start.c.graphic.visible = false;
 
@@ -277,6 +272,8 @@
     };
 
     // Register systems.
+    var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
+
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
 
@@ -291,12 +288,16 @@
     var scoreSystem = new ScoreSystem(soundSystem);
     world.register(scoreSystem);
 
-    world.register(new BirdSystem(controls, collisionSystem, soundSystem, scoreSystem));
+    world.register(new BirdSystem(controlsSystem, collisionSystem, soundSystem, scoreSystem));
     world.register(new GravitySystem());
     world.register(new DeathSystem(world, rooms, collisionSystem, soundSystem, scoreSystem));
     world.register(new PipeGeneratorSystem(world));
     world.register(new ScrollSystem(world));
-    world.register(new StartSystem(controls));
+    world.register(new StartSystem(controlsSystem));
+
+    // Bind controls.
+    controlsSystem.bind('m1', 'flap');
+    controlsSystem.bind('m1', 'start');
 
     // Define entities.
     var Player = function (params) {

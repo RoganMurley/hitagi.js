@@ -3,12 +3,12 @@
 
     var _ = require('lodash');
 
-    var Controls = function () {
+    var ControlsSystem = function () {
         var keys = {};
         var mousePos = {
-                x: 0,
-                y: 0
-            };
+            x: 0,
+            y: 0
+        };
 
         var bindings = {};
         var mouseMappings = {
@@ -17,35 +17,53 @@
             3: 'm3'
         };
 
-        var pressKey = function (key) {
-            keys[key] = {
-                active: true,
-                held: keys[key] && keys[key].active // Shortcircuit
-            };
-        };
+        var KeyState = function () {
+            this.active = false;
+            this.held = false;
 
-        var releaseKey = function (key) {
-            keys[key] = {
-                active: false,
-                held: false
+            this.updateHeld = function () {
+                if (this.active) {
+                    this.held = true;
+                }
+            };
+
+            this.press = function () {
+                this.active = true;
+            };
+
+            this.release = function () {
+                this.active = false;
+                this.held = false;
             };
         };
 
         // Listen for input.
         document.onkeydown = function (e) {
-            pressKey(e.which);
+            var code = e.which;
+            if (_.has(keys, code)) {
+                keys[code].press();
+            }
         };
 
         document.onkeyup = function (e) {
-            releaseKey(e.which);
+            var code = e.which;
+            if (_.has(keys, code)) {
+                keys[code].release();
+            }
         };
 
         document.onmousedown = function(e) {
-            pressKey(mouseMappings[e.which]);
+            var code = mouseMappings[e.which];
+            if (_.has(keys, code)) {
+                keys[code].press();
+            }
         };
 
         document.onmouseup = function(e) {
-            releaseKey(mouseMappings[e.which]);
+            var code = mouseMappings[e.which];
+            if (_.has(keys, code)) {
+                keys[code].release();
+            }
         };
 
         // Update mouse position.
@@ -72,6 +90,7 @@
                 throw new Error('ControlAlreadyBound');
             }
             bindings[name] = code;
+            keys[code] = new KeyState();
         };
 
         // Remove a binding.
@@ -80,21 +99,33 @@
                 console.error(name + ' not bound.');
                 throw new Error('ControlNotBound');
             }
+            var code = bindings[name];
             delete bindings[name];
+            delete keys[code];
         };
 
         // Check that a key binding has been pressed.
-        // If once is true, only check for it once.
+        // If once is true, only check for the press..
         this.check = function (binding, once) {
-            var keyCode = bindings[binding];
-            var keyPressed = keys[keyCode] && keys[keyCode].active; // Shortcircuit
-            if (once && keys[keyCode]) {
-                keyPressed = keyPressed && !(keys[keyCode].held);
+            var keyCode = bindings[binding],
+                key = keys[keyCode];
+
+            if (once) {
+                return key.active && !key.held;
             }
-            return keyPressed;
+            return key.active;
+        };
+
+        this.tickEnd = function () {
+            _.each(
+                keys,
+                function (key) {
+                    key.updateHeld();
+                }
+            );
         };
 
     };
 
-    module.exports = Controls;
+    module.exports = ControlsSystem;
 } ());

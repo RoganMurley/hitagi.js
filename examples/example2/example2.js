@@ -14,12 +14,11 @@
     // Setup world.
     var world = new hitagi.World();
 
-    // Setup controls.
-    var controls = new hitagi.Controls();
-    controls.bind(38, 'up');
-    controls.bind(40, 'down');
-
     // Define and register systems.
+    var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
+    controlsSystem.bind(38, 'up');
+    controlsSystem.bind(40, 'down');
+
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
 
@@ -65,20 +64,20 @@
     };
     var paddleSystem = world.register(new PaddleSystem());
 
-    var PlayerSystem = function (paddleSystem) {
+    var PlayerSystem = function (controlsSystem, paddleSystem) {
         this.update = {
             player: function (entity, dt) {
                 // Handle player input.
-                if (controls.check('up')) {
+                if (controlsSystem.check('up')) {
                     paddleSystem.input(entity, 'up');
                 }
-                if (controls.check('down')) {
+                if (controlsSystem.check('down')) {
                     paddleSystem.input(entity, 'down');
                 }
             }
         };
     };
-    world.register(new PlayerSystem(paddleSystem));
+    world.register(new PlayerSystem(controlsSystem, paddleSystem));
 
     var AISystem = function () {
         var that = this;
