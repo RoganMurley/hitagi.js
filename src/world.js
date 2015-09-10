@@ -12,72 +12,25 @@
 
         // Update the game by one tick.
         this.tick = function (dt) {
-            that.tickStart(dt);
-            that.update(dt);
-            that.tickEnd(dt);
+            tickStart(dt);
+            update(dt);
+            tickEnd(dt);
         };
 
         // Add an entity to the world.
         this.add = function (entity) {
             entity.world = this;
             entities[entity.uid] = entity;
-            this.build(entity);
-            this.track(entity);
+            build(entity);
+            track(entity);
             return entity;
         };
 
         // Remove an entity from the world.
         this.remove = function (entity) {
-            this.destroy(entity);
-            this.untrack(entity);
+            destroy(entity);
+            untrack(entity);
             delete entities[entity.uid];
-        };
-
-        // Call all system's tick start callback.
-        this.tickStart = function () {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'tickStart')) {
-                        system.tickStart();
-                    }
-                }
-            );
-        };
-
-        // Called every tick, updates every system.
-        this.update = function (dt) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'update')) {
-                        _.each(
-                            entities,
-                            function (entity) {
-                                if (!_.isUndefined(entity)) {
-                                    _.each(system.update, function (func, id) {
-                                        if (entity.has(id)){
-                                            func(entity, dt);
-                                        }
-                                    });
-                                }
-                            }
-                        );
-                    }
-                }
-            );
-        };
-
-        // Call all system's tick end callback.
-        this.tickEnd = function () {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'tickEnd')) {
-                        system.tickEnd();
-                    }
-                }
-            );
         };
 
         // Register a system to the world.
@@ -107,117 +60,13 @@
             return system;
         };
 
-        // Build an entity into systems.
-        // If trackID is given, only systems tracking
-        // that ID build the entity, otherwise all systems do.
-        this.build = function (entity, trackID) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'build')) {
-                        _.each(system.build, function (func, id) {
-                            if (entity.has(id)){
-                                // Only build in tracking systems.
-                                if (trackID) {
-                                    if (id !== trackID) {
-                                        return;
-                                    }
-                                }
-                                // Perform build.
-                                func(entity);
-                            }
-                        });
-                    }
-                }
-            );
-        };
-
-        // Destroy an entity in systems.
-        // If trackID is given, only systems tracking
-        // that ID destroy the entity, otherwise all systems do.
-        this.destroy = function (entity, trackID) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'destroy')) {
-                        _.each(system.destroy, function (func, id) {
-                            if (entity.has(id)){
-                                // Only remove from tracking systems.
-                                if (trackID) {
-                                    if (id !== trackID) {
-                                        return;
-                                    }
-                                }
-                                // Perform the remove.
-                                func(entity);
-                            }
-                        });
-                    }
-                }
-            );
-        };
-
         // Rebuild an entity with all registered systems.
         this.rebuild = function (entity, trackID) {
-            that.destroy(entity, trackID);
-            this.untrack(entity);
+            destroy(entity, trackID);
+            untrack(entity);
 
-            that.build(entity, trackID);
-            this.track(entity);
-        };
-
-        // Track entities that systems want to.
-        this.track = function (entity) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, '$tracking')) {
-                        _.each(system.$tracking, function (trackingType, id) {
-                            if (entity.has(id)){
-                                switch (trackingType) {
-                                    case 'many':
-                                        system.$tracked[id][entity.uid] = entity;
-                                        break;
-                                    case 'single':
-                                        if (system.$tracked[id] === null) {
-                                            system.$tracked[id] = entity;
-                                        } else {
-                                            throw new Error('ExpectedSingleEntity');
-                                        }
-                                        break;
-                                    default:
-                                        throw new Error('UnknownTrackingType');
-                                }
-                            }
-                        });
-                    }
-                }
-            );
-        };
-
-        // Stop tracking entities that systems want to.
-        this.untrack = function (entity) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, '$tracking')) {
-                        _.each(system.$tracking, function (trackingType, id) {
-                            if (entity.has(id)){
-                                switch (trackingType) {
-                                    case 'many':
-                                        delete system.$tracked[id][entity.uid];
-                                        break;
-                                    case 'single':
-                                        system.$tracked[id] = null;
-                                        break;
-                                    default:
-                                        throw new Error('UnknownTrackingType');
-                                }
-                            }
-                        });
-                    }
-                }
-            );
+            build(entity, trackID);
+            track(entity);
         };
 
         // Clear all entities from the world and systems.
@@ -225,8 +74,8 @@
             _.each(
                 entities,
                 function (entity) {
-                    that.destroy(entity);
-                    that.untrack(entity);
+                    destroy(entity);
+                    untrack(entity);
                 }
             );
             entities = {};
@@ -273,6 +122,158 @@
                 }
             );
         };
+
+        // Call all system's tick start callback.
+        var tickStart = function () {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'tickStart')) {
+                        system.tickStart();
+                    }
+                }
+            );
+        };
+
+        // Called every tick, updates every system.
+        var update = function (dt) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'update')) {
+                        _.each(
+                            entities,
+                            function (entity) {
+                                if (!_.isUndefined(entity)) {
+                                    _.each(system.update, function (func, id) {
+                                        if (entity.has(id)){
+                                            func(entity, dt);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+        };
+
+        // Call all system's tick end callback.
+        var tickEnd = function () {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'tickEnd')) {
+                        system.tickEnd();
+                    }
+                }
+            );
+        };
+
+        // Build an entity into systems.
+        // If trackID is given, only systems tracking
+        // that ID build the entity, otherwise all systems do.
+        var build = function (entity, trackID) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'build')) {
+                        _.each(system.build, function (func, id) {
+                            if (entity.has(id)){
+                                // Only build in tracking systems.
+                                if (trackID) {
+                                    if (id !== trackID) {
+                                        return;
+                                    }
+                                }
+                                // Perform build.
+                                func(entity);
+                            }
+                        });
+                    }
+                }
+            );
+        };
+
+        // Destroy an entity in systems.
+        // If trackID is given, only systems tracking
+        // that ID destroy the entity, otherwise all systems do.
+        var destroy = function (entity, trackID) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, 'destroy')) {
+                        _.each(system.destroy, function (func, id) {
+                            if (entity.has(id)){
+                                // Only remove from tracking systems.
+                                if (trackID) {
+                                    if (id !== trackID) {
+                                        return;
+                                    }
+                                }
+                                // Perform the remove.
+                                func(entity);
+                            }
+                        });
+                    }
+                }
+            );
+        };
+
+        // Track entities that systems want to.
+        var track = function (entity) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, '$tracking')) {
+                        _.each(system.$tracking, function (trackingType, id) {
+                            if (entity.has(id)){
+                                switch (trackingType) {
+                                    case 'many':
+                                        system.$tracked[id][entity.uid] = entity;
+                                        break;
+                                    case 'single':
+                                        if (system.$tracked[id] === null) {
+                                            system.$tracked[id] = entity;
+                                        } else {
+                                            throw new Error('ExpectedSingleEntity');
+                                        }
+                                        break;
+                                    default:
+                                        throw new Error('UnknownTrackingType');
+                                }
+                            }
+                        });
+                    }
+                }
+            );
+        };
+
+        // Stop tracking entities that systems want to.
+        var untrack = function (entity) {
+            _.each(
+                systems,
+                function (system) {
+                    if (_.has(system, '$tracking')) {
+                        _.each(system.$tracking, function (trackingType, id) {
+                            if (entity.has(id)){
+                                switch (trackingType) {
+                                    case 'many':
+                                        delete system.$tracked[id][entity.uid];
+                                        break;
+                                    case 'single':
+                                        system.$tracked[id] = null;
+                                        break;
+                                    default:
+                                        throw new Error('UnknownTrackingType');
+                                }
+                            }
+                        });
+                    }
+                }
+            );
+        };
+
     };
 
     module.exports = World;

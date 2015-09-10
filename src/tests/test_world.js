@@ -28,7 +28,7 @@
             world = new World();
         });
 
-        it('registered systems should call their update methods once for each added entity per world update', function () {
+        it('registered systems should call their update methods once for each added entity per world tick', function () {
             world.register(mockSystem);
             world.add(
                 new Entity().attach({
@@ -38,7 +38,7 @@
 
             assert.equal(mockSystem.update.testing.callCount, 0);
 
-            world.update();
+            world.tick();
             assert.equal(mockSystem.update.testing.callCount, 1);
 
             mockSystem.update.testing.reset();
@@ -51,7 +51,7 @@
                 );
             });
 
-            world.update();
+            world.tick();
             assert.equal(mockSystem.update.testing.callCount, 5);
         });
 
@@ -63,13 +63,15 @@
                 })
             );
 
+            mockSystem.tickStart.reset();
+            mockSystem.tickEnd.reset();
+
             assert.equal(mockSystem.tickStart.callCount, 0);
             assert.equal(mockSystem.tickEnd.callCount, 0);
 
-            world.tickStart();
-            assert.equal(mockSystem.tickStart.callCount, 1);
+            world.tick();
 
-            world.tickEnd();
+            assert.equal(mockSystem.tickStart.callCount, 1);
             assert.equal(mockSystem.tickEnd.callCount, 1);
 
             mockSystem.tickStart.reset();
@@ -83,27 +85,10 @@
                 );
             });
 
-            world.tickStart();
-            assert.equal(mockSystem.tickStart.callCount, 1);
-
-            world.tickEnd();
-            assert.equal(mockSystem.tickEnd.callCount, 1);
-        });
-
-        it('world tick should call tickStart, update and tickEnd once each', function () {
-            world.tickStart = simple.mock(world.tickStart);
-            world.update = simple.mock(world.update);
-            world.tickEnd = simple.mock(world.tickEnd);
-
-            assert.equal(world.tickStart.callCount, 0);
-            assert.equal(world.update.callCount, 0);
-            assert.equal(world.tickEnd.callCount, 0);
-
             world.tick();
 
-            assert.equal(world.tickStart.callCount, 1);
-            assert.equal(world.update.callCount, 1);
-            assert.equal(world.tickEnd.callCount, 1);
+            assert.equal(mockSystem.tickStart.callCount, 1);
+            assert.equal(mockSystem.tickEnd.callCount, 1);
         });
 
         it('if an entity has been added to a world, attaching a component to the entity should rebuild the entity.', function () {
