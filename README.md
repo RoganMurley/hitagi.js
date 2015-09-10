@@ -1,7 +1,4 @@
 # About
-
-[![Join the chat at https://gitter.im/RoganMurley/hitagi.js](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RoganMurley/hitagi.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 Hitagi is a JavaScript/HTML5 game development framework that loves to keep your code and data separate. It uses an [Entity Component System](http://en.wikipedia.org/wiki/Entity_component_system) architecture.
 
 # How does it work?
@@ -17,3 +14,5 @@ Hitagi is a JavaScript/HTML5 game development framework that loves to keep your 
 
 # Contributing
 We're currently early in development, so any issues or pull requests are welcome!
+
+[![Join the chat at https://gitter.im/RoganMurley/hitagi.js](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RoganMurley/hitagi.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
