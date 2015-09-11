@@ -12,7 +12,4 @@ Hitagi is a JavaScript/HTML5 game development framework that loves to keep your 
 * [Flappy Bird](http://codepen.io/Purpwood/pen/xGmOLo?editors=001)
 * [Platformer](http://codepen.io/Purpwood/pen/OVeodX?editors=001)
 
-# Contributing
-We're currently early in development, so any issues or pull requests are welcome!
-
 [![Join the chat at https://gitter.im/RoganMurley/hitagi.js](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RoganMurley/hitagi.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
