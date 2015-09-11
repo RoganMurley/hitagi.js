@@ -41290,37 +41290,17 @@ global.hitagi = require('./main.js');
 
         // Register a system to the world.
         this.register = function (system) {
-            // Set up entity tracking.
-            if (_.has(system, '$tracking')) {
-                system.$tracked = {};
-                _.each(
-                    system.$tracking,
-                    function (trackingType, id) {
-                        switch (trackingType) {
-                            case 'many':
-                                system.$tracked[id] = {};
-                                break;
-                            case 'single':
-                                system.$tracked[id] = null;
-                                break;
-                            default:
-                                throw new Error('UnknownTrackingType');
-                        }
-                    }
-                );
-            }
-
+            setupTracking(system);
             systems.push(system);
-
             return system;
         };
 
         // Rebuild an entity with all registered systems.
-        this.rebuild = function (entity, trackID) {
-            destroy(entity, trackID);
+        this.rebuild = function (entity, just) {
+            destroy(entity, just);
             untrack(entity);
 
-            build(entity, trackID);
+            build(entity, just);
             track(entity);
         };
 
@@ -41378,7 +41358,7 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Call all system's tick start callback.
+        // Call all registered system's tick start function.
         var tickStart = function () {
             _.each(
                 systems,
@@ -41390,7 +41370,7 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Called every tick, updates every system.
+        // Call all registered system's update function, passing a timestep.
         var update = function (dt) {
             _.each(
                 systems,
@@ -41413,7 +41393,7 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Call all system's tick end callback.
+        // Call all registered system's tick end function.
         var tickEnd = function () {
             _.each(
                 systems,
@@ -41425,10 +41405,10 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Build an entity into systems.
-        // If trackID is given, only systems tracking
-        // that ID build the entity, otherwise all systems do.
-        var build = function (entity, trackID) {
+        // Build an entity in all registered systems.
+        // If 'just' is given, just systems that deal with that
+        // component build the entity rather than all.
+        var build = function (entity, just) {
             _.each(
                 systems,
                 function (system) {
@@ -41436,8 +41416,8 @@ global.hitagi = require('./main.js');
                         _.each(system.build, function (func, id) {
                             if (entity.has(id)){
                                 // Only build in tracking systems.
-                                if (trackID) {
-                                    if (id !== trackID) {
+                                if (!_.isUndefined(just)) {
+                                    if (id !== just) {
                                         return;
                                     }
                                 }
@@ -41450,10 +41430,10 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Destroy an entity in systems.
-        // If trackID is given, only systems tracking
-        // that ID destroy the entity, otherwise all systems do.
-        var destroy = function (entity, trackID) {
+        // Destroys an entity in all registered systems.
+        // If 'just' is given, just systems that deal with that
+        // component destroy the entity rather than all.
+        var destroy = function (entity, just) {
             _.each(
                 systems,
                 function (system) {
@@ -41461,8 +41441,8 @@ global.hitagi = require('./main.js');
                         _.each(system.destroy, function (func, id) {
                             if (entity.has(id)){
                                 // Only remove from tracking systems.
-                                if (trackID) {
-                                    if (id !== trackID) {
+                                if (!_.isUndefined(just)) {
+                                    if (id !== just) {
                                         return;
                                     }
                                 }
@@ -41475,7 +41455,31 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Track entities that systems want to.
+        // Setup tracking on a system.
+        // Creates the appropriate data structure on the $tracked object.
+        var setupTracking = function (system) {
+            if (_.has(system, '$tracking')) {
+                system.$tracked = {};
+                _.each(
+                    system.$tracking,
+                    function (trackingType, id) {
+                        switch (trackingType) {
+                            case 'many':
+                                system.$tracked[id] = {};
+                                break;
+                            case 'single':
+                                system.$tracked[id] = null;
+                                break;
+                            default:
+                                throw new Error('UnknownTrackingType');
+                        }
+                    }
+                );
+            }
+        };
+
+        // Make systems track a given entity.
+        // The entity will be referenced by the $tracked object.
         var track = function (entity) {
             _.each(
                 systems,
@@ -41504,7 +41508,9 @@ global.hitagi = require('./main.js');
             );
         };
 
-        // Stop tracking entities that systems want to.
+        // Stop systems from tracking a given entity.
+        // The entity will no longer be referenced by the $tracked object
+        // until it is tracked again.
         var untrack = function (entity) {
             _.each(
                 systems,
