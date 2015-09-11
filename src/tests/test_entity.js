@@ -125,6 +125,27 @@
             assert.equal(true, entity.has(testComponent.$id));
             assert.equal(false, entity.has('noComponent'));
         });
+
+        it('component should throw an error if it is detached while it is a dependency', function () {
+            var testComponent1 = {
+                $id: 'testComponent1',
+            };
+            var testComponent2 = {
+                $id: 'testComponent2',
+                $deps: ['testComponent1']
+            };
+
+            entity.attach(testComponent1);
+            entity.attach(testComponent2);
+
+            assert.throws(
+                function () {
+                    entity.detach('testComponent1');
+                },
+                'ComponentDependencyMissing'
+            );
+        });
+
     });
 
 } ());

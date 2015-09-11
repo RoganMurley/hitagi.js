@@ -45,7 +45,25 @@
         };
 
         // Remove a component from the entity.
-        this.detach = function (componentID){
+        this.detach = function (componentID) {
+            // Check that the component was not a dependency.
+            _.each(
+                that.c,
+                function (component) {
+                    var dependencyExists = _.any(
+                        component.$deps,
+                        function (dep) {
+                            return dep === componentID;
+                        }
+                    );
+                    if (dependencyExists) {
+                        console.error(component.$id + ' depends on ' + componentID);
+                        throw new Error('ComponentDependencyMissing');
+                    }
+                }
+            );
+
+            // Detach the component.
             delete this.c[componentID];
 
             if (this.world) {
@@ -57,6 +75,7 @@
         this.has = function (componentID) {
             return _.has(this.c, componentID);
         };
+
     };
 
     module.exports = Entity;
