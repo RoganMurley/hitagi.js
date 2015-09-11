@@ -37,6 +37,7 @@
         this.register = function (system) {
             setupTracking(system);
             systems.push(system);
+            _.each(entities, that.rebuild);
             return system;
         };
 
