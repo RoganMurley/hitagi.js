@@ -49,6 +49,10 @@
 
         // Deregister a system from the world.
         this.deregister = function (systemID) {
+            if (_.has(system, 'deregister')) {
+                system.deregister();
+            }
+
             delete systems[systemID];
         };
 
