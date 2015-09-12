@@ -41282,7 +41282,7 @@ global.hitagi = require('./main.js');
 
         var that = this;
         var entities = {};
-        var systems = [];
+        var systems = {};
 
         // Update the game by one tick.
         this.tick = function (dt) {
@@ -41295,8 +41295,10 @@ global.hitagi = require('./main.js');
         this.add = function (entity) {
             entity.world = this;
             entities[entity.uid] = entity;
+
             build(entity);
             track(entity);
+
             return entity;
         };
 
@@ -41304,15 +41306,26 @@ global.hitagi = require('./main.js');
         this.remove = function (entity) {
             destroy(entity);
             untrack(entity);
+
             delete entities[entity.uid];
         };
 
         // Register a system to the world.
         this.register = function (system) {
+            system.$uid = _.uniqueId();
+            systems[system.$uid] = system;
+
             setupTracking(system);
-            systems.push(system);
             _.each(entities, that.rebuild);
+
+            debugger;
+
             return system;
+        };
+
+        // Deregister a system from the world.
+        this.deregister = function (systemID) {
+            delete systems[systemID];
         };
 
         // Rebuild an entity with all registered systems.
@@ -41379,12 +41392,12 @@ global.hitagi = require('./main.js');
         };
 
         // Call all registered system's tick start function.
-        var tickStart = function () {
+        var tickStart = function (dt) {
             _.each(
                 systems,
                 function (system) {
                     if (_.has(system, 'tickStart')) {
-                        system.tickStart();
+                        system.tickStart(dt);
                     }
                 }
             );
@@ -41414,12 +41427,12 @@ global.hitagi = require('./main.js');
         };
 
         // Call all registered system's tick end function.
-        var tickEnd = function () {
+        var tickEnd = function (dt) {
             _.each(
                 systems,
                 function (system) {
                     if (_.has(system, 'tickEnd')) {
-                        system.tickEnd();
+                        system.tickEnd(dt);
                     }
                 }
             );

@@ -146,6 +146,13 @@
             );
         });
 
+        it('should add a uid to systems when they are registered', function () {
+            var freshMockSystem = {};
+            assert.equal(_.isUndefined(freshMockSystem.$uid), true);
+            world.register(freshMockSystem);
+            assert.equal(_.isUndefined(freshMockSystem.$uid), false);
+        });
+
     });
 
 } ());
