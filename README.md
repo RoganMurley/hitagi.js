@@ -4,7 +4,7 @@ Hitagi is an HTML5 game development framework based on an [Entity-Component-Syst
 # How does it work?
 * **Entities** are our data, made of 'building blocks' called **Components**.
 * **Systems** are our code, processing our **Entities** and performing I/O.
-* **Worlds** are containers holding **Entities** and **Systems**, allowing them to interact.
+* **Worlds** wire **Entities** and **Systems** together.
 
 # Standing on the shoulders of giants
 Hitagi wouldn't be possible without some awesome libraries, notably:
