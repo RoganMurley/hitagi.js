@@ -40438,6 +40438,7 @@ if (!global.cancelAnimationFrame) {
 
         // Each entity has a number of components.
         this.c = {};
+        Object.seal(this.c);
 
         // World this entity has been added to.
         this.world = null;
@@ -40461,7 +40462,10 @@ if (!global.cancelAnimationFrame) {
             }
 
             // Attach component.
-            this.c[component.$id] = component;
+            var newC = _.clone(that.c);
+            newC[component.$id] = component;
+            Object.seal(newC);
+            this.c = newC;
 
             // If the entity has already been added to a world, rebuild it.
             if (this.world) {
@@ -40491,7 +40495,10 @@ if (!global.cancelAnimationFrame) {
             );
 
             // Detach the component.
-            delete this.c[componentID];
+            var newC = _.clone(that.c);
+            delete newC[componentID];
+            Object.seal(newC);
+            this.c = newC;
 
             if (this.world) {
                 this.world.rebuild(this);
@@ -41379,14 +41386,17 @@ global.hitagi = require('./main.js');
             _.each(
                 componentBatches,
                 function (componentBatch) {
-                    var newEntity = new Entity();
+                    var newEntity = new Entity(),
+                        newC = {};
 
                     _.each(
                         componentBatch,
                         function (component) {
-                            newEntity.c[component.$id] = _.clone(component);
+                            newC[component.$id] = _.clone(component);
                         }
                     );
+
+                    newEntity.c = newC;
 
                     that.add(newEntity);
                 }

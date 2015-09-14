@@ -105,14 +105,17 @@
             _.each(
                 componentBatches,
                 function (componentBatch) {
-                    var newEntity = new Entity();
+                    var newEntity = new Entity(),
+                        newC = {};
 
                     _.each(
                         componentBatch,
                         function (component) {
-                            newEntity.c[component.$id] = _.clone(component);
+                            newC[component.$id] = _.clone(component);
                         }
                     );
+
+                    newEntity.c = newC;
 
                     that.add(newEntity);
                 }
