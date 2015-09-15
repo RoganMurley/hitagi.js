@@ -40503,6 +40503,8 @@ if (!global.cancelAnimationFrame) {
             if (this.world) {
                 this.world.rebuild(this);
             }
+
+            return this;
         };
 
         // Check if the entity has a given component.
