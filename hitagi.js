@@ -41329,12 +41329,12 @@ global.hitagi = require('./main.js');
         };
 
         // Deregister a system from the world.
-        this.deregister = function (systemID) {
+        this.deregister = function (system) {
             if (_.has(system, 'deregister')) {
                 system.deregister();
             }
 
-            delete systems[systemID];
+            delete systems[system.$uid];
         };
 
         // Rebuild an entity with all registered systems.
