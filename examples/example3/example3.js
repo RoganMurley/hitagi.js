@@ -13,12 +13,12 @@
     // Setup world.
     var world = new hitagi.World();
 
-    // Setup controls.
-    var controls = new hitagi.Controls();
-    controls.bind(38, 'up');
-    controls.bind(40, 'down');
-
     // Register systems.
+    var controlsSystem = new hitagi.systems.ControlsSystem();
+    controlsSystem.bind(38, 'up');
+    controlsSystem.bind(40, 'down');
+    world.register(controlsSystem);
+
     var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
     world.register(renderSystem);
     renderSystem.load('ghostSheet.json', function () {
@@ -29,7 +29,7 @@
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
 
-    var BorderSystem = function (collisionSystem) {
+    var BorderSystem = function (collisionSystem, controlsSystem) {
         this.update = {
             ghost: function (entity) {
                 var test = collisionSystem.collide(entity, 'border');
@@ -38,10 +38,10 @@
                     entity.c.velocity.yspeed = Math.random()*10 - 5;
                 }
 
-                if (controls.check('up')) {
+                if (controlsSystem.check('up')) {
                     entity.c.sprite.currentFrame = 0;
                 }
-                if (controls.check('down')) {
+                if (controlsSystem.check('down')) {
                     entity.c.sprite.currentFrame = 1;
                 }
 
@@ -59,7 +59,7 @@
             }
         };
     };
-    world.register(new BorderSystem(collisionSystem));
+    world.register(new BorderSystem(collisionSystem, controlsSystem));
 
     // Add entities.
     world.add(
