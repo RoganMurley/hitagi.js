@@ -40821,12 +40821,13 @@ global.hitagi = require('./main.js');
         };
 
         // Check that a key binding has been pressed.
+        // Options: once
         // If once is true, only check for the press..
-        this.check = function (binding, once) {
+        this.check = function (binding, options) {
             var keyCode = bindings[binding],
                 key = keys[keyCode];
 
-            if (once) {
+            if (options && options.once) {
                 return key.active && !key.held;
             }
             return key.active;

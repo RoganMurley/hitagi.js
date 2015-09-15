@@ -37,7 +37,7 @@
         this.update = {
             bird: function (entity, dt) {
                 // Flap wings if clicking,
-                if (controlsSystem.check('flap', true)) {
+                if (controlsSystem.check('flap', {once: true})) {
                     entity.c.velocity.yspeed = -entity.c.bird.flapSpeed;
                     entity.c.sprite.currentFrame = 0;
                     soundSystem.play('http://hitagi.s3-website-eu-west-1.amazonaws.com/flap.ogg');
