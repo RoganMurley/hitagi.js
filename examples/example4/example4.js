@@ -10,10 +10,6 @@
         levelHeight = 800;
     }
 
-    // Setup pixi.
-    var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
-    document.body.appendChild(renderer.view);
-
     // Setup world.
     var world = new hitagi.World();
 
@@ -273,7 +269,7 @@
     // Register systems.
     var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
 
-    var renderSystem = new hitagi.systems.PixiRenderSystem();
+    var renderSystem = new hitagi.systems.PixiRenderSystem({width: levelWidth, height: levelHeight});
     world.register(renderSystem);
 
     world.register(new hitagi.systems.VelocitySystem());
@@ -293,6 +289,9 @@
     world.register(new PipeGeneratorSystem(world));
     world.register(new ScrollSystem(world));
     world.register(new StartSystem(controlsSystem));
+
+    // Setup rendering.
+    document.body.appendChild(renderSystem.view);
 
     // Bind controls.
     controlsSystem.bind('m1', 'flap');
@@ -586,7 +585,7 @@
             world.tick(1000);
 
             // Render the world.
-            renderSystem.render(renderer);
+            renderSystem.render();
 
             // Next frame.
             requestAnimationFrame(animate);

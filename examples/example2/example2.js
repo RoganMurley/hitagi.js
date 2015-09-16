@@ -2,26 +2,24 @@
 (function () {
     "use strict";
 
-    // Setup dimensions.
+    // Setup level dimensions.
     var levelWidth = 600;
     var levelHeight = 400;
-
-    // Setup pixi.
-    var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
-    document.body.appendChild(renderer.view);
 
     // Setup world.
     var world = new hitagi.World();
 
     // Define and register systems.
+    var renderSystem = new hitagi.systems.PixiRenderSystem({width: levelWidth, height: levelHeight});
+    world.register(renderSystem);
+    document.body.appendChild(renderSystem.view);
+
     var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
     controlsSystem.bind(38, 'up');
     controlsSystem.bind(40, 'down');
 
-    var renderSystem = new hitagi.systems.PixiRenderSystem();
-    world.register(renderSystem);
-
-    world.register(new hitagi.systems.VelocitySystem());
+    var velocitySystem = new hitagi.systems.VelocitySystem();
+    world.register(velocitySystem);
 
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
@@ -328,7 +326,7 @@
         world.tick(1000);
 
         // Render the world.
-        renderSystem.render(renderer);
+        renderSystem.render();
 
         // Next frame.
         requestAnimationFrame(animate);

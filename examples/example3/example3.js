@@ -2,25 +2,24 @@
 (function () {
     "use strict";
 
+    // Setup level dimensions.
     var levelWidth = 600;
     var levelHeight = 400;
-
-    // Setup pixi.
-    var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
-    document.body.appendChild(renderer.view);
 
     // Setup world.
     var world = new hitagi.World();
 
     // Register systems.
+    var renderSystem = new hitagi.systems.PixiRenderSystem({width: levelWidth, height: levelHeight});
+    world.register(renderSystem);
+    document.body.appendChild(renderSystem.view);
+
+    renderSystem.load('ghostSheet.json', function () {
+
     var controlsSystem = new hitagi.systems.ControlsSystem();
     controlsSystem.bind(38, 'up');
     controlsSystem.bind(40, 'down');
     world.register(controlsSystem);
-
-    var renderSystem = new hitagi.systems.PixiRenderSystem();
-    world.register(renderSystem);
-    renderSystem.load('ghostSheet.json', function () {
 
     var velocitySystem = new hitagi.systems.VelocitySystem();
     world.register(velocitySystem);
@@ -187,7 +186,7 @@
         world.tick(1000);
 
         // Render the world.
-        renderSystem.render(renderer);
+        renderSystem.render();
 
         // Next frame.
         requestAnimationFrame(animate);

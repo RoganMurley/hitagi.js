@@ -5,10 +5,6 @@
     var levelWidth = window.innerWidth;
     var levelHeight = window.innerHeight;
 
-    // Setup pixi.
-    var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
-    document.body.appendChild(renderer.view);
-
     // Setup world.
     var world = new hitagi.World();
 
@@ -16,17 +12,6 @@
     var rooms = new hitagi.Rooms(world);
 
     // Define systems.
-    var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
-    controlsSystem.bind(82, 'reload');
-
-    controlsSystem.bind(32, 'jump');
-
-    controlsSystem.bind(37, 'left');
-    controlsSystem.bind(39, 'right');
-    controlsSystem.bind(38, 'up');
-    controlsSystem.bind(40, 'down');
-
-    controlsSystem.bind('m1', 'spawn');
 
     // We need to update horizontal and vertical velocity seperately for our collision resolution technique.
     // The default hitagi VelocitySystem doesn't support this, but it's easy to make our own.
@@ -245,7 +230,8 @@
     };
 
     // Create systems.
-    var renderSystem = new hitagi.systems.PixiRenderSystem();
+    var renderSystem = new hitagi.systems.PixiRenderSystem({width: levelWidth, height:levelHeight});
+    var controlsSystem = new hitagi.systems.ControlsSystem();
     var soundSystem = new hitagi.systems.SoundSystem();
     var collisionSystem = new hitagi.systems.CollisionSystem();
     var horizontalVelocitySystem = new HorizontalVelocitySystem();
@@ -258,6 +244,7 @@
 
     // Register systems (order matters).
     world.register(renderSystem);
+    world.register(controlsSystem);
     world.register(soundSystem);
     world.register(collisionSystem);
 
@@ -270,6 +257,18 @@
     world.register(verticalBodySystem);
 
     world.register(gravitySystem);
+
+    // Add renderer view to document.
+    document.body.appendChild(renderSystem.view);
+
+    // Bind controls.
+    controlsSystem.bind(82, 'reload');
+    controlsSystem.bind(32, 'jump');
+    controlsSystem.bind(37, 'left');
+    controlsSystem.bind(39, 'right');
+    controlsSystem.bind(38, 'up');
+    controlsSystem.bind(40, 'down');
+    controlsSystem.bind('m1', 'spawn');
 
     // Define components.
     //'components';
@@ -437,7 +436,7 @@
             world.tick(1000/60);
 
             // Render the world.
-            renderSystem.render(renderer);
+            renderSystem.render();
 
             // Next frame.
             requestAnimationFrame(animate);

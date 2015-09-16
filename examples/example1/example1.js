@@ -2,16 +2,15 @@
 (function () {
     "use strict";
 
-    // Setup pixi.
-    var renderer = PIXI.autoDetectRenderer(600, 400);
-    document.body.appendChild(renderer.view);
-
     // Setup world.
     var world = new hitagi.World();
 
     // Register systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem();
     world.register(renderSystem);
+
+    // Put the renderer view on the page.
+    document.body.appendChild(renderSystem.view)
 
     // Add entities.
     world.add(
@@ -37,8 +36,8 @@
         // Update the world.
         world.tick();
 
-        // Render the world.
-        renderSystem.render(renderer);
+        // Render.
+        renderSystem.render();
 
         // Next frame.
         requestAnimationFrame(animate);

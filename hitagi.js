@@ -40859,10 +40859,18 @@ global.hitagi = require('./main.js');
         proxy = utils.proxy,
         readOnlyProxy = utils.readOnlyProxy;
 
-    var PixiRenderSystem = function () {
+    var PixiRenderSystem = function (params) {
         var that = this;
 
+        params = _.extend({
+            width: 600,
+            height: 400
+        }, params);
+
         var stage = new pixi.Container();
+
+        var renderer = pixi.autoDetectRenderer(params.width, params.height);
+
         var sprites = {};
         var graphics = {};
 
@@ -40889,6 +40897,22 @@ global.hitagi = require('./main.js');
                 }
             );
             that.build.graphic(entity);
+        };
+
+        // Getter for renderer view.
+        Object.defineProperty(
+            this,
+            'view',
+            {
+                get: function() {
+                    return renderer.view;
+                }
+            }
+        );
+
+        // Render stage to a renderer.
+        this.render = function () {
+            renderer.render(stage);
         };
 
         // Build the system, called by world on every entity.
@@ -41152,11 +41176,6 @@ global.hitagi = require('./main.js');
                 loader.once('complete', callback);
             }
             loader.load();
-        };
-
-        // Render stage to a renderer.
-        this.render = function (renderer) {
-            renderer.render(stage);
         };
     };
 
