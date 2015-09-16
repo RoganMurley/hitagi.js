@@ -3,7 +3,6 @@
     "use strict";
 
     // Setup pixi.
-    var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(600, 400);
     document.body.appendChild(renderer.view);
 
@@ -11,7 +10,7 @@
     var world = new hitagi.World();
 
     // Register systems.
-    var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
+    var renderSystem = new hitagi.systems.PixiRenderSystem();
     world.register(renderSystem);
 
     // Add entities.
@@ -39,7 +38,7 @@
         world.tick();
 
         // Render the world.
-        renderer.render(stage);
+        renderSystem.render(renderer);
 
         // Next frame.
         requestAnimationFrame(animate);

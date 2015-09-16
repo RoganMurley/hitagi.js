@@ -6,7 +6,6 @@
     var levelHeight = 400;
 
     // Setup pixi.
-    var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
     document.body.appendChild(renderer.view);
 
@@ -19,7 +18,7 @@
     controlsSystem.bind(40, 'down');
     world.register(controlsSystem);
 
-    var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
+    var renderSystem = new hitagi.systems.PixiRenderSystem();
     world.register(renderSystem);
     renderSystem.load('ghostSheet.json', function () {
 
@@ -188,7 +187,7 @@
         world.tick(1000);
 
         // Render the world.
-        renderer.render(stage);
+        renderSystem.render(renderer);
 
         // Next frame.
         requestAnimationFrame(animate);

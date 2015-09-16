@@ -9,9 +9,10 @@
         proxy = utils.proxy,
         readOnlyProxy = utils.readOnlyProxy;
 
-    var PixiRenderSystem = function (stage) {
+    var PixiRenderSystem = function () {
         var that = this;
 
+        var stage = new pixi.Container();
         var sprites = {};
         var graphics = {};
 
@@ -301,6 +302,11 @@
                 loader.once('complete', callback);
             }
             loader.load();
+        };
+
+        // Render stage to a renderer.
+        this.render = function (renderer) {
+            renderer.render(stage);
         };
     };
 

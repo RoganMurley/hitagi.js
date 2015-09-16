@@ -6,7 +6,6 @@
     var levelHeight = window.innerHeight;
 
     // Setup pixi.
-    var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(levelWidth, levelHeight);
     document.body.appendChild(renderer.view);
 
@@ -246,7 +245,7 @@
     };
 
     // Create systems.
-    var renderSystem = new hitagi.systems.PixiRenderSystem(stage);
+    var renderSystem = new hitagi.systems.PixiRenderSystem();
     var soundSystem = new hitagi.systems.SoundSystem();
     var collisionSystem = new hitagi.systems.CollisionSystem();
     var horizontalVelocitySystem = new HorizontalVelocitySystem();
@@ -438,7 +437,7 @@
             world.tick(1000/60);
 
             // Render the world.
-            renderer.render(stage);
+            renderSystem.render(renderer);
 
             // Next frame.
             requestAnimationFrame(animate);
