@@ -4,9 +4,6 @@
     var _ = require('lodash');
 
     // Represents the collision boundaries of an entity.
-    // PARAMS:
-    //      width - width of collision hitbox.
-    //      height - height of collision hitbox.
     var Collision = function (params) {
         params = _.extend({
             anchor: {

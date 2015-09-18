@@ -40159,9 +40159,6 @@ if (!global.cancelAnimationFrame) {
     var _ = require('lodash');
 
     // Represents the collision boundaries of an entity.
-    // PARAMS:
-    //      width - width of collision hitbox.
-    //      height - height of collision hitbox.
     var Collision = function (params) {
         params = _.extend({
             anchor: {
@@ -40221,7 +40218,7 @@ if (!global.cancelAnimationFrame) {
     // Represents a graphic to draw.
     var Graphic = function (params) {
         this.$id = 'graphic';
-        this.$deps = []; // Position dependency added later is relative positioning is true.
+        this.$deps = []; // Position dependency added later if relative positioning is true.
 
         params = _.extend({
             alpha: 1,
@@ -40253,7 +40250,6 @@ if (!global.cancelAnimationFrame) {
         this.scale = params.scale;
         this.tint = params.tint;
         this.translate = params.translate;
-        this.type = params.type;
         this.visible = params.visible;
         this.z = params.z;
 
@@ -40391,9 +40387,6 @@ if (!global.cancelAnimationFrame) {
     'use strict';
 
     // Represents an entity's position in 2D space.
-    // PARAMS:
-    //      x - x Cartesian coordinate.
-    //      y - y Cartesian coordinate.
     var Position = function (params) {
         this.$id = 'position';
         this.$deps = [];
@@ -40410,9 +40403,6 @@ if (!global.cancelAnimationFrame) {
     'use strict';
 
     // Represents an entity's velocity in 2D space.
-    // PARAMS:
-    //      xspeed - delta in x direction.
-    //      yspeed - delta in y direction.
     var Velocity = function (params) {
         this.$id = 'velocity';
         this.$deps = ['position'];

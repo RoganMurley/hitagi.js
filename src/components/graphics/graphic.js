@@ -6,7 +6,7 @@
     // Represents a graphic to draw.
     var Graphic = function (params) {
         this.$id = 'graphic';
-        this.$deps = []; // Position dependency added later is relative positioning is true.
+        this.$deps = []; // Position dependency added later if relative positioning is true.
 
         params = _.extend({
             alpha: 1,
@@ -38,7 +38,6 @@
         this.scale = params.scale;
         this.tint = params.tint;
         this.translate = params.translate;
-        this.type = params.type;
         this.visible = params.visible;
         this.z = params.z;
 
