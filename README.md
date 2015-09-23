@@ -9,7 +9,7 @@ Hitagi is an HTML5 game development framework that loves to keep your code and d
 ## Documentation
 [Check out the wiki for docs](https://github.com/RoganMurley/hitagi.js/wiki)
 
-[There's a useful 'Getting Started!' page!](https://github.com/RoganMurley/hitagi.js/wiki/Getting-Started)
+[There's a useful 'Getting Started!' page](https://github.com/RoganMurley/hitagi.js/wiki/Getting-Started)
 
 ## Examples
 * [Hello, world!](http://codepen.io/Purpwood/pen/dozPJw?editors=001)
