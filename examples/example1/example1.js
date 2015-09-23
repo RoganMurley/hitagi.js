@@ -10,7 +10,7 @@
     world.register(renderSystem);
 
     // Put the renderer view on the page.
-    document.body.appendChild(renderSystem.view)
+    document.body.appendChild(renderSystem.view);
 
     // Add entities.
     world.add(
@@ -34,7 +34,7 @@
 
     function animate() {
         // Update the world.
-        world.tick();
+        world.tick(1000/60);
 
         // Render.
         renderSystem.render();
