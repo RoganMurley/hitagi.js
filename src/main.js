@@ -26,9 +26,9 @@
             'CollisionSystem': require('./systems/collisionSystem.js'),
             'ControlsSystem': require('./systems/controlsSystem.js'),
             'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
+            'RoomSystem': require('./systems/roomSystem.js'),
             'SoundSystem': require('./systems/soundSystem.js'),
-            'VelocitySystem': require('./systems/velocitySystem.js'),
-            'RoomSystem': require('./systems/roomSystem.js')
+            'VelocitySystem': require('./systems/velocitySystem.js')
         }
     };
 

@@ -130,6 +130,7 @@
         this.tickStart = function () {
             mousePos = controlsSystem.getMousePos();
 
+            // If dragging, show the potential block on the UI.
             if (!dragging && controlsSystem.check('spawn')) {
                 world.add(
                     new hitagi.Entity()
@@ -158,18 +159,14 @@
                                 y: 0
                             }
                         }))
-                        .attach({
-                            $id: 'dragBoxUI',
-                            width: 0,
-                            height: 0,
-                            origin: {
-                                x: mousePos.x,
-                                y: mousePos.y
-                            }
-                        })
+                        .attach(new DragBoxUIComponent({
+                            x: mousePos.x,
+                            y: mousePos.y
+                        }))
                 );
             }
 
+            // When dragging is released, try to make the block.
             if (dragging && !controlsSystem.check('spawn')) {
                 var box = this.$tracked.dragBoxUI;
 
@@ -178,6 +175,7 @@
                 var width = box.c.dragBoxUI.width;
                 var height = box.c.dragBoxUI.height;
 
+                // Adjust co-ordinates so that width and height are positive.
                 if (width < 0) {
                     width = Math.abs(width);
                     x -= width;
@@ -191,6 +189,8 @@
                 box.c.collision.width = width;
                 box.c.collision.height = height;
 
+                // Check if the block would make the player get stuck.
+                // If not, make the block.
                 var test = collisionSystem.collide(box, 'player', {x: x, y: y});
                 if (!test.length) {
                     var newBlock = world.add(
@@ -216,8 +216,8 @@
         this.update = {
             dragBoxUI: function (entity) {
                 // Get box dimensions.
-               entity.c.dragBoxUI.width = mousePos.x - entity.c.dragBoxUI.origin.x;
-               entity.c.dragBoxUI.height = mousePos.y - entity.c.dragBoxUI.origin.y;
+                entity.c.dragBoxUI.width = mousePos.x - entity.c.dragBoxUI.origin.x;
+                entity.c.dragBoxUI.height = mousePos.y - entity.c.dragBoxUI.origin.y;
 
                 // Update graphic.
                 entity.c.rectangle.width = entity.c.dragBoxUI.width;
@@ -269,7 +269,15 @@
     controlsSystem.bind('m1', 'spawn');
 
     // Define components.
-    //'components';
+    var DragBoxUIComponent = function (params) {
+        this.$id = 'dragBoxUI';
+        this.width = 0;
+        this.height = 0;
+        this.origin = {
+            x: params.x,
+            y: params.y
+        };
+    };
 
     // Define entities.
     var Background = function (params) {
