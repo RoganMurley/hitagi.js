@@ -8,9 +8,6 @@
     // Setup world.
     var world = new hitagi.World();
 
-    // Setup rooms.
-    var rooms = new hitagi.Rooms(world);
-
     // Define systems.
 
     // We need to update horizontal and vertical velocity seperately for our collision resolution technique.
@@ -232,6 +229,7 @@
     // Create systems.
     var renderSystem = new hitagi.systems.PixiRenderSystem({width: levelWidth, height:levelHeight});
     var controlsSystem = new hitagi.systems.ControlsSystem();
+    var roomSystem = new hitagi.systems.RoomSystem(world);
     var soundSystem = new hitagi.systems.SoundSystem();
     var collisionSystem = new hitagi.systems.CollisionSystem();
     var horizontalVelocitySystem = new HorizontalVelocitySystem();
@@ -425,8 +423,8 @@
         );
 
         // Load starting room.
-        rooms.saveRoom('start', startRoomEntities);
-        rooms.loadRoom('start');
+        roomSystem.saveRoom('start', startRoomEntities);
+        roomSystem.loadRoom('start');
 
         // Setup game loop.
         requestAnimationFrame(animate);

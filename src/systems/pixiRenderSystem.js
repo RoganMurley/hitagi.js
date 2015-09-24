@@ -18,6 +18,7 @@
         }, params);
 
         var stage = new pixi.Container();
+        stage.interactive = true;
 
         var renderer = pixi.autoDetectRenderer(params.width, params.height);
 

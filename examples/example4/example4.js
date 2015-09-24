@@ -13,9 +13,6 @@
     // Setup world.
     var world = new hitagi.World();
 
-    // Setup rooms.
-    var rooms = new hitagi.Rooms(world);
-
     // Define systems.
     var GravitySystem = function () {
         this.update = {
@@ -111,7 +108,7 @@
         };
     };
 
-    var DeathSystem = function (world, rooms, collisionSystem, soundSystem, scoreSystem) {
+    var DeathSystem = function (world, roomSystem, collisionSystem, soundSystem, scoreSystem) {
         var that = this;
         this.$tracking = {
             'pipeGenerator': 'single',
@@ -131,7 +128,7 @@
 
         var restartGame = function () {
             scoreSystem.saveBestScore();
-            rooms.loadRoom('start');
+            roomSystem.loadRoom('start');
             world.add(
                 new Best({cleared: scoreSystem.loadBestScore()})
             );
@@ -267,12 +264,14 @@
     };
 
     // Register systems.
-    var controlsSystem = world.register(new hitagi.systems.ControlsSystem());
+    var controlsSystem = new hitagi.systems.ControlsSystem();
+    world.register(controlsSystem);
 
     var renderSystem = new hitagi.systems.PixiRenderSystem({width: levelWidth, height: levelHeight});
     world.register(renderSystem);
 
-    world.register(new hitagi.systems.VelocitySystem());
+    var velocitySystem = new hitagi.systems.VelocitySystem();
+    world.register(velocitySystem);
 
     var collisionSystem = new hitagi.systems.CollisionSystem();
     world.register(collisionSystem);
@@ -280,12 +279,15 @@
     var soundSystem = new hitagi.systems.SoundSystem();
     world.register(soundSystem);
 
+    var roomSystem = new hitagi.systems.RoomSystem(world);
+    world.register(roomSystem);
+
     var scoreSystem = new ScoreSystem(soundSystem);
     world.register(scoreSystem);
 
     world.register(new BirdSystem(controlsSystem, collisionSystem, soundSystem, scoreSystem));
     world.register(new GravitySystem());
-    world.register(new DeathSystem(world, rooms, collisionSystem, soundSystem, scoreSystem));
+    world.register(new DeathSystem(world, roomSystem, collisionSystem, soundSystem, scoreSystem));
     world.register(new PipeGeneratorSystem(world));
     world.register(new ScrollSystem(world));
     world.register(new StartSystem(controlsSystem));
@@ -570,8 +572,8 @@
             startRoomEntities.push(new Floor({x: (floorWidth/2) + i * floorWidth}));
         });
 
-        rooms.saveRoom('start', startRoomEntities);
-        rooms.loadRoom('start');
+        roomSystem.saveRoom('start', startRoomEntities);
+        roomSystem.loadRoom('start');
 
         // Load best score.
         var bestScore = scoreSystem.loadBestScore();

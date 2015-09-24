@@ -3,7 +3,7 @@
 
     var _ = require('lodash');
 
-    var Rooms = function (world) {
+    var RoomSystem = function (world) {
         var rooms = {};
 
         this.saveRoom = function (roomName, entities) {
@@ -17,5 +17,5 @@
         };
     };
 
-    module.exports = Rooms;
+    module.exports = RoomSystem;
 } ());

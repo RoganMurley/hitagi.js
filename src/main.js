@@ -4,7 +4,6 @@
     var hitagi = {
         'Entity': require('./entity.js'),
         'World': require('./world.js'),
-        'Rooms': require('./rooms.js'),
         'utils': require('./utils.js'),
         'components': {
             'Collision': require('./components/collision.js'),
@@ -28,7 +27,8 @@
             'ControlsSystem': require('./systems/controlsSystem.js'),
             'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
             'SoundSystem': require('./systems/soundSystem.js'),
-            'VelocitySystem': require('./systems/velocitySystem.js')
+            'VelocitySystem': require('./systems/velocitySystem.js'),
+            'RoomSystem': require('./systems/roomSystem.js')
         }
     };
 
