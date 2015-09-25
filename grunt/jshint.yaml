@@ -3,4 +3,10 @@ files:
     - 'examples/example*/example*.js'
 
 options:
+    browser: true
     force: true
+    globals:
+        'hitagi':
+            true
+    globalstrict:
+        true

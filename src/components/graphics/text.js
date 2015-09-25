@@ -8,8 +8,14 @@
         this.$deps = ['graphic'];
 
         params = _.extend({
-            bitmapFont: false
+            bitmapFont: false,
+            style: {}
         }, params);
+
+        params.style = _.extend({
+            font: '32px monospace',
+            fill: 0xffffff
+        }, params.style);
 
         this.bitmapFont = params.bitmapFont;
         this.copy = params.copy;
