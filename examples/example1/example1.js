@@ -7,14 +7,12 @@ var renderSystem = world.register(new hitagi.systems.PixiRenderSystem());
 document.body.appendChild(renderSystem.view);
 
 world.add(
-    new hitagi.Entity()
-        .attach(new hitagi.components.Position({x: 300, y: 200}))
-        .attach(new hitagi.components.graphics.Graphic())
+    new hitagi.prefabs.Base({x: 300, y: 200})
         .attach(new hitagi.components.graphics.Text({copy: 'Hello, World!'}))
 );
 
 (function animate() {
-    world.tick(1000/60);
+    world.tick(1000/60); // Hacky fixed timestep as it's just an example!
     renderSystem.render();
     requestAnimationFrame(animate);
 }());

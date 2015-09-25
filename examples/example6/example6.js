@@ -133,31 +133,22 @@
             // If dragging, show the potential block on the UI.
             if (!dragging && controlsSystem.check('spawn')) {
                 world.add(
-                    new hitagi.Entity()
-                        .attach(new hitagi.components.Position({
+                    new hitagi.prefabs.StaticBody({
                             x: mousePos.x,
-                            y: mousePos.y
-                        }))
-                        .attach(new hitagi.components.graphics.Graphic({
+                            y: mousePos.y,
                             alpha: 0.7,
                             anchor: {
                                 x: 0,
                                 y: 0
                             },
-                            z: 100
-                        }))
+                            z: 100,
+                            width: 0,
+                            height: 0
+                        })
                         .attach(new hitagi.components.graphics.Rectangle({
                             width: 0,
                             height: 0,
                             color: 0xc9283e,
-                        }))
-                        .attach(new hitagi.components.Collision({
-                            width: 0,
-                            height: 0,
-                            anchor: {
-                                x: 0,
-                                y: 0
-                            }
                         }))
                         .attach(new DragBoxUIComponent({
                             x: mousePos.x,
@@ -305,43 +296,18 @@
             }
         }, params);
 
-        return new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: params.x,
-                y: params.y
-            }))
-            .attach(new hitagi.components.graphics.Graphic({
-                anchor: params.anchor
-            }))
+        return new hitagi.prefabs.StaticBody(params)
             .attach(new hitagi.components.graphics.Rectangle({
                 color: 0xf0433a,
                 width: params.width,
                 height: params.height
             }))
-            .attach(new hitagi.components.Collision({
-                width: params.width,
-                height: params.height,
-                anchor: params.anchor
-            }))
-            .attach({
-                $id: 'block'
-            })
-            .attach({
-                $id: 'solid'
-            });
+            .attach({$id: 'block'})
+            .attach({$id: 'solid'});
     };
 
     var Player = function (params) {
-        return new hitagi.Entity()
-            .attach(new hitagi.components.Position({
-                x: params.x,
-                y: params.y
-            }))
-            .attach (new hitagi.components.Velocity({
-                xspeed: 0,
-                yspeed: 0
-            }))
-            .attach(new hitagi.components.graphics.Graphic())
+        return new hitagi.prefabs.Base(params)
             .attach(new hitagi.components.graphics.Rectangle({
                 color: 0xffffff,
                 width: params.width,
