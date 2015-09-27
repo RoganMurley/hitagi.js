@@ -40819,6 +40819,7 @@ global.hitagi = require('./main.js');
             var code = e.which;
             if (_.has(keys, code)) {
                 keys[code].press();
+                return false; // Prevent default.
             }
         };
 
@@ -40826,6 +40827,7 @@ global.hitagi = require('./main.js');
             var code = e.which;
             if (_.has(keys, code)) {
                 keys[code].release();
+                return false; // Prevent default.
             }
         };
 
@@ -40833,6 +40835,7 @@ global.hitagi = require('./main.js');
             var code = mouseMappings[e.which];
             if (_.has(keys, code)) {
                 keys[code].press();
+                return false; // Prevent default.
             }
         };
 
@@ -40840,6 +40843,7 @@ global.hitagi = require('./main.js');
             var code = mouseMappings[e.which];
             if (_.has(keys, code)) {
                 keys[code].release();
+                return false; // Prevent default.
             }
         };
 
