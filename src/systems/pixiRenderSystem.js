@@ -253,6 +253,10 @@
                 proxy(entity.c.text, 'copy', graphics[entity.uid], 'text');
                 proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
 
+                // Set and proxy rotation.
+                graphics[entity.uid].rotation = entity.c.text.rotation;
+                proxy(entity.c.text, 'rotation', graphics[entity.uid], 'rotation');
+
                 // Anchor is a Pixi property on text, so is proxied here.
                 graphics[entity.uid].anchor = entity.c.graphic.anchor;
                 proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');

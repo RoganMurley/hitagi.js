@@ -9,6 +9,7 @@
 
         params = _.extend({
             bitmapFont: false,
+            rotation: 0,
             style: {}
         }, params);
 
@@ -19,6 +20,7 @@
 
         this.bitmapFont = params.bitmapFont;
         this.copy = params.copy;
+        this.rotation = params.rotation;
         this.style = params.style;
     };
 

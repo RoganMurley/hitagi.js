@@ -40372,6 +40372,7 @@ if (!global.cancelAnimationFrame) {
 
         params = _.extend({
             bitmapFont: false,
+            rotation: 0,
             style: {}
         }, params);
 
@@ -40382,6 +40383,7 @@ if (!global.cancelAnimationFrame) {
 
         this.bitmapFont = params.bitmapFont;
         this.copy = params.copy;
+        this.rotation = params.rotation;
         this.style = params.style;
     };
 
@@ -41161,6 +41163,10 @@ global.hitagi = require('./main.js');
                 // Proxy text properties.
                 proxy(entity.c.text, 'copy', graphics[entity.uid], 'text');
                 proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
+
+                // Set and proxy rotation.
+                graphics[entity.uid].rotation = entity.c.text.rotation;
+                proxy(entity.c.text, 'rotation', graphics[entity.uid], 'rotation');
 
                 // Anchor is a Pixi property on text, so is proxied here.
                 graphics[entity.uid].anchor = entity.c.graphic.anchor;

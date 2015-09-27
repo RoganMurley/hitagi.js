@@ -11,8 +11,16 @@ world.add(
         .attach(new hitagi.components.graphics.Text({copy: 'Hello, World!'}))
 );
 
+world.register({
+    update: {
+        text: function (entity) {
+            entity.c.text.rotation += 0.01;
+        }
+    }
+});
+
 (function animate() {
-    world.tick(1000/60); // Hacky fixed timestep as it's just an example!
+    world.tick();
     renderSystem.render();
     requestAnimationFrame(animate);
 }());
