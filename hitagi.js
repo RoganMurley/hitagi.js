@@ -40807,6 +40807,8 @@ global.hitagi = require('./main.js');
 
                 // Look for changes to radius, redrawing if necessary.
                 look(entity.c.circle, 'radius', redraw, entity);
+
+                proxy(entity.c.circle, 'color', graphics[entity.uid], 'color');
             },
 
             ellipse : function (entity) {
@@ -40826,6 +40828,8 @@ global.hitagi = require('./main.js');
 
                 // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
                 look(entity.c.graphic, 'anchor', redraw, entity);
+
+                proxy(entity.c.ellipse, 'color', graphics[entity.uid], 'color');
             },
 
             line : function (entity) {
@@ -40850,6 +40854,8 @@ global.hitagi = require('./main.js');
                 look(entity.c.line, 'y1', redraw, entity);
                 look(entity.c.line, 'x2', redraw, entity);
                 look(entity.c.line, 'y2', redraw, entity);
+
+                proxy(entity.c.line, 'color', graphics[entity.uid], 'color');
             },
 
             polygon: function (entity) {
@@ -40860,6 +40866,8 @@ global.hitagi = require('./main.js');
 
                 // Look for changes to params, redrawing if necessary.
                 look(entity.c.polygon, 'points', redraw, entity);
+
+                proxy(entity.c.polygon, 'color', graphics[entity.uid], 'color');
             },
 
             rectangle : function (entity) {
@@ -40879,6 +40887,8 @@ global.hitagi = require('./main.js');
 
                 // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
                 look(entity.c.graphic, 'anchor', redraw, entity);
+
+                proxy(entity.c.rectangle, 'color', graphics[entity.uid], 'color');
             },
 
             sprite: function (entity) {
