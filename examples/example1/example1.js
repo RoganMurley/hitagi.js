@@ -7,14 +7,20 @@ var renderSystem = world.register(new hitagi.systems.PixiRenderSystem());
 document.body.appendChild(renderSystem.view);
 
 world.add(
-    new hitagi.Entity()
-        .attach(new hitagi.components.Position({x: 300, y: 200}))
-        .attach(new hitagi.components.graphics.Graphic())
+    new hitagi.prefabs.Static({x: 300, y: 200})
         .attach(new hitagi.components.graphics.Text({copy: 'Hello, World!'}))
 );
 
+world.register({
+    update: {
+        text: function (entity) {
+            entity.c.text.rotation += 0.01;
+        }
+    }
+});
+
 (function animate() {
-    world.tick(1000/60);
+    world.tick();
     renderSystem.render();
     requestAnimationFrame(animate);
 }());

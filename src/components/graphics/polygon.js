@@ -5,6 +5,7 @@
         this.$id = 'polygon';
         this.$deps = ['graphic'];
 
+        this.color = params.color;
         this.points = params.points;
     };
 

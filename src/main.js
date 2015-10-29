@@ -22,6 +22,12 @@
                 'Text': require('./components/graphics/text.js')
             }
         },
+        'prefabs': {
+            'Base': require('./prefabs/base.js'),
+            'Body': require('./prefabs/body.js'),
+            'Static': require('./prefabs/static.js'),
+            'StaticBody': require('./prefabs/staticBody.js')
+        },
         'systems': {
             'CollisionSystem': require('./systems/collisionSystem.js'),
             'ControlsSystem': require('./systems/controlsSystem.js'),
