@@ -14,7 +14,7 @@
         }, params);
 
         return new Static(params)
-            .attach(new Velocity(params))
+            .attach(new Velocity(params));
     };
 
     module.exports = Basic;
