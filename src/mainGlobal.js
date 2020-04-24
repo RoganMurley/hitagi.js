@@ -1,1 +1,2 @@
-global.hitagi = require('./main.js');
+import hitagi from './main.js';
+window.hitagi = hitagi;

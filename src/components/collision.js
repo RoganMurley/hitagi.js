@@ -1,24 +1,13 @@
-(function () {
-    'use strict';
+export default class Collision {
+  // Represents the collision boundaries of an entity.
+  constructor(params) {
+    this.$id = 'collision';
+    this.$deps = ['position'];
 
-    var _ = require('lodash');
+    params = { anchor: { x: 0.5, y: 0.5 }, ...params };
 
-    // Represents the collision boundaries of an entity.
-    var Collision = function (params) {
-        params = _.extend({
-            anchor: {
-                x: 0.5,
-                y: 0.5
-            }
-        }, params);
-
-        this.$id = 'collision';
-        this.$deps = ['position'];
-
-        this.width = params.width;
-        this.height = params.height;
-        this.anchor = params.anchor;
-    };
-
-    module.exports = Collision;
-} ());
+    this.width = params.width;
+    this.height = params.height;
+    this.anchor = params.anchor;
+  }
+}

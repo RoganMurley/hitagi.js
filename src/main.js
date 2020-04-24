@@ -1,42 +1,67 @@
-(function () {
-    'use strict';
+import Entity from './entity.js';
+import World from './World.js';
+import * as utils from './utils.js';
 
-    var hitagi = {
-        'Entity': require('./entity.js'),
-        'World': require('./world.js'),
-        'utils': require('./utils.js'),
-        'components': {
-            'Collision': require('./components/collision.js'),
-            'Position': require('./components/position.js'),
-            'Velocity': require('./components/velocity.js'),
+import Collision from './components/Collision.js';
+import Position from './components/Position.js';
+import Velocity from './components/Velocity.js';
 
-            'graphics': {
-                'Circle': require('./components/graphics/circle.js'),
-                'Ellipse': require('./components/graphics/ellipse.js'),
-                'Graphic': require('./components/graphics/graphic.js'),
-                'Line': require('./components/graphics/line.js'),
-                'Polygon': require('./components/graphics/polygon.js'),
-                'Rectangle': require('./components/graphics/rectangle.js'),
-                'StaticSprite': require('./components/graphics/staticSprite.js'),
-                'Sprite': require('./components/graphics/sprite.js'),
-                'Text': require('./components/graphics/text.js')
-            }
-        },
-        'prefabs': {
-            'Base': require('./prefabs/base.js'),
-            'Body': require('./prefabs/body.js'),
-            'Static': require('./prefabs/static.js'),
-            'StaticBody': require('./prefabs/staticBody.js')
-        },
-        'systems': {
-            'CollisionSystem': require('./systems/collisionSystem.js'),
-            'ControlsSystem': require('./systems/controlsSystem.js'),
-            'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
-            'RoomSystem': require('./systems/roomSystem.js'),
-            'SoundSystem': require('./systems/soundSystem.js'),
-            'VelocitySystem': require('./systems/velocitySystem.js')
+import Circle from './components/graphics/Circle.js';
+import Ellipse from './components/graphics/Ellipse.js';
+import Graphic from './components/graphics/Graphic.js';
+import Line from './components/graphics/Line.js';
+import Polygon from './components/graphics/Polygon.js';
+import Rectangle from './components/graphics/Rectangle.js';
+import StaticSprite from './components/graphics/StaticSprite.js';
+import Sprite from './components/graphics/Sprite.js';
+import Text from './components/graphics/Text.js';
+
+import Base from './prefabs/base.js';
+import Body from './prefabs/body.js';
+import Static from './prefabs/static.js';
+import StaticBody from './prefabs/staticBody.js';
+
+import CollisionSystem from './systems/collisionSystem.js';
+import ControlsSystem from './systems/controlsSystem.js';
+import PixiRenderSystem from './systems/pixiRenderSystem.js';
+import RoomSystem from './systems/roomSystem.js';
+import SoundSystem from './systems/soundSystem.js';
+import VelocitySystem from './systems/velocitySystem.js';
+
+
+const hitagi = {
+    Entity,
+    World,
+    utils,
+    components: {
+        Collision,
+        Position,
+        Velocity,
+        graphics: {
+          Circle,
+          Ellipse,
+          Graphic,
+          Line,
+          Polygon,
+          Rectangle,
+          StaticSprite,
+          Sprite,
+          Text,
         }
-    };
-
-    module.exports = hitagi;
-} ());
+    },
+    prefabs: {
+      Base,
+      Body,
+      Static,
+      StaticBody,
+    },
+    systems: {
+      CollisionSystem,
+      ControlsSystem,
+      PixiRenderSystem,
+      RoomSystem,
+      SoundSystem,
+      VelocitySystem,
+    },
+};
+export default hitagi;

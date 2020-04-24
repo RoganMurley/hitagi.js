@@ -1,415 +1,2367 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (process){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/mainGlobal.js");
+/******/ })
+/************************************************************************/
+/******/ ({
 
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
+/***/ "./node_modules/async/lib/async.js":
+/*!*****************************************!*\
+  !*** ./node_modules/async/lib/async.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe =
-    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function(filename) {
-  return splitPathRe.exec(filename).slice(1);
-};
-
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function(path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function(path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-
-// path.relative(from, to)
-// posix version
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function(path) {
-  var result = splitPath(path),
-      root = result[0],
-      dir = result[1];
-
-  if (!root && !dir) {
-    // No dirname whatsoever
-    return '.';
-  }
-
-  if (dir) {
-    // It has a dirname, strip trailing slash
-    dir = dir.substr(0, dir.length - 1);
-  }
-
-  return root + dir;
-};
-
-
-exports.basename = function(path, ext) {
-  var f = splitPath(path)[2];
-  // TODO: make this comparison case-insensitive on windows?
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-};
-
-
-exports.extname = function(path) {
-  return splitPath(path)[3];
-};
-
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b'
-    ? function (str, start, len) { return str.substr(start, len) }
-    : function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    }
-;
-
-}).call(this,require('_process'))
-},{"_process":2}],2:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
+/* WEBPACK VAR INJECTION */(function(global, setImmediate, process) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * async
+ * https://github.com/caolan/async
+ *
+ * Copyright 2010-2014 Caolan McMahon
+ * Released under the MIT license
+ */
 (function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
+
+    var async = {};
+    function noop() {}
+    function identity(v) {
+        return v;
+    }
+    function toBool(v) {
+        return !!v;
+    }
+    function notId(v) {
+        return !v;
+    }
+
+    // global on the server, window in the browser
+    var previous_async;
+
+    // Establish the root object, `window` (`self`) in the browser, `global`
+    // on the server, or `this` in some virtual machines. We use `self`
+    // instead of `window` for `WebWorker` support.
+    var root = typeof self === 'object' && self.self === self && self ||
+            typeof global === 'object' && global.global === global && global ||
+            this;
+
+    if (root != null) {
+        previous_async = root.async;
+    }
+
+    async.noConflict = function () {
+        root.async = previous_async;
+        return async;
+    };
+
+    function only_once(fn) {
+        return function() {
+            if (fn === null) throw new Error("Callback was already called.");
+            fn.apply(this, arguments);
+            fn = null;
+        };
+    }
+
+    function _once(fn) {
+        return function() {
+            if (fn === null) return;
+            fn.apply(this, arguments);
+            fn = null;
+        };
+    }
+
+    //// cross-browser compatiblity functions ////
+
+    var _toString = Object.prototype.toString;
+
+    var _isArray = Array.isArray || function (obj) {
+        return _toString.call(obj) === '[object Array]';
+    };
+
+    // Ported from underscore.js isObject
+    var _isObject = function(obj) {
+        var type = typeof obj;
+        return type === 'function' || type === 'object' && !!obj;
+    };
+
+    function _isArrayLike(arr) {
+        return _isArray(arr) || (
+            // has a positive integer length property
+            typeof arr.length === "number" &&
+            arr.length >= 0 &&
+            arr.length % 1 === 0
+        );
+    }
+
+    function _arrayEach(arr, iterator) {
+        var index = -1,
+            length = arr.length;
+
+        while (++index < length) {
+            iterator(arr[index], index, arr);
         }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
     }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
+
+    function _map(arr, iterator) {
+        var index = -1,
+            length = arr.length,
+            result = Array(length);
+
+        while (++index < length) {
+            result[index] = iterator(arr[index], index, arr);
         }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
+        return result;
     }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
+
+    function _range(count) {
+        return _map(Array(count), function (v, i) { return i; });
     }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
+
+    function _reduce(arr, iterator, memo) {
+        _arrayEach(arr, function (x, i, a) {
+            memo = iterator(memo, x, i, a);
+        });
+        return memo;
     }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
+
+    function _forEachOf(object, iterator) {
+        _arrayEach(_keys(object), function (key) {
+            iterator(object[key], key);
+        });
+    }
+
+    function _indexOf(arr, item) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === item) return i;
         }
+        return -1;
     }
 
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
+    var _keys = Object.keys || function (obj) {
+        var keys = [];
+        for (var k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                keys.push(k);
             }
         }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
+        return keys;
+    };
 
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
+    function _keyIterator(coll) {
+        var i = -1;
+        var len;
+        var keys;
+        if (_isArrayLike(coll)) {
+            len = coll.length;
+            return function next() {
+                i++;
+                return i < len ? i : null;
+            };
+        } else {
+            keys = _keys(coll);
+            len = keys.length;
+            return function next() {
+                i++;
+                return i < len ? keys[i] : null;
+            };
         }
     }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
+
+    // Similar to ES6's rest param (http://ariya.ofilabs.com/2013/03/es6-and-rest-parameter.html)
+    // This accumulates the arguments passed into an array, after a given index.
+    // From underscore.js (https://github.com/jashkenas/underscore/pull/2140).
+    function _restParam(func, startIndex) {
+        startIndex = startIndex == null ? func.length - 1 : +startIndex;
+        return function() {
+            var length = Math.max(arguments.length - startIndex, 0);
+            var rest = Array(length);
+            for (var index = 0; index < length; index++) {
+                rest[index] = arguments[index + startIndex];
+            }
+            switch (startIndex) {
+                case 0: return func.call(this, rest);
+                case 1: return func.call(this, arguments[0], rest);
+            }
+            // Currently unused but handle cases outside of the switch statement:
+            // var args = Array(startIndex + 1);
+            // for (index = 0; index < startIndex; index++) {
+            //     args[index] = arguments[index];
+            // }
+            // args[startIndex] = rest;
+            // return func.apply(this, args);
+        };
     }
-};
 
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
+    function _withoutIndex(iterator) {
+        return function (value, index, callback) {
+            return iterator(value, callback);
+        };
+    }
+
+    //// exported async module functions ////
+
+    //// nextTick implementation with browser-compatible fallback ////
+
+    // capture the global reference to guard against fakeTimer mocks
+    var _setImmediate = typeof setImmediate === 'function' && setImmediate;
+
+    var _delay = _setImmediate ? function(fn) {
+        // not a direct alias for IE10 compatibility
+        _setImmediate(fn);
+    } : function(fn) {
+        setTimeout(fn, 0);
+    };
+
+    if (typeof process === 'object' && typeof process.nextTick === 'function') {
+        async.nextTick = process.nextTick;
+    } else {
+        async.nextTick = _delay;
+    }
+    async.setImmediate = _setImmediate ? _delay : async.nextTick;
+
+
+    async.forEach =
+    async.each = function (arr, iterator, callback) {
+        return async.eachOf(arr, _withoutIndex(iterator), callback);
+    };
+
+    async.forEachSeries =
+    async.eachSeries = function (arr, iterator, callback) {
+        return async.eachOfSeries(arr, _withoutIndex(iterator), callback);
+    };
+
+
+    async.forEachLimit =
+    async.eachLimit = function (arr, limit, iterator, callback) {
+        return _eachOfLimit(limit)(arr, _withoutIndex(iterator), callback);
+    };
+
+    async.forEachOf =
+    async.eachOf = function (object, iterator, callback) {
+        callback = _once(callback || noop);
+        object = object || [];
+
+        var iter = _keyIterator(object);
+        var key, completed = 0;
+
+        while ((key = iter()) != null) {
+            completed += 1;
+            iterator(object[key], key, only_once(done));
+        }
+
+        if (completed === 0) callback(null);
+
+        function done(err) {
+            completed--;
+            if (err) {
+                callback(err);
+            }
+            // Check key is null in case iterator isn't exhausted
+            // and done resolved synchronously.
+            else if (key === null && completed <= 0) {
+                callback(null);
+            }
+        }
+    };
+
+    async.forEachOfSeries =
+    async.eachOfSeries = function (obj, iterator, callback) {
+        callback = _once(callback || noop);
+        obj = obj || [];
+        var nextKey = _keyIterator(obj);
+        var key = nextKey();
+        function iterate() {
+            var sync = true;
+            if (key === null) {
+                return callback(null);
+            }
+            iterator(obj[key], key, only_once(function (err) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    key = nextKey();
+                    if (key === null) {
+                        return callback(null);
+                    } else {
+                        if (sync) {
+                            async.setImmediate(iterate);
+                        } else {
+                            iterate();
+                        }
+                    }
+                }
+            }));
+            sync = false;
+        }
+        iterate();
+    };
+
+
+
+    async.forEachOfLimit =
+    async.eachOfLimit = function (obj, limit, iterator, callback) {
+        _eachOfLimit(limit)(obj, iterator, callback);
+    };
+
+    function _eachOfLimit(limit) {
+
+        return function (obj, iterator, callback) {
+            callback = _once(callback || noop);
+            obj = obj || [];
+            var nextKey = _keyIterator(obj);
+            if (limit <= 0) {
+                return callback(null);
+            }
+            var done = false;
+            var running = 0;
+            var errored = false;
+
+            (function replenish () {
+                if (done && running <= 0) {
+                    return callback(null);
+                }
+
+                while (running < limit && !errored) {
+                    var key = nextKey();
+                    if (key === null) {
+                        done = true;
+                        if (running <= 0) {
+                            callback(null);
+                        }
+                        return;
+                    }
+                    running += 1;
+                    iterator(obj[key], key, only_once(function (err) {
+                        running -= 1;
+                        if (err) {
+                            callback(err);
+                            errored = true;
+                        }
+                        else {
+                            replenish();
+                        }
+                    }));
+                }
+            })();
+        };
+    }
+
+
+    function doParallel(fn) {
+        return function (obj, iterator, callback) {
+            return fn(async.eachOf, obj, iterator, callback);
+        };
+    }
+    function doParallelLimit(fn) {
+        return function (obj, limit, iterator, callback) {
+            return fn(_eachOfLimit(limit), obj, iterator, callback);
+        };
+    }
+    function doSeries(fn) {
+        return function (obj, iterator, callback) {
+            return fn(async.eachOfSeries, obj, iterator, callback);
+        };
+    }
+
+    function _asyncMap(eachfn, arr, iterator, callback) {
+        callback = _once(callback || noop);
+        arr = arr || [];
+        var results = _isArrayLike(arr) ? [] : {};
+        eachfn(arr, function (value, index, callback) {
+            iterator(value, function (err, v) {
+                results[index] = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, results);
+        });
+    }
+
+    async.map = doParallel(_asyncMap);
+    async.mapSeries = doSeries(_asyncMap);
+    async.mapLimit = doParallelLimit(_asyncMap);
+
+    // reduce only has a series version, as doing reduce in parallel won't
+    // work in many situations.
+    async.inject =
+    async.foldl =
+    async.reduce = function (arr, memo, iterator, callback) {
+        async.eachOfSeries(arr, function (x, i, callback) {
+            iterator(memo, x, function (err, v) {
+                memo = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, memo);
+        });
+    };
+
+    async.foldr =
+    async.reduceRight = function (arr, memo, iterator, callback) {
+        var reversed = _map(arr, identity).reverse();
+        async.reduce(reversed, memo, iterator, callback);
+    };
+
+    async.transform = function (arr, memo, iterator, callback) {
+        if (arguments.length === 3) {
+            callback = iterator;
+            iterator = memo;
+            memo = _isArray(arr) ? [] : {};
+        }
+
+        async.eachOf(arr, function(v, k, cb) {
+            iterator(memo, v, k, cb);
+        }, function(err) {
+            callback(err, memo);
+        });
+    };
+
+    function _filter(eachfn, arr, iterator, callback) {
+        var results = [];
+        eachfn(arr, function (x, index, callback) {
+            iterator(x, function (v) {
+                if (v) {
+                    results.push({index: index, value: x});
+                }
+                callback();
+            });
+        }, function () {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    }
+
+    async.select =
+    async.filter = doParallel(_filter);
+
+    async.selectLimit =
+    async.filterLimit = doParallelLimit(_filter);
+
+    async.selectSeries =
+    async.filterSeries = doSeries(_filter);
+
+    function _reject(eachfn, arr, iterator, callback) {
+        _filter(eachfn, arr, function(value, cb) {
+            iterator(value, function(v) {
+                cb(!v);
+            });
+        }, callback);
+    }
+    async.reject = doParallel(_reject);
+    async.rejectLimit = doParallelLimit(_reject);
+    async.rejectSeries = doSeries(_reject);
+
+    function _createTester(eachfn, check, getResult) {
+        return function(arr, limit, iterator, cb) {
+            function done() {
+                if (cb) cb(getResult(false, void 0));
+            }
+            function iteratee(x, _, callback) {
+                if (!cb) return callback();
+                iterator(x, function (v) {
+                    if (cb && check(v)) {
+                        cb(getResult(true, x));
+                        cb = iterator = false;
+                    }
+                    callback();
+                });
+            }
+            if (arguments.length > 3) {
+                eachfn(arr, limit, iteratee, done);
+            } else {
+                cb = iterator;
+                iterator = limit;
+                eachfn(arr, iteratee, done);
+            }
+        };
+    }
+
+    async.any =
+    async.some = _createTester(async.eachOf, toBool, identity);
+
+    async.someLimit = _createTester(async.eachOfLimit, toBool, identity);
+
+    async.all =
+    async.every = _createTester(async.eachOf, notId, notId);
+
+    async.everyLimit = _createTester(async.eachOfLimit, notId, notId);
+
+    function _findGetResult(v, x) {
+        return x;
+    }
+    async.detect = _createTester(async.eachOf, identity, _findGetResult);
+    async.detectSeries = _createTester(async.eachOfSeries, identity, _findGetResult);
+    async.detectLimit = _createTester(async.eachOfLimit, identity, _findGetResult);
+
+    async.sortBy = function (arr, iterator, callback) {
+        async.map(arr, function (x, callback) {
+            iterator(x, function (err, criteria) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, {value: x, criteria: criteria});
+                }
+            });
+        }, function (err, results) {
+            if (err) {
+                return callback(err);
+            }
+            else {
+                callback(null, _map(results.sort(comparator), function (x) {
+                    return x.value;
+                }));
+            }
+
+        });
+
+        function comparator(left, right) {
+            var a = left.criteria, b = right.criteria;
+            return a < b ? -1 : a > b ? 1 : 0;
+        }
+    };
+
+    async.auto = function (tasks, concurrency, callback) {
+        if (typeof arguments[1] === 'function') {
+            // concurrency is optional, shift the args.
+            callback = concurrency;
+            concurrency = null;
+        }
+        callback = _once(callback || noop);
+        var keys = _keys(tasks);
+        var remainingTasks = keys.length;
+        if (!remainingTasks) {
+            return callback(null);
+        }
+        if (!concurrency) {
+            concurrency = remainingTasks;
+        }
+
+        var results = {};
+        var runningTasks = 0;
+
+        var hasError = false;
+
+        var listeners = [];
+        function addListener(fn) {
+            listeners.unshift(fn);
+        }
+        function removeListener(fn) {
+            var idx = _indexOf(listeners, fn);
+            if (idx >= 0) listeners.splice(idx, 1);
+        }
+        function taskComplete() {
+            remainingTasks--;
+            _arrayEach(listeners.slice(0), function (fn) {
+                fn();
+            });
+        }
+
+        addListener(function () {
+            if (!remainingTasks) {
+                callback(null, results);
+            }
+        });
+
+        _arrayEach(keys, function (k) {
+            if (hasError) return;
+            var task = _isArray(tasks[k]) ? tasks[k]: [tasks[k]];
+            var taskCallback = _restParam(function(err, args) {
+                runningTasks--;
+                if (args.length <= 1) {
+                    args = args[0];
+                }
+                if (err) {
+                    var safeResults = {};
+                    _forEachOf(results, function(val, rkey) {
+                        safeResults[rkey] = val;
+                    });
+                    safeResults[k] = args;
+                    hasError = true;
+
+                    callback(err, safeResults);
+                }
+                else {
+                    results[k] = args;
+                    async.setImmediate(taskComplete);
+                }
+            });
+            var requires = task.slice(0, task.length - 1);
+            // prevent dead-locks
+            var len = requires.length;
+            var dep;
+            while (len--) {
+                if (!(dep = tasks[requires[len]])) {
+                    throw new Error('Has nonexistent dependency in ' + requires.join(', '));
+                }
+                if (_isArray(dep) && _indexOf(dep, k) >= 0) {
+                    throw new Error('Has cyclic dependencies');
+                }
+            }
+            function ready() {
+                return runningTasks < concurrency && _reduce(requires, function (a, x) {
+                    return (a && results.hasOwnProperty(x));
+                }, true) && !results.hasOwnProperty(k);
+            }
+            if (ready()) {
+                runningTasks++;
+                task[task.length - 1](taskCallback, results);
+            }
+            else {
+                addListener(listener);
+            }
+            function listener() {
+                if (ready()) {
+                    runningTasks++;
+                    removeListener(listener);
+                    task[task.length - 1](taskCallback, results);
+                }
+            }
+        });
+    };
+
+
+
+    async.retry = function(times, task, callback) {
+        var DEFAULT_TIMES = 5;
+        var DEFAULT_INTERVAL = 0;
+
+        var attempts = [];
+
+        var opts = {
+            times: DEFAULT_TIMES,
+            interval: DEFAULT_INTERVAL
+        };
+
+        function parseTimes(acc, t){
+            if(typeof t === 'number'){
+                acc.times = parseInt(t, 10) || DEFAULT_TIMES;
+            } else if(typeof t === 'object'){
+                acc.times = parseInt(t.times, 10) || DEFAULT_TIMES;
+                acc.interval = parseInt(t.interval, 10) || DEFAULT_INTERVAL;
+            } else {
+                throw new Error('Unsupported argument type for \'times\': ' + typeof t);
+            }
+        }
+
+        var length = arguments.length;
+        if (length < 1 || length > 3) {
+            throw new Error('Invalid arguments - must be either (task), (task, callback), (times, task) or (times, task, callback)');
+        } else if (length <= 2 && typeof times === 'function') {
+            callback = task;
+            task = times;
+        }
+        if (typeof times !== 'function') {
+            parseTimes(opts, times);
+        }
+        opts.callback = callback;
+        opts.task = task;
+
+        function wrappedTask(wrappedCallback, wrappedResults) {
+            function retryAttempt(task, finalAttempt) {
+                return function(seriesCallback) {
+                    task(function(err, result){
+                        seriesCallback(!err || finalAttempt, {err: err, result: result});
+                    }, wrappedResults);
+                };
+            }
+
+            function retryInterval(interval){
+                return function(seriesCallback){
+                    setTimeout(function(){
+                        seriesCallback(null);
+                    }, interval);
+                };
+            }
+
+            while (opts.times) {
+
+                var finalAttempt = !(opts.times-=1);
+                attempts.push(retryAttempt(opts.task, finalAttempt));
+                if(!finalAttempt && opts.interval > 0){
+                    attempts.push(retryInterval(opts.interval));
+                }
+            }
+
+            async.series(attempts, function(done, data){
+                data = data[data.length - 1];
+                (wrappedCallback || opts.callback)(data.err, data.result);
+            });
+        }
+
+        // If a callback is passed, run this as a controll flow
+        return opts.callback ? wrappedTask() : wrappedTask;
+    };
+
+    async.waterfall = function (tasks, callback) {
+        callback = _once(callback || noop);
+        if (!_isArray(tasks)) {
+            var err = new Error('First argument to waterfall must be an array of functions');
+            return callback(err);
+        }
+        if (!tasks.length) {
+            return callback();
+        }
+        function wrapIterator(iterator) {
+            return _restParam(function (err, args) {
+                if (err) {
+                    callback.apply(null, [err].concat(args));
+                }
+                else {
+                    var next = iterator.next();
+                    if (next) {
+                        args.push(wrapIterator(next));
+                    }
+                    else {
+                        args.push(callback);
+                    }
+                    ensureAsync(iterator).apply(null, args);
+                }
+            });
+        }
+        wrapIterator(async.iterator(tasks))();
+    };
+
+    function _parallel(eachfn, tasks, callback) {
+        callback = callback || noop;
+        var results = _isArrayLike(tasks) ? [] : {};
+
+        eachfn(tasks, function (task, key, callback) {
+            task(_restParam(function (err, args) {
+                if (args.length <= 1) {
+                    args = args[0];
+                }
+                results[key] = args;
+                callback(err);
+            }));
+        }, function (err) {
+            callback(err, results);
+        });
+    }
+
+    async.parallel = function (tasks, callback) {
+        _parallel(async.eachOf, tasks, callback);
+    };
+
+    async.parallelLimit = function(tasks, limit, callback) {
+        _parallel(_eachOfLimit(limit), tasks, callback);
+    };
+
+    async.series = function(tasks, callback) {
+        _parallel(async.eachOfSeries, tasks, callback);
+    };
+
+    async.iterator = function (tasks) {
+        function makeCallback(index) {
+            function fn() {
+                if (tasks.length) {
+                    tasks[index].apply(null, arguments);
+                }
+                return fn.next();
+            }
+            fn.next = function () {
+                return (index < tasks.length - 1) ? makeCallback(index + 1): null;
+            };
+            return fn;
+        }
+        return makeCallback(0);
+    };
+
+    async.apply = _restParam(function (fn, args) {
+        return _restParam(function (callArgs) {
+            return fn.apply(
+                null, args.concat(callArgs)
+            );
+        });
+    });
+
+    function _concat(eachfn, arr, fn, callback) {
+        var result = [];
+        eachfn(arr, function (x, index, cb) {
+            fn(x, function (err, y) {
+                result = result.concat(y || []);
+                cb(err);
+            });
+        }, function (err) {
+            callback(err, result);
+        });
+    }
+    async.concat = doParallel(_concat);
+    async.concatSeries = doSeries(_concat);
+
+    async.whilst = function (test, iterator, callback) {
+        callback = callback || noop;
+        if (test()) {
+            var next = _restParam(function(err, args) {
+                if (err) {
+                    callback(err);
+                } else if (test.apply(this, args)) {
+                    iterator(next);
+                } else {
+                    callback.apply(null, [null].concat(args));
+                }
+            });
+            iterator(next);
+        } else {
+            callback(null);
+        }
+    };
+
+    async.doWhilst = function (iterator, test, callback) {
+        var calls = 0;
+        return async.whilst(function() {
+            return ++calls <= 1 || test.apply(this, arguments);
+        }, iterator, callback);
+    };
+
+    async.until = function (test, iterator, callback) {
+        return async.whilst(function() {
+            return !test.apply(this, arguments);
+        }, iterator, callback);
+    };
+
+    async.doUntil = function (iterator, test, callback) {
+        return async.doWhilst(iterator, function() {
+            return !test.apply(this, arguments);
+        }, callback);
+    };
+
+    async.during = function (test, iterator, callback) {
+        callback = callback || noop;
+
+        var next = _restParam(function(err, args) {
+            if (err) {
+                callback(err);
+            } else {
+                args.push(check);
+                test.apply(this, args);
+            }
+        });
+
+        var check = function(err, truth) {
+            if (err) {
+                callback(err);
+            } else if (truth) {
+                iterator(next);
+            } else {
+                callback(null);
+            }
+        };
+
+        test(check);
+    };
+
+    async.doDuring = function (iterator, test, callback) {
+        var calls = 0;
+        async.during(function(next) {
+            if (calls++ < 1) {
+                next(null, true);
+            } else {
+                test.apply(this, arguments);
+            }
+        }, iterator, callback);
+    };
+
+    function _queue(worker, concurrency, payload) {
+        if (concurrency == null) {
+            concurrency = 1;
+        }
+        else if(concurrency === 0) {
+            throw new Error('Concurrency must not be zero');
+        }
+        function _insert(q, data, pos, callback) {
+            if (callback != null && typeof callback !== "function") {
+                throw new Error("task callback must be a function");
+            }
+            q.started = true;
+            if (!_isArray(data)) {
+                data = [data];
+            }
+            if(data.length === 0 && q.idle()) {
+                // call drain immediately if there are no tasks
+                return async.setImmediate(function() {
+                    q.drain();
+                });
+            }
+            _arrayEach(data, function(task) {
+                var item = {
+                    data: task,
+                    callback: callback || noop
+                };
+
+                if (pos) {
+                    q.tasks.unshift(item);
+                } else {
+                    q.tasks.push(item);
+                }
+
+                if (q.tasks.length === q.concurrency) {
+                    q.saturated();
+                }
+            });
+            async.setImmediate(q.process);
+        }
+        function _next(q, tasks) {
+            return function(){
+                workers -= 1;
+
+                var removed = false;
+                var args = arguments;
+                _arrayEach(tasks, function (task) {
+                    _arrayEach(workersList, function (worker, index) {
+                        if (worker === task && !removed) {
+                            workersList.splice(index, 1);
+                            removed = true;
+                        }
+                    });
+
+                    task.callback.apply(task, args);
+                });
+                if (q.tasks.length + workers === 0) {
+                    q.drain();
+                }
+                q.process();
+            };
+        }
+
+        var workers = 0;
+        var workersList = [];
+        var q = {
+            tasks: [],
+            concurrency: concurrency,
+            payload: payload,
+            saturated: noop,
+            empty: noop,
+            drain: noop,
+            started: false,
+            paused: false,
+            push: function (data, callback) {
+                _insert(q, data, false, callback);
+            },
+            kill: function () {
+                q.drain = noop;
+                q.tasks = [];
+            },
+            unshift: function (data, callback) {
+                _insert(q, data, true, callback);
+            },
+            process: function () {
+                while(!q.paused && workers < q.concurrency && q.tasks.length){
+
+                    var tasks = q.payload ?
+                        q.tasks.splice(0, q.payload) :
+                        q.tasks.splice(0, q.tasks.length);
+
+                    var data = _map(tasks, function (task) {
+                        return task.data;
+                    });
+
+                    if (q.tasks.length === 0) {
+                        q.empty();
+                    }
+                    workers += 1;
+                    workersList.push(tasks[0]);
+                    var cb = only_once(_next(q, tasks));
+                    worker(data, cb);
+                }
+            },
+            length: function () {
+                return q.tasks.length;
+            },
+            running: function () {
+                return workers;
+            },
+            workersList: function () {
+                return workersList;
+            },
+            idle: function() {
+                return q.tasks.length + workers === 0;
+            },
+            pause: function () {
+                q.paused = true;
+            },
+            resume: function () {
+                if (q.paused === false) { return; }
+                q.paused = false;
+                var resumeCount = Math.min(q.concurrency, q.tasks.length);
+                // Need to call q.process once per concurrent
+                // worker to preserve full concurrency after pause
+                for (var w = 1; w <= resumeCount; w++) {
+                    async.setImmediate(q.process);
+                }
+            }
+        };
+        return q;
+    }
+
+    async.queue = function (worker, concurrency) {
+        var q = _queue(function (items, cb) {
+            worker(items[0], cb);
+        }, concurrency, 1);
+
+        return q;
+    };
+
+    async.priorityQueue = function (worker, concurrency) {
+
+        function _compareTasks(a, b){
+            return a.priority - b.priority;
+        }
+
+        function _binarySearch(sequence, item, compare) {
+            var beg = -1,
+                end = sequence.length - 1;
+            while (beg < end) {
+                var mid = beg + ((end - beg + 1) >>> 1);
+                if (compare(item, sequence[mid]) >= 0) {
+                    beg = mid;
+                } else {
+                    end = mid - 1;
+                }
+            }
+            return beg;
+        }
+
+        function _insert(q, data, priority, callback) {
+            if (callback != null && typeof callback !== "function") {
+                throw new Error("task callback must be a function");
+            }
+            q.started = true;
+            if (!_isArray(data)) {
+                data = [data];
+            }
+            if(data.length === 0) {
+                // call drain immediately if there are no tasks
+                return async.setImmediate(function() {
+                    q.drain();
+                });
+            }
+            _arrayEach(data, function(task) {
+                var item = {
+                    data: task,
+                    priority: priority,
+                    callback: typeof callback === 'function' ? callback : noop
+                };
+
+                q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
+
+                if (q.tasks.length === q.concurrency) {
+                    q.saturated();
+                }
+                async.setImmediate(q.process);
+            });
+        }
+
+        // Start with a normal queue
+        var q = async.queue(worker, concurrency);
+
+        // Override push to accept second parameter representing priority
+        q.push = function (data, priority, callback) {
+            _insert(q, data, priority, callback);
+        };
+
+        // Remove unshift function
+        delete q.unshift;
+
+        return q;
+    };
+
+    async.cargo = function (worker, payload) {
+        return _queue(worker, 1, payload);
+    };
+
+    function _console_fn(name) {
+        return _restParam(function (fn, args) {
+            fn.apply(null, args.concat([_restParam(function (err, args) {
+                if (typeof console === 'object') {
+                    if (err) {
+                        if (console.error) {
+                            console.error(err);
+                        }
+                    }
+                    else if (console[name]) {
+                        _arrayEach(args, function (x) {
+                            console[name](x);
+                        });
+                    }
+                }
+            })]));
+        });
+    }
+    async.log = _console_fn('log');
+    async.dir = _console_fn('dir');
+    /*async.info = _console_fn('info');
+    async.warn = _console_fn('warn');
+    async.error = _console_fn('error');*/
+
+    async.memoize = function (fn, hasher) {
+        var memo = {};
+        var queues = {};
+        var has = Object.prototype.hasOwnProperty;
+        hasher = hasher || identity;
+        var memoized = _restParam(function memoized(args) {
+            var callback = args.pop();
+            var key = hasher.apply(null, args);
+            if (has.call(memo, key)) {   
+                async.setImmediate(function () {
+                    callback.apply(null, memo[key]);
+                });
+            }
+            else if (has.call(queues, key)) {
+                queues[key].push(callback);
+            }
+            else {
+                queues[key] = [callback];
+                fn.apply(null, args.concat([_restParam(function (args) {
+                    memo[key] = args;
+                    var q = queues[key];
+                    delete queues[key];
+                    for (var i = 0, l = q.length; i < l; i++) {
+                        q[i].apply(null, args);
+                    }
+                })]));
+            }
+        });
+        memoized.memo = memo;
+        memoized.unmemoized = fn;
+        return memoized;
+    };
+
+    async.unmemoize = function (fn) {
+        return function () {
+            return (fn.unmemoized || fn).apply(null, arguments);
+        };
+    };
+
+    function _times(mapper) {
+        return function (count, iterator, callback) {
+            mapper(_range(count), iterator, callback);
+        };
+    }
+
+    async.times = _times(async.map);
+    async.timesSeries = _times(async.mapSeries);
+    async.timesLimit = function (count, limit, iterator, callback) {
+        return async.mapLimit(_range(count), limit, iterator, callback);
+    };
+
+    async.seq = function (/* functions... */) {
+        var fns = arguments;
+        return _restParam(function (args) {
+            var that = this;
+
+            var callback = args[args.length - 1];
+            if (typeof callback == 'function') {
+                args.pop();
+            } else {
+                callback = noop;
+            }
+
+            async.reduce(fns, args, function (newargs, fn, cb) {
+                fn.apply(that, newargs.concat([_restParam(function (err, nextargs) {
+                    cb(err, nextargs);
+                })]));
+            },
+            function (err, results) {
+                callback.apply(that, [err].concat(results));
+            });
+        });
+    };
+
+    async.compose = function (/* functions... */) {
+        return async.seq.apply(null, Array.prototype.reverse.call(arguments));
+    };
+
+
+    function _applyEach(eachfn) {
+        return _restParam(function(fns, args) {
+            var go = _restParam(function(args) {
+                var that = this;
+                var callback = args.pop();
+                return eachfn(fns, function (fn, _, cb) {
+                    fn.apply(that, args.concat([cb]));
+                },
+                callback);
+            });
+            if (args.length) {
+                return go.apply(this, args);
+            }
+            else {
+                return go;
+            }
+        });
+    }
+
+    async.applyEach = _applyEach(async.eachOf);
+    async.applyEachSeries = _applyEach(async.eachOfSeries);
+
+
+    async.forever = function (fn, callback) {
+        var done = only_once(callback || noop);
+        var task = ensureAsync(fn);
+        function next(err) {
+            if (err) {
+                return done(err);
+            }
+            task(next);
+        }
+        next();
+    };
+
+    function ensureAsync(fn) {
+        return _restParam(function (args) {
+            var callback = args.pop();
+            args.push(function () {
+                var innerArgs = arguments;
+                if (sync) {
+                    async.setImmediate(function () {
+                        callback.apply(null, innerArgs);
+                    });
+                } else {
+                    callback.apply(null, innerArgs);
+                }
+            });
+            var sync = true;
+            fn.apply(this, args);
+            sync = false;
+        });
+    }
+
+    async.ensureAsync = ensureAsync;
+
+    async.constant = _restParam(function(values) {
+        var args = [null].concat(values);
+        return function (callback) {
+            return callback.apply(this, args);
+        };
+    });
+
+    async.wrapSync =
+    async.asyncify = function asyncify(func) {
+        return _restParam(function (args) {
+            var callback = args.pop();
+            var result;
+            try {
+                result = func.apply(this, args);
+            } catch (e) {
+                return callback(e);
+            }
+            // if result is Promise object
+            if (_isObject(result) && typeof result.then === "function") {
+                result.then(function(value) {
+                    callback(null, value);
+                })["catch"](function(err) {
+                    callback(err.message ? err : new Error(err));
+                });
+            } else {
+                callback(null, result);
+            }
+        });
+    };
+
+    // Node.js
+    if ( true && module.exports) {
+        module.exports = async;
+    }
+    // AMD / RequireJS
+    else if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+            return async;
+        }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
+    // included directly via <script> tag
+    else {}
+
+}());
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../../node-libs-browser/node_modules/timers-browserify/main.js */ "./node_modules/node-libs-browser/node_modules/timers-browserify/main.js").setImmediate, __webpack_require__(/*! ./../../process/browser.js */ "./node_modules/process/browser.js")))
+
+/***/ }),
+
+/***/ "./node_modules/earcut/src/earcut.js":
+/*!*******************************************!*\
+  !*** ./node_modules/earcut/src/earcut.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = earcut;
+module.exports.default = earcut;
+
+function earcut(data, holeIndices, dim) {
+
+    dim = dim || 2;
+
+    var hasHoles = holeIndices && holeIndices.length,
+        outerLen = hasHoles ? holeIndices[0] * dim : data.length,
+        outerNode = linkedList(data, 0, outerLen, dim, true),
+        triangles = [];
+
+    if (!outerNode || outerNode.next === outerNode.prev) return triangles;
+
+    var minX, minY, maxX, maxY, x, y, invSize;
+
+    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);
+
+    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
+    if (data.length > 80 * dim) {
+        minX = maxX = data[0];
+        minY = maxY = data[1];
+
+        for (var i = dim; i < outerLen; i += dim) {
+            x = data[i];
+            y = data[i + 1];
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+        }
+
+        // minX, minY and invSize are later used to transform coords into integers for z-order calculation
+        invSize = Math.max(maxX - minX, maxY - minY);
+        invSize = invSize !== 0 ? 1 / invSize : 0;
+    }
+
+    earcutLinked(outerNode, triangles, dim, minX, minY, invSize);
+
+    return triangles;
 }
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
+
+// create a circular doubly linked list from polygon points in the specified winding order
+function linkedList(data, start, end, dim, clockwise) {
+    var i, last;
+
+    if (clockwise === (signedArea(data, start, end, dim) > 0)) {
+        for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);
+    } else {
+        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);
+    }
+
+    if (last && equals(last, last.next)) {
+        removeNode(last);
+        last = last.next;
+    }
+
+    return last;
+}
+
+// eliminate colinear or duplicate points
+function filterPoints(start, end) {
+    if (!start) return start;
+    if (!end) end = start;
+
+    var p = start,
+        again;
+    do {
+        again = false;
+
+        if (!p.steiner && (equals(p, p.next) || area(p.prev, p, p.next) === 0)) {
+            removeNode(p);
+            p = end = p.prev;
+            if (p === p.next) break;
+            again = true;
+
+        } else {
+            p = p.next;
+        }
+    } while (again || p !== end);
+
+    return end;
+}
+
+// main ear slicing loop which triangulates a polygon (given as a linked list)
+function earcutLinked(ear, triangles, dim, minX, minY, invSize, pass) {
+    if (!ear) return;
+
+    // interlink polygon nodes in z-order
+    if (!pass && invSize) indexCurve(ear, minX, minY, invSize);
+
+    var stop = ear,
+        prev, next;
+
+    // iterate through ears, slicing them one by one
+    while (ear.prev !== ear.next) {
+        prev = ear.prev;
+        next = ear.next;
+
+        if (invSize ? isEarHashed(ear, minX, minY, invSize) : isEar(ear)) {
+            // cut off the triangle
+            triangles.push(prev.i / dim);
+            triangles.push(ear.i / dim);
+            triangles.push(next.i / dim);
+
+            removeNode(ear);
+
+            // skipping the next vertex leads to less sliver triangles
+            ear = next.next;
+            stop = next.next;
+
+            continue;
+        }
+
+        ear = next;
+
+        // if we looped through the whole remaining polygon and can't find any more ears
+        if (ear === stop) {
+            // try filtering points and slicing again
+            if (!pass) {
+                earcutLinked(filterPoints(ear), triangles, dim, minX, minY, invSize, 1);
+
+            // if this didn't work, try curing all small self-intersections locally
+            } else if (pass === 1) {
+                ear = cureLocalIntersections(filterPoints(ear), triangles, dim);
+                earcutLinked(ear, triangles, dim, minX, minY, invSize, 2);
+
+            // as a last resort, try splitting the remaining polygon into two
+            } else if (pass === 2) {
+                splitEarcut(ear, triangles, dim, minX, minY, invSize);
+            }
+
+            break;
+        }
+    }
+}
+
+// check whether a polygon node forms a valid ear with adjacent nodes
+function isEar(ear) {
+    var a = ear.prev,
+        b = ear,
+        c = ear.next;
+
+    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
+
+    // now make sure we don't have other points inside the potential ear
+    var p = ear.next.next;
+
+    while (p !== ear.prev) {
+        if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
+            area(p.prev, p, p.next) >= 0) return false;
+        p = p.next;
+    }
+
+    return true;
+}
+
+function isEarHashed(ear, minX, minY, invSize) {
+    var a = ear.prev,
+        b = ear,
+        c = ear.next;
+
+    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
+
+    // triangle bbox; min & max are calculated like this for speed
+    var minTX = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x),
+        minTY = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y),
+        maxTX = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x),
+        maxTY = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y);
+
+    // z-order range for the current triangle bbox;
+    var minZ = zOrder(minTX, minTY, minX, minY, invSize),
+        maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);
+
+    var p = ear.prevZ,
+        n = ear.nextZ;
+
+    // look for points inside the triangle in both directions
+    while (p && p.z >= minZ && n && n.z <= maxZ) {
+        if (p !== ear.prev && p !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
+            area(p.prev, p, p.next) >= 0) return false;
+        p = p.prevZ;
+
+        if (n !== ear.prev && n !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
+            area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
+    }
+
+    // look for remaining points in decreasing z-order
+    while (p && p.z >= minZ) {
+        if (p !== ear.prev && p !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
+            area(p.prev, p, p.next) >= 0) return false;
+        p = p.prevZ;
+    }
+
+    // look for remaining points in increasing z-order
+    while (n && n.z <= maxZ) {
+        if (n !== ear.prev && n !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
+            area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
+    }
+
+    return true;
+}
+
+// go through all polygon nodes and cure small local self-intersections
+function cureLocalIntersections(start, triangles, dim) {
+    var p = start;
+    do {
+        var a = p.prev,
+            b = p.next.next;
+
+        if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
+
+            triangles.push(a.i / dim);
+            triangles.push(p.i / dim);
+            triangles.push(b.i / dim);
+
+            // remove two nodes involved
+            removeNode(p);
+            removeNode(p.next);
+
+            p = start = b;
+        }
+        p = p.next;
+    } while (p !== start);
+
+    return filterPoints(p);
+}
+
+// try splitting polygon into two and triangulate them independently
+function splitEarcut(start, triangles, dim, minX, minY, invSize) {
+    // look for a valid diagonal that divides the polygon into two
+    var a = start;
+    do {
+        var b = a.next.next;
+        while (b !== a.prev) {
+            if (a.i !== b.i && isValidDiagonal(a, b)) {
+                // split the polygon in two by the diagonal
+                var c = splitPolygon(a, b);
+
+                // filter colinear points around the cuts
+                a = filterPoints(a, a.next);
+                c = filterPoints(c, c.next);
+
+                // run earcut on each half
+                earcutLinked(a, triangles, dim, minX, minY, invSize);
+                earcutLinked(c, triangles, dim, minX, minY, invSize);
+                return;
+            }
+            b = b.next;
+        }
+        a = a.next;
+    } while (a !== start);
+}
+
+// link every hole into the outer loop, producing a single-ring polygon without holes
+function eliminateHoles(data, holeIndices, outerNode, dim) {
+    var queue = [],
+        i, len, start, end, list;
+
+    for (i = 0, len = holeIndices.length; i < len; i++) {
+        start = holeIndices[i] * dim;
+        end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
+        list = linkedList(data, start, end, dim, false);
+        if (list === list.next) list.steiner = true;
+        queue.push(getLeftmost(list));
+    }
+
+    queue.sort(compareX);
+
+    // process holes from left to right
+    for (i = 0; i < queue.length; i++) {
+        eliminateHole(queue[i], outerNode);
+        outerNode = filterPoints(outerNode, outerNode.next);
+    }
+
+    return outerNode;
+}
+
+function compareX(a, b) {
+    return a.x - b.x;
+}
+
+// find a bridge between vertices that connects hole with an outer ring and and link it
+function eliminateHole(hole, outerNode) {
+    outerNode = findHoleBridge(hole, outerNode);
+    if (outerNode) {
+        var b = splitPolygon(outerNode, hole);
+
+        // filter collinear points around the cuts
+        filterPoints(outerNode, outerNode.next);
+        filterPoints(b, b.next);
+    }
+}
+
+// David Eberly's algorithm for finding a bridge between hole and outer polygon
+function findHoleBridge(hole, outerNode) {
+    var p = outerNode,
+        hx = hole.x,
+        hy = hole.y,
+        qx = -Infinity,
+        m;
+
+    // find a segment intersected by a ray from the hole's leftmost point to the left;
+    // segment's endpoint with lesser x will be potential connection point
+    do {
+        if (hy <= p.y && hy >= p.next.y && p.next.y !== p.y) {
+            var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
+            if (x <= hx && x > qx) {
+                qx = x;
+                if (x === hx) {
+                    if (hy === p.y) return p;
+                    if (hy === p.next.y) return p.next;
+                }
+                m = p.x < p.next.x ? p : p.next;
+            }
+        }
+        p = p.next;
+    } while (p !== outerNode);
+
+    if (!m) return null;
+
+    if (hx === qx) return m; // hole touches outer segment; pick leftmost endpoint
+
+    // look for points inside the triangle of hole point, segment intersection and endpoint;
+    // if there are no points found, we have a valid connection;
+    // otherwise choose the point of the minimum angle with the ray as connection point
+
+    var stop = m,
+        mx = m.x,
+        my = m.y,
+        tanMin = Infinity,
+        tan;
+
+    p = m;
+
+    do {
+        if (hx >= p.x && p.x >= mx && hx !== p.x &&
+                pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {
+
+            tan = Math.abs(hy - p.y) / (hx - p.x); // tangential
+
+            if (locallyInside(p, hole) &&
+                (tan < tanMin || (tan === tanMin && (p.x > m.x || (p.x === m.x && sectorContainsSector(m, p)))))) {
+                m = p;
+                tanMin = tan;
+            }
+        }
+
+        p = p.next;
+    } while (p !== stop);
+
+    return m;
+}
+
+// whether sector in vertex m contains sector in vertex p in the same coordinates
+function sectorContainsSector(m, p) {
+    return area(m.prev, m, p.prev) < 0 && area(p.next, m, m.next) < 0;
+}
+
+// interlink polygon nodes in z-order
+function indexCurve(start, minX, minY, invSize) {
+    var p = start;
+    do {
+        if (p.z === null) p.z = zOrder(p.x, p.y, minX, minY, invSize);
+        p.prevZ = p.prev;
+        p.nextZ = p.next;
+        p = p.next;
+    } while (p !== start);
+
+    p.prevZ.nextZ = null;
+    p.prevZ = null;
+
+    sortLinked(p);
+}
+
+// Simon Tatham's linked list merge sort algorithm
+// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+function sortLinked(list) {
+    var i, p, q, e, tail, numMerges, pSize, qSize,
+        inSize = 1;
+
+    do {
+        p = list;
+        list = null;
+        tail = null;
+        numMerges = 0;
+
+        while (p) {
+            numMerges++;
+            q = p;
+            pSize = 0;
+            for (i = 0; i < inSize; i++) {
+                pSize++;
+                q = q.nextZ;
+                if (!q) break;
+            }
+            qSize = inSize;
+
+            while (pSize > 0 || (qSize > 0 && q)) {
+
+                if (pSize !== 0 && (qSize === 0 || !q || p.z <= q.z)) {
+                    e = p;
+                    p = p.nextZ;
+                    pSize--;
+                } else {
+                    e = q;
+                    q = q.nextZ;
+                    qSize--;
+                }
+
+                if (tail) tail.nextZ = e;
+                else list = e;
+
+                e.prevZ = tail;
+                tail = e;
+            }
+
+            p = q;
+        }
+
+        tail.nextZ = null;
+        inSize *= 2;
+
+    } while (numMerges > 1);
+
+    return list;
+}
+
+// z-order of a point given coords and inverse of the longer side of data bbox
+function zOrder(x, y, minX, minY, invSize) {
+    // coords are transformed into non-negative 15-bit integer range
+    x = 32767 * (x - minX) * invSize;
+    y = 32767 * (y - minY) * invSize;
+
+    x = (x | (x << 8)) & 0x00FF00FF;
+    x = (x | (x << 4)) & 0x0F0F0F0F;
+    x = (x | (x << 2)) & 0x33333333;
+    x = (x | (x << 1)) & 0x55555555;
+
+    y = (y | (y << 8)) & 0x00FF00FF;
+    y = (y | (y << 4)) & 0x0F0F0F0F;
+    y = (y | (y << 2)) & 0x33333333;
+    y = (y | (y << 1)) & 0x55555555;
+
+    return x | (y << 1);
+}
+
+// find the leftmost node of a polygon ring
+function getLeftmost(start) {
+    var p = start,
+        leftmost = start;
+    do {
+        if (p.x < leftmost.x || (p.x === leftmost.x && p.y < leftmost.y)) leftmost = p;
+        p = p.next;
+    } while (p !== start);
+
+    return leftmost;
+}
+
+// check if a point lies within a convex triangle
+function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
+    return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&
+           (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&
+           (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
+}
+
+// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
+function isValidDiagonal(a, b) {
+    return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && // dones't intersect other edges
+           (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && // locally visible
+            (area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
+            equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
+}
+
+// signed area of a triangle
+function area(p, q, r) {
+    return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+}
+
+// check if two points are equal
+function equals(p1, p2) {
+    return p1.x === p2.x && p1.y === p2.y;
+}
+
+// check if two segments intersect
+function intersects(p1, q1, p2, q2) {
+    var o1 = sign(area(p1, q1, p2));
+    var o2 = sign(area(p1, q1, q2));
+    var o3 = sign(area(p2, q2, p1));
+    var o4 = sign(area(p2, q2, q1));
+
+    if (o1 !== o2 && o3 !== o4) return true; // general case
+
+    if (o1 === 0 && onSegment(p1, p2, q1)) return true; // p1, q1 and p2 are collinear and p2 lies on p1q1
+    if (o2 === 0 && onSegment(p1, q2, q1)) return true; // p1, q1 and q2 are collinear and q2 lies on p1q1
+    if (o3 === 0 && onSegment(p2, p1, q2)) return true; // p2, q2 and p1 are collinear and p1 lies on p2q2
+    if (o4 === 0 && onSegment(p2, q1, q2)) return true; // p2, q2 and q1 are collinear and q1 lies on p2q2
+
+    return false;
+}
+
+// for collinear points p, q, r, check if point q lies on segment pr
+function onSegment(p, q, r) {
+    return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
+}
+
+function sign(num) {
+    return num > 0 ? 1 : num < 0 ? -1 : 0;
+}
+
+// check if a polygon diagonal intersects any polygon segments
+function intersectsPolygon(a, b) {
+    var p = a;
+    do {
+        if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
+                intersects(p, p.next, a, b)) return true;
+        p = p.next;
+    } while (p !== a);
+
+    return false;
+}
+
+// check if a polygon diagonal is locally inside the polygon
+function locallyInside(a, b) {
+    return area(a.prev, a, a.next) < 0 ?
+        area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 :
+        area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;
+}
+
+// check if the middle point of a polygon diagonal is inside the polygon
+function middleInside(a, b) {
+    var p = a,
+        inside = false,
+        px = (a.x + b.x) / 2,
+        py = (a.y + b.y) / 2;
+    do {
+        if (((p.y > py) !== (p.next.y > py)) && p.next.y !== p.y &&
+                (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x))
+            inside = !inside;
+        p = p.next;
+    } while (p !== a);
+
+    return inside;
+}
+
+// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;
+// if one belongs to the outer ring and another to a hole, it merges it into a single ring
+function splitPolygon(a, b) {
+    var a2 = new Node(a.i, a.x, a.y),
+        b2 = new Node(b.i, b.x, b.y),
+        an = a.next,
+        bp = b.prev;
+
+    a.next = b;
+    b.prev = a;
+
+    a2.next = an;
+    an.prev = a2;
+
+    b2.next = a2;
+    a2.prev = b2;
+
+    bp.next = b2;
+    b2.prev = bp;
+
+    return b2;
+}
+
+// create a node and optionally link it with previous one (in a circular doubly linked list)
+function insertNode(i, x, y, last) {
+    var p = new Node(i, x, y);
+
+    if (!last) {
+        p.prev = p;
+        p.next = p;
+
+    } else {
+        p.next = last.next;
+        p.prev = last;
+        last.next.prev = p;
+        last.next = p;
+    }
+    return p;
+}
+
+function removeNode(p) {
+    p.next.prev = p.prev;
+    p.prev.next = p.next;
+
+    if (p.prevZ) p.prevZ.nextZ = p.nextZ;
+    if (p.nextZ) p.nextZ.prevZ = p.prevZ;
+}
+
+function Node(i, x, y) {
+    // vertex index in coordinates array
+    this.i = i;
+
+    // vertex coordinates
+    this.x = x;
+    this.y = y;
+
+    // previous and next vertex nodes in a polygon ring
+    this.prev = null;
+    this.next = null;
+
+    // z-order curve value
+    this.z = null;
+
+    // previous and next nodes in z-order
+    this.prevZ = null;
+    this.nextZ = null;
+
+    // indicates whether this is a steiner point
+    this.steiner = false;
+}
+
+// return a percentage difference between the polygon area and its triangulation area;
+// used to verify correctness of triangulation
+earcut.deviation = function (data, holeIndices, dim, triangles) {
+    var hasHoles = holeIndices && holeIndices.length;
+    var outerLen = hasHoles ? holeIndices[0] * dim : data.length;
+
+    var polygonArea = Math.abs(signedArea(data, 0, outerLen, dim));
+    if (hasHoles) {
+        for (var i = 0, len = holeIndices.length; i < len; i++) {
+            var start = holeIndices[i] * dim;
+            var end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
+            polygonArea -= Math.abs(signedArea(data, start, end, dim));
+        }
+    }
+
+    var trianglesArea = 0;
+    for (i = 0; i < triangles.length; i += 3) {
+        var a = triangles[i] * dim;
+        var b = triangles[i + 1] * dim;
+        var c = triangles[i + 2] * dim;
+        trianglesArea += Math.abs(
+            (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -
+            (data[a] - data[b]) * (data[c + 1] - data[a + 1]));
+    }
+
+    return polygonArea === 0 && trianglesArea === 0 ? 0 :
+        Math.abs((trianglesArea - polygonArea) / polygonArea);
 };
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
 
-function noop() {}
+function signedArea(data, start, end, dim) {
+    var sum = 0;
+    for (var i = start, j = end - dim; i < end; i += dim) {
+        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+        j = i;
+    }
+    return sum;
+}
 
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
+// turn a polygon in a multi-dimensional array form (e.g. as in GeoJSON) into a form Earcut accepts
+earcut.flatten = function (data) {
+    var dim = data[0][0].length,
+        result = {vertices: [], holes: [], dimensions: dim},
+        holeIndex = 0;
 
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
+    for (var i = 0; i < data.length; i++) {
+        for (var j = 0; j < data[i].length; j++) {
+            for (var d = 0; d < dim; d++) result.vertices.push(data[i][j][d]);
+        }
+        if (i > 0) {
+            holeIndex += data[i - 1].length;
+            result.holes.push(holeIndex);
+        }
+    }
+    return result;
 };
 
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
 
-},{}],3:[function(require,module,exports){
-/*!
+/***/ }),
+
+/***/ "./node_modules/eventemitter3/index.js":
+/*!*********************************************!*\
+  !*** ./node_modules/eventemitter3/index.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty;
+
+//
+// We store our EE objects in a plain object whose properties are event names.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// `~` to make sure that the built-in object properties are not overridden or
+// used as an attack vector.
+// We also assume that `Object.create(null)` is available when the event name
+// is an ES6 Symbol.
+//
+var prefix = typeof Object.create !== 'function' ? '~' : false;
+
+/**
+ * Representation of a single EventEmitter function.
+ *
+ * @param {Function} fn Event handler to be called.
+ * @param {Mixed} context Context for function execution.
+ * @param {Boolean} [once=false] Only emit once
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal EventEmitter interface that is molded against the Node.js
+ * EventEmitter interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() { /* Nothing to set */ }
+
+/**
+ * Hold the assigned EventEmitters by name.
+ *
+ * @type {Object}
+ * @private
+ */
+EventEmitter.prototype._events = undefined;
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var events = this._events
+    , names = []
+    , name;
+
+  if (!events) return names;
+
+  for (name in events) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return a list of assigned event listeners.
+ *
+ * @param {String} event The events that should be listed.
+ * @param {Boolean} exists We only need to know if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events && this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Emit an event to all registered event listeners.
+ *
+ * @param {String} event The name of the event.
+ * @returns {Boolean} Indication if we've emitted an event.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events || !this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if ('function' === typeof listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Register a new EventListener for the given event.
+ *
+ * @param {String} event Name of the event.
+ * @param {Function} fn Callback function.
+ * @param {Mixed} [context=this] The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events) this._events = prefix ? {} : Object.create(null);
+  if (!this._events[evt]) this._events[evt] = listener;
+  else {
+    if (!this._events[evt].fn) this._events[evt].push(listener);
+    else this._events[evt] = [
+      this._events[evt], listener
+    ];
+  }
+
+  return this;
+};
+
+/**
+ * Add an EventListener that's only called once.
+ *
+ * @param {String} event Name of the event.
+ * @param {Function} fn Callback function.
+ * @param {Mixed} [context=this] The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events) this._events = prefix ? {} : Object.create(null);
+  if (!this._events[evt]) this._events[evt] = listener;
+  else {
+    if (!this._events[evt].fn) this._events[evt].push(listener);
+    else this._events[evt] = [
+      this._events[evt], listener
+    ];
+  }
+
+  return this;
+};
+
+/**
+ * Remove event listeners.
+ *
+ * @param {String} event The event we want to remove.
+ * @param {Function} fn The listener that we need to find.
+ * @param {Mixed} context Only remove listeners matching this context.
+ * @param {Boolean} once Only remove once listeners.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events || !this._events[evt]) return this;
+
+  var listeners = this._events[evt]
+    , events = [];
+
+  if (fn) {
+    if (listeners.fn) {
+      if (
+           listeners.fn !== fn
+        || (once && !listeners.once)
+        || (context && listeners.context !== context)
+      ) {
+        events.push(listeners);
+      }
+    } else {
+      for (var i = 0, length = listeners.length; i < length; i++) {
+        if (
+             listeners[i].fn !== fn
+          || (once && !listeners[i].once)
+          || (context && listeners[i].context !== context)
+        ) {
+          events.push(listeners[i]);
+        }
+      }
+    }
+  }
+
+  //
+  // Reset the array, or remove it completely if we have no more listeners.
+  //
+  if (events.length) {
+    this._events[evt] = events.length === 1 ? events[0] : events;
+  } else {
+    delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners or only the listeners for the specified event.
+ *
+ * @param {String} event The event want to remove all listeners for.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  if (!this._events) return this;
+
+  if (event) delete this._events[prefix ? prefix + event : event];
+  else this._events = prefix ? {} : Object.create(null);
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/howler/howler.js":
+/*!***************************************!*\
+  !*** ./node_modules/howler/howler.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/*!
  *  howler.js v1.1.29
  *  howlerjs.com
  *
@@ -1736,19 +3688,20 @@ process.umask = function() { return 0; };
   /**
    * Add support for AMD (Asynchronous Module Definition) libraries such as require.js.
    */
-  if (typeof define === 'function' && define.amd) {
-    define(function() {
+  if (true) {
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
       return {
         Howler: Howler,
         Howl: Howl
       };
-    });
+    }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   }
 
   /**
    * Add support for CommonJS libraries such as browserify.
    */
-  if (typeof exports !== 'undefined') {
+  if (true) {
     exports.Howler = Howler;
     exports.Howl = Howl;
   }
@@ -1762,9 +3715,17 @@ process.umask = function() { return 0; };
 
 })();
 
-},{}],4:[function(require,module,exports){
-(function (global){
-/**
+
+/***/ }),
+
+/***/ "./node_modules/lodash/index.js":
+/*!**************************************!*\
+  !*** ./node_modules/lodash/index.js ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * lodash 3.10.1 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern -d -o ./index.js`
@@ -14086,7 +16047,7 @@ process.umask = function() { return 0; };
   var _ = runInContext();
 
   // Some AMD build optimizers like r.js check for condition patterns like the following:
-  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+  if (true) {
     // Expose lodash to the global object when an AMD loader is present to avoid
     // errors in cases where lodash is loaded by a script tag and not intended
     // as an AMD module. See http://requirejs.org/docs/errors.html#mismatch for
@@ -14095,2237 +16056,111 @@ process.umask = function() { return 0; };
 
     // Define as an anonymous module so, through path mapping, it can be
     // referenced as the "underscore" module.
-    define(function() {
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
       return _;
-    });
+    }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   }
   // Check for `exports` after `define` in case a build optimizer adds an `exports` object.
-  else if (freeExports && freeModule) {
-    // Export for Node.js or RingoJS.
-    if (moduleExports) {
-      (freeModule.exports = _)._ = _;
-    }
-    // Export for Rhino with CommonJS support.
-    else {
-      freeExports._ = _;
-    }
-  }
-  else {
-    // Export for a browser or Rhino.
-    root._ = _;
-  }
+  else {}
 }.call(this));
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],5:[function(require,module,exports){
-(function (process,global){
-/*!
- * async
- * https://github.com/caolan/async
- *
- * Copyright 2010-2014 Caolan McMahon
- * Released under the MIT license
- */
-(function () {
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module), __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
-    var async = {};
-    function noop() {}
-    function identity(v) {
-        return v;
-    }
-    function toBool(v) {
-        return !!v;
-    }
-    function notId(v) {
-        return !v;
-    }
+/***/ }),
 
-    // global on the server, window in the browser
-    var previous_async;
+/***/ "./node_modules/node-libs-browser/node_modules/timers-browserify/main.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/node-libs-browser/node_modules/timers-browserify/main.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-    // Establish the root object, `window` (`self`) in the browser, `global`
-    // on the server, or `this` in some virtual machines. We use `self`
-    // instead of `window` for `WebWorker` support.
-    var root = typeof self === 'object' && self.self === self && self ||
-            typeof global === 'object' && global.global === global && global ||
-            this;
+/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
+            (typeof self !== "undefined" && self) ||
+            window;
+var apply = Function.prototype.apply;
 
-    if (root != null) {
-        previous_async = root.async;
-    }
+// DOM APIs, for completeness
 
-    async.noConflict = function () {
-        root.async = previous_async;
-        return async;
-    };
-
-    function only_once(fn) {
-        return function() {
-            if (fn === null) throw new Error("Callback was already called.");
-            fn.apply(this, arguments);
-            fn = null;
-        };
-    }
-
-    function _once(fn) {
-        return function() {
-            if (fn === null) return;
-            fn.apply(this, arguments);
-            fn = null;
-        };
-    }
-
-    //// cross-browser compatiblity functions ////
-
-    var _toString = Object.prototype.toString;
-
-    var _isArray = Array.isArray || function (obj) {
-        return _toString.call(obj) === '[object Array]';
-    };
-
-    // Ported from underscore.js isObject
-    var _isObject = function(obj) {
-        var type = typeof obj;
-        return type === 'function' || type === 'object' && !!obj;
-    };
-
-    function _isArrayLike(arr) {
-        return _isArray(arr) || (
-            // has a positive integer length property
-            typeof arr.length === "number" &&
-            arr.length >= 0 &&
-            arr.length % 1 === 0
-        );
-    }
-
-    function _arrayEach(arr, iterator) {
-        var index = -1,
-            length = arr.length;
-
-        while (++index < length) {
-            iterator(arr[index], index, arr);
-        }
-    }
-
-    function _map(arr, iterator) {
-        var index = -1,
-            length = arr.length,
-            result = Array(length);
-
-        while (++index < length) {
-            result[index] = iterator(arr[index], index, arr);
-        }
-        return result;
-    }
-
-    function _range(count) {
-        return _map(Array(count), function (v, i) { return i; });
-    }
-
-    function _reduce(arr, iterator, memo) {
-        _arrayEach(arr, function (x, i, a) {
-            memo = iterator(memo, x, i, a);
-        });
-        return memo;
-    }
-
-    function _forEachOf(object, iterator) {
-        _arrayEach(_keys(object), function (key) {
-            iterator(object[key], key);
-        });
-    }
-
-    function _indexOf(arr, item) {
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] === item) return i;
-        }
-        return -1;
-    }
-
-    var _keys = Object.keys || function (obj) {
-        var keys = [];
-        for (var k in obj) {
-            if (obj.hasOwnProperty(k)) {
-                keys.push(k);
-            }
-        }
-        return keys;
-    };
-
-    function _keyIterator(coll) {
-        var i = -1;
-        var len;
-        var keys;
-        if (_isArrayLike(coll)) {
-            len = coll.length;
-            return function next() {
-                i++;
-                return i < len ? i : null;
-            };
-        } else {
-            keys = _keys(coll);
-            len = keys.length;
-            return function next() {
-                i++;
-                return i < len ? keys[i] : null;
-            };
-        }
-    }
-
-    // Similar to ES6's rest param (http://ariya.ofilabs.com/2013/03/es6-and-rest-parameter.html)
-    // This accumulates the arguments passed into an array, after a given index.
-    // From underscore.js (https://github.com/jashkenas/underscore/pull/2140).
-    function _restParam(func, startIndex) {
-        startIndex = startIndex == null ? func.length - 1 : +startIndex;
-        return function() {
-            var length = Math.max(arguments.length - startIndex, 0);
-            var rest = Array(length);
-            for (var index = 0; index < length; index++) {
-                rest[index] = arguments[index + startIndex];
-            }
-            switch (startIndex) {
-                case 0: return func.call(this, rest);
-                case 1: return func.call(this, arguments[0], rest);
-            }
-            // Currently unused but handle cases outside of the switch statement:
-            // var args = Array(startIndex + 1);
-            // for (index = 0; index < startIndex; index++) {
-            //     args[index] = arguments[index];
-            // }
-            // args[startIndex] = rest;
-            // return func.apply(this, args);
-        };
-    }
-
-    function _withoutIndex(iterator) {
-        return function (value, index, callback) {
-            return iterator(value, callback);
-        };
-    }
-
-    //// exported async module functions ////
-
-    //// nextTick implementation with browser-compatible fallback ////
-
-    // capture the global reference to guard against fakeTimer mocks
-    var _setImmediate = typeof setImmediate === 'function' && setImmediate;
-
-    var _delay = _setImmediate ? function(fn) {
-        // not a direct alias for IE10 compatibility
-        _setImmediate(fn);
-    } : function(fn) {
-        setTimeout(fn, 0);
-    };
-
-    if (typeof process === 'object' && typeof process.nextTick === 'function') {
-        async.nextTick = process.nextTick;
-    } else {
-        async.nextTick = _delay;
-    }
-    async.setImmediate = _setImmediate ? _delay : async.nextTick;
-
-
-    async.forEach =
-    async.each = function (arr, iterator, callback) {
-        return async.eachOf(arr, _withoutIndex(iterator), callback);
-    };
-
-    async.forEachSeries =
-    async.eachSeries = function (arr, iterator, callback) {
-        return async.eachOfSeries(arr, _withoutIndex(iterator), callback);
-    };
-
-
-    async.forEachLimit =
-    async.eachLimit = function (arr, limit, iterator, callback) {
-        return _eachOfLimit(limit)(arr, _withoutIndex(iterator), callback);
-    };
-
-    async.forEachOf =
-    async.eachOf = function (object, iterator, callback) {
-        callback = _once(callback || noop);
-        object = object || [];
-
-        var iter = _keyIterator(object);
-        var key, completed = 0;
-
-        while ((key = iter()) != null) {
-            completed += 1;
-            iterator(object[key], key, only_once(done));
-        }
-
-        if (completed === 0) callback(null);
-
-        function done(err) {
-            completed--;
-            if (err) {
-                callback(err);
-            }
-            // Check key is null in case iterator isn't exhausted
-            // and done resolved synchronously.
-            else if (key === null && completed <= 0) {
-                callback(null);
-            }
-        }
-    };
-
-    async.forEachOfSeries =
-    async.eachOfSeries = function (obj, iterator, callback) {
-        callback = _once(callback || noop);
-        obj = obj || [];
-        var nextKey = _keyIterator(obj);
-        var key = nextKey();
-        function iterate() {
-            var sync = true;
-            if (key === null) {
-                return callback(null);
-            }
-            iterator(obj[key], key, only_once(function (err) {
-                if (err) {
-                    callback(err);
-                }
-                else {
-                    key = nextKey();
-                    if (key === null) {
-                        return callback(null);
-                    } else {
-                        if (sync) {
-                            async.setImmediate(iterate);
-                        } else {
-                            iterate();
-                        }
-                    }
-                }
-            }));
-            sync = false;
-        }
-        iterate();
-    };
-
-
-
-    async.forEachOfLimit =
-    async.eachOfLimit = function (obj, limit, iterator, callback) {
-        _eachOfLimit(limit)(obj, iterator, callback);
-    };
-
-    function _eachOfLimit(limit) {
-
-        return function (obj, iterator, callback) {
-            callback = _once(callback || noop);
-            obj = obj || [];
-            var nextKey = _keyIterator(obj);
-            if (limit <= 0) {
-                return callback(null);
-            }
-            var done = false;
-            var running = 0;
-            var errored = false;
-
-            (function replenish () {
-                if (done && running <= 0) {
-                    return callback(null);
-                }
-
-                while (running < limit && !errored) {
-                    var key = nextKey();
-                    if (key === null) {
-                        done = true;
-                        if (running <= 0) {
-                            callback(null);
-                        }
-                        return;
-                    }
-                    running += 1;
-                    iterator(obj[key], key, only_once(function (err) {
-                        running -= 1;
-                        if (err) {
-                            callback(err);
-                            errored = true;
-                        }
-                        else {
-                            replenish();
-                        }
-                    }));
-                }
-            })();
-        };
-    }
-
-
-    function doParallel(fn) {
-        return function (obj, iterator, callback) {
-            return fn(async.eachOf, obj, iterator, callback);
-        };
-    }
-    function doParallelLimit(fn) {
-        return function (obj, limit, iterator, callback) {
-            return fn(_eachOfLimit(limit), obj, iterator, callback);
-        };
-    }
-    function doSeries(fn) {
-        return function (obj, iterator, callback) {
-            return fn(async.eachOfSeries, obj, iterator, callback);
-        };
-    }
-
-    function _asyncMap(eachfn, arr, iterator, callback) {
-        callback = _once(callback || noop);
-        arr = arr || [];
-        var results = _isArrayLike(arr) ? [] : {};
-        eachfn(arr, function (value, index, callback) {
-            iterator(value, function (err, v) {
-                results[index] = v;
-                callback(err);
-            });
-        }, function (err) {
-            callback(err, results);
-        });
-    }
-
-    async.map = doParallel(_asyncMap);
-    async.mapSeries = doSeries(_asyncMap);
-    async.mapLimit = doParallelLimit(_asyncMap);
-
-    // reduce only has a series version, as doing reduce in parallel won't
-    // work in many situations.
-    async.inject =
-    async.foldl =
-    async.reduce = function (arr, memo, iterator, callback) {
-        async.eachOfSeries(arr, function (x, i, callback) {
-            iterator(memo, x, function (err, v) {
-                memo = v;
-                callback(err);
-            });
-        }, function (err) {
-            callback(err, memo);
-        });
-    };
-
-    async.foldr =
-    async.reduceRight = function (arr, memo, iterator, callback) {
-        var reversed = _map(arr, identity).reverse();
-        async.reduce(reversed, memo, iterator, callback);
-    };
-
-    async.transform = function (arr, memo, iterator, callback) {
-        if (arguments.length === 3) {
-            callback = iterator;
-            iterator = memo;
-            memo = _isArray(arr) ? [] : {};
-        }
-
-        async.eachOf(arr, function(v, k, cb) {
-            iterator(memo, v, k, cb);
-        }, function(err) {
-            callback(err, memo);
-        });
-    };
-
-    function _filter(eachfn, arr, iterator, callback) {
-        var results = [];
-        eachfn(arr, function (x, index, callback) {
-            iterator(x, function (v) {
-                if (v) {
-                    results.push({index: index, value: x});
-                }
-                callback();
-            });
-        }, function () {
-            callback(_map(results.sort(function (a, b) {
-                return a.index - b.index;
-            }), function (x) {
-                return x.value;
-            }));
-        });
-    }
-
-    async.select =
-    async.filter = doParallel(_filter);
-
-    async.selectLimit =
-    async.filterLimit = doParallelLimit(_filter);
-
-    async.selectSeries =
-    async.filterSeries = doSeries(_filter);
-
-    function _reject(eachfn, arr, iterator, callback) {
-        _filter(eachfn, arr, function(value, cb) {
-            iterator(value, function(v) {
-                cb(!v);
-            });
-        }, callback);
-    }
-    async.reject = doParallel(_reject);
-    async.rejectLimit = doParallelLimit(_reject);
-    async.rejectSeries = doSeries(_reject);
-
-    function _createTester(eachfn, check, getResult) {
-        return function(arr, limit, iterator, cb) {
-            function done() {
-                if (cb) cb(getResult(false, void 0));
-            }
-            function iteratee(x, _, callback) {
-                if (!cb) return callback();
-                iterator(x, function (v) {
-                    if (cb && check(v)) {
-                        cb(getResult(true, x));
-                        cb = iterator = false;
-                    }
-                    callback();
-                });
-            }
-            if (arguments.length > 3) {
-                eachfn(arr, limit, iteratee, done);
-            } else {
-                cb = iterator;
-                iterator = limit;
-                eachfn(arr, iteratee, done);
-            }
-        };
-    }
-
-    async.any =
-    async.some = _createTester(async.eachOf, toBool, identity);
-
-    async.someLimit = _createTester(async.eachOfLimit, toBool, identity);
-
-    async.all =
-    async.every = _createTester(async.eachOf, notId, notId);
-
-    async.everyLimit = _createTester(async.eachOfLimit, notId, notId);
-
-    function _findGetResult(v, x) {
-        return x;
-    }
-    async.detect = _createTester(async.eachOf, identity, _findGetResult);
-    async.detectSeries = _createTester(async.eachOfSeries, identity, _findGetResult);
-    async.detectLimit = _createTester(async.eachOfLimit, identity, _findGetResult);
-
-    async.sortBy = function (arr, iterator, callback) {
-        async.map(arr, function (x, callback) {
-            iterator(x, function (err, criteria) {
-                if (err) {
-                    callback(err);
-                }
-                else {
-                    callback(null, {value: x, criteria: criteria});
-                }
-            });
-        }, function (err, results) {
-            if (err) {
-                return callback(err);
-            }
-            else {
-                callback(null, _map(results.sort(comparator), function (x) {
-                    return x.value;
-                }));
-            }
-
-        });
-
-        function comparator(left, right) {
-            var a = left.criteria, b = right.criteria;
-            return a < b ? -1 : a > b ? 1 : 0;
-        }
-    };
-
-    async.auto = function (tasks, concurrency, callback) {
-        if (typeof arguments[1] === 'function') {
-            // concurrency is optional, shift the args.
-            callback = concurrency;
-            concurrency = null;
-        }
-        callback = _once(callback || noop);
-        var keys = _keys(tasks);
-        var remainingTasks = keys.length;
-        if (!remainingTasks) {
-            return callback(null);
-        }
-        if (!concurrency) {
-            concurrency = remainingTasks;
-        }
-
-        var results = {};
-        var runningTasks = 0;
-
-        var hasError = false;
-
-        var listeners = [];
-        function addListener(fn) {
-            listeners.unshift(fn);
-        }
-        function removeListener(fn) {
-            var idx = _indexOf(listeners, fn);
-            if (idx >= 0) listeners.splice(idx, 1);
-        }
-        function taskComplete() {
-            remainingTasks--;
-            _arrayEach(listeners.slice(0), function (fn) {
-                fn();
-            });
-        }
-
-        addListener(function () {
-            if (!remainingTasks) {
-                callback(null, results);
-            }
-        });
-
-        _arrayEach(keys, function (k) {
-            if (hasError) return;
-            var task = _isArray(tasks[k]) ? tasks[k]: [tasks[k]];
-            var taskCallback = _restParam(function(err, args) {
-                runningTasks--;
-                if (args.length <= 1) {
-                    args = args[0];
-                }
-                if (err) {
-                    var safeResults = {};
-                    _forEachOf(results, function(val, rkey) {
-                        safeResults[rkey] = val;
-                    });
-                    safeResults[k] = args;
-                    hasError = true;
-
-                    callback(err, safeResults);
-                }
-                else {
-                    results[k] = args;
-                    async.setImmediate(taskComplete);
-                }
-            });
-            var requires = task.slice(0, task.length - 1);
-            // prevent dead-locks
-            var len = requires.length;
-            var dep;
-            while (len--) {
-                if (!(dep = tasks[requires[len]])) {
-                    throw new Error('Has nonexistent dependency in ' + requires.join(', '));
-                }
-                if (_isArray(dep) && _indexOf(dep, k) >= 0) {
-                    throw new Error('Has cyclic dependencies');
-                }
-            }
-            function ready() {
-                return runningTasks < concurrency && _reduce(requires, function (a, x) {
-                    return (a && results.hasOwnProperty(x));
-                }, true) && !results.hasOwnProperty(k);
-            }
-            if (ready()) {
-                runningTasks++;
-                task[task.length - 1](taskCallback, results);
-            }
-            else {
-                addListener(listener);
-            }
-            function listener() {
-                if (ready()) {
-                    runningTasks++;
-                    removeListener(listener);
-                    task[task.length - 1](taskCallback, results);
-                }
-            }
-        });
-    };
-
-
-
-    async.retry = function(times, task, callback) {
-        var DEFAULT_TIMES = 5;
-        var DEFAULT_INTERVAL = 0;
-
-        var attempts = [];
-
-        var opts = {
-            times: DEFAULT_TIMES,
-            interval: DEFAULT_INTERVAL
-        };
-
-        function parseTimes(acc, t){
-            if(typeof t === 'number'){
-                acc.times = parseInt(t, 10) || DEFAULT_TIMES;
-            } else if(typeof t === 'object'){
-                acc.times = parseInt(t.times, 10) || DEFAULT_TIMES;
-                acc.interval = parseInt(t.interval, 10) || DEFAULT_INTERVAL;
-            } else {
-                throw new Error('Unsupported argument type for \'times\': ' + typeof t);
-            }
-        }
-
-        var length = arguments.length;
-        if (length < 1 || length > 3) {
-            throw new Error('Invalid arguments - must be either (task), (task, callback), (times, task) or (times, task, callback)');
-        } else if (length <= 2 && typeof times === 'function') {
-            callback = task;
-            task = times;
-        }
-        if (typeof times !== 'function') {
-            parseTimes(opts, times);
-        }
-        opts.callback = callback;
-        opts.task = task;
-
-        function wrappedTask(wrappedCallback, wrappedResults) {
-            function retryAttempt(task, finalAttempt) {
-                return function(seriesCallback) {
-                    task(function(err, result){
-                        seriesCallback(!err || finalAttempt, {err: err, result: result});
-                    }, wrappedResults);
-                };
-            }
-
-            function retryInterval(interval){
-                return function(seriesCallback){
-                    setTimeout(function(){
-                        seriesCallback(null);
-                    }, interval);
-                };
-            }
-
-            while (opts.times) {
-
-                var finalAttempt = !(opts.times-=1);
-                attempts.push(retryAttempt(opts.task, finalAttempt));
-                if(!finalAttempt && opts.interval > 0){
-                    attempts.push(retryInterval(opts.interval));
-                }
-            }
-
-            async.series(attempts, function(done, data){
-                data = data[data.length - 1];
-                (wrappedCallback || opts.callback)(data.err, data.result);
-            });
-        }
-
-        // If a callback is passed, run this as a controll flow
-        return opts.callback ? wrappedTask() : wrappedTask;
-    };
-
-    async.waterfall = function (tasks, callback) {
-        callback = _once(callback || noop);
-        if (!_isArray(tasks)) {
-            var err = new Error('First argument to waterfall must be an array of functions');
-            return callback(err);
-        }
-        if (!tasks.length) {
-            return callback();
-        }
-        function wrapIterator(iterator) {
-            return _restParam(function (err, args) {
-                if (err) {
-                    callback.apply(null, [err].concat(args));
-                }
-                else {
-                    var next = iterator.next();
-                    if (next) {
-                        args.push(wrapIterator(next));
-                    }
-                    else {
-                        args.push(callback);
-                    }
-                    ensureAsync(iterator).apply(null, args);
-                }
-            });
-        }
-        wrapIterator(async.iterator(tasks))();
-    };
-
-    function _parallel(eachfn, tasks, callback) {
-        callback = callback || noop;
-        var results = _isArrayLike(tasks) ? [] : {};
-
-        eachfn(tasks, function (task, key, callback) {
-            task(_restParam(function (err, args) {
-                if (args.length <= 1) {
-                    args = args[0];
-                }
-                results[key] = args;
-                callback(err);
-            }));
-        }, function (err) {
-            callback(err, results);
-        });
-    }
-
-    async.parallel = function (tasks, callback) {
-        _parallel(async.eachOf, tasks, callback);
-    };
-
-    async.parallelLimit = function(tasks, limit, callback) {
-        _parallel(_eachOfLimit(limit), tasks, callback);
-    };
-
-    async.series = function(tasks, callback) {
-        _parallel(async.eachOfSeries, tasks, callback);
-    };
-
-    async.iterator = function (tasks) {
-        function makeCallback(index) {
-            function fn() {
-                if (tasks.length) {
-                    tasks[index].apply(null, arguments);
-                }
-                return fn.next();
-            }
-            fn.next = function () {
-                return (index < tasks.length - 1) ? makeCallback(index + 1): null;
-            };
-            return fn;
-        }
-        return makeCallback(0);
-    };
-
-    async.apply = _restParam(function (fn, args) {
-        return _restParam(function (callArgs) {
-            return fn.apply(
-                null, args.concat(callArgs)
-            );
-        });
-    });
-
-    function _concat(eachfn, arr, fn, callback) {
-        var result = [];
-        eachfn(arr, function (x, index, cb) {
-            fn(x, function (err, y) {
-                result = result.concat(y || []);
-                cb(err);
-            });
-        }, function (err) {
-            callback(err, result);
-        });
-    }
-    async.concat = doParallel(_concat);
-    async.concatSeries = doSeries(_concat);
-
-    async.whilst = function (test, iterator, callback) {
-        callback = callback || noop;
-        if (test()) {
-            var next = _restParam(function(err, args) {
-                if (err) {
-                    callback(err);
-                } else if (test.apply(this, args)) {
-                    iterator(next);
-                } else {
-                    callback.apply(null, [null].concat(args));
-                }
-            });
-            iterator(next);
-        } else {
-            callback(null);
-        }
-    };
-
-    async.doWhilst = function (iterator, test, callback) {
-        var calls = 0;
-        return async.whilst(function() {
-            return ++calls <= 1 || test.apply(this, arguments);
-        }, iterator, callback);
-    };
-
-    async.until = function (test, iterator, callback) {
-        return async.whilst(function() {
-            return !test.apply(this, arguments);
-        }, iterator, callback);
-    };
-
-    async.doUntil = function (iterator, test, callback) {
-        return async.doWhilst(iterator, function() {
-            return !test.apply(this, arguments);
-        }, callback);
-    };
-
-    async.during = function (test, iterator, callback) {
-        callback = callback || noop;
-
-        var next = _restParam(function(err, args) {
-            if (err) {
-                callback(err);
-            } else {
-                args.push(check);
-                test.apply(this, args);
-            }
-        });
-
-        var check = function(err, truth) {
-            if (err) {
-                callback(err);
-            } else if (truth) {
-                iterator(next);
-            } else {
-                callback(null);
-            }
-        };
-
-        test(check);
-    };
-
-    async.doDuring = function (iterator, test, callback) {
-        var calls = 0;
-        async.during(function(next) {
-            if (calls++ < 1) {
-                next(null, true);
-            } else {
-                test.apply(this, arguments);
-            }
-        }, iterator, callback);
-    };
-
-    function _queue(worker, concurrency, payload) {
-        if (concurrency == null) {
-            concurrency = 1;
-        }
-        else if(concurrency === 0) {
-            throw new Error('Concurrency must not be zero');
-        }
-        function _insert(q, data, pos, callback) {
-            if (callback != null && typeof callback !== "function") {
-                throw new Error("task callback must be a function");
-            }
-            q.started = true;
-            if (!_isArray(data)) {
-                data = [data];
-            }
-            if(data.length === 0 && q.idle()) {
-                // call drain immediately if there are no tasks
-                return async.setImmediate(function() {
-                    q.drain();
-                });
-            }
-            _arrayEach(data, function(task) {
-                var item = {
-                    data: task,
-                    callback: callback || noop
-                };
-
-                if (pos) {
-                    q.tasks.unshift(item);
-                } else {
-                    q.tasks.push(item);
-                }
-
-                if (q.tasks.length === q.concurrency) {
-                    q.saturated();
-                }
-            });
-            async.setImmediate(q.process);
-        }
-        function _next(q, tasks) {
-            return function(){
-                workers -= 1;
-
-                var removed = false;
-                var args = arguments;
-                _arrayEach(tasks, function (task) {
-                    _arrayEach(workersList, function (worker, index) {
-                        if (worker === task && !removed) {
-                            workersList.splice(index, 1);
-                            removed = true;
-                        }
-                    });
-
-                    task.callback.apply(task, args);
-                });
-                if (q.tasks.length + workers === 0) {
-                    q.drain();
-                }
-                q.process();
-            };
-        }
-
-        var workers = 0;
-        var workersList = [];
-        var q = {
-            tasks: [],
-            concurrency: concurrency,
-            payload: payload,
-            saturated: noop,
-            empty: noop,
-            drain: noop,
-            started: false,
-            paused: false,
-            push: function (data, callback) {
-                _insert(q, data, false, callback);
-            },
-            kill: function () {
-                q.drain = noop;
-                q.tasks = [];
-            },
-            unshift: function (data, callback) {
-                _insert(q, data, true, callback);
-            },
-            process: function () {
-                while(!q.paused && workers < q.concurrency && q.tasks.length){
-
-                    var tasks = q.payload ?
-                        q.tasks.splice(0, q.payload) :
-                        q.tasks.splice(0, q.tasks.length);
-
-                    var data = _map(tasks, function (task) {
-                        return task.data;
-                    });
-
-                    if (q.tasks.length === 0) {
-                        q.empty();
-                    }
-                    workers += 1;
-                    workersList.push(tasks[0]);
-                    var cb = only_once(_next(q, tasks));
-                    worker(data, cb);
-                }
-            },
-            length: function () {
-                return q.tasks.length;
-            },
-            running: function () {
-                return workers;
-            },
-            workersList: function () {
-                return workersList;
-            },
-            idle: function() {
-                return q.tasks.length + workers === 0;
-            },
-            pause: function () {
-                q.paused = true;
-            },
-            resume: function () {
-                if (q.paused === false) { return; }
-                q.paused = false;
-                var resumeCount = Math.min(q.concurrency, q.tasks.length);
-                // Need to call q.process once per concurrent
-                // worker to preserve full concurrency after pause
-                for (var w = 1; w <= resumeCount; w++) {
-                    async.setImmediate(q.process);
-                }
-            }
-        };
-        return q;
-    }
-
-    async.queue = function (worker, concurrency) {
-        var q = _queue(function (items, cb) {
-            worker(items[0], cb);
-        }, concurrency, 1);
-
-        return q;
-    };
-
-    async.priorityQueue = function (worker, concurrency) {
-
-        function _compareTasks(a, b){
-            return a.priority - b.priority;
-        }
-
-        function _binarySearch(sequence, item, compare) {
-            var beg = -1,
-                end = sequence.length - 1;
-            while (beg < end) {
-                var mid = beg + ((end - beg + 1) >>> 1);
-                if (compare(item, sequence[mid]) >= 0) {
-                    beg = mid;
-                } else {
-                    end = mid - 1;
-                }
-            }
-            return beg;
-        }
-
-        function _insert(q, data, priority, callback) {
-            if (callback != null && typeof callback !== "function") {
-                throw new Error("task callback must be a function");
-            }
-            q.started = true;
-            if (!_isArray(data)) {
-                data = [data];
-            }
-            if(data.length === 0) {
-                // call drain immediately if there are no tasks
-                return async.setImmediate(function() {
-                    q.drain();
-                });
-            }
-            _arrayEach(data, function(task) {
-                var item = {
-                    data: task,
-                    priority: priority,
-                    callback: typeof callback === 'function' ? callback : noop
-                };
-
-                q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
-
-                if (q.tasks.length === q.concurrency) {
-                    q.saturated();
-                }
-                async.setImmediate(q.process);
-            });
-        }
-
-        // Start with a normal queue
-        var q = async.queue(worker, concurrency);
-
-        // Override push to accept second parameter representing priority
-        q.push = function (data, priority, callback) {
-            _insert(q, data, priority, callback);
-        };
-
-        // Remove unshift function
-        delete q.unshift;
-
-        return q;
-    };
-
-    async.cargo = function (worker, payload) {
-        return _queue(worker, 1, payload);
-    };
-
-    function _console_fn(name) {
-        return _restParam(function (fn, args) {
-            fn.apply(null, args.concat([_restParam(function (err, args) {
-                if (typeof console === 'object') {
-                    if (err) {
-                        if (console.error) {
-                            console.error(err);
-                        }
-                    }
-                    else if (console[name]) {
-                        _arrayEach(args, function (x) {
-                            console[name](x);
-                        });
-                    }
-                }
-            })]));
-        });
-    }
-    async.log = _console_fn('log');
-    async.dir = _console_fn('dir');
-    /*async.info = _console_fn('info');
-    async.warn = _console_fn('warn');
-    async.error = _console_fn('error');*/
-
-    async.memoize = function (fn, hasher) {
-        var memo = {};
-        var queues = {};
-        var has = Object.prototype.hasOwnProperty;
-        hasher = hasher || identity;
-        var memoized = _restParam(function memoized(args) {
-            var callback = args.pop();
-            var key = hasher.apply(null, args);
-            if (has.call(memo, key)) {   
-                async.setImmediate(function () {
-                    callback.apply(null, memo[key]);
-                });
-            }
-            else if (has.call(queues, key)) {
-                queues[key].push(callback);
-            }
-            else {
-                queues[key] = [callback];
-                fn.apply(null, args.concat([_restParam(function (args) {
-                    memo[key] = args;
-                    var q = queues[key];
-                    delete queues[key];
-                    for (var i = 0, l = q.length; i < l; i++) {
-                        q[i].apply(null, args);
-                    }
-                })]));
-            }
-        });
-        memoized.memo = memo;
-        memoized.unmemoized = fn;
-        return memoized;
-    };
-
-    async.unmemoize = function (fn) {
-        return function () {
-            return (fn.unmemoized || fn).apply(null, arguments);
-        };
-    };
-
-    function _times(mapper) {
-        return function (count, iterator, callback) {
-            mapper(_range(count), iterator, callback);
-        };
-    }
-
-    async.times = _times(async.map);
-    async.timesSeries = _times(async.mapSeries);
-    async.timesLimit = function (count, limit, iterator, callback) {
-        return async.mapLimit(_range(count), limit, iterator, callback);
-    };
-
-    async.seq = function (/* functions... */) {
-        var fns = arguments;
-        return _restParam(function (args) {
-            var that = this;
-
-            var callback = args[args.length - 1];
-            if (typeof callback == 'function') {
-                args.pop();
-            } else {
-                callback = noop;
-            }
-
-            async.reduce(fns, args, function (newargs, fn, cb) {
-                fn.apply(that, newargs.concat([_restParam(function (err, nextargs) {
-                    cb(err, nextargs);
-                })]));
-            },
-            function (err, results) {
-                callback.apply(that, [err].concat(results));
-            });
-        });
-    };
-
-    async.compose = function (/* functions... */) {
-        return async.seq.apply(null, Array.prototype.reverse.call(arguments));
-    };
-
-
-    function _applyEach(eachfn) {
-        return _restParam(function(fns, args) {
-            var go = _restParam(function(args) {
-                var that = this;
-                var callback = args.pop();
-                return eachfn(fns, function (fn, _, cb) {
-                    fn.apply(that, args.concat([cb]));
-                },
-                callback);
-            });
-            if (args.length) {
-                return go.apply(this, args);
-            }
-            else {
-                return go;
-            }
-        });
-    }
-
-    async.applyEach = _applyEach(async.eachOf);
-    async.applyEachSeries = _applyEach(async.eachOfSeries);
-
-
-    async.forever = function (fn, callback) {
-        var done = only_once(callback || noop);
-        var task = ensureAsync(fn);
-        function next(err) {
-            if (err) {
-                return done(err);
-            }
-            task(next);
-        }
-        next();
-    };
-
-    function ensureAsync(fn) {
-        return _restParam(function (args) {
-            var callback = args.pop();
-            args.push(function () {
-                var innerArgs = arguments;
-                if (sync) {
-                    async.setImmediate(function () {
-                        callback.apply(null, innerArgs);
-                    });
-                } else {
-                    callback.apply(null, innerArgs);
-                }
-            });
-            var sync = true;
-            fn.apply(this, args);
-            sync = false;
-        });
-    }
-
-    async.ensureAsync = ensureAsync;
-
-    async.constant = _restParam(function(values) {
-        var args = [null].concat(values);
-        return function (callback) {
-            return callback.apply(this, args);
-        };
-    });
-
-    async.wrapSync =
-    async.asyncify = function asyncify(func) {
-        return _restParam(function (args) {
-            var callback = args.pop();
-            var result;
-            try {
-                result = func.apply(this, args);
-            } catch (e) {
-                return callback(e);
-            }
-            // if result is Promise object
-            if (_isObject(result) && typeof result.then === "function") {
-                result.then(function(value) {
-                    callback(null, value);
-                })["catch"](function(err) {
-                    callback(err.message ? err : new Error(err));
-                });
-            } else {
-                callback(null, result);
-            }
-        });
-    };
-
-    // Node.js
-    if (typeof module === 'object' && module.exports) {
-        module.exports = async;
-    }
-    // AMD / RequireJS
-    else if (typeof define === 'function' && define.amd) {
-        define([], function () {
-            return async;
-        });
-    }
-    // included directly via <script> tag
-    else {
-        root.async = async;
-    }
-
-}());
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":2}],6:[function(require,module,exports){
-'use strict';
-
-module.exports = earcut;
-
-function earcut(data, holeIndices, dim) {
-
-    dim = dim || 2;
-
-    var hasHoles = holeIndices && holeIndices.length,
-        outerLen = hasHoles ? holeIndices[0] * dim : data.length,
-        outerNode = linkedList(data, 0, outerLen, dim, true),
-        triangles = [];
-
-    if (!outerNode) return triangles;
-
-    var minX, minY, maxX, maxY, x, y, size;
-
-    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);
-
-    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
-    if (data.length > 80 * dim) {
-        minX = maxX = data[0];
-        minY = maxY = data[1];
-
-        for (var i = dim; i < outerLen; i += dim) {
-            x = data[i];
-            y = data[i + 1];
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-        }
-
-        // minX, minY and size are later used to transform coords into integers for z-order calculation
-        size = Math.max(maxX - minX, maxY - minY);
-    }
-
-    earcutLinked(outerNode, triangles, dim, minX, minY, size);
-
-    return triangles;
-}
-
-// create a circular doubly linked list from polygon points in the specified winding order
-function linkedList(data, start, end, dim, clockwise) {
-    var i, last;
-
-    if (clockwise === (signedArea(data, start, end, dim) > 0)) {
-        for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);
-    } else {
-        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);
-    }
-
-    if (last && equals(last, last.next)) {
-        removeNode(last);
-        last = last.next;
-    }
-
-    return last;
-}
-
-// eliminate colinear or duplicate points
-function filterPoints(start, end) {
-    if (!start) return start;
-    if (!end) end = start;
-
-    var p = start,
-        again;
-    do {
-        again = false;
-
-        if (!p.steiner && (equals(p, p.next) || area(p.prev, p, p.next) === 0)) {
-            removeNode(p);
-            p = end = p.prev;
-            if (p === p.next) return null;
-            again = true;
-
-        } else {
-            p = p.next;
-        }
-    } while (again || p !== end);
-
-    return end;
-}
-
-// main ear slicing loop which triangulates a polygon (given as a linked list)
-function earcutLinked(ear, triangles, dim, minX, minY, size, pass) {
-    if (!ear) return;
-
-    // interlink polygon nodes in z-order
-    if (!pass && size) indexCurve(ear, minX, minY, size);
-
-    var stop = ear,
-        prev, next;
-
-    // iterate through ears, slicing them one by one
-    while (ear.prev !== ear.next) {
-        prev = ear.prev;
-        next = ear.next;
-
-        if (size ? isEarHashed(ear, minX, minY, size) : isEar(ear)) {
-            // cut off the triangle
-            triangles.push(prev.i / dim);
-            triangles.push(ear.i / dim);
-            triangles.push(next.i / dim);
-
-            removeNode(ear);
-
-            // skipping the next vertice leads to less sliver triangles
-            ear = next.next;
-            stop = next.next;
-
-            continue;
-        }
-
-        ear = next;
-
-        // if we looped through the whole remaining polygon and can't find any more ears
-        if (ear === stop) {
-            // try filtering points and slicing again
-            if (!pass) {
-                earcutLinked(filterPoints(ear), triangles, dim, minX, minY, size, 1);
-
-            // if this didn't work, try curing all small self-intersections locally
-            } else if (pass === 1) {
-                ear = cureLocalIntersections(ear, triangles, dim);
-                earcutLinked(ear, triangles, dim, minX, minY, size, 2);
-
-            // as a last resort, try splitting the remaining polygon into two
-            } else if (pass === 2) {
-                splitEarcut(ear, triangles, dim, minX, minY, size);
-            }
-
-            break;
-        }
-    }
-}
-
-// check whether a polygon node forms a valid ear with adjacent nodes
-function isEar(ear) {
-    var a = ear.prev,
-        b = ear,
-        c = ear.next;
-
-    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
-
-    // now make sure we don't have other points inside the potential ear
-    var p = ear.next.next;
-
-    while (p !== ear.prev) {
-        if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
-            area(p.prev, p, p.next) >= 0) return false;
-        p = p.next;
-    }
-
-    return true;
-}
-
-function isEarHashed(ear, minX, minY, size) {
-    var a = ear.prev,
-        b = ear,
-        c = ear.next;
-
-    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
-
-    // triangle bbox; min & max are calculated like this for speed
-    var minTX = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x),
-        minTY = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y),
-        maxTX = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x),
-        maxTY = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y);
-
-    // z-order range for the current triangle bbox;
-    var minZ = zOrder(minTX, minTY, minX, minY, size),
-        maxZ = zOrder(maxTX, maxTY, minX, minY, size);
-
-    // first look for points inside the triangle in increasing z-order
-    var p = ear.nextZ;
-
-    while (p && p.z <= maxZ) {
-        if (p !== ear.prev && p !== ear.next &&
-            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
-            area(p.prev, p, p.next) >= 0) return false;
-        p = p.nextZ;
-    }
-
-    // then look for points in decreasing z-order
-    p = ear.prevZ;
-
-    while (p && p.z >= minZ) {
-        if (p !== ear.prev && p !== ear.next &&
-            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
-            area(p.prev, p, p.next) >= 0) return false;
-        p = p.prevZ;
-    }
-
-    return true;
-}
-
-// go through all polygon nodes and cure small local self-intersections
-function cureLocalIntersections(start, triangles, dim) {
-    var p = start;
-    do {
-        var a = p.prev,
-            b = p.next.next;
-
-        if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
-
-            triangles.push(a.i / dim);
-            triangles.push(p.i / dim);
-            triangles.push(b.i / dim);
-
-            // remove two nodes involved
-            removeNode(p);
-            removeNode(p.next);
-
-            p = start = b;
-        }
-        p = p.next;
-    } while (p !== start);
-
-    return p;
-}
-
-// try splitting polygon into two and triangulate them independently
-function splitEarcut(start, triangles, dim, minX, minY, size) {
-    // look for a valid diagonal that divides the polygon into two
-    var a = start;
-    do {
-        var b = a.next.next;
-        while (b !== a.prev) {
-            if (a.i !== b.i && isValidDiagonal(a, b)) {
-                // split the polygon in two by the diagonal
-                var c = splitPolygon(a, b);
-
-                // filter colinear points around the cuts
-                a = filterPoints(a, a.next);
-                c = filterPoints(c, c.next);
-
-                // run earcut on each half
-                earcutLinked(a, triangles, dim, minX, minY, size);
-                earcutLinked(c, triangles, dim, minX, minY, size);
-                return;
-            }
-            b = b.next;
-        }
-        a = a.next;
-    } while (a !== start);
-}
-
-// link every hole into the outer loop, producing a single-ring polygon without holes
-function eliminateHoles(data, holeIndices, outerNode, dim) {
-    var queue = [],
-        i, len, start, end, list;
-
-    for (i = 0, len = holeIndices.length; i < len; i++) {
-        start = holeIndices[i] * dim;
-        end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
-        list = linkedList(data, start, end, dim, false);
-        if (list === list.next) list.steiner = true;
-        queue.push(getLeftmost(list));
-    }
-
-    queue.sort(compareX);
-
-    // process holes from left to right
-    for (i = 0; i < queue.length; i++) {
-        eliminateHole(queue[i], outerNode);
-        outerNode = filterPoints(outerNode, outerNode.next);
-    }
-
-    return outerNode;
-}
-
-function compareX(a, b) {
-    return a.x - b.x;
-}
-
-// find a bridge between vertices that connects hole with an outer ring and and link it
-function eliminateHole(hole, outerNode) {
-    outerNode = findHoleBridge(hole, outerNode);
-    if (outerNode) {
-        var b = splitPolygon(outerNode, hole);
-        filterPoints(b, b.next);
-    }
-}
-
-// David Eberly's algorithm for finding a bridge between hole and outer polygon
-function findHoleBridge(hole, outerNode) {
-    var p = outerNode,
-        hx = hole.x,
-        hy = hole.y,
-        qx = -Infinity,
-        m;
-
-    // find a segment intersected by a ray from the hole's leftmost point to the left;
-    // segment's endpoint with lesser x will be potential connection point
-    do {
-        if (hy <= p.y && hy >= p.next.y) {
-            var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
-            if (x <= hx && x > qx) {
-                qx = x;
-                if (x === hx) {
-                    if (hy === p.y) return p;
-                    if (hy === p.next.y) return p.next;
-                }
-                m = p.x < p.next.x ? p : p.next;
-            }
-        }
-        p = p.next;
-    } while (p !== outerNode);
-
-    if (!m) return null;
-
-    if (hx === qx) return m.prev; // hole touches outer segment; pick lower endpoint
-
-    // look for points inside the triangle of hole point, segment intersection and endpoint;
-    // if there are no points found, we have a valid connection;
-    // otherwise choose the point of the minimum angle with the ray as connection point
-
-    var stop = m,
-        mx = m.x,
-        my = m.y,
-        tanMin = Infinity,
-        tan;
-
-    p = m.next;
-
-    while (p !== stop) {
-        if (hx >= p.x && p.x >= mx &&
-                pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {
-
-            tan = Math.abs(hy - p.y) / (hx - p.x); // tangential
-
-            if ((tan < tanMin || (tan === tanMin && p.x > m.x)) && locallyInside(p, hole)) {
-                m = p;
-                tanMin = tan;
-            }
-        }
-
-        p = p.next;
-    }
-
-    return m;
-}
-
-// interlink polygon nodes in z-order
-function indexCurve(start, minX, minY, size) {
-    var p = start;
-    do {
-        if (p.z === null) p.z = zOrder(p.x, p.y, minX, minY, size);
-        p.prevZ = p.prev;
-        p.nextZ = p.next;
-        p = p.next;
-    } while (p !== start);
-
-    p.prevZ.nextZ = null;
-    p.prevZ = null;
-
-    sortLinked(p);
-}
-
-// Simon Tatham's linked list merge sort algorithm
-// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-function sortLinked(list) {
-    var i, p, q, e, tail, numMerges, pSize, qSize,
-        inSize = 1;
-
-    do {
-        p = list;
-        list = null;
-        tail = null;
-        numMerges = 0;
-
-        while (p) {
-            numMerges++;
-            q = p;
-            pSize = 0;
-            for (i = 0; i < inSize; i++) {
-                pSize++;
-                q = q.nextZ;
-                if (!q) break;
-            }
-
-            qSize = inSize;
-
-            while (pSize > 0 || (qSize > 0 && q)) {
-
-                if (pSize === 0) {
-                    e = q;
-                    q = q.nextZ;
-                    qSize--;
-                } else if (qSize === 0 || !q) {
-                    e = p;
-                    p = p.nextZ;
-                    pSize--;
-                } else if (p.z <= q.z) {
-                    e = p;
-                    p = p.nextZ;
-                    pSize--;
-                } else {
-                    e = q;
-                    q = q.nextZ;
-                    qSize--;
-                }
-
-                if (tail) tail.nextZ = e;
-                else list = e;
-
-                e.prevZ = tail;
-                tail = e;
-            }
-
-            p = q;
-        }
-
-        tail.nextZ = null;
-        inSize *= 2;
-
-    } while (numMerges > 1);
-
-    return list;
-}
-
-// z-order of a point given coords and size of the data bounding box
-function zOrder(x, y, minX, minY, size) {
-    // coords are transformed into non-negative 15-bit integer range
-    x = 32767 * (x - minX) / size;
-    y = 32767 * (y - minY) / size;
-
-    x = (x | (x << 8)) & 0x00FF00FF;
-    x = (x | (x << 4)) & 0x0F0F0F0F;
-    x = (x | (x << 2)) & 0x33333333;
-    x = (x | (x << 1)) & 0x55555555;
-
-    y = (y | (y << 8)) & 0x00FF00FF;
-    y = (y | (y << 4)) & 0x0F0F0F0F;
-    y = (y | (y << 2)) & 0x33333333;
-    y = (y | (y << 1)) & 0x55555555;
-
-    return x | (y << 1);
-}
-
-// find the leftmost node of a polygon ring
-function getLeftmost(start) {
-    var p = start,
-        leftmost = start;
-    do {
-        if (p.x < leftmost.x) leftmost = p;
-        p = p.next;
-    } while (p !== start);
-
-    return leftmost;
-}
-
-// check if a point lies within a convex triangle
-function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
-    return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&
-           (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&
-           (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
-}
-
-// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
-function isValidDiagonal(a, b) {
-    return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) &&
-           locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b);
-}
-
-// signed area of a triangle
-function area(p, q, r) {
-    return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-}
-
-// check if two points are equal
-function equals(p1, p2) {
-    return p1.x === p2.x && p1.y === p2.y;
-}
-
-// check if two segments intersect
-function intersects(p1, q1, p2, q2) {
-    if ((equals(p1, q1) && equals(p2, q2)) ||
-        (equals(p1, q2) && equals(p2, q1))) return true;
-    return area(p1, q1, p2) > 0 !== area(p1, q1, q2) > 0 &&
-           area(p2, q2, p1) > 0 !== area(p2, q2, q1) > 0;
-}
-
-// check if a polygon diagonal intersects any polygon segments
-function intersectsPolygon(a, b) {
-    var p = a;
-    do {
-        if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
-                intersects(p, p.next, a, b)) return true;
-        p = p.next;
-    } while (p !== a);
-
-    return false;
-}
-
-// check if a polygon diagonal is locally inside the polygon
-function locallyInside(a, b) {
-    return area(a.prev, a, a.next) < 0 ?
-        area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 :
-        area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;
-}
-
-// check if the middle point of a polygon diagonal is inside the polygon
-function middleInside(a, b) {
-    var p = a,
-        inside = false,
-        px = (a.x + b.x) / 2,
-        py = (a.y + b.y) / 2;
-    do {
-        if (((p.y > py) !== (p.next.y > py)) && (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x))
-            inside = !inside;
-        p = p.next;
-    } while (p !== a);
-
-    return inside;
-}
-
-// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;
-// if one belongs to the outer ring and another to a hole, it merges it into a single ring
-function splitPolygon(a, b) {
-    var a2 = new Node(a.i, a.x, a.y),
-        b2 = new Node(b.i, b.x, b.y),
-        an = a.next,
-        bp = b.prev;
-
-    a.next = b;
-    b.prev = a;
-
-    a2.next = an;
-    an.prev = a2;
-
-    b2.next = a2;
-    a2.prev = b2;
-
-    bp.next = b2;
-    b2.prev = bp;
-
-    return b2;
-}
-
-// create a node and optionally link it with previous one (in a circular doubly linked list)
-function insertNode(i, x, y, last) {
-    var p = new Node(i, x, y);
-
-    if (!last) {
-        p.prev = p;
-        p.next = p;
-
-    } else {
-        p.next = last.next;
-        p.prev = last;
-        last.next.prev = p;
-        last.next = p;
-    }
-    return p;
-}
-
-function removeNode(p) {
-    p.next.prev = p.prev;
-    p.prev.next = p.next;
-
-    if (p.prevZ) p.prevZ.nextZ = p.nextZ;
-    if (p.nextZ) p.nextZ.prevZ = p.prevZ;
-}
-
-function Node(i, x, y) {
-    // vertice index in coordinates array
-    this.i = i;
-
-    // vertex coordinates
-    this.x = x;
-    this.y = y;
-
-    // previous and next vertice nodes in a polygon ring
-    this.prev = null;
-    this.next = null;
-
-    // z-order curve value
-    this.z = null;
-
-    // previous and next nodes in z-order
-    this.prevZ = null;
-    this.nextZ = null;
-
-    // indicates whether this is a steiner point
-    this.steiner = false;
-}
-
-// return a percentage difference between the polygon area and its triangulation area;
-// used to verify correctness of triangulation
-earcut.deviation = function (data, holeIndices, dim, triangles) {
-    var hasHoles = holeIndices && holeIndices.length;
-    var outerLen = hasHoles ? holeIndices[0] * dim : data.length;
-
-    var polygonArea = Math.abs(signedArea(data, 0, outerLen, dim));
-    if (hasHoles) {
-        for (var i = 0, len = holeIndices.length; i < len; i++) {
-            var start = holeIndices[i] * dim;
-            var end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
-            polygonArea -= Math.abs(signedArea(data, start, end, dim));
-        }
-    }
-
-    var trianglesArea = 0;
-    for (i = 0; i < triangles.length; i += 3) {
-        var a = triangles[i] * dim;
-        var b = triangles[i + 1] * dim;
-        var c = triangles[i + 2] * dim;
-        trianglesArea += Math.abs(
-            (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -
-            (data[a] - data[b]) * (data[c + 1] - data[a + 1]));
-    }
-
-    return polygonArea === 0 && trianglesArea === 0 ? 0 :
-        Math.abs((trianglesArea - polygonArea) / polygonArea);
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
 };
-
-function signedArea(data, start, end, dim) {
-    var sum = 0;
-    for (var i = start, j = end - dim; i < end; i += dim) {
-        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
-        j = i;
-    }
-    return sum;
-}
-
-// turn a polygon in a multi-dimensional array form (e.g. as in GeoJSON) into a form Earcut accepts
-earcut.flatten = function (data) {
-    var dim = data[0][0].length,
-        result = {vertices: [], holes: [], dimensions: dim},
-        holeIndex = 0;
-
-    for (var i = 0; i < data.length; i++) {
-        for (var j = 0; j < data[i].length; j++) {
-            for (var d = 0; d < dim; d++) result.vertices.push(data[i][j][d]);
-        }
-        if (i > 0) {
-            holeIndex += data[i - 1].length;
-            result.holes.push(holeIndex);
-        }
-    }
-    return result;
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
 };
-
-},{}],7:[function(require,module,exports){
-'use strict';
-
-var has = Object.prototype.hasOwnProperty;
-
-//
-// We store our EE objects in a plain object whose properties are event names.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// `~` to make sure that the built-in object properties are not overridden or
-// used as an attack vector.
-// We also assume that `Object.create(null)` is available when the event name
-// is an ES6 Symbol.
-//
-var prefix = typeof Object.create !== 'function' ? '~' : false;
-
-/**
- * Representation of a single EventEmitter function.
- *
- * @param {Function} fn Event handler to be called.
- * @param {Mixed} context Context for function execution.
- * @param {Boolean} [once=false] Only emit once
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal EventEmitter interface that is molded against the Node.js
- * EventEmitter interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() { /* Nothing to set */ }
-
-/**
- * Hold the assigned EventEmitters by name.
- *
- * @type {Object}
- * @private
- */
-EventEmitter.prototype._events = undefined;
-
-/**
- * Return an array listing the events for which the emitter has registered
- * listeners.
- *
- * @returns {Array}
- * @api public
- */
-EventEmitter.prototype.eventNames = function eventNames() {
-  var events = this._events
-    , names = []
-    , name;
-
-  if (!events) return names;
-
-  for (name in events) {
-    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
   }
-
-  if (Object.getOwnPropertySymbols) {
-    return names.concat(Object.getOwnPropertySymbols(events));
-  }
-
-  return names;
 };
 
-/**
- * Return a list of assigned event listeners.
- *
- * @param {String} event The events that should be listed.
- * @param {Boolean} exists We only need to know if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events && this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Emit an event to all registered event listeners.
- *
- * @param {String} event The name of the event.
- * @returns {Boolean} Indication if we've emitted an event.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events || !this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if ('function' === typeof listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Register a new EventListener for the given event.
- *
- * @param {String} event Name of the event.
- * @param {Function} fn Callback function.
- * @param {Mixed} [context=this] The context of the function.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events) this._events = prefix ? {} : Object.create(null);
-  if (!this._events[evt]) this._events[evt] = listener;
-  else {
-    if (!this._events[evt].fn) this._events[evt].push(listener);
-    else this._events[evt] = [
-      this._events[evt], listener
-    ];
-  }
-
-  return this;
-};
-
-/**
- * Add an EventListener that's only called once.
- *
- * @param {String} event Name of the event.
- * @param {Function} fn Callback function.
- * @param {Mixed} [context=this] The context of the function.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events) this._events = prefix ? {} : Object.create(null);
-  if (!this._events[evt]) this._events[evt] = listener;
-  else {
-    if (!this._events[evt].fn) this._events[evt].push(listener);
-    else this._events[evt] = [
-      this._events[evt], listener
-    ];
-  }
-
-  return this;
-};
-
-/**
- * Remove event listeners.
- *
- * @param {String} event The event we want to remove.
- * @param {Function} fn The listener that we need to find.
- * @param {Mixed} context Only remove listeners matching this context.
- * @param {Boolean} once Only remove once listeners.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events || !this._events[evt]) return this;
-
-  var listeners = this._events[evt]
-    , events = [];
-
-  if (fn) {
-    if (listeners.fn) {
-      if (
-           listeners.fn !== fn
-        || (once && !listeners.once)
-        || (context && listeners.context !== context)
-      ) {
-        events.push(listeners);
-      }
-    } else {
-      for (var i = 0, length = listeners.length; i < length; i++) {
-        if (
-             listeners[i].fn !== fn
-          || (once && !listeners[i].once)
-          || (context && listeners[i].context !== context)
-        ) {
-          events.push(listeners[i]);
-        }
-      }
-    }
-  }
-
-  //
-  // Reset the array, or remove it completely if we have no more listeners.
-  //
-  if (events.length) {
-    this._events[evt] = events.length === 1 ? events[0] : events;
-  } else {
-    delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners or only the listeners for the specified event.
- *
- * @param {String} event The event want to remove all listeners for.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  if (!this._events) return this;
-
-  if (event) delete this._events[prefix ? prefix + event : event];
-  else this._events = prefix ? {} : Object.create(null);
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Expose the module.
-//
-if ('undefined' !== typeof module) {
-  module.exports = EventEmitter;
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
 }
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(scope, this._id);
+};
 
-},{}],8:[function(require,module,exports){
-'use strict';
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(/*! setimmediate */ "./node_modules/setimmediate/setImmediate.js");
+// On some exotic environments, it's not clear which object `setimmediate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/object-assign/index.js":
+/*!*********************************************!*\
+  !*** ./node_modules/object-assign/index.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+
 /* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -16346,7 +16181,7 @@ function shouldUseNative() {
 		// Detect buggy property enumeration order in older V8 versions.
 
 		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
 		test1[5] = 'de';
 		if (Object.getOwnPropertyNames(test1)[0] === '5') {
 			return false;
@@ -16375,7 +16210,7 @@ function shouldUseNative() {
 		}
 
 		return true;
-	} catch (e) {
+	} catch (err) {
 		// We don't expect any of the above to throw, but better to be safe.
 		return false;
 	}
@@ -16395,8 +16230,8 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 			}
 		}
 
-		if (Object.getOwnPropertySymbols) {
-			symbols = Object.getOwnPropertySymbols(from);
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
 			for (var i = 0; i < symbols.length; i++) {
 				if (propIsEnumerable.call(from, symbols[i])) {
 					to[symbols[i]] = from[symbols[i]];
@@ -16408,321 +16243,18 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],9:[function(require,module,exports){
-'use strict';
 
-var has = Object.prototype.hasOwnProperty
-  , prefix = '~';
+/***/ }),
 
-/**
- * Constructor to create a storage for our `EE` objects.
- * An `Events` instance is a plain object whose properties are event names.
- *
- * @constructor
- * @api private
- */
-function Events() {}
+/***/ "./node_modules/parse-uri/index.js":
+/*!*****************************************!*\
+  !*** ./node_modules/parse-uri/index.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-//
-// We try to not inherit from `Object.prototype`. In some engines creating an
-// instance in this way is faster than calling `Object.create(null)` directly.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// character to make sure that the built-in object properties are not
-// overridden or used as an attack vector.
-//
-if (Object.create) {
-  Events.prototype = Object.create(null);
+"use strict";
 
-  //
-  // This hack is needed because the `__proto__` property is still inherited in
-  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
-  //
-  if (!new Events().__proto__) prefix = false;
-}
-
-/**
- * Representation of a single event listener.
- *
- * @param {Function} fn The listener function.
- * @param {Mixed} context The context to invoke the listener with.
- * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
- * @constructor
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal `EventEmitter` interface that is molded against the Node.js
- * `EventEmitter` interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() {
-  this._events = new Events();
-  this._eventsCount = 0;
-}
-
-/**
- * Return an array listing the events for which the emitter has registered
- * listeners.
- *
- * @returns {Array}
- * @api public
- */
-EventEmitter.prototype.eventNames = function eventNames() {
-  var names = []
-    , events
-    , name;
-
-  if (this._eventsCount === 0) return names;
-
-  for (name in (events = this._events)) {
-    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-  }
-
-  if (Object.getOwnPropertySymbols) {
-    return names.concat(Object.getOwnPropertySymbols(events));
-  }
-
-  return names;
-};
-
-/**
- * Return the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Boolean} exists Only check if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Calls each of the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @returns {Boolean} `true` if the event had listeners, else `false`.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if (listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Add a listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Add a one-time listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Remove the listeners of a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn Only remove the listeners that match this function.
- * @param {Mixed} context Only remove the listeners that have this context.
- * @param {Boolean} once Only remove one-time listeners.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return this;
-  if (!fn) {
-    if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-    return this;
-  }
-
-  var listeners = this._events[evt];
-
-  if (listeners.fn) {
-    if (
-         listeners.fn === fn
-      && (!once || listeners.once)
-      && (!context || listeners.context === context)
-    ) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-      if (
-           listeners[i].fn !== fn
-        || (once && !listeners[i].once)
-        || (context && listeners[i].context !== context)
-      ) {
-        events.push(listeners[i]);
-      }
-    }
-
-    //
-    // Reset the array, or remove it completely if we have no more listeners.
-    //
-    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-    else if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners, or those of the specified event.
- *
- * @param {String|Symbol} [event] The event name.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  var evt;
-
-  if (event) {
-    evt = prefix ? prefix + event : event;
-    if (this._events[evt]) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    this._events = new Events();
-    this._eventsCount = 0;
-  }
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Allow `EventEmitter` to be imported as module namespace.
-//
-EventEmitter.EventEmitter = EventEmitter;
-
-//
-// Expose the module.
-//
-if ('undefined' !== typeof module) {
-  module.exports = EventEmitter;
-}
-
-},{}],10:[function(require,module,exports){
-'use strict'
 
 module.exports = function parseURI (str, opts) {
   opts = opts || {}
@@ -16753,1802 +16285,336 @@ module.exports = function parseURI (str, opts) {
   return uri
 }
 
-},{}],11:[function(require,module,exports){
-'use strict';
 
-var parseUri        = require('parse-uri');
-var async           = require('./async');
-var Resource        = require('./Resource');
-var EventEmitter    = require('eventemitter3');
+/***/ }),
 
-// some constants
-var DEFAULT_CONCURRENCY = 10;
-var MAX_PROGRESS = 100;
+/***/ "./node_modules/path-browserify/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/path-browserify/index.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-/**
- * Manages the state and loading of multiple resources to load.
- *
- * @class
- * @param {string} [baseUrl=''] - The base url for all resources loaded by this loader.
- * @param {number} [concurrency=10] - The number of resources to load concurrently.
- */
-function Loader(baseUrl, concurrency) {
-    EventEmitter.call(this);
+/* WEBPACK VAR INJECTION */(function(process) {// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
+// backported and transplited with Babel, with backwards-compat fixes
 
-    concurrency = concurrency || DEFAULT_CONCURRENCY;
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    /**
-     * The base url for all resources loaded by this loader.
-     *
-     * @member {string}
-     */
-    this.baseUrl = baseUrl || '';
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
 
-    /**
-     * The progress percent of the loader going through the queue.
-     *
-     * @member {number}
-     */
-    this.progress = 0;
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
 
-    /**
-     * Loading state of the loader, true if it is currently loading resources.
-     *
-     * @member {boolean}
-     */
-    this.loading = false;
-
-    /**
-     * The percentage of total progress that a single resource represents.
-     *
-     * @member {number}
-     */
-    this._progressChunk = 0;
-
-    /**
-     * The middleware to run before loading each resource.
-     *
-     * @member {function[]}
-     */
-    this._beforeMiddleware = [];
-
-    /**
-     * The middleware to run after loading each resource.
-     *
-     * @member {function[]}
-     */
-    this._afterMiddleware = [];
-
-    /**
-     * The `_loadResource` function bound with this object context.
-     *
-     * @private
-     * @member {function}
-     */
-    this._boundLoadResource = this._loadResource.bind(this);
-
-    /**
-     * The resource buffer that fills until `load` is called to start loading resources.
-     *
-     * @private
-     * @member {Resource[]}
-     */
-    this._buffer = [];
-
-    /**
-     * Used to track load completion.
-     *
-     * @private
-     * @member {number}
-     */
-    this._numToLoad = 0;
-
-    /**
-     * The resources waiting to be loaded.
-     *
-     * @private
-     * @member {Resource[]}
-     */
-    this._queue = async.queue(this._boundLoadResource, concurrency);
-
-    /**
-     * All the resources for this loader keyed by name.
-     *
-     * @member {object<string, Resource>}
-     */
-    this.resources = {};
-
-    /**
-     * Emitted once per loaded or errored resource.
-     *
-     * @event progress
-     * @memberof Loader#
-     */
-
-    /**
-     * Emitted once per errored resource.
-     *
-     * @event error
-     * @memberof Loader#
-     */
-
-    /**
-     * Emitted once per loaded resource.
-     *
-     * @event load
-     * @memberof Loader#
-     */
-
-    /**
-     * Emitted when the loader begins to process the queue.
-     *
-     * @event start
-     * @memberof Loader#
-     */
-
-    /**
-     * Emitted when the queued resources all load.
-     *
-     * @event complete
-     * @memberof Loader#
-     */
+  return parts;
 }
 
-Loader.prototype = Object.create(EventEmitter.prototype);
-Loader.prototype.constructor = Loader;
-module.exports = Loader;
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
 
-/**
- * Adds a resource (or multiple resources) to the loader queue.
- *
- * This function can take a wide variety of different parameters. The only thing that is always
- * required the url to load. All the following will work:
- *
- * ```js
- * loader
- *     // normal param syntax
- *     .add('key', 'http://...', function () {})
- *     .add('http://...', function () {})
- *     .add('http://...')
- *
- *     // object syntax
- *     .add({
- *         name: 'key2',
- *         url: 'http://...'
- *     }, function () {})
- *     .add({
- *         url: 'http://...'
- *     }, function () {})
- *     .add({
- *         name: 'key3',
- *         url: 'http://...'
- *         onComplete: function () {}
- *     })
- *     .add({
- *         url: 'https://...',
- *         onComplete: function () {},
- *         crossOrigin: true
- *     })
- *
- *     // you can also pass an array of objects or urls or both
- *     .add([
- *         { name: 'key4', url: 'http://...', onComplete: function () {} },
- *         { url: 'http://...', onComplete: function () {} },
- *         'http://...'
- *     ])
- *
- *     // and you can use both params and options
- *     .add('key', 'http://...', { crossOrigin: true }, function () {})
- *     .add('http://...', { crossOrigin: true }, function () {});
- * ```
- *
- * @alias enqueue
- * @param {string} [name] - The name of the resource to load, if not passed the url is used.
- * @param {string} [url] - The url for this resource, relative to the baseUrl of this loader.
- * @param {object} [options] - The options for the load.
- * @param {boolean} [options.crossOrigin] - Is this request cross-origin? Default is to determine automatically.
- * @param {Resource.XHR_LOAD_TYPE} [options.loadType=Resource.LOAD_TYPE.XHR] - How should this resource be loaded?
- * @param {Resource.XHR_RESPONSE_TYPE} [options.xhrType=Resource.XHR_RESPONSE_TYPE.DEFAULT] - How should the data being
- *      loaded be interpreted when using XHR?
- * @param {function} [cb] - Function to call when this specific resource completes loading.
- * @return {Loader} Returns itself.
- */
-Loader.prototype.add = Loader.prototype.enqueue = function (name, url, options, cb) {
-    // special case of an array of objects or urls
-    if (Array.isArray(name)) {
-        for (var i = 0; i < name.length; ++i) {
-            this.add(name[i]);
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function(path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+
+// path.relative(from, to)
+// posix version
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  if (path.length === 0) return '.';
+  var code = path.charCodeAt(0);
+  var hasRoot = code === 47 /*/*/;
+  var end = -1;
+  var matchedSlash = true;
+  for (var i = path.length - 1; i >= 1; --i) {
+    code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        if (!matchedSlash) {
+          end = i;
+          break;
         }
-
-        return this;
+      } else {
+      // We saw the first non-path separator
+      matchedSlash = false;
     }
+  }
 
-    // if an object is passed instead of params
-    if (typeof name === 'object') {
-        cb = url || name.callback || name.onComplete;
-        options = name;
-        url = name.url;
-        name = name.name || name.key || name.url;
-    }
-
-    // case where no name is passed shift all args over by one.
-    if (typeof url !== 'string') {
-        cb = options;
-        options = url;
-        url = name;
-    }
-
-    // now that we shifted make sure we have a proper url.
-    if (typeof url !== 'string') {
-        throw new Error('No url passed to add resource to loader.');
-    }
-
-    // options are optional so people might pass a function and no options
-    if (typeof options === 'function') {
-        cb = options;
-        options = null;
-    }
-
-    // check if resource already exists.
-    if (this.resources[name]) {
-        throw new Error('Resource with name "' + name + '" already exists.');
-    }
-
-    // add base url if this isn't an absolute url
-    url = this._prepareUrl(url);
-
-    // create the store the resource
-    this.resources[name] = new Resource(name, url, options);
-
-    if (typeof cb === 'function') {
-        this.resources[name].once('afterMiddleware', cb);
-    }
-
-    this._numToLoad++;
-
-    // if already loading add it to the worker queue
-    if (this._queue.started) {
-        this._queue.push(this.resources[name]);
-        this._progressChunk = (MAX_PROGRESS - this.progress) / (this._queue.length() + this._queue.running());
-    }
-    // otherwise buffer it to be added to the queue later
-    else {
-        this._buffer.push(this.resources[name]);
-        this._progressChunk = MAX_PROGRESS / this._buffer.length;
-    }
-
-    return this;
+  if (end === -1) return hasRoot ? '/' : '.';
+  if (hasRoot && end === 1) {
+    // return '//';
+    // Backwards-compat fix:
+    return '/';
+  }
+  return path.slice(0, end);
 };
 
-/**
- * Sets up a middleware function that will run *before* the
- * resource is loaded.
- *
- * @alias pre
- * @method before
- * @param {function} fn - The middleware function to register.
- * @return {Loader} Returns itself.
- */
-Loader.prototype.before = Loader.prototype.pre = function (fn) {
-    this._beforeMiddleware.push(fn);
+function basename(path) {
+  if (typeof path !== 'string') path = path + '';
 
-    return this;
-};
+  var start = 0;
+  var end = -1;
+  var matchedSlash = true;
+  var i;
 
-/**
- * Sets up a middleware function that will run *after* the
- * resource is loaded.
- *
- * @alias use
- * @method after
- * @param {function} fn - The middleware function to register.
- * @return {Loader} Returns itself.
- */
-Loader.prototype.after = Loader.prototype.use = function (fn) {
-    this._afterMiddleware.push(fn);
-
-    return this;
-};
-
-/**
- * Resets the queue of the loader to prepare for a new load.
- *
- * @return {Loader} Returns itself.
- */
-Loader.prototype.reset = function () {
-    // this.baseUrl = baseUrl || '';
-
-    this.progress = 0;
-
-    this.loading = false;
-
-    this._progressChunk = 0;
-
-    // this._beforeMiddleware.length = 0;
-    // this._afterMiddleware.length = 0;
-
-    this._buffer.length = 0;
-
-    this._numToLoad = 0;
-
-    this._queue.kill();
-    this._queue.started = false;
-
-    // abort all resource loads
-    for (var k in this.resources) {
-        var res = this.resources[k];
-
-        res.off('complete', this._onLoad, this);
-
-        if (res.isLoading) {
-            res.abort();
+  for (i = path.length - 1; i >= 0; --i) {
+    if (path.charCodeAt(i) === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          start = i + 1;
+          break;
         }
+      } else if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // path component
+      matchedSlash = false;
+      end = i + 1;
     }
+  }
 
-    this.resources = {};
-
-    return this;
-};
-
-/**
- * Starts loading the queued resources.
- *
- * @fires start
- * @param {function} [cb] - Optional callback that will be bound to the `complete` event.
- * @return {Loader} Returns itself.
- */
-Loader.prototype.load = function (cb) {
-    // register complete callback if they pass one
-    if (typeof cb === 'function') {
-        this.once('complete', cb);
-    }
-
-    // if the queue has already started we are done here
-    if (this._queue.started) {
-        return this;
-    }
-
-    // notify of start
-    this.emit('start', this);
-
-    // update loading state
-    this.loading = true;
-
-    // start the internal queue
-    for (var i = 0; i < this._buffer.length; ++i) {
-        this._queue.push(this._buffer[i]);
-    }
-
-    // empty the buffer
-    this._buffer.length = 0;
-
-    return this;
-};
-
-/**
- * Prepares a url for usage based on the configuration of this object
- *
- * @private
- * @param {string} url - The url to prepare.
- * @return {string} The prepared url.
- */
-Loader.prototype._prepareUrl = function (url) {
-    var parsedUrl = parseUri(url, { strictMode: true });
-
-    // absolute url, just use it as is.
-    if (parsedUrl.protocol || !parsedUrl.path || parsedUrl.path.indexOf('//') === 0) {
-        return url;
-    }
-
-    // if baseUrl doesn't end in slash and url doesn't start with slash, then add a slash inbetween
-    if (this.baseUrl.length
-        && this.baseUrl.lastIndexOf('/') !== this.baseUrl.length - 1
-        && url.charAt(0) !== '/'
-    ) {
-        return this.baseUrl + '/' + url;
-    }
-
-    return this.baseUrl + url;
-};
-
-/**
- * Loads a single resource.
- *
- * @private
- * @param {Resource} resource - The resource to load.
- * @param {function} dequeue - The function to call when we need to dequeue this item.
- */
-Loader.prototype._loadResource = function (resource, dequeue) {
-    var self = this;
-
-    resource._dequeue = dequeue;
-
-    // run before middleware
-    async.eachSeries(
-        this._beforeMiddleware,
-        function (fn, next) {
-            fn.call(self, resource, function () {
-                // if the before middleware marks the resource as complete,
-                // break and don't process any more before middleware
-                next(resource.isComplete ? {} : null);
-            });
-        },
-        function () {
-            // resource.on('progress', self.emit.bind(self, 'progress'));
-
-            if (resource.isComplete) {
-                self._onLoad(resource);
-            }
-            else {
-                resource.once('complete', self._onLoad, self);
-                resource.load();
-            }
-        }
-    );
-};
-
-/**
- * Called once each resource has loaded.
- *
- * @fires complete
- * @private
- */
-Loader.prototype._onComplete = function () {
-    this.loading = false;
-
-    this.emit('complete', this, this.resources);
-};
-
-/**
- * Called each time a resources is loaded.
- *
- * @fires progress
- * @fires error
- * @fires load
- * @private
- * @param {Resource} resource - The resource that was loaded
- */
-Loader.prototype._onLoad = function (resource) {
-    var self = this;
-
-    // run middleware, this *must* happen before dequeue so sub-assets get added properly
-    async.eachSeries(
-        this._afterMiddleware,
-        function (fn, next) {
-            fn.call(self, resource, next);
-        },
-        function () {
-            resource.emit('afterMiddleware', resource);
-
-            self._numToLoad--;
-
-            self.progress += self._progressChunk;
-            self.emit('progress', self, resource);
-
-            if (resource.error) {
-                self.emit('error', resource.error, self, resource);
-            }
-            else {
-                self.emit('load', self, resource);
-            }
-
-            // do completion check
-            if (self._numToLoad === 0) {
-                self.progress = 100;
-                self._onComplete();
-            }
-        }
-    );
-
-    // remove this resource from the async queue
-    resource._dequeue();
-};
-
-Loader.LOAD_TYPE = Resource.LOAD_TYPE;
-Loader.XHR_RESPONSE_TYPE = Resource.XHR_RESPONSE_TYPE;
-
-},{"./Resource":12,"./async":13,"eventemitter3":9,"parse-uri":10}],12:[function(require,module,exports){
-'use strict';
-
-var EventEmitter    = require('eventemitter3');
-var parseUri        = require('parse-uri');
-
-// tests is CORS is supported in XHR, if not we need to use XDR
-var useXdr = !!(window.XDomainRequest && !('withCredentials' in (new XMLHttpRequest())));
-var tempAnchor = null;
-
-// some status constants
-var STATUS_NONE = 0;
-var STATUS_OK = 200;
-var STATUS_EMPTY = 204;
-
-/**
- * Manages the state and loading of a single resource represented by
- * a single URL.
- *
- * @class
- * @param {string} name - The name of the resource to load.
- * @param {string|string[]} url - The url for this resource, for audio/video loads you can pass an array of sources.
- * @param {object} [options] - The options for the load.
- * @param {string|boolean} [options.crossOrigin] - Is this request cross-origin? Default is to determine automatically.
- * @param {Resource.LOAD_TYPE} [options.loadType=Resource.LOAD_TYPE.XHR] - How should this resource be loaded?
- * @param {Resource.XHR_RESPONSE_TYPE} [options.xhrType=Resource.XHR_RESPONSE_TYPE.DEFAULT] - How should the data being
- *      loaded be interpreted when using XHR?
- * @param {object} [options.metadata] - Extra info for middleware.
- */
-function Resource(name, url, options) {
-    EventEmitter.call(this);
-
-    options = options || {};
-
-    if (typeof name !== 'string' || typeof url !== 'string') {
-        throw new Error('Both name and url are required for constructing a resource.');
-    }
-
-    /**
-     * The name of this resource.
-     *
-     * @member {string}
-     * @readonly
-     */
-    this.name = name;
-
-    /**
-     * The url used to load this resource.
-     *
-     * @member {string}
-     * @readonly
-     */
-    this.url = url;
-
-    /**
-     * Stores whether or not this url is a data url.
-     *
-     * @member {boolean}
-     * @readonly
-     */
-    this.isDataUrl = this.url.indexOf('data:') === 0;
-
-    /**
-     * The data that was loaded by the resource.
-     *
-     * @member {any}
-     */
-    this.data = null;
-
-    /**
-     * Is this request cross-origin? If unset, determined automatically.
-     *
-     * @member {string}
-     */
-    this.crossOrigin = options.crossOrigin === true ? 'anonymous' : options.crossOrigin;
-
-    /**
-     * The method of loading to use for this resource.
-     *
-     * @member {Resource.LOAD_TYPE}
-     */
-    this.loadType = options.loadType || this._determineLoadType();
-
-    /**
-     * The type used to load the resource via XHR. If unset, determined automatically.
-     *
-     * @member {string}
-     */
-    this.xhrType = options.xhrType;
-
-    /**
-     * Extra info for middleware, and controlling specifics about how the resource loads.
-     *
-     * Note that if you pass in a `loadElement`, the Resource class takes ownership of it.
-     * Meaning it will modify it as it sees fit.
-     *
-     * @member {object}
-     * @property {HTMLImageElement|HTMLAudioElement|HTMLVideoElement} [loadElement=null] - The
-     *  element to use for loading, instead of creating one.
-     * @property {boolean} [skipSource=false] - Skips adding source(s) to the load element. This
-     *  is useful if you want to pass in a `loadElement` that you already added load sources
-     *  to.
-     */
-    this.metadata = options.metadata || {};
-
-    /**
-     * The error that occurred while loading (if any).
-     *
-     * @member {Error}
-     * @readonly
-     */
-    this.error = null;
-
-    /**
-     * The XHR object that was used to load this resource. This is only set
-     * when `loadType` is `Resource.LOAD_TYPE.XHR`.
-     *
-     * @member {XMLHttpRequest}
-     */
-    this.xhr = null;
-
-    /**
-     * Describes if this resource was loaded as json. Only valid after the resource
-     * has completely loaded.
-     *
-     * @member {boolean}
-     */
-    this.isJson = false;
-
-    /**
-     * Describes if this resource was loaded as xml. Only valid after the resource
-     * has completely loaded.
-     *
-     * @member {boolean}
-     */
-    this.isXml = false;
-
-    /**
-     * Describes if this resource was loaded as an image tag. Only valid after the resource
-     * has completely loaded.
-     *
-     * @member {boolean}
-     */
-    this.isImage = false;
-
-    /**
-     * Describes if this resource was loaded as an audio tag. Only valid after the resource
-     * has completely loaded.
-     *
-     * @member {boolean}
-     */
-    this.isAudio = false;
-
-    /**
-     * Describes if this resource was loaded as a video tag. Only valid after the resource
-     * has completely loaded.
-     *
-     * @member {boolean}
-     */
-    this.isVideo = false;
-
-    /**
-     * Describes if this resource has finished loading. Is true when the resource has completely
-     * loaded.
-     *
-     * @member {boolean}
-     */
-    this.isComplete = false;
-
-    /**
-     * Describes if this resource is currently loading. Is true when the resource starts loading,
-     * and is false again when complete.
-     *
-     * @member {boolean}
-     */
-    this.isLoading = false;
-
-    /**
-     * The `dequeue` method that will be used a storage place for the async queue dequeue method
-     * used privately by the loader.
-     *
-     * @private
-     * @member {function}
-     */
-    this._dequeue = null;
-
-    /**
-     * The `complete` function bound to this resource's context.
-     *
-     * @private
-     * @member {function}
-     */
-    this._boundComplete = this.complete.bind(this);
-
-    /**
-     * The `_onError` function bound to this resource's context.
-     *
-     * @private
-     * @member {function}
-     */
-    this._boundOnError = this._onError.bind(this);
-
-    /**
-     * The `_onProgress` function bound to this resource's context.
-     *
-     * @private
-     * @member {function}
-     */
-    this._boundOnProgress = this._onProgress.bind(this);
-
-    // xhr callbacks
-    this._boundXhrOnError = this._xhrOnError.bind(this);
-    this._boundXhrOnAbort = this._xhrOnAbort.bind(this);
-    this._boundXhrOnLoad = this._xhrOnLoad.bind(this);
-    this._boundXdrOnTimeout = this._xdrOnTimeout.bind(this);
-
-    /**
-     * Emitted when the resource beings to load.
-     *
-     * @event start
-     * @memberof Resource#
-     */
-
-    /**
-     * Emitted each time progress of this resource load updates.
-     * Not all resources types and loader systems can support this event
-     * so sometimes it may not be available. If the resource
-     * is being loaded on a modern browser, using XHR, and the remote server
-     * properly sets Content-Length headers, then this will be available.
-     *
-     * @event progress
-     * @memberof Resource#
-     */
-
-    /**
-     * Emitted once this resource has loaded, if there was an error it will
-     * be in the `error` property.
-     *
-     * @event complete
-     * @memberof Resource#
-     */
+  if (end === -1) return '';
+  return path.slice(start, end);
 }
 
-Resource.prototype = Object.create(EventEmitter.prototype);
-Resource.prototype.constructor = Resource;
-module.exports = Resource;
+// Uses a mixed approach for backwards-compatibility, as ext behavior changed
+// in new Node.js versions, so only basename() above is backported here
+exports.basename = function (path, ext) {
+  var f = basename(path);
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
 
-/**
- * Marks the resource as complete.
- *
- * @fires complete
- */
-Resource.prototype.complete = function () {
-    // TODO: Clean this up in a wrapper or something...gross....
-    if (this.data && this.data.removeEventListener) {
-        this.data.removeEventListener('error', this._boundOnError, false);
-        this.data.removeEventListener('load', this._boundComplete, false);
-        this.data.removeEventListener('progress', this._boundOnProgress, false);
-        this.data.removeEventListener('canplaythrough', this._boundComplete, false);
-    }
-
-    if (this.xhr) {
-        if (this.xhr.removeEventListener) {
-            this.xhr.removeEventListener('error', this._boundXhrOnError, false);
-            this.xhr.removeEventListener('abort', this._boundXhrOnAbort, false);
-            this.xhr.removeEventListener('progress', this._boundOnProgress, false);
-            this.xhr.removeEventListener('load', this._boundXhrOnLoad, false);
+exports.extname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  var startDot = -1;
+  var startPart = 0;
+  var end = -1;
+  var matchedSlash = true;
+  // Track the state of characters (if any) we see before our first dot and
+  // after any path separator we find
+  var preDotState = 0;
+  for (var i = path.length - 1; i >= 0; --i) {
+    var code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          startPart = i + 1;
+          break;
         }
-        else {
-            this.xhr.onerror = null;
-            this.xhr.ontimeout = null;
-            this.xhr.onprogress = null;
-            this.xhr.onload = null;
-        }
+        continue;
+      }
+    if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // extension
+      matchedSlash = false;
+      end = i + 1;
     }
-
-    if (this.isComplete) {
-        throw new Error('Complete called again for an already completed resource.');
+    if (code === 46 /*.*/) {
+        // If this is our first dot, mark it as the start of our extension
+        if (startDot === -1)
+          startDot = i;
+        else if (preDotState !== 1)
+          preDotState = 1;
+    } else if (startDot !== -1) {
+      // We saw a non-dot and non-path separator before our dot, so we should
+      // have a good chance at having a non-empty extension
+      preDotState = -1;
     }
-
-    this.isComplete = true;
-    this.isLoading = false;
-
-    this.emit('complete', this);
-};
-
-/**
- * Aborts the loading of this resource, with an optional message.
- *
- * @param {string} message - The message to use for the error
- */
-Resource.prototype.abort = function (message) {
-    // abort can be called multiple times, ignore subsequent calls.
-    if (this.error) {
-        return;
-    }
-
-    // store error
-    this.error = new Error(message);
-
-    // abort the actual loading
-    if (this.xhr) {
-        this.xhr.abort();
-    }
-    else if (this.xdr) {
-        this.xdr.abort();
-    }
-    else if (this.data) {
-        // single source
-        if (typeof this.data.src !== 'undefined') {
-            this.data.src = '';
-        }
-        // multi-source
-        else {
-            while (this.data.firstChild) {
-                this.data.removeChild(this.data.firstChild);
-            }
-        }
-    }
-
-    // done now.
-    this.complete();
-};
-
-/**
- * Kicks off loading of this resource. This method is asynchronous.
- *
- * @fires start
- * @param {function} [cb] - Optional callback to call once the resource is loaded.
- */
-Resource.prototype.load = function (cb) {
-    if (this.isLoading) {
-        return;
-    }
-
-    if (this.isComplete) {
-        if (cb) {
-            var self = this;
-
-            setTimeout(function () {
-                cb(self);
-            }, 1);
-        }
-
-        return;
-    }
-    else if (cb) {
-        this.once('complete', cb);
-    }
-
-    this.isLoading = true;
-
-    this.emit('start', this);
-
-    // if unset, determine the value
-    if (this.crossOrigin === false || typeof this.crossOrigin !== 'string') {
-        this.crossOrigin = this._determineCrossOrigin(this.url);
-    }
-
-    switch (this.loadType) {
-        case Resource.LOAD_TYPE.IMAGE:
-            this._loadElement('image');
-            break;
-
-        case Resource.LOAD_TYPE.AUDIO:
-            this._loadSourceElement('audio');
-            break;
-
-        case Resource.LOAD_TYPE.VIDEO:
-            this._loadSourceElement('video');
-            break;
-
-        case Resource.LOAD_TYPE.XHR:
-            /* falls through */
-        default:
-            if (useXdr && this.crossOrigin) {
-                this._loadXdr();
-            }
-            else {
-                this._loadXhr();
-            }
-            break;
-    }
-};
-
-/**
- * Loads this resources using an element that has a single source,
- * like an HTMLImageElement.
- *
- * @private
- * @param {string} type - The type of element to use.
- */
-Resource.prototype._loadElement = function (type) {
-    if (this.metadata.loadElement) {
-        this.data = this.metadata.loadElement;
-    }
-    else if (type === 'image' && typeof window.Image !== 'undefined') {
-        this.data = new Image();
-    }
-    else {
-        this.data = document.createElement(type);
-    }
-
-    if (this.crossOrigin) {
-        this.data.crossOrigin = this.crossOrigin;
-    }
-
-    if (!this.metadata.skipSource) {
-        this.data.src = this.url;
-    }
-
-    var typeName = 'is' + type[0].toUpperCase() + type.substring(1);
-
-    if (this[typeName] === false) {
-        this[typeName] = true;
-    }
-
-    this.data.addEventListener('error', this._boundOnError, false);
-    this.data.addEventListener('load', this._boundComplete, false);
-    this.data.addEventListener('progress', this._boundOnProgress, false);
-};
-
-/**
- * Loads this resources using an element that has multiple sources,
- * like an HTMLAudioElement or HTMLVideoElement.
- *
- * @private
- * @param {string} type - The type of element to use.
- */
-Resource.prototype._loadSourceElement = function (type) {
-    if (this.metadata.loadElement) {
-        this.data = this.metadata.loadElement;
-    }
-    else if (type === 'audio' && typeof window.Audio !== 'undefined') {
-        this.data = new Audio();
-    }
-    else {
-        this.data = document.createElement(type);
-    }
-
-    if (this.data === null) {
-        this.abort('Unsupported element ' + type);
-
-        return;
-    }
-
-    if (!this.metadata.skipSource) {
-        // support for CocoonJS Canvas+ runtime, lacks document.createElement('source')
-        if (navigator.isCocoonJS) {
-            this.data.src = Array.isArray(this.url) ? this.url[0] : this.url;
-        }
-        else if (Array.isArray(this.url)) {
-            for (var i = 0; i < this.url.length; ++i) {
-                this.data.appendChild(this._createSource(type, this.url[i]));
-            }
-        }
-        else {
-            this.data.appendChild(this._createSource(type, this.url));
-        }
-    }
-
-    this['is' + type[0].toUpperCase() + type.substring(1)] = true;
-
-    this.data.addEventListener('error', this._boundOnError, false);
-    this.data.addEventListener('load', this._boundComplete, false);
-    this.data.addEventListener('progress', this._boundOnProgress, false);
-    this.data.addEventListener('canplaythrough', this._boundComplete, false);
-
-    this.data.load();
-};
-
-/**
- * Loads this resources using an XMLHttpRequest.
- *
- * @private
- */
-Resource.prototype._loadXhr = function () {
-    // if unset, determine the value
-    if (typeof this.xhrType !== 'string') {
-        this.xhrType = this._determineXhrType();
-    }
-
-    var xhr = this.xhr = new XMLHttpRequest();
-
-    // set the request type and url
-    xhr.open('GET', this.url, true);
-
-    // load json as text and parse it ourselves. We do this because some browsers
-    // *cough* safari *cough* can't deal with it.
-    if (this.xhrType === Resource.XHR_RESPONSE_TYPE.JSON || this.xhrType === Resource.XHR_RESPONSE_TYPE.DOCUMENT) {
-        xhr.responseType = Resource.XHR_RESPONSE_TYPE.TEXT;
-    }
-    else {
-        xhr.responseType = this.xhrType;
-    }
-
-    xhr.addEventListener('error', this._boundXhrOnError, false);
-    xhr.addEventListener('abort', this._boundXhrOnAbort, false);
-    xhr.addEventListener('progress', this._boundOnProgress, false);
-    xhr.addEventListener('load', this._boundXhrOnLoad, false);
-
-    xhr.send();
-};
-
-/**
- * Loads this resources using an XDomainRequest. This is here because we need to support IE9 (gross).
- *
- * @private
- */
-Resource.prototype._loadXdr = function () {
-    // if unset, determine the value
-    if (typeof this.xhrType !== 'string') {
-        this.xhrType = this._determineXhrType();
-    }
-
-    var xdr = this.xhr = new XDomainRequest();
-
-    // XDomainRequest has a few quirks. Occasionally it will abort requests
-    // A way to avoid this is to make sure ALL callbacks are set even if not used
-    // More info here: http://stackoverflow.com/questions/15786966/xdomainrequest-aborts-post-on-ie-9
-    xdr.timeout = 5000;
-
-    xdr.onerror = this._boundXhrOnError;
-    xdr.ontimeout = this._boundXdrOnTimeout;
-    xdr.onprogress = this._boundOnProgress;
-    xdr.onload = this._boundXhrOnLoad;
-
-    xdr.open('GET', this.url, true);
-
-    // Note: The xdr.send() call is wrapped in a timeout to prevent an
-    // issue with the interface where some requests are lost if multiple
-    // XDomainRequests are being sent at the same time.
-    // Some info here: https://github.com/photonstorm/phaser/issues/1248
-    setTimeout(function () {
-        xdr.send();
-    }, 0);
-};
-
-/**
- * Creates a source used in loading via an element.
- *
- * @private
- * @param {string} type - The element type (video or audio).
- * @param {string} url - The source URL to load from.
- * @param {string} [mime] - The mime type of the video
- * @return {HTMLSourceElement} The source element.
- */
-Resource.prototype._createSource = function (type, url, mime) {
-    if (!mime) {
-        mime = type + '/' + url.substr(url.lastIndexOf('.') + 1);
-    }
-
-    var source = document.createElement('source');
-
-    source.src = url;
-    source.type = mime;
-
-    return source;
-};
-
-/**
- * Called if a load errors out.
- *
- * @param {Event} event - The error event from the element that emits it.
- * @private
- */
-Resource.prototype._onError = function (event) {
-    this.abort('Failed to load element using ' + event.target.nodeName);
-};
-
-/**
- * Called if a load progress event fires for xhr/xdr.
- *
- * @fires progress
- * @private
- * @param {XMLHttpRequestProgressEvent|Event} event - Progress event.
- */
-Resource.prototype._onProgress = function (event) {
-    if (event && event.lengthComputable) {
-        this.emit('progress', this, event.loaded / event.total);
-    }
-};
-
-/**
- * Called if an error event fires for xhr/xdr.
- *
- * @private
- * @param {XMLHttpRequestErrorEvent|Event} event - Error event.
- */
-Resource.prototype._xhrOnError = function () {
-    var xhr = this.xhr;
-
-    this.abort(reqType(xhr) + ' Request failed. Status: ' + xhr.status + ', text: "' + xhr.statusText + '"');
-};
-
-/**
- * Called if an abort event fires for xhr.
- *
- * @private
- * @param {XMLHttpRequestAbortEvent} event - Abort Event
- */
-Resource.prototype._xhrOnAbort = function () {
-    this.abort(reqType(this.xhr) + ' Request was aborted by the user.');
-};
-
-/**
- * Called if a timeout event fires for xdr.
- *
- * @private
- * @param {Event} event - Timeout event.
- */
-Resource.prototype._xdrOnTimeout = function () {
-    this.abort(reqType(this.xhr) + ' Request timed out.');
-};
-
-/**
- * Called when data successfully loads from an xhr/xdr request.
- *
- * @private
- * @param {XMLHttpRequestLoadEvent|Event} event - Load event
- */
-Resource.prototype._xhrOnLoad = function () {
-    var xhr = this.xhr;
-    var status = typeof xhr.status === 'undefined' ? xhr.status : STATUS_OK; // XDR has no `.status`, assume 200.
-
-    // status can be 0 when using the file:// protocol, also check if a response was found
-    if (status === STATUS_OK || status === STATUS_EMPTY || (status === STATUS_NONE && xhr.responseText.length > 0)) {
-        // if text, just return it
-        if (this.xhrType === Resource.XHR_RESPONSE_TYPE.TEXT) {
-            this.data = xhr.responseText;
-        }
-        // if json, parse into json object
-        else if (this.xhrType === Resource.XHR_RESPONSE_TYPE.JSON) {
-            try {
-                this.data = JSON.parse(xhr.responseText);
-                this.isJson = true;
-            }
-            catch (e) {
-                this.abort('Error trying to parse loaded json:', e);
-
-                return;
-            }
-        }
-        // if xml, parse into an xml document or div element
-        else if (this.xhrType === Resource.XHR_RESPONSE_TYPE.DOCUMENT) {
-            try {
-                if (window.DOMParser) {
-                    var domparser = new DOMParser();
-
-                    this.data = domparser.parseFromString(xhr.responseText, 'text/xml');
-                }
-                else {
-                    var div = document.createElement('div');
-
-                    div.innerHTML = xhr.responseText;
-                    this.data = div;
-                }
-                this.isXml = true;
-            }
-            catch (e) {
-                this.abort('Error trying to parse loaded xml:', e);
-
-                return;
-            }
-        }
-        // other types just return the response
-        else {
-            this.data = xhr.response || xhr.responseText;
-        }
-    }
-    else {
-        this.abort('[' + xhr.status + ']' + xhr.statusText + ':' + xhr.responseURL);
-
-        return;
-    }
-
-    this.complete();
-};
-
-/**
- * Sets the `crossOrigin` property for this resource based on if the url
- * for this resource is cross-origin. If crossOrigin was manually set, this
- * function does nothing.
- *
- * @private
- * @param {string} url - The url to test.
- * @param {object} [loc=window.location] - The location object to test against.
- * @return {string} The crossOrigin value to use (or empty string for none).
- */
-Resource.prototype._determineCrossOrigin = function (url, loc) {
-    // data: and javascript: urls are considered same-origin
-    if (url.indexOf('data:') === 0) {
-        return '';
-    }
-
-    // default is window.location
-    loc = loc || window.location;
-
-    if (!tempAnchor) {
-        tempAnchor = document.createElement('a');
-    }
-
-    // let the browser determine the full href for the url of this resource and then
-    // parse with the node url lib, we can't use the properties of the anchor element
-    // because they don't work in IE9 :(
-    tempAnchor.href = url;
-    url = parseUri(tempAnchor.href, { strictMode: true });
-
-    var samePort = (!url.port && loc.port === '') || (url.port === loc.port);
-    var protocol = url.protocol ? url.protocol + ':' : '';
-
-    // if cross origin
-    if (url.host !== loc.hostname || !samePort || protocol !== loc.protocol) {
-        return 'anonymous';
-    }
-
+  }
+
+  if (startDot === -1 || end === -1 ||
+      // We saw a non-dot character immediately before the dot
+      preDotState === 0 ||
+      // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
     return '';
+  }
+  return path.slice(startDot, end);
 };
 
-/**
- * Determines the responseType of an XHR request based on the extension of the
- * resource being loaded.
- *
- * @private
- * @return {Resource.XHR_RESPONSE_TYPE} The responseType to use.
- */
-Resource.prototype._determineXhrType = function () {
-    return Resource._xhrTypeMap[this._getExtension()] || Resource.XHR_RESPONSE_TYPE.TEXT;
-};
-
-Resource.prototype._determineLoadType = function () {
-    return Resource._loadTypeMap[this._getExtension()] || Resource.LOAD_TYPE.XHR;
-};
-
-Resource.prototype._getExtension = function () {
-    var url = this.url;
-    var ext = '';
-
-    if (this.isDataUrl) {
-        var slashIndex = url.indexOf('/');
-
-        ext = url.substring(slashIndex + 1, url.indexOf(';', slashIndex));
+function filter (xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) res.push(xs[i]);
     }
-    else {
-        var queryStart = url.indexOf('?');
-
-        if (queryStart !== -1) {
-            url = url.substring(0, queryStart);
-        }
-
-        ext = url.substring(url.lastIndexOf('.') + 1);
-    }
-
-    return ext.toLowerCase();
-};
-
-/**
- * Determines the mime type of an XHR request based on the responseType of
- * resource being loaded.
- *
- * @private
- * @param {Resource.XHR_RESPONSE_TYPE} type - The type to get a mime type for.
- * @return {string} The mime type to use.
- */
-Resource.prototype._getMimeFromXhrType = function (type) {
-    switch (type) {
-        case Resource.XHR_RESPONSE_TYPE.BUFFER:
-            return 'application/octet-binary';
-
-        case Resource.XHR_RESPONSE_TYPE.BLOB:
-            return 'application/blob';
-
-        case Resource.XHR_RESPONSE_TYPE.DOCUMENT:
-            return 'application/xml';
-
-        case Resource.XHR_RESPONSE_TYPE.JSON:
-            return 'application/json';
-
-        case Resource.XHR_RESPONSE_TYPE.DEFAULT:
-        case Resource.XHR_RESPONSE_TYPE.TEXT:
-            /* falls through */
-        default:
-            return 'text/plain';
-
-    }
-};
-
-/**
- * Quick helper to get string xhr type.
- *
- * @ignore
- * @param {XMLHttpRequest|XDomainRequest} xhr - The request to check.
- * @return {string} The type.
- */
-function reqType(xhr) {
-    return xhr.toString().replace('object ', '');
+    return res;
 }
 
-/**
- * The types of loading a resource can use.
- *
- * @static
- * @readonly
- * @enum {number}
- */
-Resource.LOAD_TYPE = {
-    /** Uses XMLHttpRequest to load the resource. */
-    XHR:    1,
-    /** Uses an `Image` object to load the resource. */
-    IMAGE:  2,
-    /** Uses an `Audio` object to load the resource. */
-    AUDIO:  3,
-    /** Uses a `Video` object to load the resource. */
-    VIDEO:  4
-};
-
-/**
- * The XHR ready states, used internally.
- *
- * @static
- * @readonly
- * @enum {string}
- */
-Resource.XHR_RESPONSE_TYPE = {
-    /** defaults to text */
-    DEFAULT:    'text',
-    /** ArrayBuffer */
-    BUFFER:     'arraybuffer',
-    /** Blob */
-    BLOB:       'blob',
-    /** Document */
-    DOCUMENT:   'document',
-    /** Object */
-    JSON:       'json',
-    /** String */
-    TEXT:       'text'
-};
-
-Resource._loadTypeMap = {
-    gif:      Resource.LOAD_TYPE.IMAGE,
-    png:      Resource.LOAD_TYPE.IMAGE,
-    bmp:      Resource.LOAD_TYPE.IMAGE,
-    jpg:      Resource.LOAD_TYPE.IMAGE,
-    jpeg:     Resource.LOAD_TYPE.IMAGE,
-    tif:      Resource.LOAD_TYPE.IMAGE,
-    tiff:     Resource.LOAD_TYPE.IMAGE,
-    webp:     Resource.LOAD_TYPE.IMAGE,
-    tga:      Resource.LOAD_TYPE.IMAGE,
-    'svg+xml':  Resource.LOAD_TYPE.IMAGE
-};
-
-Resource._xhrTypeMap = {
-    // xml
-    xhtml:    Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-    html:     Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-    htm:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-    xml:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-    tmx:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-    tsx:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-    svg:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
-
-    // images
-    gif:      Resource.XHR_RESPONSE_TYPE.BLOB,
-    png:      Resource.XHR_RESPONSE_TYPE.BLOB,
-    bmp:      Resource.XHR_RESPONSE_TYPE.BLOB,
-    jpg:      Resource.XHR_RESPONSE_TYPE.BLOB,
-    jpeg:     Resource.XHR_RESPONSE_TYPE.BLOB,
-    tif:      Resource.XHR_RESPONSE_TYPE.BLOB,
-    tiff:     Resource.XHR_RESPONSE_TYPE.BLOB,
-    webp:     Resource.XHR_RESPONSE_TYPE.BLOB,
-    tga:      Resource.XHR_RESPONSE_TYPE.BLOB,
-
-    // json
-    json:     Resource.XHR_RESPONSE_TYPE.JSON,
-
-    // text
-    text:     Resource.XHR_RESPONSE_TYPE.TEXT,
-    txt:      Resource.XHR_RESPONSE_TYPE.TEXT
-};
-
-/**
- * Sets the load type to be used for a specific extension.
- *
- * @static
- * @param {string} extname - The extension to set the type for, e.g. "png" or "fnt"
- * @param {Resource.LOAD_TYPE} loadType - The load type to set it to.
- */
-Resource.setExtensionLoadType = function (extname, loadType) {
-    setExtMap(Resource._loadTypeMap, extname, loadType);
-};
-
-/**
- * Sets the load type to be used for a specific extension.
- *
- * @static
- * @param {string} extname - The extension to set the type for, e.g. "png" or "fnt"
- * @param {Resource.XHR_RESPONSE_TYPE} xhrType - The xhr type to set it to.
- */
-Resource.setExtensionXhrType = function (extname, xhrType) {
-    setExtMap(Resource._xhrTypeMap, extname, xhrType);
-};
-
-function setExtMap(map, extname, val) {
-    if (extname && extname.indexOf('.') === 0) {
-        extname = extname.substring(1);
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b'
+    ? function (str, start, len) { return str.substr(start, len) }
+    : function (str, start, len) {
+        if (start < 0) start = str.length + start;
+        return str.substr(start, len);
     }
+;
 
-    if (!extname) {
-        return;
-    }
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
 
-    map[extname] = val;
-}
+/***/ }),
 
-},{"eventemitter3":9,"parse-uri":10}],13:[function(require,module,exports){
-'use strict';
+/***/ "./node_modules/pixi.js/src/accessibility/AccessibilityManager.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/accessibility/AccessibilityManager.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-/**
- * Smaller version of the async library constructs.
- *
- */
-
-module.exports = {
-    eachSeries: asyncEachSeries,
-    queue: asyncQueue
-};
-
-function _noop() { /* empty */ }
-
-/**
- * Iterates an array in series.
- *
- * @param {*[]} array - Array to iterate.
- * @param {function} iterator - Function to call for each element.
- * @param {function} callback - Function to call when done, or on error.
- */
-function asyncEachSeries(array, iterator, callback) {
-    var i = 0;
-    var len = array.length;
-
-    (function next(err) {
-        if (err || i === len) {
-            if (callback) {
-                callback(err);
-            }
-
-            return;
-        }
-
-        iterator(array[i++], next);
-    })();
-}
-
-/**
- * Ensures a function is only called once.
- *
- * @param {function} fn - The function to wrap.
- * @return {function} The wrapping function.
- */
-function onlyOnce(fn) {
-    return function onceWrapper() {
-        if (fn === null) {
-            throw new Error('Callback was already called.');
-        }
-
-        var callFn = fn;
-
-        fn = null;
-        callFn.apply(this, arguments);
-    };
-}
-
-/**
- * Async queue implementation,
- *
- * @param {function} worker - The worker function to call for each task.
- * @param {number} concurrency - How many workers to run in parrallel.
- * @return {*} The async queue object.
- */
-function asyncQueue(worker, concurrency) {
-    if (concurrency == null) { // eslint-disable-line no-eq-null,eqeqeq
-        concurrency = 1;
-    }
-    else if (concurrency === 0) {
-        throw new Error('Concurrency must not be zero');
-    }
-
-    var workers = 0;
-    var q = {
-        _tasks: [],
-        concurrency: concurrency,
-        saturated: _noop,
-        unsaturated: _noop,
-        buffer: concurrency / 4,
-        empty: _noop,
-        drain: _noop,
-        error: _noop,
-        started: false,
-        paused: false,
-        push: function (data, callback) {
-            _insert(data, false, callback);
-        },
-        kill: function () {
-            q.drain = _noop;
-            q._tasks = [];
-        },
-        unshift: function (data, callback) {
-            _insert(data, true, callback);
-        },
-        process: function () {
-            while (!q.paused && workers < q.concurrency && q._tasks.length) {
-                var task = q._tasks.shift();
-
-                if (q._tasks.length === 0) {
-                    q.empty();
-                }
-
-                workers += 1;
-
-                if (workers === q.concurrency) {
-                    q.saturated();
-                }
-
-                worker(task.data, onlyOnce(_next(task)));
-            }
-        },
-        length: function () {
-            return q._tasks.length;
-        },
-        running: function () {
-            return workers;
-        },
-        idle: function () {
-            return q._tasks.length + workers === 0;
-        },
-        pause: function () {
-            if (q.paused === true) {
-                return;
-            }
-
-            q.paused = true;
-        },
-        resume: function () {
-            if (q.paused === false) {
-                return;
-            }
-
-            q.paused = false;
-
-            // Need to call q.process once per concurrent
-            // worker to preserve full concurrency after pause
-            for (var w = 1; w <= q.concurrency; w++) {
-                q.process();
-            }
-        }
-    };
-
-    function _insert(data, insertAtFront, callback) {
-        if (callback != null && typeof callback !== 'function') { // eslint-disable-line no-eq-null,eqeqeq
-            throw new Error('task callback must be a function');
-        }
-
-        q.started = true;
-
-        if (data == null && q.idle()) { // eslint-disable-line no-eq-null,eqeqeq
-            // call drain immediately if there are no tasks
-            setTimeout(function () {
-                q.drain();
-            }, 1);
-
-            return;
-        }
-
-        var item = {
-            data: data,
-            callback: typeof callback === 'function' ? callback : _noop
-        };
-
-        if (insertAtFront) {
-            q._tasks.unshift(item);
-        }
-        else {
-            q._tasks.push(item);
-        }
-
-        setTimeout(function () {
-            q.process();
-        }, 1);
-    }
-
-    function _next(task) {
-        return function () {
-            workers -= 1;
-
-            task.callback.apply(task, arguments);
-
-            if (arguments[0] != null) { // eslint-disable-line no-eq-null,eqeqeq
-                q.error(arguments[0], task.data);
-            }
-
-            if (workers <= (q.concurrency - q.buffer)) {
-                q.unsaturated();
-            }
-
-            if (q.idle()) {
-                q.drain();
-            }
-
-            q.process();
-        };
-    }
-
-    return q;
-}
-
-},{}],14:[function(require,module,exports){
-/* eslint no-magic-numbers: 0 */
-'use strict';
-
-module.exports = {
-    // private property
-    _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-
-    encodeBinary: function (input) {
-        var output = '';
-        var bytebuffer;
-        var encodedCharIndexes = new Array(4);
-        var inx = 0;
-        var jnx = 0;
-        var paddingBytes = 0;
-
-        while (inx < input.length) {
-            // Fill byte buffer array
-            bytebuffer = new Array(3);
-
-            for (jnx = 0; jnx < bytebuffer.length; jnx++) {
-                if (inx < input.length) {
-                    // throw away high-order byte, as documented at:
-                    // https://developer.mozilla.org/En/Using_XMLHttpRequest#Handling_binary_data
-                    bytebuffer[jnx] = input.charCodeAt(inx++) & 0xff;
-                }
-                else {
-                    bytebuffer[jnx] = 0;
-                }
-            }
-
-            // Get each encoded character, 6 bits at a time
-            // index 1: first 6 bits
-            encodedCharIndexes[0] = bytebuffer[0] >> 2;
-            // index 2: second 6 bits (2 least significant bits from input byte 1 + 4 most significant bits from byte 2)
-            encodedCharIndexes[1] = ((bytebuffer[0] & 0x3) << 4) | (bytebuffer[1] >> 4);
-            // index 3: third 6 bits (4 least significant bits from input byte 2 + 2 most significant bits from byte 3)
-            encodedCharIndexes[2] = ((bytebuffer[1] & 0x0f) << 2) | (bytebuffer[2] >> 6);
-            // index 3: forth 6 bits (6 least significant bits from input byte 3)
-            encodedCharIndexes[3] = bytebuffer[2] & 0x3f;
-
-            // Determine whether padding happened, and adjust accordingly
-            paddingBytes = inx - (input.length - 1);
-            switch (paddingBytes) {
-                case 2:
-                    // Set last 2 characters to padding char
-                    encodedCharIndexes[3] = 64;
-                    encodedCharIndexes[2] = 64;
-                    break;
-
-                case 1:
-                    // Set last character to padding char
-                    encodedCharIndexes[3] = 64;
-                    break;
-
-                default:
-                    break; // No padding - proceed
-            }
-
-            // Now we will grab each appropriate character out of our keystring
-            // based on our index array and append it to the output string
-            for (jnx = 0; jnx < encodedCharIndexes.length; jnx++) {
-                output += this._keyStr.charAt(encodedCharIndexes[jnx]);
-            }
-        }
-
-        return output;
-    }
-};
-
-},{}],15:[function(require,module,exports){
-/* eslint global-require: 0 */
-'use strict';
-
-module.exports = require('./Loader');
-module.exports.Resource = require('./Resource');
-module.exports.middleware = {
-    caching: {
-        memory: require('./middlewares/caching/memory')
-    },
-    parsing: {
-        blob: require('./middlewares/parsing/blob')
-    }
-};
-
-module.exports.async = require('./async');
-
-},{"./Loader":11,"./Resource":12,"./async":13,"./middlewares/caching/memory":16,"./middlewares/parsing/blob":17}],16:[function(require,module,exports){
-'use strict';
-
-// a simple in-memory cache for resources
-var cache = {};
-
-module.exports = function () {
-    return function (resource, next) {
-        // if cached, then set data and complete the resource
-        if (cache[resource.url]) {
-            resource.data = cache[resource.url];
-            resource.complete(); // marks resource load complete and stops processing before middlewares
-        }
-        // if not cached, wait for complete and store it in the cache.
-        else {
-            resource.once('complete', function () {
-                cache[this.url] = this.data;
-            });
-        }
-
-        next();
-    };
-};
-
-},{}],17:[function(require,module,exports){
-'use strict';
-
-var Resource = require('../../Resource');
-var b64 = require('../../b64');
-
-var Url = window.URL || window.webkitURL;
-
-// a middleware for transforming XHR loaded Blobs into more useful objects
-
-module.exports = function () {
-    return function (resource, next) {
-        if (!resource.data) {
-            next();
-
-            return;
-        }
-
-        // if this was an XHR load of a blob
-        if (resource.xhr && resource.xhrType === Resource.XHR_RESPONSE_TYPE.BLOB) {
-            // if there is no blob support we probably got a binary string back
-            if (!window.Blob || typeof resource.data === 'string') {
-                var type = resource.xhr.getResponseHeader('content-type');
-
-                // this is an image, convert the binary string into a data url
-                if (type && type.indexOf('image') === 0) {
-                    resource.data = new Image();
-                    resource.data.src = 'data:' + type + ';base64,' + b64.encodeBinary(resource.xhr.responseText);
-
-                    resource.isImage = true;
-
-                    // wait until the image loads and then callback
-                    resource.data.onload = function () {
-                        resource.data.onload = null;
-
-                        next();
-                    };
-
-                    // next will be called on load
-                    return;
-                }
-            }
-            // if content type says this is an image, then we should transform the blob into an Image object
-            else if (resource.data.type.indexOf('image') === 0) {
-                var src = Url.createObjectURL(resource.data);
-
-                resource.blob = resource.data;
-                resource.data = new Image();
-                resource.data.src = src;
-
-                resource.isImage = true;
-
-                // cleanup the no longer used blob after the image loads
-                resource.data.onload = function () {
-                    Url.revokeObjectURL(src);
-                    resource.data.onload = null;
-
-                    next();
-                };
-
-                // next will be called on load.
-                return;
-            }
-        }
-
-        next();
-    };
-};
-
-},{"../../Resource":12,"../../b64":14}],18:[function(require,module,exports){
-var core = require('../core');
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 // add some extra variables to the container..
 Object.assign(
     core.DisplayObject.prototype,
-    require('./accessibleTarget')
+    __webpack_require__(/*! ./accessibleTarget */ "./node_modules/pixi.js/src/accessibility/accessibleTarget.js")
 );
 
 
@@ -18952,7 +17018,16 @@ core.WebGLRenderer.registerPlugin('accessibility', AccessibilityManager);
 core.CanvasRenderer.registerPlugin('accessibility', AccessibilityManager);
 
 
-},{"../core":28,"./accessibleTarget":19}],19:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/accessibility/accessibleTarget.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/accessibility/accessibleTarget.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Default property values of accessible objects
  * used by {@link PIXI.accessibility.AccessibilityManager}.
@@ -18998,7 +17073,16 @@ var accessibleTarget = {
 
 module.exports = accessibleTarget;
 
-},{}],20:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/accessibility/index.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/pixi.js/src/accessibility/index.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI accessibility library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -19010,11 +17094,20 @@ module.exports = accessibleTarget;
  * @namespace PIXI.interaction
  */
 module.exports = {
-    accessibleTarget:     require('./accessibleTarget'),
-    AccessibilityManager: require('./AccessibilityManager')
+    accessibleTarget:     __webpack_require__(/*! ./accessibleTarget */ "./node_modules/pixi.js/src/accessibility/accessibleTarget.js"),
+    AccessibilityManager: __webpack_require__(/*! ./AccessibilityManager */ "./node_modules/pixi.js/src/accessibility/AccessibilityManager.js")
 };
 
-},{"./AccessibilityManager":18,"./accessibleTarget":19}],21:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/const.js":
+/*!************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/const.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Constant values used in pixi
  *
@@ -19028,7 +17121,7 @@ var CONST = {
      * @constant
      * @property {string} VERSION
      */
-    VERSION: '3.0.11',
+    VERSION: '__VERSION__',
 
     /**
      * @property {number} PI_2 - Two Pi
@@ -19237,11 +17330,20 @@ var CONST = {
 
 module.exports = CONST;
 
-},{}],22:[function(require,module,exports){
-var math = require('../math'),
-    utils = require('../utils'),
-    DisplayObject = require('./DisplayObject'),
-    RenderTexture = require('../textures/RenderTexture'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/display/Container.js":
+/*!************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/display/Container.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    DisplayObject = __webpack_require__(/*! ./DisplayObject */ "./node_modules/pixi.js/src/core/display/DisplayObject.js"),
+    RenderTexture = __webpack_require__(/*! ../textures/RenderTexture */ "./node_modules/pixi.js/src/core/textures/RenderTexture.js"),
     _tempMatrix = new math.Matrix();
 
 /**
@@ -19881,11 +17983,20 @@ Container.prototype.destroy = function (destroyChildren)
     this.children = null;
 };
 
-},{"../math":32,"../textures/RenderTexture":70,"../utils":76,"./DisplayObject":23}],23:[function(require,module,exports){
-var math = require('../math'),
-    RenderTexture = require('../textures/RenderTexture'),
-    EventEmitter = require('eventemitter3'),
-    CONST = require('../const'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/display/DisplayObject.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/display/DisplayObject.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    RenderTexture = __webpack_require__(/*! ../textures/RenderTexture */ "./node_modules/pixi.js/src/core/textures/RenderTexture.js"),
+    EventEmitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
     _tempMatrix = new math.Matrix(),
     _tempDisplayObjectParent = {worldTransform:new math.Matrix(), worldAlpha:1, children:[]};
 
@@ -20447,14 +18558,23 @@ DisplayObject.prototype.destroy = function ()
     this.filterArea = null;
 };
 
-},{"../const":21,"../math":32,"../textures/RenderTexture":70,"eventemitter3":7}],24:[function(require,module,exports){
-var Container = require('../display/Container'),
-    Texture = require('../textures/Texture'),
-    CanvasBuffer = require('../renderers/canvas/utils/CanvasBuffer'),
-    CanvasGraphics = require('../renderers/canvas/utils/CanvasGraphics'),
-    GraphicsData = require('./GraphicsData'),
-    math = require('../math'),
-    CONST = require('../const'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/graphics/Graphics.js":
+/*!************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/graphics/Graphics.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Container = __webpack_require__(/*! ../display/Container */ "./node_modules/pixi.js/src/core/display/Container.js"),
+    Texture = __webpack_require__(/*! ../textures/Texture */ "./node_modules/pixi.js/src/core/textures/Texture.js"),
+    CanvasBuffer = __webpack_require__(/*! ../renderers/canvas/utils/CanvasBuffer */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasBuffer.js"),
+    CanvasGraphics = __webpack_require__(/*! ../renderers/canvas/utils/CanvasGraphics */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasGraphics.js"),
+    GraphicsData = __webpack_require__(/*! ./GraphicsData */ "./node_modules/pixi.js/src/core/graphics/GraphicsData.js"),
+    math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
     tempPoint = new math.Point();
 
 /**
@@ -21632,7 +19752,16 @@ Graphics.prototype.destroy = function () {
     this._localBounds = null;
 };
 
-},{"../const":21,"../display/Container":22,"../math":32,"../renderers/canvas/utils/CanvasBuffer":44,"../renderers/canvas/utils/CanvasGraphics":45,"../textures/Texture":71,"./GraphicsData":25}],25:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/graphics/GraphicsData.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/graphics/GraphicsData.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * A GraphicsData object.
  *
@@ -21725,14 +19854,23 @@ GraphicsData.prototype.destroy = function () {
     this.shape = null;
 };
 
-},{}],26:[function(require,module,exports){
-var utils = require('../../utils'),
-    math = require('../../math'),
-    CONST = require('../../const'),
-    ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
-    WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
-    WebGLGraphicsData = require('./WebGLGraphicsData'),
-    earcut = require('earcut');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/graphics/webgl/GraphicsRenderer.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/graphics/webgl/GraphicsRenderer.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(/*! ../../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    math = __webpack_require__(/*! ../../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js"),
+    ObjectRenderer = __webpack_require__(/*! ../../renderers/webgl/utils/ObjectRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js"),
+    WebGLRenderer = __webpack_require__(/*! ../../renderers/webgl/WebGLRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/WebGLRenderer.js"),
+    WebGLGraphicsData = __webpack_require__(/*! ./WebGLGraphicsData */ "./node_modules/pixi.js/src/core/graphics/webgl/WebGLGraphicsData.js"),
+    earcut = __webpack_require__(/*! earcut */ "./node_modules/earcut/src/earcut.js");
 
 /**
  * Renders the graphics object.
@@ -22630,7 +20768,16 @@ GraphicsRenderer.prototype.buildPoly = function (graphicsData, webGLData)
     return true;
 };
 
-},{"../../const":21,"../../math":32,"../../renderers/webgl/WebGLRenderer":48,"../../renderers/webgl/utils/ObjectRenderer":62,"../../utils":76,"./WebGLGraphicsData":27,"earcut":6}],27:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/graphics/webgl/WebGLGraphicsData.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/graphics/webgl/WebGLGraphicsData.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * An object containing WebGL specific properties to be used by the WebGL renderer
  *
@@ -22748,7 +20895,16 @@ WebGLGraphicsData.prototype.destroy = function () {
     this.glIndices = null;
 };
 
-},{}],28:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/index.js":
+/*!************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/index.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI core library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -22760,56 +20916,56 @@ WebGLGraphicsData.prototype.destroy = function () {
  * @namespace PIXI
  */
 // export core and const. We assign core to const so that the non-reference types in const remain in-tact
-var core = module.exports = Object.assign(require('./const'), require('./math'), {
+var core = module.exports = Object.assign(__webpack_require__(/*! ./const */ "./node_modules/pixi.js/src/core/const.js"), __webpack_require__(/*! ./math */ "./node_modules/pixi.js/src/core/math/index.js"), {
     // utils
-    utils: require('./utils'),
-    ticker: require('./ticker'),
+    utils: __webpack_require__(/*! ./utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    ticker: __webpack_require__(/*! ./ticker */ "./node_modules/pixi.js/src/core/ticker/index.js"),
 
     // display
-    DisplayObject:          require('./display/DisplayObject'),
-    Container:              require('./display/Container'),
+    DisplayObject:          __webpack_require__(/*! ./display/DisplayObject */ "./node_modules/pixi.js/src/core/display/DisplayObject.js"),
+    Container:              __webpack_require__(/*! ./display/Container */ "./node_modules/pixi.js/src/core/display/Container.js"),
 
     // sprites
-    Sprite:                 require('./sprites/Sprite'),
-    ParticleContainer:      require('./particles/ParticleContainer'),
-    SpriteRenderer:         require('./sprites/webgl/SpriteRenderer'),
-    ParticleRenderer:       require('./particles/webgl/ParticleRenderer'),
+    Sprite:                 __webpack_require__(/*! ./sprites/Sprite */ "./node_modules/pixi.js/src/core/sprites/Sprite.js"),
+    ParticleContainer:      __webpack_require__(/*! ./particles/ParticleContainer */ "./node_modules/pixi.js/src/core/particles/ParticleContainer.js"),
+    SpriteRenderer:         __webpack_require__(/*! ./sprites/webgl/SpriteRenderer */ "./node_modules/pixi.js/src/core/sprites/webgl/SpriteRenderer.js"),
+    ParticleRenderer:       __webpack_require__(/*! ./particles/webgl/ParticleRenderer */ "./node_modules/pixi.js/src/core/particles/webgl/ParticleRenderer.js"),
 
     // text
-    Text:                   require('./text/Text'),
+    Text:                   __webpack_require__(/*! ./text/Text */ "./node_modules/pixi.js/src/core/text/Text.js"),
 
     // primitives
-    Graphics:               require('./graphics/Graphics'),
-    GraphicsData:           require('./graphics/GraphicsData'),
-    GraphicsRenderer:       require('./graphics/webgl/GraphicsRenderer'),
+    Graphics:               __webpack_require__(/*! ./graphics/Graphics */ "./node_modules/pixi.js/src/core/graphics/Graphics.js"),
+    GraphicsData:           __webpack_require__(/*! ./graphics/GraphicsData */ "./node_modules/pixi.js/src/core/graphics/GraphicsData.js"),
+    GraphicsRenderer:       __webpack_require__(/*! ./graphics/webgl/GraphicsRenderer */ "./node_modules/pixi.js/src/core/graphics/webgl/GraphicsRenderer.js"),
 
     // textures
-    Texture:                require('./textures/Texture'),
-    BaseTexture:            require('./textures/BaseTexture'),
-    RenderTexture:          require('./textures/RenderTexture'),
-    VideoBaseTexture:       require('./textures/VideoBaseTexture'),
-    TextureUvs:             require('./textures/TextureUvs'),
+    Texture:                __webpack_require__(/*! ./textures/Texture */ "./node_modules/pixi.js/src/core/textures/Texture.js"),
+    BaseTexture:            __webpack_require__(/*! ./textures/BaseTexture */ "./node_modules/pixi.js/src/core/textures/BaseTexture.js"),
+    RenderTexture:          __webpack_require__(/*! ./textures/RenderTexture */ "./node_modules/pixi.js/src/core/textures/RenderTexture.js"),
+    VideoBaseTexture:       __webpack_require__(/*! ./textures/VideoBaseTexture */ "./node_modules/pixi.js/src/core/textures/VideoBaseTexture.js"),
+    TextureUvs:             __webpack_require__(/*! ./textures/TextureUvs */ "./node_modules/pixi.js/src/core/textures/TextureUvs.js"),
 
     // renderers - canvas
-    CanvasRenderer:         require('./renderers/canvas/CanvasRenderer'),
-    CanvasGraphics:         require('./renderers/canvas/utils/CanvasGraphics'),
-    CanvasBuffer:           require('./renderers/canvas/utils/CanvasBuffer'),
+    CanvasRenderer:         __webpack_require__(/*! ./renderers/canvas/CanvasRenderer */ "./node_modules/pixi.js/src/core/renderers/canvas/CanvasRenderer.js"),
+    CanvasGraphics:         __webpack_require__(/*! ./renderers/canvas/utils/CanvasGraphics */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasGraphics.js"),
+    CanvasBuffer:           __webpack_require__(/*! ./renderers/canvas/utils/CanvasBuffer */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasBuffer.js"),
 
     // renderers - webgl
-    WebGLRenderer:          require('./renderers/webgl/WebGLRenderer'),
-    WebGLManager:           require('./renderers/webgl/managers/WebGLManager'),
-    ShaderManager:          require('./renderers/webgl/managers/ShaderManager'),
-    Shader:                 require('./renderers/webgl/shaders/Shader'),
-    TextureShader:          require('./renderers/webgl/shaders/TextureShader'),
-    PrimitiveShader:        require('./renderers/webgl/shaders/PrimitiveShader'),
-    ComplexPrimitiveShader: require('./renderers/webgl/shaders/ComplexPrimitiveShader'),
-    ObjectRenderer:         require('./renderers/webgl/utils/ObjectRenderer'),
-    RenderTarget:           require('./renderers/webgl/utils/RenderTarget'),
+    WebGLRenderer:          __webpack_require__(/*! ./renderers/webgl/WebGLRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/WebGLRenderer.js"),
+    WebGLManager:           __webpack_require__(/*! ./renderers/webgl/managers/WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js"),
+    ShaderManager:          __webpack_require__(/*! ./renderers/webgl/managers/ShaderManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/ShaderManager.js"),
+    Shader:                 __webpack_require__(/*! ./renderers/webgl/shaders/Shader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/Shader.js"),
+    TextureShader:          __webpack_require__(/*! ./renderers/webgl/shaders/TextureShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/TextureShader.js"),
+    PrimitiveShader:        __webpack_require__(/*! ./renderers/webgl/shaders/PrimitiveShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader.js"),
+    ComplexPrimitiveShader: __webpack_require__(/*! ./renderers/webgl/shaders/ComplexPrimitiveShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader.js"),
+    ObjectRenderer:         __webpack_require__(/*! ./renderers/webgl/utils/ObjectRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js"),
+    RenderTarget:           __webpack_require__(/*! ./renderers/webgl/utils/RenderTarget */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/RenderTarget.js"),
 
     // filters - webgl
-    AbstractFilter:         require('./renderers/webgl/filters/AbstractFilter'),
-    FXAAFilter:             require('./renderers/webgl/filters/FXAAFilter'),
-    SpriteMaskFilter:       require('./renderers/webgl/filters/SpriteMaskFilter'),
+    AbstractFilter:         __webpack_require__(/*! ./renderers/webgl/filters/AbstractFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/AbstractFilter.js"),
+    FXAAFilter:             __webpack_require__(/*! ./renderers/webgl/filters/FXAAFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/FXAAFilter.js"),
+    SpriteMaskFilter:       __webpack_require__(/*! ./renderers/webgl/filters/SpriteMaskFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter.js"),
 
     /**
      * This helper function will automatically detect which renderer you should be using.
@@ -22844,7 +21000,16 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
     }
 });
 
-},{"./const":21,"./display/Container":22,"./display/DisplayObject":23,"./graphics/Graphics":24,"./graphics/GraphicsData":25,"./graphics/webgl/GraphicsRenderer":26,"./math":32,"./particles/ParticleContainer":38,"./particles/webgl/ParticleRenderer":40,"./renderers/canvas/CanvasRenderer":43,"./renderers/canvas/utils/CanvasBuffer":44,"./renderers/canvas/utils/CanvasGraphics":45,"./renderers/webgl/WebGLRenderer":48,"./renderers/webgl/filters/AbstractFilter":49,"./renderers/webgl/filters/FXAAFilter":50,"./renderers/webgl/filters/SpriteMaskFilter":51,"./renderers/webgl/managers/ShaderManager":55,"./renderers/webgl/managers/WebGLManager":57,"./renderers/webgl/shaders/ComplexPrimitiveShader":58,"./renderers/webgl/shaders/PrimitiveShader":59,"./renderers/webgl/shaders/Shader":60,"./renderers/webgl/shaders/TextureShader":61,"./renderers/webgl/utils/ObjectRenderer":62,"./renderers/webgl/utils/RenderTarget":64,"./sprites/Sprite":66,"./sprites/webgl/SpriteRenderer":67,"./text/Text":68,"./textures/BaseTexture":69,"./textures/RenderTexture":70,"./textures/Texture":71,"./textures/TextureUvs":72,"./textures/VideoBaseTexture":73,"./ticker":75,"./utils":76}],29:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/GroupD8.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/GroupD8.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 // Your friendly neighbour https://en.wikipedia.org/wiki/Dihedral_group of order 16
 
 var ux = [1, 1, 0, -1, -1, -1, 0, 1, 1, 1, 0, -1, -1, -1, 0, 1];
@@ -22852,7 +21017,7 @@ var uy = [0, 1, 1, 1, 0, -1, -1, -1, 0, 1, 1, 1, 0, -1, -1, -1];
 var vx = [0, -1, -1, -1, 0, 1, 1, 1, 0, 1, 1, 1, 0, -1, -1, -1];
 var vy = [1, 1, 0, -1, -1, -1, 0, 1, -1, -1, 0, 1, 1, 1, 0, -1];
 var tempMatrices = [];
-var Matrix = require('./Matrix');
+var Matrix = __webpack_require__(/*! ./Matrix */ "./node_modules/pixi.js/src/core/math/Matrix.js");
 
 var mul = [];
 
@@ -23008,12 +21173,21 @@ var GroupD8 = {
 
 module.exports = GroupD8;
 
-},{"./Matrix":30}],30:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/Matrix.js":
+/*!******************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/Matrix.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 // @todo - ignore the too many parameters warning for now
 // should either fix it or change the jshint config
 // jshint -W072
 
-var Point = require('./Point');
+var Point = __webpack_require__(/*! ./Point */ "./node_modules/pixi.js/src/core/math/Point.js");
 
 /**
  * The pixi Matrix class as an object, which makes it a lot faster,
@@ -23448,7 +21622,16 @@ Matrix.IDENTITY = new Matrix();
  */
 Matrix.TEMP_MATRIX = new Matrix();
 
-},{"./Point":31}],31:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/Point.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/Point.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * The Point object represents a location in a two-dimensional coordinate system, where x represents
  * the horizontal axis and y represents the vertical axis.
@@ -23518,7 +21701,16 @@ Point.prototype.set = function (x, y)
     this.y = y || ( (y !== 0) ? this.x : 0 ) ;
 };
 
-},{}],32:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/index.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/index.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * Math classes and utilities mixed into PIXI namespace.
  *
@@ -23530,20 +21722,29 @@ module.exports = {
     // to avoid circular dependencies and cut down on
     // internal module requires.
 
-    Point:      require('./Point'),
-    Matrix:     require('./Matrix'),
-    GroupD8:    require('./GroupD8'),
+    Point:      __webpack_require__(/*! ./Point */ "./node_modules/pixi.js/src/core/math/Point.js"),
+    Matrix:     __webpack_require__(/*! ./Matrix */ "./node_modules/pixi.js/src/core/math/Matrix.js"),
+    GroupD8:    __webpack_require__(/*! ./GroupD8 */ "./node_modules/pixi.js/src/core/math/GroupD8.js"),
 
-    Circle:     require('./shapes/Circle'),
-    Ellipse:    require('./shapes/Ellipse'),
-    Polygon:    require('./shapes/Polygon'),
-    Rectangle:  require('./shapes/Rectangle'),
-    RoundedRectangle: require('./shapes/RoundedRectangle')
+    Circle:     __webpack_require__(/*! ./shapes/Circle */ "./node_modules/pixi.js/src/core/math/shapes/Circle.js"),
+    Ellipse:    __webpack_require__(/*! ./shapes/Ellipse */ "./node_modules/pixi.js/src/core/math/shapes/Ellipse.js"),
+    Polygon:    __webpack_require__(/*! ./shapes/Polygon */ "./node_modules/pixi.js/src/core/math/shapes/Polygon.js"),
+    Rectangle:  __webpack_require__(/*! ./shapes/Rectangle */ "./node_modules/pixi.js/src/core/math/shapes/Rectangle.js"),
+    RoundedRectangle: __webpack_require__(/*! ./shapes/RoundedRectangle */ "./node_modules/pixi.js/src/core/math/shapes/RoundedRectangle.js")
 };
 
-},{"./GroupD8":29,"./Matrix":30,"./Point":31,"./shapes/Circle":33,"./shapes/Ellipse":34,"./shapes/Polygon":35,"./shapes/Rectangle":36,"./shapes/RoundedRectangle":37}],33:[function(require,module,exports){
-var Rectangle = require('./Rectangle'),
-    CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/shapes/Circle.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/shapes/Circle.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Rectangle = __webpack_require__(/*! ./Rectangle */ "./node_modules/pixi.js/src/core/math/shapes/Rectangle.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * The Circle object can be used to specify a hit area for displayObjects
@@ -23629,9 +21830,18 @@ Circle.prototype.getBounds = function ()
     return new Rectangle(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
 };
 
-},{"../../const":21,"./Rectangle":36}],34:[function(require,module,exports){
-var Rectangle = require('./Rectangle'),
-    CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/shapes/Ellipse.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/shapes/Ellipse.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Rectangle = __webpack_require__(/*! ./Rectangle */ "./node_modules/pixi.js/src/core/math/shapes/Rectangle.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * The Ellipse object can be used to specify a hit area for displayObjects
@@ -23724,9 +21934,18 @@ Ellipse.prototype.getBounds = function ()
     return new Rectangle(this.x - this.width, this.y - this.height, this.width, this.height);
 };
 
-},{"../../const":21,"./Rectangle":36}],35:[function(require,module,exports){
-var Point = require('../Point'),
-    CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/shapes/Polygon.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/shapes/Polygon.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Point = __webpack_require__(/*! ../Point */ "./node_modules/pixi.js/src/core/math/Point.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * @class
@@ -23827,8 +22046,17 @@ Polygon.prototype.contains = function (x, y)
     return inside;
 };
 
-},{"../../const":21,"../Point":31}],36:[function(require,module,exports){
-var CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/shapes/Rectangle.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/shapes/Rectangle.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * the Rectangle object is an area defined by its position, as indicated by its top-left corner point (x, y) and by its width and its height.
@@ -23921,8 +22149,17 @@ Rectangle.prototype.contains = function (x, y)
     return false;
 };
 
-},{"../../const":21}],37:[function(require,module,exports){
-var CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/math/shapes/RoundedRectangle.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/math/shapes/RoundedRectangle.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * The Rounded Rectangle object is an area that has nice rounded corners, as indicated by its top-left corner point (x, y) and by its width and its height and its radius.
@@ -24013,9 +22250,18 @@ RoundedRectangle.prototype.contains = function (x, y)
     return false;
 };
 
-},{"../../const":21}],38:[function(require,module,exports){
-var Container = require('../display/Container'),
-    CONST = require('../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/particles/ParticleContainer.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/particles/ParticleContainer.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Container = __webpack_require__(/*! ../display/Container */ "./node_modules/pixi.js/src/core/display/Container.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * The ParticleContainer class is a really fast version of the Container built solely for speed,
@@ -24332,7 +22578,16 @@ ParticleContainer.prototype.destroy = function () {
     this._buffers = null;
 };
 
-},{"../const":21,"../display/Container":22}],39:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/particles/webgl/ParticleBuffer.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/particles/webgl/ParticleBuffer.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 
 /**
  * @author Mat Groves
@@ -24552,12 +22807,21 @@ ParticleBuffer.prototype.destroy = function ()
     this.gl.deleteBuffer(this.staticBuffer);
 };
 
-},{}],40:[function(require,module,exports){
-var ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
-    WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
-    ParticleShader = require('./ParticleShader'),
-    ParticleBuffer = require('./ParticleBuffer'),
-    math            = require('../../math');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/particles/webgl/ParticleRenderer.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/particles/webgl/ParticleRenderer.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ObjectRenderer = __webpack_require__(/*! ../../renderers/webgl/utils/ObjectRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js"),
+    WebGLRenderer = __webpack_require__(/*! ../../renderers/webgl/WebGLRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/WebGLRenderer.js"),
+    ParticleShader = __webpack_require__(/*! ./ParticleShader */ "./node_modules/pixi.js/src/core/particles/webgl/ParticleShader.js"),
+    ParticleBuffer = __webpack_require__(/*! ./ParticleBuffer */ "./node_modules/pixi.js/src/core/particles/webgl/ParticleBuffer.js"),
+    math            = __webpack_require__(/*! ../../math */ "./node_modules/pixi.js/src/core/math/index.js");
 
 /**
  * @author Mat Groves
@@ -25028,8 +23292,17 @@ ParticleRenderer.prototype.destroy = function ()
     this.tempMatrix = null;
 };
 
-},{"../../math":32,"../../renderers/webgl/WebGLRenderer":48,"../../renderers/webgl/utils/ObjectRenderer":62,"./ParticleBuffer":39,"./ParticleShader":41}],41:[function(require,module,exports){
-var TextureShader = require('../../renderers/webgl/shaders/TextureShader');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/particles/webgl/ParticleShader.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/particles/webgl/ParticleShader.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var TextureShader = __webpack_require__(/*! ../../renderers/webgl/shaders/TextureShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/TextureShader.js");
 
 /**
  * @class
@@ -25106,11 +23379,20 @@ ParticleShader.prototype.constructor = ParticleShader;
 
 module.exports = ParticleShader;
 
-},{"../../renderers/webgl/shaders/TextureShader":61}],42:[function(require,module,exports){
-var utils = require('../utils'),
-    math = require('../math'),
-    CONST = require('../const'),
-    EventEmitter = require('eventemitter3');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/SystemRenderer.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/SystemRenderer.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
+    EventEmitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 /**
  * The CanvasRenderer draws the scene and all its content onto a 2d canvas. This renderer should be used for browsers that do not support webGL.
@@ -25367,12 +23649,21 @@ SystemRenderer.prototype.destroy = function (removeView) {
     this._backgroundColorString = null;
 };
 
-},{"../const":21,"../math":32,"../utils":76,"eventemitter3":7}],43:[function(require,module,exports){
-var SystemRenderer = require('../SystemRenderer'),
-    CanvasMaskManager = require('./utils/CanvasMaskManager'),
-    utils = require('../../utils'),
-    math = require('../../math'),
-    CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/canvas/CanvasRenderer.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/canvas/CanvasRenderer.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var SystemRenderer = __webpack_require__(/*! ../SystemRenderer */ "./node_modules/pixi.js/src/core/renderers/SystemRenderer.js"),
+    CanvasMaskManager = __webpack_require__(/*! ./utils/CanvasMaskManager */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasMaskManager.js"),
+    utils = __webpack_require__(/*! ../../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    math = __webpack_require__(/*! ../../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * The CanvasRenderer draws the scene and all its content onto a 2d canvas. This renderer should be used for browsers that do not support webGL.
@@ -25635,7 +23926,16 @@ CanvasRenderer.prototype._mapBlendModes = function ()
     }
 };
 
-},{"../../const":21,"../../math":32,"../../utils":76,"../SystemRenderer":42,"./utils/CanvasMaskManager":46}],44:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasBuffer.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasBuffer.js ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Creates a Canvas element of the given size.
  *
@@ -25735,8 +24035,17 @@ CanvasBuffer.prototype.destroy = function ()
     this.canvas = null;
 };
 
-},{}],45:[function(require,module,exports){
-var CONST = require('../../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasGraphics.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasGraphics.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CONST = __webpack_require__(/*! ../../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * A set of functions used by the canvas renderer to draw the primitive graphics data.
@@ -26089,8 +24398,17 @@ CanvasGraphics.updateGraphicsTint = function (graphics)
 };
 
 
-},{"../../../const":21}],46:[function(require,module,exports){
-var CanvasGraphics = require('./CanvasGraphics');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasMaskManager.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasMaskManager.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CanvasGraphics = __webpack_require__(/*! ./CanvasGraphics */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasGraphics.js");
 
 /**
  * A set of functions used to handle masking.
@@ -26151,8 +24469,17 @@ CanvasMaskManager.prototype.popMask = function (renderer)
 
 CanvasMaskManager.prototype.destroy = function () {};
 
-},{"./CanvasGraphics":45}],47:[function(require,module,exports){
-var utils = require('../../../utils');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasTinter.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasTinter.js ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(/*! ../../../utils */ "./node_modules/pixi.js/src/core/utils/index.js");
 
 /**
  * Utility methods for Sprite/Texture tinting.
@@ -26403,18 +24730,27 @@ CanvasTinter.canUseMultiply = utils.canUseNewCanvasBlendModes();
  */
 CanvasTinter.tintMethod = CanvasTinter.canUseMultiply ? CanvasTinter.tintWithMultiply :  CanvasTinter.tintWithPerPixel;
 
-},{"../../../utils":76}],48:[function(require,module,exports){
-var SystemRenderer = require('../SystemRenderer'),
-    ShaderManager = require('./managers/ShaderManager'),
-    MaskManager = require('./managers/MaskManager'),
-    StencilManager = require('./managers/StencilManager'),
-    FilterManager = require('./managers/FilterManager'),
-    BlendModeManager = require('./managers/BlendModeManager'),
-    RenderTarget = require('./utils/RenderTarget'),
-    ObjectRenderer = require('./utils/ObjectRenderer'),
-    FXAAFilter = require('./filters/FXAAFilter'),
-    utils = require('../../utils'),
-    CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/WebGLRenderer.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/WebGLRenderer.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var SystemRenderer = __webpack_require__(/*! ../SystemRenderer */ "./node_modules/pixi.js/src/core/renderers/SystemRenderer.js"),
+    ShaderManager = __webpack_require__(/*! ./managers/ShaderManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/ShaderManager.js"),
+    MaskManager = __webpack_require__(/*! ./managers/MaskManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/MaskManager.js"),
+    StencilManager = __webpack_require__(/*! ./managers/StencilManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/StencilManager.js"),
+    FilterManager = __webpack_require__(/*! ./managers/FilterManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/FilterManager.js"),
+    BlendModeManager = __webpack_require__(/*! ./managers/BlendModeManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/BlendModeManager.js"),
+    RenderTarget = __webpack_require__(/*! ./utils/RenderTarget */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/RenderTarget.js"),
+    ObjectRenderer = __webpack_require__(/*! ./utils/ObjectRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js"),
+    FXAAFilter = __webpack_require__(/*! ./filters/FXAAFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/FXAAFilter.js"),
+    utils = __webpack_require__(/*! ../../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * The WebGLRenderer draws the scene and all its content onto a webGL enabled canvas. This renderer
@@ -26993,8 +25329,17 @@ WebGLRenderer.prototype._mapGlModes = function ()
     }
 };
 
-},{"../../const":21,"../../utils":76,"../SystemRenderer":42,"./filters/FXAAFilter":50,"./managers/BlendModeManager":52,"./managers/FilterManager":53,"./managers/MaskManager":54,"./managers/ShaderManager":55,"./managers/StencilManager":56,"./utils/ObjectRenderer":62,"./utils/RenderTarget":64}],49:[function(require,module,exports){
-var DefaultShader = require('../shaders/TextureShader');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/filters/AbstractFilter.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/filters/AbstractFilter.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var DefaultShader = __webpack_require__(/*! ../shaders/TextureShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/TextureShader.js");
 
 /**
  * This is the base class for creating a PIXI filter. Currently only WebGL supports filters.
@@ -27105,8 +25450,17 @@ AbstractFilter.prototype.syncUniform = function (uniform)
     }
 };
 
-},{"../shaders/TextureShader":61}],50:[function(require,module,exports){
-var AbstractFilter = require('./AbstractFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/filters/FXAAFilter.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/filters/FXAAFilter.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var AbstractFilter = __webpack_require__(/*! ./AbstractFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/AbstractFilter.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -27160,9 +25514,18 @@ FXAAFilter.prototype.applyFilter = function (renderer, input, output)
     filterManager.applyFilter(shader, input, output);
 };
 
-},{"./AbstractFilter":49}],51:[function(require,module,exports){
-var AbstractFilter = require('./AbstractFilter'),
-    math =  require('../../../math');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var AbstractFilter = __webpack_require__(/*! ./AbstractFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/AbstractFilter.js"),
+    math =  __webpack_require__(/*! ../../../math */ "./node_modules/pixi.js/src/core/math/index.js");
 
 // @see https://github.com/substack/brfs/issues/25
 
@@ -27257,8 +25620,17 @@ Object.defineProperties(SpriteMaskFilter.prototype, {
     }
 });
 
-},{"../../../math":32,"./AbstractFilter":49}],52:[function(require,module,exports){
-var WebGLManager = require('./WebGLManager');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/managers/BlendModeManager.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/managers/BlendModeManager.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var WebGLManager = __webpack_require__(/*! ./WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js");
 
 /**
  * @class
@@ -27301,12 +25673,21 @@ BlendModeManager.prototype.setBlendMode = function (blendMode)
     return true;
 };
 
-},{"./WebGLManager":57}],53:[function(require,module,exports){
-var WebGLManager = require('./WebGLManager'),
-    RenderTarget = require('../utils/RenderTarget'),
-    CONST = require('../../../const'),
-    Quad = require('../utils/Quad'),
-    math =  require('../../../math');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/managers/FilterManager.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/managers/FilterManager.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var WebGLManager = __webpack_require__(/*! ./WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js"),
+    RenderTarget = __webpack_require__(/*! ../utils/RenderTarget */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/RenderTarget.js"),
+    CONST = __webpack_require__(/*! ../../../const */ "./node_modules/pixi.js/src/core/const.js"),
+    Quad = __webpack_require__(/*! ../utils/Quad */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/Quad.js"),
+    math =  __webpack_require__(/*! ../../../math */ "./node_modules/pixi.js/src/core/math/index.js");
 
 /**
  * @class
@@ -27753,9 +26134,18 @@ FilterManager.prototype.destroy = function ()
     this.texturePool = null;
 };
 
-},{"../../../const":21,"../../../math":32,"../utils/Quad":63,"../utils/RenderTarget":64,"./WebGLManager":57}],54:[function(require,module,exports){
-var WebGLManager = require('./WebGLManager'),
-    AlphaMaskFilter = require('../filters/SpriteMaskFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/managers/MaskManager.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/managers/MaskManager.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var WebGLManager = __webpack_require__(/*! ./WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js"),
+    AlphaMaskFilter = __webpack_require__(/*! ../filters/SpriteMaskFilter */ "./node_modules/pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter.js");
 
 /**
  * @class
@@ -27868,12 +26258,21 @@ MaskManager.prototype.popStencilMask = function (target, maskData)
 };
 
 
-},{"../filters/SpriteMaskFilter":51,"./WebGLManager":57}],55:[function(require,module,exports){
-var WebGLManager = require('./WebGLManager'),
-    TextureShader = require('../shaders/TextureShader'),
-    ComplexPrimitiveShader = require('../shaders/ComplexPrimitiveShader'),
-    PrimitiveShader = require('../shaders/PrimitiveShader'),
-    utils = require('../../../utils');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/managers/ShaderManager.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/managers/ShaderManager.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var WebGLManager = __webpack_require__(/*! ./WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js"),
+    TextureShader = __webpack_require__(/*! ../shaders/TextureShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/TextureShader.js"),
+    ComplexPrimitiveShader = __webpack_require__(/*! ../shaders/ComplexPrimitiveShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader.js"),
+    PrimitiveShader = __webpack_require__(/*! ../shaders/PrimitiveShader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader.js"),
+    utils = __webpack_require__(/*! ../../../utils */ "./node_modules/pixi.js/src/core/utils/index.js");
 
 /**
  * @class
@@ -28037,9 +26436,18 @@ ShaderManager.prototype.destroy = function ()
     this.tempAttribState = null;
 };
 
-},{"../../../utils":76,"../shaders/ComplexPrimitiveShader":58,"../shaders/PrimitiveShader":59,"../shaders/TextureShader":61,"./WebGLManager":57}],56:[function(require,module,exports){
-var WebGLManager = require('./WebGLManager'),
-    utils = require('../../../utils');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/managers/StencilManager.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/managers/StencilManager.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var WebGLManager = __webpack_require__(/*! ./WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js"),
+    utils = __webpack_require__(/*! ../../../utils */ "./node_modules/pixi.js/src/core/utils/index.js");
 
 /**
  * @class
@@ -28383,7 +26791,16 @@ WebGLMaskManager.prototype.popMask = function (maskData)
 };
 
 
-},{"../../../utils":76,"./WebGLManager":57}],57:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * @class
  * @memberof PIXI
@@ -28424,8 +26841,17 @@ WebGLManager.prototype.destroy = function ()
     this.renderer = null;
 };
 
-},{}],58:[function(require,module,exports){
-var Shader = require('./Shader');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Shader = __webpack_require__(/*! ./Shader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/Shader.js");
 
 /**
  * This shader is used to draw complex primitive shapes for {@link PIXI.Graphics}.
@@ -28486,8 +26912,17 @@ ComplexPrimitiveShader.prototype = Object.create(Shader.prototype);
 ComplexPrimitiveShader.prototype.constructor = ComplexPrimitiveShader;
 module.exports = ComplexPrimitiveShader;
 
-},{"./Shader":60}],59:[function(require,module,exports){
-var Shader = require('./Shader');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Shader = __webpack_require__(/*! ./Shader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/Shader.js");
 
 /**
  * This shader is used to draw simple primitive shapes for {@link PIXI.Graphics}.
@@ -28549,9 +26984,18 @@ PrimitiveShader.prototype = Object.create(Shader.prototype);
 PrimitiveShader.prototype.constructor = PrimitiveShader;
 module.exports = PrimitiveShader;
 
-},{"./Shader":60}],60:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/Shader.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/shaders/Shader.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /*global console */
-var utils = require('../../../utils');
+var utils = __webpack_require__(/*! ../../../utils */ "./node_modules/pixi.js/src/core/utils/index.js");
 
 /**
  * Base shader class for PIXI managed shaders.
@@ -29113,8 +27557,17 @@ Shader.prototype._glCompile = function (type, src)
     return shader;
 };
 
-},{"../../../utils":76}],61:[function(require,module,exports){
-var Shader = require('./Shader');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/TextureShader.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/shaders/TextureShader.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Shader = __webpack_require__(/*! ./Shader */ "./node_modules/pixi.js/src/core/renderers/webgl/shaders/Shader.js");
 
 /**
  * @class
@@ -29224,8 +27677,17 @@ TextureShader.defaultFragmentSrc = [
     '}'
 ].join('\n');
 
-},{"./Shader":60}],62:[function(require,module,exports){
-var WebGLManager = require('../managers/WebGLManager');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var WebGLManager = __webpack_require__(/*! ../managers/WebGLManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/WebGLManager.js");
 
 /**
  * Base for a common object renderer that can be used as a system renderer plugin.
@@ -29282,7 +27744,16 @@ ObjectRenderer.prototype.render = function (object) // jshint unused:false
     // render the object
 };
 
-},{"../managers/WebGLManager":57}],63:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/utils/Quad.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/utils/Quad.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Helper class to create a quad
  *
@@ -29437,12 +27908,21 @@ module.exports = Quad;
 
 
 
-},{}],64:[function(require,module,exports){
-var math = require('../../../math'),
-    utils = require('../../../utils'),
-    CONST = require('../../../const'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/utils/RenderTarget.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/utils/RenderTarget.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var math = __webpack_require__(/*! ../../../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    utils = __webpack_require__(/*! ../../../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    CONST = __webpack_require__(/*! ../../../const */ "./node_modules/pixi.js/src/core/const.js"),
     //StencilManager = require('../managers/StencilManager'),
-    StencilMaskStack = require('./StencilMaskStack');
+    StencilMaskStack = __webpack_require__(/*! ./StencilMaskStack */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/StencilMaskStack.js");
 
 /**
  * @author Mat Groves http://matgroves.com/ @Doormat23
@@ -29759,7 +28239,16 @@ RenderTarget.prototype.destroy = function ()
     this.texture = null;
 };
 
-},{"../../../const":21,"../../../math":32,"../../../utils":76,"./StencilMaskStack":65}],65:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/renderers/webgl/utils/StencilMaskStack.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/renderers/webgl/utils/StencilMaskStack.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Generic Mask Stack data structure
  * @class
@@ -29792,13 +28281,22 @@ function StencilMaskStack()
 StencilMaskStack.prototype.constructor = StencilMaskStack;
 module.exports = StencilMaskStack;
 
-},{}],66:[function(require,module,exports){
-var math = require('../math'),
-    Texture = require('../textures/Texture'),
-    Container = require('../display/Container'),
-    CanvasTinter = require('../renderers/canvas/utils/CanvasTinter'),
-    utils = require('../utils'),
-    CONST = require('../const'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/sprites/Sprite.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/sprites/Sprite.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    Texture = __webpack_require__(/*! ../textures/Texture */ "./node_modules/pixi.js/src/core/textures/Texture.js"),
+    Container = __webpack_require__(/*! ../display/Container */ "./node_modules/pixi.js/src/core/display/Container.js"),
+    CanvasTinter = __webpack_require__(/*! ../renderers/canvas/utils/CanvasTinter */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasTinter.js"),
+    utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
     tempPoint = new math.Point(),
     GroupD8 = math.GroupD8,
     canvasRenderWorldTransform = new math.Matrix();
@@ -30360,10 +28858,19 @@ Sprite.fromImage = function (imageId, crossorigin, scaleMode)
     return new Sprite(Texture.fromImage(imageId, crossorigin, scaleMode));
 };
 
-},{"../const":21,"../display/Container":22,"../math":32,"../renderers/canvas/utils/CanvasTinter":47,"../textures/Texture":71,"../utils":76}],67:[function(require,module,exports){
-var ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
-    WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
-    CONST = require('../../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/sprites/webgl/SpriteRenderer.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/sprites/webgl/SpriteRenderer.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ObjectRenderer = __webpack_require__(/*! ../../renderers/webgl/utils/ObjectRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js"),
+    WebGLRenderer = __webpack_require__(/*! ../../renderers/webgl/WebGLRenderer */ "./node_modules/pixi.js/src/core/renderers/webgl/WebGLRenderer.js"),
+    CONST = __webpack_require__(/*! ../../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * @author Mat Groves
@@ -30833,12 +29340,21 @@ SpriteRenderer.prototype.destroy = function ()
     this.shader = null;
 };
 
-},{"../../const":21,"../../renderers/webgl/WebGLRenderer":48,"../../renderers/webgl/utils/ObjectRenderer":62}],68:[function(require,module,exports){
-var Sprite = require('../sprites/Sprite'),
-    Texture = require('../textures/Texture'),
-    math = require('../math'),
-    utils = require('../utils'),
-    CONST = require('../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/text/Text.js":
+/*!****************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/text/Text.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Sprite = __webpack_require__(/*! ../sprites/Sprite */ "./node_modules/pixi.js/src/core/sprites/Sprite.js"),
+    Texture = __webpack_require__(/*! ../textures/Texture */ "./node_modules/pixi.js/src/core/textures/Texture.js"),
+    math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * A Text Object will create a line or multiple lines of text. To split a line you can use '\n' in your text string,
@@ -31530,10 +30046,19 @@ Text.prototype.destroy = function (destroyBaseTexture)
     this._texture.destroy(destroyBaseTexture === undefined ? true : destroyBaseTexture);
 };
 
-},{"../const":21,"../math":32,"../sprites/Sprite":66,"../textures/Texture":71,"../utils":76}],69:[function(require,module,exports){
-var utils = require('../utils'),
-    CONST = require('../const'),
-    EventEmitter = require('eventemitter3');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/textures/BaseTexture.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/textures/BaseTexture.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
+    EventEmitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 /**
  * A texture stores the information that represents an image. All textures have a base texture.
@@ -31966,14 +30491,23 @@ BaseTexture.fromCanvas = function (canvas, scaleMode)
     return baseTexture;
 };
 
-},{"../const":21,"../utils":76,"eventemitter3":7}],70:[function(require,module,exports){
-var BaseTexture = require('./BaseTexture'),
-    Texture = require('./Texture'),
-    RenderTarget = require('../renderers/webgl/utils/RenderTarget'),
-    FilterManager = require('../renderers/webgl/managers/FilterManager'),
-    CanvasBuffer = require('../renderers/canvas/utils/CanvasBuffer'),
-    math = require('../math'),
-    CONST = require('../const'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/textures/RenderTexture.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/textures/RenderTexture.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var BaseTexture = __webpack_require__(/*! ./BaseTexture */ "./node_modules/pixi.js/src/core/textures/BaseTexture.js"),
+    Texture = __webpack_require__(/*! ./Texture */ "./node_modules/pixi.js/src/core/textures/Texture.js"),
+    RenderTarget = __webpack_require__(/*! ../renderers/webgl/utils/RenderTarget */ "./node_modules/pixi.js/src/core/renderers/webgl/utils/RenderTarget.js"),
+    FilterManager = __webpack_require__(/*! ../renderers/webgl/managers/FilterManager */ "./node_modules/pixi.js/src/core/renderers/webgl/managers/FilterManager.js"),
+    CanvasBuffer = __webpack_require__(/*! ../renderers/canvas/utils/CanvasBuffer */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasBuffer.js"),
+    math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
     tempMatrix = new math.Matrix();
 
 /**
@@ -32445,13 +30979,22 @@ RenderTexture.prototype.getPixel = function (x, y)
     }
 };
 
-},{"../const":21,"../math":32,"../renderers/canvas/utils/CanvasBuffer":44,"../renderers/webgl/managers/FilterManager":53,"../renderers/webgl/utils/RenderTarget":64,"./BaseTexture":69,"./Texture":71}],71:[function(require,module,exports){
-var BaseTexture = require('./BaseTexture'),
-    VideoBaseTexture = require('./VideoBaseTexture'),
-    TextureUvs = require('./TextureUvs'),
-    EventEmitter = require('eventemitter3'),
-    math = require('../math'),
-    utils = require('../utils');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/textures/Texture.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/textures/Texture.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var BaseTexture = __webpack_require__(/*! ./BaseTexture */ "./node_modules/pixi.js/src/core/textures/BaseTexture.js"),
+    VideoBaseTexture = __webpack_require__(/*! ./VideoBaseTexture */ "./node_modules/pixi.js/src/core/textures/VideoBaseTexture.js"),
+    TextureUvs = __webpack_require__(/*! ./TextureUvs */ "./node_modules/pixi.js/src/core/textures/TextureUvs.js"),
+    EventEmitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js"),
+    math = __webpack_require__(/*! ../math */ "./node_modules/pixi.js/src/core/math/index.js"),
+    utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js");
 
 /**
  * A texture stores the information that represents an image or part of an image. It cannot be added
@@ -32897,7 +31440,16 @@ Texture.removeTextureFromCache = function (id)
  */
 Texture.EMPTY = new Texture(new BaseTexture());
 
-},{"../math":32,"../utils":76,"./BaseTexture":69,"./TextureUvs":72,"./VideoBaseTexture":73,"eventemitter3":7}],72:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/textures/TextureUvs.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/textures/TextureUvs.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 
 /**
  * A standard object to store the Uvs of a texture
@@ -32923,7 +31475,7 @@ function TextureUvs()
 
 module.exports = TextureUvs;
 
-var GroupD8 = require('../math/GroupD8');
+var GroupD8 = __webpack_require__(/*! ../math/GroupD8 */ "./node_modules/pixi.js/src/core/math/GroupD8.js");
 
 /**
  * Sets the texture Uvs based on the given frame information
@@ -32976,9 +31528,18 @@ TextureUvs.prototype.set = function (frame, baseFrame, rotate)
     }
 };
 
-},{"../math/GroupD8":29}],73:[function(require,module,exports){
-var BaseTexture = require('./BaseTexture'),
-    utils = require('../utils');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/textures/VideoBaseTexture.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/textures/VideoBaseTexture.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var BaseTexture = __webpack_require__(/*! ./BaseTexture */ "./node_modules/pixi.js/src/core/textures/BaseTexture.js"),
+    utils = __webpack_require__(/*! ../utils */ "./node_modules/pixi.js/src/core/utils/index.js");
 
 /**
  * A texture of a [playing] Video.
@@ -33213,9 +31774,18 @@ function createSource(path, type)
     return source;
 }
 
-},{"../utils":76,"./BaseTexture":69}],74:[function(require,module,exports){
-var CONST = require('../const'),
-    EventEmitter = require('eventemitter3'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/ticker/Ticker.js":
+/*!********************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/ticker/Ticker.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js"),
+    EventEmitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js"),
     // Internal event used by composed emitter
     TICK = 'tick';
 
@@ -33568,8 +32138,17 @@ Ticker.prototype.update = function update(currentTime)
 
 module.exports = Ticker;
 
-},{"../const":21,"eventemitter3":7}],75:[function(require,module,exports){
-var Ticker = require('./Ticker');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/ticker/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/ticker/index.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Ticker = __webpack_require__(/*! ./Ticker */ "./node_modules/pixi.js/src/core/ticker/Ticker.js");
 
 /**
  * The shared ticker instance used by {@link PIXI.extras.MovieClip}.
@@ -33624,8 +32203,17 @@ module.exports = {
     Ticker: Ticker
 };
 
-},{"./Ticker":74}],76:[function(require,module,exports){
-var CONST = require('../const');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/utils/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/utils/index.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CONST = __webpack_require__(/*! ../const */ "./node_modules/pixi.js/src/core/const.js");
 
 /**
  * @namespace PIXI.utils
@@ -33634,9 +32222,9 @@ var utils = module.exports = {
     _uid: 0,
     _saidHello: false,
 
-    EventEmitter:   require('eventemitter3'),
-    pluginTarget:   require('./pluginTarget'),
-    async:          require('async'),
+    EventEmitter:   __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js"),
+    pluginTarget:   __webpack_require__(/*! ./pluginTarget */ "./node_modules/pixi.js/src/core/utils/pluginTarget.js"),
+    async:          __webpack_require__(/*! async */ "./node_modules/async/lib/async.js"),
 
     /**
      * Gets the next unique identifier
@@ -33901,7 +32489,16 @@ var utils = module.exports = {
     BaseTextureCache: {}
 };
 
-},{"../const":21,"./pluginTarget":77,"async":5,"eventemitter3":7}],77:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/core/utils/pluginTarget.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/pixi.js/src/core/utils/pluginTarget.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Mixins functionality to make an object have "plugins".
  *
@@ -33971,12 +32568,21 @@ module.exports = {
     }
 };
 
-},{}],78:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/deprecation.js":
+/*!*************************************************!*\
+  !*** ./node_modules/pixi.js/src/deprecation.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /*global console */
-var core = require('./core'),
-    mesh = require('./mesh'),
-    extras = require('./extras'),
-    filters = require('./filters');
+var core = __webpack_require__(/*! ./core */ "./node_modules/pixi.js/src/core/index.js"),
+    mesh = __webpack_require__(/*! ./mesh */ "./node_modules/pixi.js/src/mesh/index.js"),
+    extras = __webpack_require__(/*! ./extras */ "./node_modules/pixi.js/src/extras/index.js"),
+    filters = __webpack_require__(/*! ./filters */ "./node_modules/pixi.js/src/filters/index.js");
 
 /**
  * @class
@@ -34322,8 +32928,17 @@ core.utils.uuid = function ()
     return core.utils.uid();
 };
 
-},{"./core":28,"./extras":85,"./filters":102,"./mesh":127}],79:[function(require,module,exports){
-var core = require('../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/BitmapText.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/BitmapText.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
  * A BitmapText object will create a line or multiple lines of text using bitmap font. To
@@ -34710,8 +33325,17 @@ BitmapText.prototype.validate = function()
 
 BitmapText.fonts = {};
 
-},{"../core":28}],80:[function(require,module,exports){
-var core = require('../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/MovieClip.js":
+/*!******************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/MovieClip.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
  * A MovieClip is a simple way to display an animation depicted by a list of textures.
@@ -35030,11 +33654,20 @@ MovieClip.fromImages = function (images)
 
     return new MovieClip(textures);
 };
-},{"../core":28}],81:[function(require,module,exports){
-var core = require('../core'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/TilingSprite.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/TilingSprite.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
     // a sprite use dfor rendering textures..
     tempPoint = new core.Point(),
-    CanvasTinter = require('../core/renderers/canvas/utils/CanvasTinter');
+    CanvasTinter = __webpack_require__(/*! ../core/renderers/canvas/utils/CanvasTinter */ "./node_modules/pixi.js/src/core/renderers/canvas/utils/CanvasTinter.js");
 
 /**
  * A tiling sprite is a fast way of rendering a tiling image
@@ -35482,8 +34115,17 @@ TilingSprite.fromImage = function (imageId, width, height, crossorigin, scaleMod
     return new TilingSprite(core.Texture.fromImage(imageId, crossorigin, scaleMode),width,height);
 };
 
-},{"../core":28,"../core/renderers/canvas/utils/CanvasTinter":47}],82:[function(require,module,exports){
-var core = require('../core'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/cacheAsBitmap.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/cacheAsBitmap.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
     DisplayObject = core.DisplayObject,
     _tempMatrix = new core.Matrix();
 
@@ -35754,8 +34396,17 @@ DisplayObject.prototype._cacheAsBitmapDestroy = function ()
     this._originalDestroy();
 };
 
-},{"../core":28}],83:[function(require,module,exports){
-var core = require('../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/getChildByName.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/getChildByName.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
  * The instance name of the object.
@@ -35784,8 +34435,17 @@ core.Container.prototype.getChildByName = function (name)
     return null;
 };
 
-},{"../core":28}],84:[function(require,module,exports){
-var core = require('../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/getGlobalPosition.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/getGlobalPosition.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
 * Returns the global position of the displayObject
@@ -35814,7 +34474,16 @@ core.DisplayObject.prototype.getGlobalPosition = function (point)
     return point;
 };
 
-},{"../core":28}],85:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/extras/index.js":
+/*!**************************************************!*\
+  !*** ./node_modules/pixi.js/src/extras/index.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI extras library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -35822,21 +34491,30 @@ core.DisplayObject.prototype.getGlobalPosition = function (point)
  * @license     {@link https://github.com/pixijs/pixi.js/blob/master/LICENSE|MIT License}
  */
 
-require('./cacheAsBitmap');
-require('./getChildByName');
-require('./getGlobalPosition');
+__webpack_require__(/*! ./cacheAsBitmap */ "./node_modules/pixi.js/src/extras/cacheAsBitmap.js");
+__webpack_require__(/*! ./getChildByName */ "./node_modules/pixi.js/src/extras/getChildByName.js");
+__webpack_require__(/*! ./getGlobalPosition */ "./node_modules/pixi.js/src/extras/getGlobalPosition.js");
 
 /**
  * @namespace PIXI.extras
  */
 module.exports = {
-    MovieClip:      require('./MovieClip'),
-    TilingSprite:   require('./TilingSprite'),
-    BitmapText:     require('./BitmapText')
+    MovieClip:      __webpack_require__(/*! ./MovieClip */ "./node_modules/pixi.js/src/extras/MovieClip.js"),
+    TilingSprite:   __webpack_require__(/*! ./TilingSprite */ "./node_modules/pixi.js/src/extras/TilingSprite.js"),
+    BitmapText:     __webpack_require__(/*! ./BitmapText */ "./node_modules/pixi.js/src/extras/BitmapText.js")
 };
 
-},{"./BitmapText":79,"./MovieClip":80,"./TilingSprite":81,"./cacheAsBitmap":82,"./getChildByName":83,"./getGlobalPosition":84}],86:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/ascii/AsciiFilter.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/ascii/AsciiFilter.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -35892,10 +34570,19 @@ Object.defineProperties(AsciiFilter.prototype, {
     }
 });
 
-},{"../../core":28}],87:[function(require,module,exports){
-var core = require('../../core'),
-    BlurXFilter = require('../blur/BlurXFilter'),
-    BlurYFilter = require('../blur/BlurYFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/bloom/BloomFilter.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/bloom/BloomFilter.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js"),
+    BlurXFilter = __webpack_require__(/*! ../blur/BlurXFilter */ "./node_modules/pixi.js/src/filters/blur/BlurXFilter.js"),
+    BlurYFilter = __webpack_require__(/*! ../blur/BlurYFilter */ "./node_modules/pixi.js/src/filters/blur/BlurYFilter.js");
 
 /**
  * The BloomFilter applies a Gaussian blur to an object.
@@ -35993,8 +34680,17 @@ Object.defineProperties(BloomFilter.prototype, {
     }
 });
 
-},{"../../core":28,"../blur/BlurXFilter":90,"../blur/BlurYFilter":91}],88:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/blur/BlurDirFilter.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/blur/BlurDirFilter.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 
 
 /**
@@ -36135,10 +34831,19 @@ Object.defineProperties(BlurDirFilter.prototype, {
     }
 });
 
-},{"../../core":28}],89:[function(require,module,exports){
-var core = require('../../core'),
-    BlurXFilter = require('./BlurXFilter'),
-    BlurYFilter = require('./BlurYFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/blur/BlurFilter.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/blur/BlurFilter.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js"),
+    BlurXFilter = __webpack_require__(/*! ./BlurXFilter */ "./node_modules/pixi.js/src/filters/blur/BlurXFilter.js"),
+    BlurYFilter = __webpack_require__(/*! ./BlurYFilter */ "./node_modules/pixi.js/src/filters/blur/BlurYFilter.js");
 
 /**
  * The BlurFilter applies a Gaussian blur to an object.
@@ -36245,8 +34950,17 @@ Object.defineProperties(BlurFilter.prototype, {
     }
 });
 
-},{"../../core":28,"./BlurXFilter":90,"./BlurYFilter":91}],90:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/blur/BlurXFilter.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/blur/BlurXFilter.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -36338,8 +35052,17 @@ Object.defineProperties(BlurXFilter.prototype, {
     }
 });
 
-},{"../../core":28}],91:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/blur/BlurYFilter.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/blur/BlurYFilter.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -36424,8 +35147,17 @@ Object.defineProperties(BlurYFilter.prototype, {
     }
 });
 
-},{"../../core":28}],92:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/blur/SmartBlurFilter.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/blur/SmartBlurFilter.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -36454,8 +35186,17 @@ SmartBlurFilter.prototype = Object.create(core.AbstractFilter.prototype);
 SmartBlurFilter.prototype.constructor = SmartBlurFilter;
 module.exports = SmartBlurFilter;
 
-},{"../../core":28}],93:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/color/ColorMatrixFilter.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/color/ColorMatrixFilter.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -36990,8 +35731,17 @@ Object.defineProperties(ColorMatrixFilter.prototype, {
     }
 });
 
-},{"../../core":28}],94:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/color/ColorStepFilter.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/color/ColorStepFilter.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37039,8 +35789,17 @@ Object.defineProperties(ColorStepFilter.prototype, {
     }
 });
 
-},{"../../core":28}],95:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/convolution/ConvolutionFilter.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/convolution/ConvolutionFilter.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37130,8 +35889,17 @@ Object.defineProperties(ConvolutionFilter.prototype, {
     }
 });
 
-},{"../../core":28}],96:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/crosshatch/CrossHatchFilter.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/crosshatch/CrossHatchFilter.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37156,8 +35924,17 @@ CrossHatchFilter.prototype = Object.create(core.AbstractFilter.prototype);
 CrossHatchFilter.prototype.constructor = CrossHatchFilter;
 module.exports = CrossHatchFilter;
 
-},{"../../core":28}],97:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/displacement/DisplacementFilter.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/displacement/DisplacementFilter.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37240,8 +36017,17 @@ Object.defineProperties(DisplacementFilter.prototype, {
     }
 });
 
-},{"../../core":28}],98:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/dot/DotScreenFilter.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/dot/DotScreenFilter.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37312,8 +36098,17 @@ Object.defineProperties(DotScreenFilter.prototype, {
     }
 });
 
-},{"../../core":28}],99:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/dropshadow/BlurYTintFilter.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/dropshadow/BlurYTintFilter.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 
 // @see https://github.com/substack/brfs/issues/25
 
@@ -37403,10 +36198,19 @@ Object.defineProperties(BlurYTintFilter.prototype, {
     }
 });
 
-},{"../../core":28}],100:[function(require,module,exports){
-var core = require('../../core'),
-    BlurXFilter = require('../blur/BlurXFilter'),
-    BlurYTintFilter = require('./BlurYTintFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/dropshadow/DropShadowFilter.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/dropshadow/DropShadowFilter.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js"),
+    BlurXFilter = __webpack_require__(/*! ../blur/BlurXFilter */ "./node_modules/pixi.js/src/filters/blur/BlurXFilter.js"),
+    BlurYTintFilter = __webpack_require__(/*! ./BlurYTintFilter */ "./node_modules/pixi.js/src/filters/dropshadow/BlurYTintFilter.js");
 
 /**
  * The DropShadowFilter applies a Gaussian blur to an object.
@@ -37596,8 +36400,17 @@ Object.defineProperties(DropShadowFilter.prototype, {
     }
 });
 
-},{"../../core":28,"../blur/BlurXFilter":90,"./BlurYTintFilter":99}],101:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/gray/GrayFilter.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/gray/GrayFilter.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37645,7 +36458,16 @@ Object.defineProperties(GrayFilter.prototype, {
     }
 });
 
-},{"../../core":28}],102:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/index.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI filters library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -37657,35 +36479,44 @@ Object.defineProperties(GrayFilter.prototype, {
  * @namespace PIXI.filters
  */
 module.exports = {
-    AsciiFilter:        require('./ascii/AsciiFilter'),
-    BloomFilter:        require('./bloom/BloomFilter'),
-    BlurFilter:         require('./blur/BlurFilter'),
-    BlurXFilter:        require('./blur/BlurXFilter'),
-    BlurYFilter:        require('./blur/BlurYFilter'),
-    BlurDirFilter:      require('./blur/BlurDirFilter'),
-    ColorMatrixFilter:  require('./color/ColorMatrixFilter'),
-    ColorStepFilter:    require('./color/ColorStepFilter'),
-    ConvolutionFilter:  require('./convolution/ConvolutionFilter'),
-    CrossHatchFilter:   require('./crosshatch/CrossHatchFilter'),
-    DisplacementFilter: require('./displacement/DisplacementFilter'),
-    DotScreenFilter:    require('./dot/DotScreenFilter'),
-    GrayFilter:         require('./gray/GrayFilter'),
-    DropShadowFilter:   require('./dropshadow/DropShadowFilter'),
-    InvertFilter:       require('./invert/InvertFilter'),
-    NoiseFilter:        require('./noise/NoiseFilter'),
-    PixelateFilter:     require('./pixelate/PixelateFilter'),
-    RGBSplitFilter:     require('./rgb/RGBSplitFilter'),
-    ShockwaveFilter:    require('./shockwave/ShockwaveFilter'),
-    SepiaFilter:        require('./sepia/SepiaFilter'),
-    SmartBlurFilter:    require('./blur/SmartBlurFilter'),
-    TiltShiftFilter:    require('./tiltshift/TiltShiftFilter'),
-    TiltShiftXFilter:   require('./tiltshift/TiltShiftXFilter'),
-    TiltShiftYFilter:   require('./tiltshift/TiltShiftYFilter'),
-    TwistFilter:        require('./twist/TwistFilter')
+    AsciiFilter:        __webpack_require__(/*! ./ascii/AsciiFilter */ "./node_modules/pixi.js/src/filters/ascii/AsciiFilter.js"),
+    BloomFilter:        __webpack_require__(/*! ./bloom/BloomFilter */ "./node_modules/pixi.js/src/filters/bloom/BloomFilter.js"),
+    BlurFilter:         __webpack_require__(/*! ./blur/BlurFilter */ "./node_modules/pixi.js/src/filters/blur/BlurFilter.js"),
+    BlurXFilter:        __webpack_require__(/*! ./blur/BlurXFilter */ "./node_modules/pixi.js/src/filters/blur/BlurXFilter.js"),
+    BlurYFilter:        __webpack_require__(/*! ./blur/BlurYFilter */ "./node_modules/pixi.js/src/filters/blur/BlurYFilter.js"),
+    BlurDirFilter:      __webpack_require__(/*! ./blur/BlurDirFilter */ "./node_modules/pixi.js/src/filters/blur/BlurDirFilter.js"),
+    ColorMatrixFilter:  __webpack_require__(/*! ./color/ColorMatrixFilter */ "./node_modules/pixi.js/src/filters/color/ColorMatrixFilter.js"),
+    ColorStepFilter:    __webpack_require__(/*! ./color/ColorStepFilter */ "./node_modules/pixi.js/src/filters/color/ColorStepFilter.js"),
+    ConvolutionFilter:  __webpack_require__(/*! ./convolution/ConvolutionFilter */ "./node_modules/pixi.js/src/filters/convolution/ConvolutionFilter.js"),
+    CrossHatchFilter:   __webpack_require__(/*! ./crosshatch/CrossHatchFilter */ "./node_modules/pixi.js/src/filters/crosshatch/CrossHatchFilter.js"),
+    DisplacementFilter: __webpack_require__(/*! ./displacement/DisplacementFilter */ "./node_modules/pixi.js/src/filters/displacement/DisplacementFilter.js"),
+    DotScreenFilter:    __webpack_require__(/*! ./dot/DotScreenFilter */ "./node_modules/pixi.js/src/filters/dot/DotScreenFilter.js"),
+    GrayFilter:         __webpack_require__(/*! ./gray/GrayFilter */ "./node_modules/pixi.js/src/filters/gray/GrayFilter.js"),
+    DropShadowFilter:   __webpack_require__(/*! ./dropshadow/DropShadowFilter */ "./node_modules/pixi.js/src/filters/dropshadow/DropShadowFilter.js"),
+    InvertFilter:       __webpack_require__(/*! ./invert/InvertFilter */ "./node_modules/pixi.js/src/filters/invert/InvertFilter.js"),
+    NoiseFilter:        __webpack_require__(/*! ./noise/NoiseFilter */ "./node_modules/pixi.js/src/filters/noise/NoiseFilter.js"),
+    PixelateFilter:     __webpack_require__(/*! ./pixelate/PixelateFilter */ "./node_modules/pixi.js/src/filters/pixelate/PixelateFilter.js"),
+    RGBSplitFilter:     __webpack_require__(/*! ./rgb/RGBSplitFilter */ "./node_modules/pixi.js/src/filters/rgb/RGBSplitFilter.js"),
+    ShockwaveFilter:    __webpack_require__(/*! ./shockwave/ShockwaveFilter */ "./node_modules/pixi.js/src/filters/shockwave/ShockwaveFilter.js"),
+    SepiaFilter:        __webpack_require__(/*! ./sepia/SepiaFilter */ "./node_modules/pixi.js/src/filters/sepia/SepiaFilter.js"),
+    SmartBlurFilter:    __webpack_require__(/*! ./blur/SmartBlurFilter */ "./node_modules/pixi.js/src/filters/blur/SmartBlurFilter.js"),
+    TiltShiftFilter:    __webpack_require__(/*! ./tiltshift/TiltShiftFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftFilter.js"),
+    TiltShiftXFilter:   __webpack_require__(/*! ./tiltshift/TiltShiftXFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftXFilter.js"),
+    TiltShiftYFilter:   __webpack_require__(/*! ./tiltshift/TiltShiftYFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftYFilter.js"),
+    TwistFilter:        __webpack_require__(/*! ./twist/TwistFilter */ "./node_modules/pixi.js/src/filters/twist/TwistFilter.js")
 };
 
-},{"./ascii/AsciiFilter":86,"./bloom/BloomFilter":87,"./blur/BlurDirFilter":88,"./blur/BlurFilter":89,"./blur/BlurXFilter":90,"./blur/BlurYFilter":91,"./blur/SmartBlurFilter":92,"./color/ColorMatrixFilter":93,"./color/ColorStepFilter":94,"./convolution/ConvolutionFilter":95,"./crosshatch/CrossHatchFilter":96,"./displacement/DisplacementFilter":97,"./dot/DotScreenFilter":98,"./dropshadow/DropShadowFilter":100,"./gray/GrayFilter":101,"./invert/InvertFilter":103,"./noise/NoiseFilter":104,"./pixelate/PixelateFilter":105,"./rgb/RGBSplitFilter":106,"./sepia/SepiaFilter":107,"./shockwave/ShockwaveFilter":108,"./tiltshift/TiltShiftFilter":110,"./tiltshift/TiltShiftXFilter":111,"./tiltshift/TiltShiftYFilter":112,"./twist/TwistFilter":113}],103:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/invert/InvertFilter.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/invert/InvertFilter.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37734,8 +36565,17 @@ Object.defineProperties(InvertFilter.prototype, {
     }
 });
 
-},{"../../core":28}],104:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/noise/NoiseFilter.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/noise/NoiseFilter.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37789,8 +36629,17 @@ Object.defineProperties(NoiseFilter.prototype, {
     }
 });
 
-},{"../../core":28}],105:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/pixelate/PixelateFilter.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/pixelate/PixelateFilter.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37840,8 +36689,17 @@ Object.defineProperties(PixelateFilter.prototype, {
     }
 });
 
-},{"../../core":28}],106:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/rgb/RGBSplitFilter.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/rgb/RGBSplitFilter.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37926,8 +36784,17 @@ Object.defineProperties(RGBSplitFilter.prototype, {
     }
 });
 
-},{"../../core":28}],107:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/sepia/SepiaFilter.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/sepia/SepiaFilter.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -37976,8 +36843,17 @@ Object.defineProperties(SepiaFilter.prototype, {
     }
 });
 
-},{"../../core":28}],108:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/shockwave/ShockwaveFilter.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/shockwave/ShockwaveFilter.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -38064,8 +36940,17 @@ Object.defineProperties(ShockwaveFilter.prototype, {
     }
 });
 
-},{"../../core":28}],109:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftAxisFilter.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/tiltshift/TiltShiftAxisFilter.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -38189,10 +37074,19 @@ Object.defineProperties(TiltShiftAxisFilter.prototype, {
     }
 });
 
-},{"../../core":28}],110:[function(require,module,exports){
-var core = require('../../core'),
-    TiltShiftXFilter = require('./TiltShiftXFilter'),
-    TiltShiftYFilter = require('./TiltShiftYFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftFilter.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/tiltshift/TiltShiftFilter.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js"),
+    TiltShiftXFilter = __webpack_require__(/*! ./TiltShiftXFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftXFilter.js"),
+    TiltShiftYFilter = __webpack_require__(/*! ./TiltShiftYFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftYFilter.js");
 
 /**
  * @author Vico @vicocotea
@@ -38299,8 +37193,17 @@ Object.defineProperties(TiltShiftFilter.prototype, {
     }
 });
 
-},{"../../core":28,"./TiltShiftXFilter":111,"./TiltShiftYFilter":112}],111:[function(require,module,exports){
-var TiltShiftAxisFilter = require('./TiltShiftAxisFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftXFilter.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/tiltshift/TiltShiftXFilter.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var TiltShiftAxisFilter = __webpack_require__(/*! ./TiltShiftAxisFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftAxisFilter.js");
 
 /**
  * @author Vico @vicocotea
@@ -38337,8 +37240,17 @@ TiltShiftXFilter.prototype.updateDelta = function ()
     this.uniforms.delta.value.y = dy / d;
 };
 
-},{"./TiltShiftAxisFilter":109}],112:[function(require,module,exports){
-var TiltShiftAxisFilter = require('./TiltShiftAxisFilter');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftYFilter.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/tiltshift/TiltShiftYFilter.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var TiltShiftAxisFilter = __webpack_require__(/*! ./TiltShiftAxisFilter */ "./node_modules/pixi.js/src/filters/tiltshift/TiltShiftAxisFilter.js");
 
 /**
  * @author Vico @vicocotea
@@ -38375,8 +37287,17 @@ TiltShiftYFilter.prototype.updateDelta = function ()
     this.uniforms.delta.value.y = dx / d;
 };
 
-},{"./TiltShiftAxisFilter":109}],113:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/filters/twist/TwistFilter.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/filters/twist/TwistFilter.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 // @see https://github.com/substack/brfs/issues/25
 
 
@@ -38460,20 +37381,28 @@ Object.defineProperties(TwistFilter.prototype, {
     }
 });
 
-},{"../../core":28}],114:[function(require,module,exports){
-(function (global){
-// run the polyfills
-require('./polyfill');
 
-var core = module.exports = require('./core');
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/index.js":
+/*!*******************************************!*\
+  !*** ./node_modules/pixi.js/src/index.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {// run the polyfills
+__webpack_require__(/*! ./polyfill */ "./node_modules/pixi.js/src/polyfill/index.js");
+
+var core = module.exports = __webpack_require__(/*! ./core */ "./node_modules/pixi.js/src/core/index.js");
 
 // add core plugins.
-core.extras         = require('./extras');
-core.filters        = require('./filters');
-core.interaction    = require('./interaction');
-core.loaders        = require('./loaders');
-core.mesh           = require('./mesh');
-core.accessibility  = require('./accessibility');
+core.extras         = __webpack_require__(/*! ./extras */ "./node_modules/pixi.js/src/extras/index.js");
+core.filters        = __webpack_require__(/*! ./filters */ "./node_modules/pixi.js/src/filters/index.js");
+core.interaction    = __webpack_require__(/*! ./interaction */ "./node_modules/pixi.js/src/interaction/index.js");
+core.loaders        = __webpack_require__(/*! ./loaders */ "./node_modules/pixi.js/src/loaders/index.js");
+core.mesh           = __webpack_require__(/*! ./mesh */ "./node_modules/pixi.js/src/mesh/index.js");
+core.accessibility  = __webpack_require__(/*! ./accessibility */ "./node_modules/pixi.js/src/accessibility/index.js");
 
 // export a premade loader instance
 /**
@@ -38486,14 +37415,23 @@ core.accessibility  = require('./accessibility');
 core.loader = new core.loaders.Loader();
 
 // mixin the deprecation features.
-Object.assign(core, require('./deprecation'));
+Object.assign(core, __webpack_require__(/*! ./deprecation */ "./node_modules/pixi.js/src/deprecation.js"));
 
 // Always export pixi globally.
 global.PIXI = core;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./accessibility":20,"./core":28,"./deprecation":78,"./extras":85,"./filters":102,"./interaction":117,"./loaders":120,"./mesh":127,"./polyfill":132}],115:[function(require,module,exports){
-var core = require('../core');
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/interaction/InteractionData.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/pixi.js/src/interaction/InteractionData.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
  * Holds all information related to an Interaction event
@@ -38541,14 +37479,23 @@ InteractionData.prototype.getLocalPosition = function (displayObject, point, glo
     return displayObject.worldTransform.applyInverse(globalPos || this.global, point);
 };
 
-},{"../core":28}],116:[function(require,module,exports){
-var core = require('../core'),
-    InteractionData = require('./InteractionData');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/interaction/InteractionManager.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/interaction/InteractionManager.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
+    InteractionData = __webpack_require__(/*! ./InteractionData */ "./node_modules/pixi.js/src/interaction/InteractionData.js");
 
 // Mix interactiveTarget into core.DisplayObject.prototype
 Object.assign(
     core.DisplayObject.prototype,
-    require('./interactiveTarget')
+    __webpack_require__(/*! ./interactiveTarget */ "./node_modules/pixi.js/src/interaction/interactiveTarget.js")
 );
 
 /**
@@ -39447,7 +38394,16 @@ InteractionManager.prototype.destroy = function () {
 core.WebGLRenderer.registerPlugin('interaction', InteractionManager);
 core.CanvasRenderer.registerPlugin('interaction', InteractionManager);
 
-},{"../core":28,"./InteractionData":115,"./interactiveTarget":118}],117:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/interaction/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/pixi.js/src/interaction/index.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI interactions library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -39459,12 +38415,21 @@ core.CanvasRenderer.registerPlugin('interaction', InteractionManager);
  * @namespace PIXI.interaction
  */
 module.exports = {
-    InteractionData:    require('./InteractionData'),
-    InteractionManager: require('./InteractionManager'),
-    interactiveTarget:  require('./interactiveTarget')
+    InteractionData:    __webpack_require__(/*! ./InteractionData */ "./node_modules/pixi.js/src/interaction/InteractionData.js"),
+    InteractionManager: __webpack_require__(/*! ./InteractionManager */ "./node_modules/pixi.js/src/interaction/InteractionManager.js"),
+    interactiveTarget:  __webpack_require__(/*! ./interactiveTarget */ "./node_modules/pixi.js/src/interaction/interactiveTarget.js")
 };
 
-},{"./InteractionData":115,"./InteractionManager":116,"./interactiveTarget":118}],118:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/interaction/interactiveTarget.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/pixi.js/src/interaction/interactiveTarget.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 /**
  * Default property values of interactive objects
  * used by {@link PIXI.interaction.InteractionManager}.
@@ -39513,11 +38478,20 @@ var interactiveTarget = {
 
 module.exports = interactiveTarget;
 
-},{}],119:[function(require,module,exports){
-var Resource = require('resource-loader').Resource,
-    core = require('../core'),
-    extras = require('../extras'),
-    path = require('path');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/loaders/bitmapFontParser.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/pixi.js/src/loaders/bitmapFontParser.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Resource = __webpack_require__(/*! resource-loader */ "./node_modules/resource-loader/src/index.js").Resource,
+    core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
+    extras = __webpack_require__(/*! ../extras */ "./node_modules/pixi.js/src/extras/index.js"),
+    path = __webpack_require__(/*! path */ "./node_modules/path-browserify/index.js");
 
 
 function parse(resource, texture) {
@@ -39637,7 +38611,16 @@ module.exports = function ()
     };
 };
 
-},{"../core":28,"../extras":85,"path":1,"resource-loader":15}],120:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/loaders/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/pixi.js/src/loaders/index.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI loaders library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -39649,20 +38632,29 @@ module.exports = function ()
  * @namespace PIXI.loaders
  */
 module.exports = {
-    Loader:             require('./loader'),
+    Loader:             __webpack_require__(/*! ./loader */ "./node_modules/pixi.js/src/loaders/loader.js"),
 
     // parsers
-    bitmapFontParser:   require('./bitmapFontParser'),
-    spritesheetParser:  require('./spritesheetParser'),
-    textureParser:      require('./textureParser'),
-    Resource:           require('resource-loader').Resource
+    bitmapFontParser:   __webpack_require__(/*! ./bitmapFontParser */ "./node_modules/pixi.js/src/loaders/bitmapFontParser.js"),
+    spritesheetParser:  __webpack_require__(/*! ./spritesheetParser */ "./node_modules/pixi.js/src/loaders/spritesheetParser.js"),
+    textureParser:      __webpack_require__(/*! ./textureParser */ "./node_modules/pixi.js/src/loaders/textureParser.js"),
+    Resource:           __webpack_require__(/*! resource-loader */ "./node_modules/resource-loader/src/index.js").Resource
 };
 
-},{"./bitmapFontParser":119,"./loader":121,"./spritesheetParser":122,"./textureParser":123,"resource-loader":15}],121:[function(require,module,exports){
-var ResourceLoader = require('resource-loader'),
-    textureParser = require('./textureParser'),
-    spritesheetParser = require('./spritesheetParser'),
-    bitmapFontParser = require('./bitmapFontParser');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/loaders/loader.js":
+/*!****************************************************!*\
+  !*** ./node_modules/pixi.js/src/loaders/loader.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ResourceLoader = __webpack_require__(/*! resource-loader */ "./node_modules/resource-loader/src/index.js"),
+    textureParser = __webpack_require__(/*! ./textureParser */ "./node_modules/pixi.js/src/loaders/textureParser.js"),
+    spritesheetParser = __webpack_require__(/*! ./spritesheetParser */ "./node_modules/pixi.js/src/loaders/spritesheetParser.js"),
+    bitmapFontParser = __webpack_require__(/*! ./bitmapFontParser */ "./node_modules/pixi.js/src/loaders/bitmapFontParser.js");
 
 /**
  *
@@ -39720,11 +38712,20 @@ var Resource = ResourceLoader.Resource;
 
 Resource.setExtensionXhrType('fnt', Resource.XHR_RESPONSE_TYPE.DOCUMENT);
 
-},{"./bitmapFontParser":119,"./spritesheetParser":122,"./textureParser":123,"resource-loader":15}],122:[function(require,module,exports){
-var Resource = require('resource-loader').Resource,
-    path = require('path'),
-    core = require('../core'),
-    async = require('async');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/loaders/spritesheetParser.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/pixi.js/src/loaders/spritesheetParser.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Resource = __webpack_require__(/*! resource-loader */ "./node_modules/resource-loader/src/index.js").Resource,
+    path = __webpack_require__(/*! path */ "./node_modules/path-browserify/index.js"),
+    core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
+    async = __webpack_require__(/*! async */ "./node_modules/async/lib/async.js");
 
 var BATCH_SIZE = 1000;
 
@@ -39839,8 +38840,17 @@ module.exports = function ()
     };
 };
 
-},{"../core":28,"async":5,"path":1,"resource-loader":15}],123:[function(require,module,exports){
-var core = require('../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/loaders/textureParser.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/pixi.js/src/loaders/textureParser.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 module.exports = function ()
 {
@@ -39861,8 +38871,17 @@ module.exports = function ()
     };
 };
 
-},{"../core":28}],124:[function(require,module,exports){
-var core = require('../core'),
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/mesh/Mesh.js":
+/*!***********************************************!*\
+  !*** ./node_modules/pixi.js/src/mesh/Mesh.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
     tempPoint = new core.Point(),
     tempPolygon = new core.Polygon();
 
@@ -40339,8 +39358,17 @@ Mesh.DRAW_MODES = {
     TRIANGLES: 1
 };
 
-},{"../core":28}],125:[function(require,module,exports){
-var Mesh = require('./Mesh');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/mesh/Plane.js":
+/*!************************************************!*\
+  !*** ./node_modules/pixi.js/src/mesh/Plane.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Mesh = __webpack_require__(/*! ./Mesh */ "./node_modules/pixi.js/src/mesh/Mesh.js");
 
 /**
  * The Plane allows you to draw a texture across several points and them manipulate these points
@@ -40465,9 +39493,18 @@ Plane.prototype._onTextureUpdate = function ()
     }
 };
 
-},{"./Mesh":124}],126:[function(require,module,exports){
-var Mesh = require('./Mesh');
-var core = require('../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/mesh/Rope.js":
+/*!***********************************************!*\
+  !*** ./node_modules/pixi.js/src/mesh/Rope.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Mesh = __webpack_require__(/*! ./Mesh */ "./node_modules/pixi.js/src/mesh/Mesh.js");
+var core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
  * The rope allows you to draw a texture across several points and them manipulate these points
@@ -40678,7 +39715,16 @@ Rope.prototype.updateTransform = function ()
     this.containerUpdateTransform();
 };
 
-},{"../core":28,"./Mesh":124}],127:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/mesh/index.js":
+/*!************************************************!*\
+  !*** ./node_modules/pixi.js/src/mesh/index.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * @file        Main export of the PIXI extras library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -40690,16 +39736,25 @@ Rope.prototype.updateTransform = function ()
  * @namespace PIXI.mesh
  */
 module.exports = {
-    Mesh:           require('./Mesh'),
-    Plane:           require('./Plane'),
-    Rope:           require('./Rope'),
-    MeshRenderer:   require('./webgl/MeshRenderer'),
-    MeshShader:     require('./webgl/MeshShader')
+    Mesh:           __webpack_require__(/*! ./Mesh */ "./node_modules/pixi.js/src/mesh/Mesh.js"),
+    Plane:           __webpack_require__(/*! ./Plane */ "./node_modules/pixi.js/src/mesh/Plane.js"),
+    Rope:           __webpack_require__(/*! ./Rope */ "./node_modules/pixi.js/src/mesh/Rope.js"),
+    MeshRenderer:   __webpack_require__(/*! ./webgl/MeshRenderer */ "./node_modules/pixi.js/src/mesh/webgl/MeshRenderer.js"),
+    MeshShader:     __webpack_require__(/*! ./webgl/MeshShader */ "./node_modules/pixi.js/src/mesh/webgl/MeshShader.js")
 };
 
-},{"./Mesh":124,"./Plane":125,"./Rope":126,"./webgl/MeshRenderer":128,"./webgl/MeshShader":129}],128:[function(require,module,exports){
-var core = require('../../core'),
-    Mesh = require('../Mesh');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/mesh/webgl/MeshRenderer.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/pixi.js/src/mesh/webgl/MeshRenderer.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js"),
+    Mesh = __webpack_require__(/*! ../Mesh */ "./node_modules/pixi.js/src/mesh/Mesh.js");
 
 /**
  * @author Mat Groves
@@ -40926,8 +39981,17 @@ MeshRenderer.prototype.destroy = function ()
     core.ObjectRenderer.prototype.destroy.call(this);
 };
 
-},{"../../core":28,"../Mesh":124}],129:[function(require,module,exports){
-var core = require('../../core');
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/mesh/webgl/MeshShader.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/pixi.js/src/mesh/webgl/MeshShader.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(/*! ../../core */ "./node_modules/pixi.js/src/core/index.js");
 
 /**
  * @class
@@ -40987,7 +40051,16 @@ module.exports = MeshShader;
 
 core.ShaderManager.registerPlugin('meshShader', MeshShader);
 
-},{"../../core":28}],130:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/polyfill/Math.sign.js":
+/*!********************************************************!*\
+  !*** ./node_modules/pixi.js/src/polyfill/Math.sign.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 // References:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
 
@@ -41003,24 +40076,50 @@ if (!Math.sign)
     };
 }
 
-},{}],131:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/polyfill/Object.assign.js":
+/*!************************************************************!*\
+  !*** ./node_modules/pixi.js/src/polyfill/Object.assign.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 // References:
 // https://github.com/sindresorhus/object-assign
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
 if (!Object.assign)
 {
-    Object.assign = require('object-assign');
+    Object.assign = __webpack_require__(/*! object-assign */ "./node_modules/object-assign/index.js");
 }
 
-},{"object-assign":8}],132:[function(require,module,exports){
-require('./Object.assign');
-require('./requestAnimationFrame');
-require('./Math.sign');
 
-},{"./Math.sign":130,"./Object.assign":131,"./requestAnimationFrame":133}],133:[function(require,module,exports){
-(function (global){
-// References:
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/polyfill/index.js":
+/*!****************************************************!*\
+  !*** ./node_modules/pixi.js/src/polyfill/index.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(/*! ./Object.assign */ "./node_modules/pixi.js/src/polyfill/Object.assign.js");
+__webpack_require__(/*! ./requestAnimationFrame */ "./node_modules/pixi.js/src/polyfill/requestAnimationFrame.js");
+__webpack_require__(/*! ./Math.sign */ "./node_modules/pixi.js/src/polyfill/Math.sign.js");
+
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/src/polyfill/requestAnimationFrame.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/pixi.js/src/polyfill/requestAnimationFrame.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {// References:
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // https://gist.github.com/1579671
 // http://updates.html5rocks.com/2012/05/requestAnimationFrame-API-now-with-sub-millisecond-precision
@@ -41087,1570 +40186,4769 @@ if (!global.cancelAnimationFrame) {
     };
 }
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],134:[function(require,module,exports){
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/process/browser.js":
+/*!*****************************************!*\
+  !*** ./node_modules/process/browser.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
 (function () {
-    'use strict';
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
 
-    var _ = require('lodash');
 
-    // Represents the collision boundaries of an entity.
-    var Collision = function (params) {
-        params = _.extend({
-            anchor: {
-                x: 0.5,
-                y: 0.5
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
             }
-        }, params);
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
 
-        this.$id = 'collision';
-        this.$deps = ['position'];
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
 
-        this.width = params.width;
-        this.height = params.height;
-        this.anchor = params.anchor;
-    };
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
 
-    module.exports = Collision;
-} ());
+function noop() {}
 
-},{"lodash":4}],135:[function(require,module,exports){
-(function () {
-    'use strict';
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
 
-    var Circle = function (params) {
-        this.$id = 'circle';
-        this.$deps = ['graphic'];
+process.listeners = function (name) { return [] }
 
-        this.color = params.color;
-        this.radius = params.radius;
-    };
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
 
-    module.exports = Circle;
-} ());
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
-},{}],136:[function(require,module,exports){
-(function () {
-    'use strict';
 
-    var Ellipse = function (params) {
-        this.$id = 'ellipse';
-        this.$deps = ['graphic'];
+/***/ }),
 
-        this.color = params.color;
-        this.width = params.width;
-        this.height = params.height;
-    };
+/***/ "./node_modules/resource-loader/node_modules/eventemitter3/index.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/resource-loader/node_modules/eventemitter3/index.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-    module.exports = Ellipse;
-} ());
+"use strict";
 
-},{}],137:[function(require,module,exports){
-(function () {
-    'use strict';
 
-    var _ = require('lodash');
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
 
-    // Represents a graphic to draw.
-    var Graphic = function (params) {
-        this.$id = 'graphic';
-        this.$deps = []; // Position dependency added later if relative positioning is true.
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
 
-        params = _.extend({
-            alpha: 1,
-            anchor: {
-                x: 0.5,
-                y: 0.5
-            },
-            relative: true,
-            scale: {
-                x: 1,
-                y: 1
-            },
-            tint: 0xffffff,
-            translate: {
-                x: 0,
-                y: 0
-            },
-            visible: true,
-            z: 0
-        }, params);
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
 
-        if (params.relative) {
-            this.$deps.push('position');
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/Loader.js":
+/*!****************************************************!*\
+  !*** ./node_modules/resource-loader/src/Loader.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var parseUri        = __webpack_require__(/*! parse-uri */ "./node_modules/parse-uri/index.js");
+var async           = __webpack_require__(/*! ./async */ "./node_modules/resource-loader/src/async.js");
+var Resource        = __webpack_require__(/*! ./Resource */ "./node_modules/resource-loader/src/Resource.js");
+var EventEmitter    = __webpack_require__(/*! eventemitter3 */ "./node_modules/resource-loader/node_modules/eventemitter3/index.js");
+
+// some constants
+var DEFAULT_CONCURRENCY = 10;
+var MAX_PROGRESS = 100;
+
+/**
+ * Manages the state and loading of multiple resources to load.
+ *
+ * @class
+ * @param {string} [baseUrl=''] - The base url for all resources loaded by this loader.
+ * @param {number} [concurrency=10] - The number of resources to load concurrently.
+ */
+function Loader(baseUrl, concurrency) {
+    EventEmitter.call(this);
+
+    concurrency = concurrency || DEFAULT_CONCURRENCY;
+
+    /**
+     * The base url for all resources loaded by this loader.
+     *
+     * @member {string}
+     */
+    this.baseUrl = baseUrl || '';
+
+    /**
+     * The progress percent of the loader going through the queue.
+     *
+     * @member {number}
+     */
+    this.progress = 0;
+
+    /**
+     * Loading state of the loader, true if it is currently loading resources.
+     *
+     * @member {boolean}
+     */
+    this.loading = false;
+
+    /**
+     * The percentage of total progress that a single resource represents.
+     *
+     * @member {number}
+     */
+    this._progressChunk = 0;
+
+    /**
+     * The middleware to run before loading each resource.
+     *
+     * @member {function[]}
+     */
+    this._beforeMiddleware = [];
+
+    /**
+     * The middleware to run after loading each resource.
+     *
+     * @member {function[]}
+     */
+    this._afterMiddleware = [];
+
+    /**
+     * The `_loadResource` function bound with this object context.
+     *
+     * @private
+     * @member {function}
+     */
+    this._boundLoadResource = this._loadResource.bind(this);
+
+    /**
+     * The resource buffer that fills until `load` is called to start loading resources.
+     *
+     * @private
+     * @member {Resource[]}
+     */
+    this._buffer = [];
+
+    /**
+     * Used to track load completion.
+     *
+     * @private
+     * @member {number}
+     */
+    this._numToLoad = 0;
+
+    /**
+     * The resources waiting to be loaded.
+     *
+     * @private
+     * @member {Resource[]}
+     */
+    this._queue = async.queue(this._boundLoadResource, concurrency);
+
+    /**
+     * All the resources for this loader keyed by name.
+     *
+     * @member {object<string, Resource>}
+     */
+    this.resources = {};
+
+    /**
+     * Emitted once per loaded or errored resource.
+     *
+     * @event progress
+     * @memberof Loader#
+     */
+
+    /**
+     * Emitted once per errored resource.
+     *
+     * @event error
+     * @memberof Loader#
+     */
+
+    /**
+     * Emitted once per loaded resource.
+     *
+     * @event load
+     * @memberof Loader#
+     */
+
+    /**
+     * Emitted when the loader begins to process the queue.
+     *
+     * @event start
+     * @memberof Loader#
+     */
+
+    /**
+     * Emitted when the queued resources all load.
+     *
+     * @event complete
+     * @memberof Loader#
+     */
+}
+
+Loader.prototype = Object.create(EventEmitter.prototype);
+Loader.prototype.constructor = Loader;
+module.exports = Loader;
+
+/**
+ * Adds a resource (or multiple resources) to the loader queue.
+ *
+ * This function can take a wide variety of different parameters. The only thing that is always
+ * required the url to load. All the following will work:
+ *
+ * ```js
+ * loader
+ *     // normal param syntax
+ *     .add('key', 'http://...', function () {})
+ *     .add('http://...', function () {})
+ *     .add('http://...')
+ *
+ *     // object syntax
+ *     .add({
+ *         name: 'key2',
+ *         url: 'http://...'
+ *     }, function () {})
+ *     .add({
+ *         url: 'http://...'
+ *     }, function () {})
+ *     .add({
+ *         name: 'key3',
+ *         url: 'http://...'
+ *         onComplete: function () {}
+ *     })
+ *     .add({
+ *         url: 'https://...',
+ *         onComplete: function () {},
+ *         crossOrigin: true
+ *     })
+ *
+ *     // you can also pass an array of objects or urls or both
+ *     .add([
+ *         { name: 'key4', url: 'http://...', onComplete: function () {} },
+ *         { url: 'http://...', onComplete: function () {} },
+ *         'http://...'
+ *     ])
+ *
+ *     // and you can use both params and options
+ *     .add('key', 'http://...', { crossOrigin: true }, function () {})
+ *     .add('http://...', { crossOrigin: true }, function () {});
+ * ```
+ *
+ * @alias enqueue
+ * @param {string} [name] - The name of the resource to load, if not passed the url is used.
+ * @param {string} [url] - The url for this resource, relative to the baseUrl of this loader.
+ * @param {object} [options] - The options for the load.
+ * @param {boolean} [options.crossOrigin] - Is this request cross-origin? Default is to determine automatically.
+ * @param {Resource.XHR_LOAD_TYPE} [options.loadType=Resource.LOAD_TYPE.XHR] - How should this resource be loaded?
+ * @param {Resource.XHR_RESPONSE_TYPE} [options.xhrType=Resource.XHR_RESPONSE_TYPE.DEFAULT] - How should the data being
+ *      loaded be interpreted when using XHR?
+ * @param {function} [cb] - Function to call when this specific resource completes loading.
+ * @return {Loader} Returns itself.
+ */
+Loader.prototype.add = Loader.prototype.enqueue = function (name, url, options, cb) {
+    // special case of an array of objects or urls
+    if (Array.isArray(name)) {
+        for (var i = 0; i < name.length; ++i) {
+            this.add(name[i]);
         }
 
-        this.alpha = params.alpha;
-        this.anchor = params.anchor;
-        this.relative = params.relative;
-        this.scale = params.scale;
-        this.tint = params.tint;
-        this.translate = params.translate;
-        this.visible = params.visible;
-        this.z = params.z;
-
-    };
-
-    module.exports = Graphic;
-} ());
-
-},{"lodash":4}],138:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Line = function (params) {
-        this.$id = 'line';
-        this.$deps = ['graphic'];
+        return this;
+    }
+
+    // if an object is passed instead of params
+    if (typeof name === 'object') {
+        cb = url || name.callback || name.onComplete;
+        options = name;
+        url = name.url;
+        name = name.name || name.key || name.url;
+    }
+
+    // case where no name is passed shift all args over by one.
+    if (typeof url !== 'string') {
+        cb = options;
+        options = url;
+        url = name;
+    }
+
+    // now that we shifted make sure we have a proper url.
+    if (typeof url !== 'string') {
+        throw new Error('No url passed to add resource to loader.');
+    }
+
+    // options are optional so people might pass a function and no options
+    if (typeof options === 'function') {
+        cb = options;
+        options = null;
+    }
+
+    // check if resource already exists.
+    if (this.resources[name]) {
+        throw new Error('Resource with name "' + name + '" already exists.');
+    }
+
+    // add base url if this isn't an absolute url
+    url = this._prepareUrl(url);
+
+    // create the store the resource
+    this.resources[name] = new Resource(name, url, options);
+
+    if (typeof cb === 'function') {
+        this.resources[name].once('afterMiddleware', cb);
+    }
+
+    this._numToLoad++;
+
+    // if already loading add it to the worker queue
+    if (this._queue.started) {
+        this._queue.push(this.resources[name]);
+        this._progressChunk = (MAX_PROGRESS - this.progress) / (this._queue.length() + this._queue.running());
+    }
+    // otherwise buffer it to be added to the queue later
+    else {
+        this._buffer.push(this.resources[name]);
+        this._progressChunk = MAX_PROGRESS / this._buffer.length;
+    }
+
+    return this;
+};
+
+/**
+ * Sets up a middleware function that will run *before* the
+ * resource is loaded.
+ *
+ * @alias pre
+ * @method before
+ * @param {function} fn - The middleware function to register.
+ * @return {Loader} Returns itself.
+ */
+Loader.prototype.before = Loader.prototype.pre = function (fn) {
+    this._beforeMiddleware.push(fn);
+
+    return this;
+};
+
+/**
+ * Sets up a middleware function that will run *after* the
+ * resource is loaded.
+ *
+ * @alias use
+ * @method after
+ * @param {function} fn - The middleware function to register.
+ * @return {Loader} Returns itself.
+ */
+Loader.prototype.after = Loader.prototype.use = function (fn) {
+    this._afterMiddleware.push(fn);
+
+    return this;
+};
+
+/**
+ * Resets the queue of the loader to prepare for a new load.
+ *
+ * @return {Loader} Returns itself.
+ */
+Loader.prototype.reset = function () {
+    // this.baseUrl = baseUrl || '';
+
+    this.progress = 0;
+
+    this.loading = false;
 
-        params = _.extend({
-            thickness: 1
-        }, params);
+    this._progressChunk = 0;
 
-        this.thickness = params.thickness;
-        this.x1 = params.x1;
-        this.y1 = params.y1;
-        this.x2 = params.x2;
-        this.y2 = params.y2;
-    };
-
-    module.exports = Line;
-} ());
-
-},{"lodash":4}],139:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var Polygon = function (params) {
-        this.$id = 'polygon';
-        this.$deps = ['graphic'];
-
-        this.color = params.color;
-        this.points = params.points;
-    };
-
-    module.exports = Polygon;
-} ());
-
-},{}],140:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var Rectangle = function (params) {
-        this.$id = 'rectangle';
-        this.$deps = ['graphic'];
-
-        this.color = params.color;
-        this.width = params.width;
-        this.height = params.height;
-    };
-
-    module.exports = Rectangle;
-} ());
-
-},{}],141:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Sprite = function (params) {
-        this.$id = 'sprite';
-        this.$deps = ['graphic'];
-
-        params = _.extend({
-            animationSpeed: 1,
-            currentFrame: 1,
-            loop: true,
-            rotation: 0
-        }, params);
-
-        this.animationSpeed = params.animationSpeed;
-        this.currentFrame = params.currentFrame;
-        this.loop = params.loop;
-        this.path = params.path;
-        this.rotation = params.rotation;
-    };
+    // this._beforeMiddleware.length = 0;
+    // this._afterMiddleware.length = 0;
 
-    module.exports = Sprite;
-} ());
+    this._buffer.length = 0;
 
-},{"lodash":4}],142:[function(require,module,exports){
-(function () {
-    'use strict';
+    this._numToLoad = 0;
 
-    var _ = require('lodash');
+    this._queue.kill();
+    this._queue.started = false;
 
-    var StaticSprite = function (params) {
-        this.$id = 'staticSprite';
-        this.$deps = ['graphic'];
-
-        params = _.extend({
-            rotation: 0
-        }, params);
-
-        this.path = params.path;
-        this.rotation = params.rotation;
-    };
-
-    module.exports = StaticSprite;
-} ());
-
-},{"lodash":4}],143:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Text = function (params) {
-        this.$id = 'text';
-        this.$deps = ['graphic'];
-
-        params = _.extend({
-            bitmapFont: false,
-            rotation: 0,
-            style: {}
-        }, params);
-
-        params.style = _.extend({
-            font: '32px monospace',
-            fill: 0xffffff
-        }, params.style);
-
-        this.bitmapFont = params.bitmapFont;
-        this.copy = params.copy;
-        this.rotation = params.rotation;
-        this.style = params.style;
-    };
-
-    module.exports = Text;
-} ());
-
-},{"lodash":4}],144:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    // Represents an entity's position in 2D space.
-    var Position = function (params) {
-        this.$id = 'position';
-        this.$deps = [];
-
-        this.x = params.x;
-        this.y = params.y;
-    };
-
-    module.exports = Position;
-} ());
-
-},{}],145:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    // Represents an entity's velocity in 2D space.
-    var Velocity = function (params) {
-        this.$id = 'velocity';
-        this.$deps = ['position'];
-
-        this.xspeed = params.xspeed;
-        this.yspeed = params.yspeed;
-    };
-
-    module.exports = Velocity;
-} ());
-
-},{}],146:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Entity = function () {
-        var that = this;
-
-        // Each entity had a unique ID.
-        this.uid = _.uniqueId();
-
-        // Each entity has a number of components.
-        this.c = {};
-        Object.seal(this.c);
-
-        // World this entity has been added to.
-        this.world = null;
-
-        // Attach a component to the entity.
-        this.attach = function (component) {
-            // Check component's dependencies are met.
-            _.each(
-                component.$deps,
-                function (dependencyID) {
-                    if (!that.has(dependencyID)) {
-                        console.error(dependencyID + ' component missing.');
-                        throw new Error('ComponentDependencyMissing');
-                    }
-                }
-            );
-
-            // Check component is not already attached.
-            if (this.has(component.$id)) {
-                throw new Error('ComponentAlreadyAttached');
-            }
-
-            // Attach component.
-            var newC = _.clone(that.c);
-            newC[component.$id] = component;
-            Object.seal(newC);
-            this.c = newC;
-
-            // If the entity has already been added to a world, rebuild it.
-            if (this.world) {
-                this.world.rebuild(this, component.$id);
-            }
-
-            return this;
-        };
-
-        // Remove a component from the entity.
-        this.detach = function (componentID) {
-            // Check that the component was not a dependency.
-            _.each(
-                that.c,
-                function (component) {
-                    var dependencyExists = _.any(
-                        component.$deps,
-                        function (dep) {
-                            return dep === componentID;
-                        }
-                    );
-                    if (dependencyExists) {
-                        console.error(component.$id + ' depends on ' + componentID);
-                        throw new Error('ComponentDependencyMissing');
-                    }
-                }
-            );
-
-            // Detach the component.
-            var newC = _.clone(that.c);
-            delete newC[componentID];
-            Object.seal(newC);
-            this.c = newC;
-
-            if (this.world) {
-                this.world.rebuild(this);
-            }
-
-            return this;
-        };
-
-        // Check if the entity has a given component.
-        this.has = function (componentID) {
-            return _.has(this.c, componentID);
-        };
-
-    };
-
-    module.exports = Entity;
-} ());
-
-},{"lodash":4}],147:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var hitagi = {
-        'Entity': require('./entity.js'),
-        'World': require('./world.js'),
-        'utils': require('./utils.js'),
-        'components': {
-            'Collision': require('./components/collision.js'),
-            'Position': require('./components/position.js'),
-            'Velocity': require('./components/velocity.js'),
-
-            'graphics': {
-                'Circle': require('./components/graphics/circle.js'),
-                'Ellipse': require('./components/graphics/ellipse.js'),
-                'Graphic': require('./components/graphics/graphic.js'),
-                'Line': require('./components/graphics/line.js'),
-                'Polygon': require('./components/graphics/polygon.js'),
-                'Rectangle': require('./components/graphics/rectangle.js'),
-                'StaticSprite': require('./components/graphics/staticSprite.js'),
-                'Sprite': require('./components/graphics/sprite.js'),
-                'Text': require('./components/graphics/text.js')
-            }
-        },
-        'prefabs': {
-            'Base': require('./prefabs/base.js'),
-            'Body': require('./prefabs/body.js'),
-            'Static': require('./prefabs/static.js'),
-            'StaticBody': require('./prefabs/staticBody.js')
-        },
-        'systems': {
-            'CollisionSystem': require('./systems/collisionSystem.js'),
-            'ControlsSystem': require('./systems/controlsSystem.js'),
-            'PixiRenderSystem': require('./systems/pixiRenderSystem.js'),
-            'RoomSystem': require('./systems/roomSystem.js'),
-            'SoundSystem': require('./systems/soundSystem.js'),
-            'VelocitySystem': require('./systems/velocitySystem.js')
+    // abort all resource loads
+    for (var k in this.resources) {
+        var res = this.resources[k];
+
+        res.off('complete', this._onLoad, this);
+
+        if (res.isLoading) {
+            res.abort();
         }
-    };
-
-    module.exports = hitagi;
-} ());
-
-},{"./components/collision.js":134,"./components/graphics/circle.js":135,"./components/graphics/ellipse.js":136,"./components/graphics/graphic.js":137,"./components/graphics/line.js":138,"./components/graphics/polygon.js":139,"./components/graphics/rectangle.js":140,"./components/graphics/sprite.js":141,"./components/graphics/staticSprite.js":142,"./components/graphics/text.js":143,"./components/position.js":144,"./components/velocity.js":145,"./entity.js":146,"./prefabs/base.js":149,"./prefabs/body.js":150,"./prefabs/static.js":151,"./prefabs/staticBody.js":152,"./systems/collisionSystem.js":153,"./systems/controlsSystem.js":154,"./systems/pixiRenderSystem.js":155,"./systems/roomSystem.js":156,"./systems/soundSystem.js":157,"./systems/velocitySystem.js":158,"./utils.js":159,"./world.js":160}],148:[function(require,module,exports){
-(function (global){
-global.hitagi = require('./main.js');
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./main.js":147}],149:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Static = require('./static.js');
-
-    var Velocity = require('../components/velocity.js');
-
-    var Basic = function (params) {
-        params = _.extend({
-            xspeed: 0,
-            yspeed: 0
-        }, params);
-
-        return new Static(params)
-            .attach(new Velocity(params));
-    };
-
-    module.exports = Basic;
-} ());
-
-},{"../components/velocity.js":145,"./static.js":151,"lodash":4}],150:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var Base = require('./base.js');
-
-    var Collision = require('../components/collision.js');
-
-    var Body = function (params) {
-        return new Base(params)
-            .attach(new Collision(params));
-    };
-
-    module.exports = Body;
-} ());
-
-},{"../components/collision.js":134,"./base.js":149}],151:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Entity = require('../entity.js');
-
-    var Position = require('../components/position.js');
-    var Graphic = require('../components/graphics/graphic.js');
-
-    var Static = function (params) {
-        params = _.extend({
-            x: 0,
-            y: 0
-        }, params);
-
-        return new Entity()
-            .attach(new Position(params))
-            .attach(new Graphic(params));
-    };
-
-    module.exports = Static;
-} ());
-
-},{"../components/graphics/graphic.js":137,"../components/position.js":144,"../entity.js":146,"lodash":4}],152:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var Static = require('./static.js');
-
-    var Collision = require('../components/collision.js');
-
-    var StaticBody = function (params) {
-        return new Static(params)
-            .attach(new Collision(params));
-    };
-
-    module.exports = StaticBody;
-} ());
-
-},{"../components/collision.js":134,"./static.js":151}],153:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var CollisionSystem = function () {
-        var that = this;
-
-        this.$tracking = {
-            'collision': 'many'
-        };
-
-        // Prospective collision test.
-        // Tests for a collision between entity and any
-        // entity with otherComponent.
-        this.collide = function (entity, otherComponent, params) {
-            return _.filter(
-                that.$tracked.collision,
-                function (other) {
-                    return (other.uid !== entity.uid) &&
-                        other.has(otherComponent) &&
-                        hitTestAABB(entity, other, params);
-                }
-            );
-        };
-
-        this.resolutionVector = function (entity, other, params) {
-            var positions = anchoredPositions(entity, other, params);
-            var x1 = positions.x1,
-                y1 = positions.y1,
-                x2 = positions.x2,
-                y2 = positions.y2;
-
-            var dirX, dirY;
-            if (x2 - x1 < 0) {
-                dirX = -1;
-            } else {
-                dirX = 1;
-            }
-            if (y2 - y1 < 0) {
-                dirY = -1;
-            } else {
-                dirY = 1;
-            }
-
-            var minApart = {
-                x: (entity.c.collision.width + other.c.collision.width) / 2,
-                y: (entity.c.collision.height + other.c.collision.height) / 2
-            };
-
-            var actualDisplacement = {
-                x: Math.abs(x1 - x2),
-                y: Math.abs(y1 - y2)
-            };
-
-            var overlap = {
-                x: actualDisplacement.x - minApart.x,
-                y: actualDisplacement.y - minApart.y
-            };
-
-            if (overlap.x > overlap.y ) {
-                return {
-                    x: dirX * overlap.x,
-                    y: 0
-                };
-            }
-            else if (overlap.x < overlap.y ) {
-                return {
-                    x: 0,
-                    y: dirY * overlap.y
-                };
-            }
-            else { //if(overlap.x == overlap.y)
-                return {
-                    x: dirX * overlap.x,
-                    y: dirY * overlap.y
-                };
-            }
-        };
-
-        var hitTestAABB = function (entity, other, params) {
-            var positions = anchoredPositions(entity, other, params);
-            var x1 = positions.x1,
-                y1 = positions.y1,
-                x2 = positions.x2,
-                y2 = positions.y2;
-
-            var width = (entity.c.collision.width + other.c.collision.width) / 2;
-            var height = (entity.c.collision.height + other.c.collision.height) / 2;
-
-            if (x1 + width > x2) {
-                if (x1 < x2 + width) {
-                    if (y1 + height > y2) {
-                        if (y1 < y2 + height) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        };
-
-        var anchoredPositions = function (entity, other, params) {
-            params = _.extend({
-                x: entity.c.position.x,
-                y: entity.c.position.y
-            }, params);
-
-            var result = {
-                x1: params.x,
-                y1: params.y,
-                x2: other.c.position.x,
-                y2: other.c.position.y
-            };
-
-            result.x1 -= (entity.c.collision.anchor.x - 0.5) * entity.c.collision.width;
-            result.y1 -= (entity.c.collision.anchor.y - 0.5) * entity.c.collision.height;
-
-            result.x2 -= (other.c.collision.anchor.x - 0.5) * other.c.collision.width;
-            result.y2 -= (other.c.collision.anchor.y - 0.5) * other.c.collision.height;
-
-            return result;
-        };
-
-    };
-
-    module.exports = CollisionSystem;
-} ());
-
-},{"lodash":4}],154:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var ControlsSystem = function () {
-        var keys = {};
-        var mousePos = {
-            x: 0,
-            y: 0
-        };
-
-        var bindings = {};
-        var mouseMappings = {
-            1: 'm1',
-            2: 'm2',
-            3: 'm3'
-        };
-
-        var KeyState = function () {
-            this.active = false;
-            this.held = false;
-
-            this.updateHeld = function () {
-                if (this.active) {
-                    this.held = true;
-                }
-            };
-
-            this.press = function () {
-                this.active = true;
-            };
-
-            this.release = function () {
-                this.active = false;
-                this.held = false;
-            };
-        };
-
-        // Listen for input.
-        document.onkeydown = function (e) {
-            var code = e.which;
-            if (_.has(keys, code)) {
-                keys[code].press();
-                return false; // Prevent default.
-            }
-        };
-
-        document.onkeyup = function (e) {
-            var code = e.which;
-            if (_.has(keys, code)) {
-                keys[code].release();
-                return false; // Prevent default.
-            }
-        };
-
-        document.onmousedown = function(e) {
-            var code = mouseMappings[e.which];
-            if (_.has(keys, code)) {
-                keys[code].press();
-                return false; // Prevent default.
-            }
-        };
-
-        document.onmouseup = function(e) {
-            var code = mouseMappings[e.which];
-            if (_.has(keys, code)) {
-                keys[code].release();
-                return false; // Prevent default.
-            }
-        };
-
-        // Update mouse position.
-        document.onmousemove = function(e) {
-            mousePos.x = e.offsetX;
-            mousePos.y = e.offsetY;
-        };
-
-        this.getMousePos = function () {
-            return mousePos;
-        };
-
-        // Disable context menu, so we can right click.
-        window.oncontextmenu = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        };
-
-        // Add a binding.
-        this.bind = function (code, name) {
-            if (_.has(bindings, name)) {
-                console.error(name + ' already bound.');
-                throw new Error('ControlAlreadyBound');
-            }
-            bindings[name] = code;
-            keys[code] = new KeyState();
-        };
-
-        // Remove a binding.
-        this.unbind = function () {
-            if (!_.has(bindings, name)) {
-                console.error(name + ' not bound.');
-                throw new Error('ControlNotBound');
-            }
-            var code = bindings[name];
-            delete bindings[name];
-            delete keys[code];
-        };
-
-        // Check that a key binding has been pressed.
-        // Options: once
-        // If once is true, only check for the press..
-        this.check = function (binding, options) {
-            var keyCode = bindings[binding],
-                key = keys[keyCode];
-
-            if (options && options.once) {
-                return key.active && !key.held;
-            }
-            return key.active;
-        };
-
-        this.tickEnd = function () {
-            _.each(
-                keys,
-                function (key) {
-                    key.updateHeld();
-                }
-            );
-        };
-
-    };
-
-    module.exports = ControlsSystem;
-} ());
-
-},{"lodash":4}],155:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-    var pixi = require('pixi.js');
-
-    var utils = require('../utils.js'),
-        look = utils.look,
-        proxy = utils.proxy,
-        readOnlyProxy = utils.readOnlyProxy;
-
-    var PixiRenderSystem = function (params) {
-        var that = this;
-
-        params = _.extend({
-            width: 600,
-            height: 400
-        }, params);
-
-        var stage = new pixi.Container();
-        stage.interactive = true;
-
-        var renderer = pixi.autoDetectRenderer(params.width, params.height);
-
-        var sprites = {};
-        var graphics = {};
-
-        var offset = {
-            x: 0,
-            y: 0
-        };
-
-        var redraw = function (newValue, entity) {
-            // Remove old sprite.
-            stage.removeChild(graphics[entity.uid]);
-            delete graphics[entity.uid];
-
-            // Add new sprite.
-            _.each(
-                that.build,
-                function (func, key) {
-                    if (key === 'graphic') {
-                        return;
-                    }
-                    if (entity.has(key)) {
-                        func(entity);
-                    }
-                }
-            );
-            that.build.graphic(entity);
-        };
-
-        // Getter for renderer view.
-        Object.defineProperty(
-            this,
-            'view',
-            {
-                get: function() {
-                    return renderer.view;
-                }
-            }
-        );
-
-        // Render stage to a renderer.
-        this.render = function () {
-            renderer.render(stage);
-        };
-
-        // Build the system, called by world on every entity.
-        this.build = {
-
-            circle: function (entity) {
-                graphics[entity.uid] = new pixi.Graphics();
-                graphics[entity.uid].beginFill(entity.c.circle.color);
-
-                graphics[entity.uid].drawCircle(
-                    -entity.c.circle.radius * entity.c.graphic.anchor.x,
-                    -entity.c.circle.radius * entity.c.graphic.anchor.y,
-                    entity.c.circle.radius
-                );
-
-                // Look for changes to radius, redrawing if necessary.
-                look(entity.c.circle, 'radius', redraw, entity);
-
-                proxy(entity.c.circle, 'color', graphics[entity.uid], 'color');
-            },
-
-            ellipse : function (entity) {
-                graphics[entity.uid] = new pixi.Graphics();
-                graphics[entity.uid].beginFill(entity.c.ellipse.color);
-
-                graphics[entity.uid].drawEllipse(
-                    -entity.c.ellipse.width * entity.c.graphic.anchor.x,
-                    -entity.c.ellipse.height * entity.c.graphic.anchor.y,
-                    entity.c.ellipse.width,
-                    entity.c.ellipse.height
-                );
-
-                // Look for changes to dimensions, redrawing if necessary.
-                look(entity.c.ellipse, 'width', redraw, entity);
-                look(entity.c.ellipse, 'height', redraw, entity);
-
-                // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
-                look(entity.c.graphic, 'anchor', redraw, entity);
-
-                proxy(entity.c.ellipse, 'color', graphics[entity.uid], 'color');
-            },
-
-            line : function (entity) {
-                graphics[entity.uid] = new pixi.Graphics();
-                graphics[entity.uid].lineStyle(
-                    entity.c.line.thickness,
-                    entity.c.line.color,
-                    1
-                );
-                graphics[entity.uid].moveTo(
-                    entity.c.line.x1,
-                    entity.c.line.y1
-                );
-                graphics[entity.uid].lineTo(
-                    entity.c.line.x2,
-                    entity.c.line.y2
-                );
-
-                // Look for changes to params, redrawing if necessary.
-                look(entity.c.line, 'thickness', redraw, entity);
-                look(entity.c.line, 'x1', redraw, entity);
-                look(entity.c.line, 'y1', redraw, entity);
-                look(entity.c.line, 'x2', redraw, entity);
-                look(entity.c.line, 'y2', redraw, entity);
-
-                proxy(entity.c.line, 'color', graphics[entity.uid], 'color');
-            },
-
-            polygon: function (entity) {
-                graphics[entity.uid] = new pixi.Graphics();
-                graphics[entity.uid].beginFill(entity.c.polygon.color);
-                graphics[entity.uid].drawPolygon(entity.c.polygon.points);
-                graphics[entity.uid].endFill();
-
-                // Look for changes to params, redrawing if necessary.
-                look(entity.c.polygon, 'points', redraw, entity);
-
-                proxy(entity.c.polygon, 'color', graphics[entity.uid], 'color');
-            },
-
-            rectangle : function (entity) {
-                graphics[entity.uid] = new pixi.Graphics();
-                graphics[entity.uid].beginFill(entity.c.rectangle.color);
-
-                graphics[entity.uid].drawRect(
-                    -entity.c.rectangle.width * entity.c.graphic.anchor.x,
-                    -entity.c.rectangle.height * entity.c.graphic.anchor.y,
-                    entity.c.rectangle.width,
-                    entity.c.rectangle.height
-                );
-
-                // Look for changes to params, redrawing if necessary.
-                look(entity.c.rectangle, 'width', redraw, entity);
-                look(entity.c.rectangle, 'height', redraw, entity);
-
-                // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
-                look(entity.c.graphic, 'anchor', redraw, entity);
-
-                proxy(entity.c.rectangle, 'color', graphics[entity.uid], 'color');
-            },
-
-            sprite: function (entity) {
-                var frames;
-
-                // If spritesheet.
-                if (_.isArray(entity.c.sprite.path)) {
-                    frames = _.map(entity.c.sprite.path, function (framePath) {
-                        return pixi.Texture.fromFrame(framePath);
-                    });
-                }
-                // If array of frames.
-                else {
-                    frames = _.map(entity.c.sprite.path, function (framePath) {
-                        return pixi.Texture.fromImage(framePath);
-                    });
-                }
-
-                graphics[entity.uid] = new pixi.extras.MovieClip(frames);
-
-                // Set and proxy framespeed.
-                graphics[entity.uid].animationSpeed = entity.c.sprite.animationSpeed;
-                proxy(
-                    entity.c.sprite, 'animationSpeed',
-                    graphics[entity.uid], 'animationSpeed'
-                );
-
-                // Set and proxy loop.
-                graphics[entity.uid].loop = entity.c.sprite.loop;
-                proxy(
-                    entity.c.sprite, 'loop',
-                    graphics[entity.uid], 'loop'
-                );
-
-                graphics[entity.uid].gotoAndPlay(entity.c.sprite.currentFrame);
-
-                // Set and proxy rotation.
-                graphics[entity.uid].rotation = entity.c.sprite.rotation;
-                proxy(entity.c.sprite, 'rotation', graphics[entity.uid], 'rotation');
-
-                // Redraw on path change.
-                look(entity.c.sprite, 'path', redraw, entity);
-
-                // Change animation frame on frame change.
-                look(
-                    entity.c.sprite,
-                    'currentFrame',
-                    function (currentFrame, entity) {
-                        graphics[entity.uid].gotoAndPlay(currentFrame);
-                    },
-                    entity
-                );
-
-                // Read only framecount property.
-                readOnlyProxy(
-                    entity.c.sprite,
-                    'frameCount',
-                    graphics[entity.uid],
-                    'totalFrames'
-                );
-
-                // Anchor is a Pixi property on MovieClip, so is proxied here.
-                graphics[entity.uid].anchor = entity.c.graphic.anchor;
-                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
-            },
-
-            staticSprite: function (entity) {
-                var texture = pixi.Texture.fromImage(entity.c.staticSprite.path);
-                graphics[entity.uid] = new pixi.Sprite(texture);
-
-                // Set and proxy rotation.
-                graphics[entity.uid].rotation = entity.c.staticSprite.rotation;
-                proxy(entity.c.staticSprite, 'rotation', graphics[entity.uid], 'rotation');
-
-                // Redraw on path change.
-                look(entity.c.staticSprite, 'path', redraw, entity);
-
-                // Anchor is a Pixi property on Sprite, so is proxied here.
-                graphics[entity.uid].anchor = entity.c.graphic.anchor;
-                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
-            },
-
-            text: function (entity) {
-                // Create the appropriate graphic.
-                if (entity.c.text.bitmapFont) {
-                    graphics[entity.uid] = new pixi.extras.BitmapText(
-                        entity.c.text.copy,
-                        entity.c.text.style
-                    );
-                } else {
-                    graphics[entity.uid] = new pixi.Text(
-                        entity.c.text.copy,
-                        entity.c.text.style
-                    );
-                }
-
-                // Proxy text properties.
-                proxy(entity.c.text, 'copy', graphics[entity.uid], 'text');
-                proxy(entity.c.text, 'style', graphics[entity.uid], 'style');
-
-                // Set and proxy rotation.
-                graphics[entity.uid].rotation = entity.c.text.rotation;
-                proxy(entity.c.text, 'rotation', graphics[entity.uid], 'rotation');
-
-                // Anchor is a Pixi property on text, so is proxied here.
-                graphics[entity.uid].anchor = entity.c.graphic.anchor;
-                proxy(entity.c.graphic, 'anchor', graphics[entity.uid], 'anchor');
-            },
-
-            graphic: function (entity) {
-                // Proxy graphic properties.
-                // Anchor is handled elsewhere.
-                var propertiesToProxy = ['alpha', 'scale', 'tint', 'visible', 'z'];
-                _.each(
-                    propertiesToProxy,
-                    function (property) {
-                        graphics[entity.uid][property] = entity.c.graphic[property];
-                        proxy(entity.c.graphic, property, graphics[entity.uid], property);
-                    }
-                );
-
-                // Add child to stage.
-                stage.addChild(graphics[entity.uid]);
-
-                // Sort stage by depth.
-                stage.children = _.sortBy(stage.children, 'z');
-
-                // Refresh screen.
-                that.update.graphic(entity);
-            }
-        };
-
-        // Destroy an entity from the system.
-        this.destroy = {
-            graphic: function (entity) {
-                var id = entity.uid;
-
-                if (_.has(graphics, id)) {
-                    stage.removeChild(graphics[id]);
-                }
-
-                delete graphics[id];
-            }
-        };
-
-        this.update = {
-            graphic: function (entity)  {
-                var graphic = graphics[entity.uid];
-
-                var x = entity.c.graphic.translate.x;
-                var y = entity.c.graphic.translate.y;
-
-                if (entity.c.graphic.relative) {
-                    x += entity.c.position.x;
-                    y += entity.c.position.y;
-                }
-
-                graphic.position.x = Math.floor(x);
-                graphic.position.y = Math.floor(y);
-            }
-
-        };
-
-         // Preload assets.
-        this.load = function (assets, callback) {
-            var loader = new pixi.loaders.Loader();
-
-            if (!_.isArray(assets)) {
-                assets = [assets];
-            }
-            _.each(assets, function (asset) {
-                loader.add(asset, asset);
+    }
+
+    this.resources = {};
+
+    return this;
+};
+
+/**
+ * Starts loading the queued resources.
+ *
+ * @fires start
+ * @param {function} [cb] - Optional callback that will be bound to the `complete` event.
+ * @return {Loader} Returns itself.
+ */
+Loader.prototype.load = function (cb) {
+    // register complete callback if they pass one
+    if (typeof cb === 'function') {
+        this.once('complete', cb);
+    }
+
+    // if the queue has already started we are done here
+    if (this._queue.started) {
+        return this;
+    }
+
+    // notify of start
+    this.emit('start', this);
+
+    // update loading state
+    this.loading = true;
+
+    // start the internal queue
+    for (var i = 0; i < this._buffer.length; ++i) {
+        this._queue.push(this._buffer[i]);
+    }
+
+    // empty the buffer
+    this._buffer.length = 0;
+
+    return this;
+};
+
+/**
+ * Prepares a url for usage based on the configuration of this object
+ *
+ * @private
+ * @param {string} url - The url to prepare.
+ * @return {string} The prepared url.
+ */
+Loader.prototype._prepareUrl = function (url) {
+    var parsedUrl = parseUri(url, { strictMode: true });
+
+    // absolute url, just use it as is.
+    if (parsedUrl.protocol || !parsedUrl.path || parsedUrl.path.indexOf('//') === 0) {
+        return url;
+    }
+
+    // if baseUrl doesn't end in slash and url doesn't start with slash, then add a slash inbetween
+    if (this.baseUrl.length
+        && this.baseUrl.lastIndexOf('/') !== this.baseUrl.length - 1
+        && url.charAt(0) !== '/'
+    ) {
+        return this.baseUrl + '/' + url;
+    }
+
+    return this.baseUrl + url;
+};
+
+/**
+ * Loads a single resource.
+ *
+ * @private
+ * @param {Resource} resource - The resource to load.
+ * @param {function} dequeue - The function to call when we need to dequeue this item.
+ */
+Loader.prototype._loadResource = function (resource, dequeue) {
+    var self = this;
+
+    resource._dequeue = dequeue;
+
+    // run before middleware
+    async.eachSeries(
+        this._beforeMiddleware,
+        function (fn, next) {
+            fn.call(self, resource, function () {
+                // if the before middleware marks the resource as complete,
+                // break and don't process any more before middleware
+                next(resource.isComplete ? {} : null);
             });
+        },
+        function () {
+            // resource.on('progress', self.emit.bind(self, 'progress'));
 
+            if (resource.isComplete) {
+                self._onLoad(resource);
+            }
+            else {
+                resource.once('complete', self._onLoad, self);
+                resource.load();
+            }
+        }
+    );
+};
+
+/**
+ * Called once each resource has loaded.
+ *
+ * @fires complete
+ * @private
+ */
+Loader.prototype._onComplete = function () {
+    this.loading = false;
+
+    this.emit('complete', this, this.resources);
+};
+
+/**
+ * Called each time a resources is loaded.
+ *
+ * @fires progress
+ * @fires error
+ * @fires load
+ * @private
+ * @param {Resource} resource - The resource that was loaded
+ */
+Loader.prototype._onLoad = function (resource) {
+    var self = this;
+
+    // run middleware, this *must* happen before dequeue so sub-assets get added properly
+    async.eachSeries(
+        this._afterMiddleware,
+        function (fn, next) {
+            fn.call(self, resource, next);
+        },
+        function () {
+            resource.emit('afterMiddleware', resource);
+
+            self._numToLoad--;
+
+            self.progress += self._progressChunk;
+            self.emit('progress', self, resource);
+
+            if (resource.error) {
+                self.emit('error', resource.error, self, resource);
+            }
+            else {
+                self.emit('load', self, resource);
+            }
+
+            // do completion check
+            if (self._numToLoad === 0) {
+                self.progress = 100;
+                self._onComplete();
+            }
+        }
+    );
+
+    // remove this resource from the async queue
+    resource._dequeue();
+};
+
+Loader.LOAD_TYPE = Resource.LOAD_TYPE;
+Loader.XHR_RESPONSE_TYPE = Resource.XHR_RESPONSE_TYPE;
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/Resource.js":
+/*!******************************************************!*\
+  !*** ./node_modules/resource-loader/src/Resource.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var EventEmitter    = __webpack_require__(/*! eventemitter3 */ "./node_modules/resource-loader/node_modules/eventemitter3/index.js");
+var parseUri        = __webpack_require__(/*! parse-uri */ "./node_modules/parse-uri/index.js");
+
+// tests is CORS is supported in XHR, if not we need to use XDR
+var useXdr = !!(window.XDomainRequest && !('withCredentials' in (new XMLHttpRequest())));
+var tempAnchor = null;
+
+// some status constants
+var STATUS_NONE = 0;
+var STATUS_OK = 200;
+var STATUS_EMPTY = 204;
+
+/**
+ * Manages the state and loading of a single resource represented by
+ * a single URL.
+ *
+ * @class
+ * @param {string} name - The name of the resource to load.
+ * @param {string|string[]} url - The url for this resource, for audio/video loads you can pass an array of sources.
+ * @param {object} [options] - The options for the load.
+ * @param {string|boolean} [options.crossOrigin] - Is this request cross-origin? Default is to determine automatically.
+ * @param {Resource.LOAD_TYPE} [options.loadType=Resource.LOAD_TYPE.XHR] - How should this resource be loaded?
+ * @param {Resource.XHR_RESPONSE_TYPE} [options.xhrType=Resource.XHR_RESPONSE_TYPE.DEFAULT] - How should the data being
+ *      loaded be interpreted when using XHR?
+ * @param {object} [options.metadata] - Extra info for middleware.
+ */
+function Resource(name, url, options) {
+    EventEmitter.call(this);
+
+    options = options || {};
+
+    if (typeof name !== 'string' || typeof url !== 'string') {
+        throw new Error('Both name and url are required for constructing a resource.');
+    }
+
+    /**
+     * The name of this resource.
+     *
+     * @member {string}
+     * @readonly
+     */
+    this.name = name;
+
+    /**
+     * The url used to load this resource.
+     *
+     * @member {string}
+     * @readonly
+     */
+    this.url = url;
+
+    /**
+     * Stores whether or not this url is a data url.
+     *
+     * @member {boolean}
+     * @readonly
+     */
+    this.isDataUrl = this.url.indexOf('data:') === 0;
+
+    /**
+     * The data that was loaded by the resource.
+     *
+     * @member {any}
+     */
+    this.data = null;
+
+    /**
+     * Is this request cross-origin? If unset, determined automatically.
+     *
+     * @member {string}
+     */
+    this.crossOrigin = options.crossOrigin === true ? 'anonymous' : options.crossOrigin;
+
+    /**
+     * The method of loading to use for this resource.
+     *
+     * @member {Resource.LOAD_TYPE}
+     */
+    this.loadType = options.loadType || this._determineLoadType();
+
+    /**
+     * The type used to load the resource via XHR. If unset, determined automatically.
+     *
+     * @member {string}
+     */
+    this.xhrType = options.xhrType;
+
+    /**
+     * Extra info for middleware, and controlling specifics about how the resource loads.
+     *
+     * Note that if you pass in a `loadElement`, the Resource class takes ownership of it.
+     * Meaning it will modify it as it sees fit.
+     *
+     * @member {object}
+     * @property {HTMLImageElement|HTMLAudioElement|HTMLVideoElement} [loadElement=null] - The
+     *  element to use for loading, instead of creating one.
+     * @property {boolean} [skipSource=false] - Skips adding source(s) to the load element. This
+     *  is useful if you want to pass in a `loadElement` that you already added load sources
+     *  to.
+     */
+    this.metadata = options.metadata || {};
+
+    /**
+     * The error that occurred while loading (if any).
+     *
+     * @member {Error}
+     * @readonly
+     */
+    this.error = null;
+
+    /**
+     * The XHR object that was used to load this resource. This is only set
+     * when `loadType` is `Resource.LOAD_TYPE.XHR`.
+     *
+     * @member {XMLHttpRequest}
+     */
+    this.xhr = null;
+
+    /**
+     * Describes if this resource was loaded as json. Only valid after the resource
+     * has completely loaded.
+     *
+     * @member {boolean}
+     */
+    this.isJson = false;
+
+    /**
+     * Describes if this resource was loaded as xml. Only valid after the resource
+     * has completely loaded.
+     *
+     * @member {boolean}
+     */
+    this.isXml = false;
+
+    /**
+     * Describes if this resource was loaded as an image tag. Only valid after the resource
+     * has completely loaded.
+     *
+     * @member {boolean}
+     */
+    this.isImage = false;
+
+    /**
+     * Describes if this resource was loaded as an audio tag. Only valid after the resource
+     * has completely loaded.
+     *
+     * @member {boolean}
+     */
+    this.isAudio = false;
+
+    /**
+     * Describes if this resource was loaded as a video tag. Only valid after the resource
+     * has completely loaded.
+     *
+     * @member {boolean}
+     */
+    this.isVideo = false;
+
+    /**
+     * Describes if this resource has finished loading. Is true when the resource has completely
+     * loaded.
+     *
+     * @member {boolean}
+     */
+    this.isComplete = false;
+
+    /**
+     * Describes if this resource is currently loading. Is true when the resource starts loading,
+     * and is false again when complete.
+     *
+     * @member {boolean}
+     */
+    this.isLoading = false;
+
+    /**
+     * The `dequeue` method that will be used a storage place for the async queue dequeue method
+     * used privately by the loader.
+     *
+     * @private
+     * @member {function}
+     */
+    this._dequeue = null;
+
+    /**
+     * The `complete` function bound to this resource's context.
+     *
+     * @private
+     * @member {function}
+     */
+    this._boundComplete = this.complete.bind(this);
+
+    /**
+     * The `_onError` function bound to this resource's context.
+     *
+     * @private
+     * @member {function}
+     */
+    this._boundOnError = this._onError.bind(this);
+
+    /**
+     * The `_onProgress` function bound to this resource's context.
+     *
+     * @private
+     * @member {function}
+     */
+    this._boundOnProgress = this._onProgress.bind(this);
+
+    // xhr callbacks
+    this._boundXhrOnError = this._xhrOnError.bind(this);
+    this._boundXhrOnAbort = this._xhrOnAbort.bind(this);
+    this._boundXhrOnLoad = this._xhrOnLoad.bind(this);
+    this._boundXdrOnTimeout = this._xdrOnTimeout.bind(this);
+
+    /**
+     * Emitted when the resource beings to load.
+     *
+     * @event start
+     * @memberof Resource#
+     */
+
+    /**
+     * Emitted each time progress of this resource load updates.
+     * Not all resources types and loader systems can support this event
+     * so sometimes it may not be available. If the resource
+     * is being loaded on a modern browser, using XHR, and the remote server
+     * properly sets Content-Length headers, then this will be available.
+     *
+     * @event progress
+     * @memberof Resource#
+     */
+
+    /**
+     * Emitted once this resource has loaded, if there was an error it will
+     * be in the `error` property.
+     *
+     * @event complete
+     * @memberof Resource#
+     */
+}
+
+Resource.prototype = Object.create(EventEmitter.prototype);
+Resource.prototype.constructor = Resource;
+module.exports = Resource;
+
+/**
+ * Marks the resource as complete.
+ *
+ * @fires complete
+ */
+Resource.prototype.complete = function () {
+    // TODO: Clean this up in a wrapper or something...gross....
+    if (this.data && this.data.removeEventListener) {
+        this.data.removeEventListener('error', this._boundOnError, false);
+        this.data.removeEventListener('load', this._boundComplete, false);
+        this.data.removeEventListener('progress', this._boundOnProgress, false);
+        this.data.removeEventListener('canplaythrough', this._boundComplete, false);
+    }
+
+    if (this.xhr) {
+        if (this.xhr.removeEventListener) {
+            this.xhr.removeEventListener('error', this._boundXhrOnError, false);
+            this.xhr.removeEventListener('abort', this._boundXhrOnAbort, false);
+            this.xhr.removeEventListener('progress', this._boundOnProgress, false);
+            this.xhr.removeEventListener('load', this._boundXhrOnLoad, false);
+        }
+        else {
+            this.xhr.onerror = null;
+            this.xhr.ontimeout = null;
+            this.xhr.onprogress = null;
+            this.xhr.onload = null;
+        }
+    }
+
+    if (this.isComplete) {
+        throw new Error('Complete called again for an already completed resource.');
+    }
+
+    this.isComplete = true;
+    this.isLoading = false;
+
+    this.emit('complete', this);
+};
+
+/**
+ * Aborts the loading of this resource, with an optional message.
+ *
+ * @param {string} message - The message to use for the error
+ */
+Resource.prototype.abort = function (message) {
+    // abort can be called multiple times, ignore subsequent calls.
+    if (this.error) {
+        return;
+    }
+
+    // store error
+    this.error = new Error(message);
+
+    // abort the actual loading
+    if (this.xhr) {
+        this.xhr.abort();
+    }
+    else if (this.xdr) {
+        this.xdr.abort();
+    }
+    else if (this.data) {
+        // single source
+        if (typeof this.data.src !== 'undefined') {
+            this.data.src = '';
+        }
+        // multi-source
+        else {
+            while (this.data.firstChild) {
+                this.data.removeChild(this.data.firstChild);
+            }
+        }
+    }
+
+    // done now.
+    this.complete();
+};
+
+/**
+ * Kicks off loading of this resource. This method is asynchronous.
+ *
+ * @fires start
+ * @param {function} [cb] - Optional callback to call once the resource is loaded.
+ */
+Resource.prototype.load = function (cb) {
+    if (this.isLoading) {
+        return;
+    }
+
+    if (this.isComplete) {
+        if (cb) {
+            var self = this;
+
+            setTimeout(function () {
+                cb(self);
+            }, 1);
+        }
+
+        return;
+    }
+    else if (cb) {
+        this.once('complete', cb);
+    }
+
+    this.isLoading = true;
+
+    this.emit('start', this);
+
+    // if unset, determine the value
+    if (this.crossOrigin === false || typeof this.crossOrigin !== 'string') {
+        this.crossOrigin = this._determineCrossOrigin(this.url);
+    }
+
+    switch (this.loadType) {
+        case Resource.LOAD_TYPE.IMAGE:
+            this._loadElement('image');
+            break;
+
+        case Resource.LOAD_TYPE.AUDIO:
+            this._loadSourceElement('audio');
+            break;
+
+        case Resource.LOAD_TYPE.VIDEO:
+            this._loadSourceElement('video');
+            break;
+
+        case Resource.LOAD_TYPE.XHR:
+            /* falls through */
+        default:
+            if (useXdr && this.crossOrigin) {
+                this._loadXdr();
+            }
+            else {
+                this._loadXhr();
+            }
+            break;
+    }
+};
+
+/**
+ * Loads this resources using an element that has a single source,
+ * like an HTMLImageElement.
+ *
+ * @private
+ * @param {string} type - The type of element to use.
+ */
+Resource.prototype._loadElement = function (type) {
+    if (this.metadata.loadElement) {
+        this.data = this.metadata.loadElement;
+    }
+    else if (type === 'image' && typeof window.Image !== 'undefined') {
+        this.data = new Image();
+    }
+    else {
+        this.data = document.createElement(type);
+    }
+
+    if (this.crossOrigin) {
+        this.data.crossOrigin = this.crossOrigin;
+    }
+
+    if (!this.metadata.skipSource) {
+        this.data.src = this.url;
+    }
+
+    var typeName = 'is' + type[0].toUpperCase() + type.substring(1);
+
+    if (this[typeName] === false) {
+        this[typeName] = true;
+    }
+
+    this.data.addEventListener('error', this._boundOnError, false);
+    this.data.addEventListener('load', this._boundComplete, false);
+    this.data.addEventListener('progress', this._boundOnProgress, false);
+};
+
+/**
+ * Loads this resources using an element that has multiple sources,
+ * like an HTMLAudioElement or HTMLVideoElement.
+ *
+ * @private
+ * @param {string} type - The type of element to use.
+ */
+Resource.prototype._loadSourceElement = function (type) {
+    if (this.metadata.loadElement) {
+        this.data = this.metadata.loadElement;
+    }
+    else if (type === 'audio' && typeof window.Audio !== 'undefined') {
+        this.data = new Audio();
+    }
+    else {
+        this.data = document.createElement(type);
+    }
+
+    if (this.data === null) {
+        this.abort('Unsupported element ' + type);
+
+        return;
+    }
+
+    if (!this.metadata.skipSource) {
+        // support for CocoonJS Canvas+ runtime, lacks document.createElement('source')
+        if (navigator.isCocoonJS) {
+            this.data.src = Array.isArray(this.url) ? this.url[0] : this.url;
+        }
+        else if (Array.isArray(this.url)) {
+            for (var i = 0; i < this.url.length; ++i) {
+                this.data.appendChild(this._createSource(type, this.url[i]));
+            }
+        }
+        else {
+            this.data.appendChild(this._createSource(type, this.url));
+        }
+    }
+
+    this['is' + type[0].toUpperCase() + type.substring(1)] = true;
+
+    this.data.addEventListener('error', this._boundOnError, false);
+    this.data.addEventListener('load', this._boundComplete, false);
+    this.data.addEventListener('progress', this._boundOnProgress, false);
+    this.data.addEventListener('canplaythrough', this._boundComplete, false);
+
+    this.data.load();
+};
+
+/**
+ * Loads this resources using an XMLHttpRequest.
+ *
+ * @private
+ */
+Resource.prototype._loadXhr = function () {
+    // if unset, determine the value
+    if (typeof this.xhrType !== 'string') {
+        this.xhrType = this._determineXhrType();
+    }
+
+    var xhr = this.xhr = new XMLHttpRequest();
+
+    // set the request type and url
+    xhr.open('GET', this.url, true);
+
+    // load json as text and parse it ourselves. We do this because some browsers
+    // *cough* safari *cough* can't deal with it.
+    if (this.xhrType === Resource.XHR_RESPONSE_TYPE.JSON || this.xhrType === Resource.XHR_RESPONSE_TYPE.DOCUMENT) {
+        xhr.responseType = Resource.XHR_RESPONSE_TYPE.TEXT;
+    }
+    else {
+        xhr.responseType = this.xhrType;
+    }
+
+    xhr.addEventListener('error', this._boundXhrOnError, false);
+    xhr.addEventListener('abort', this._boundXhrOnAbort, false);
+    xhr.addEventListener('progress', this._boundOnProgress, false);
+    xhr.addEventListener('load', this._boundXhrOnLoad, false);
+
+    xhr.send();
+};
+
+/**
+ * Loads this resources using an XDomainRequest. This is here because we need to support IE9 (gross).
+ *
+ * @private
+ */
+Resource.prototype._loadXdr = function () {
+    // if unset, determine the value
+    if (typeof this.xhrType !== 'string') {
+        this.xhrType = this._determineXhrType();
+    }
+
+    var xdr = this.xhr = new XDomainRequest();
+
+    // XDomainRequest has a few quirks. Occasionally it will abort requests
+    // A way to avoid this is to make sure ALL callbacks are set even if not used
+    // More info here: http://stackoverflow.com/questions/15786966/xdomainrequest-aborts-post-on-ie-9
+    xdr.timeout = 5000;
+
+    xdr.onerror = this._boundXhrOnError;
+    xdr.ontimeout = this._boundXdrOnTimeout;
+    xdr.onprogress = this._boundOnProgress;
+    xdr.onload = this._boundXhrOnLoad;
+
+    xdr.open('GET', this.url, true);
+
+    // Note: The xdr.send() call is wrapped in a timeout to prevent an
+    // issue with the interface where some requests are lost if multiple
+    // XDomainRequests are being sent at the same time.
+    // Some info here: https://github.com/photonstorm/phaser/issues/1248
+    setTimeout(function () {
+        xdr.send();
+    }, 0);
+};
+
+/**
+ * Creates a source used in loading via an element.
+ *
+ * @private
+ * @param {string} type - The element type (video or audio).
+ * @param {string} url - The source URL to load from.
+ * @param {string} [mime] - The mime type of the video
+ * @return {HTMLSourceElement} The source element.
+ */
+Resource.prototype._createSource = function (type, url, mime) {
+    if (!mime) {
+        mime = type + '/' + url.substr(url.lastIndexOf('.') + 1);
+    }
+
+    var source = document.createElement('source');
+
+    source.src = url;
+    source.type = mime;
+
+    return source;
+};
+
+/**
+ * Called if a load errors out.
+ *
+ * @param {Event} event - The error event from the element that emits it.
+ * @private
+ */
+Resource.prototype._onError = function (event) {
+    this.abort('Failed to load element using ' + event.target.nodeName);
+};
+
+/**
+ * Called if a load progress event fires for xhr/xdr.
+ *
+ * @fires progress
+ * @private
+ * @param {XMLHttpRequestProgressEvent|Event} event - Progress event.
+ */
+Resource.prototype._onProgress = function (event) {
+    if (event && event.lengthComputable) {
+        this.emit('progress', this, event.loaded / event.total);
+    }
+};
+
+/**
+ * Called if an error event fires for xhr/xdr.
+ *
+ * @private
+ * @param {XMLHttpRequestErrorEvent|Event} event - Error event.
+ */
+Resource.prototype._xhrOnError = function () {
+    var xhr = this.xhr;
+
+    this.abort(reqType(xhr) + ' Request failed. Status: ' + xhr.status + ', text: "' + xhr.statusText + '"');
+};
+
+/**
+ * Called if an abort event fires for xhr.
+ *
+ * @private
+ * @param {XMLHttpRequestAbortEvent} event - Abort Event
+ */
+Resource.prototype._xhrOnAbort = function () {
+    this.abort(reqType(this.xhr) + ' Request was aborted by the user.');
+};
+
+/**
+ * Called if a timeout event fires for xdr.
+ *
+ * @private
+ * @param {Event} event - Timeout event.
+ */
+Resource.prototype._xdrOnTimeout = function () {
+    this.abort(reqType(this.xhr) + ' Request timed out.');
+};
+
+/**
+ * Called when data successfully loads from an xhr/xdr request.
+ *
+ * @private
+ * @param {XMLHttpRequestLoadEvent|Event} event - Load event
+ */
+Resource.prototype._xhrOnLoad = function () {
+    var xhr = this.xhr;
+    var status = typeof xhr.status === 'undefined' ? xhr.status : STATUS_OK; // XDR has no `.status`, assume 200.
+
+    // status can be 0 when using the file:// protocol, also check if a response was found
+    if (status === STATUS_OK || status === STATUS_EMPTY || (status === STATUS_NONE && xhr.responseText.length > 0)) {
+        // if text, just return it
+        if (this.xhrType === Resource.XHR_RESPONSE_TYPE.TEXT) {
+            this.data = xhr.responseText;
+        }
+        // if json, parse into json object
+        else if (this.xhrType === Resource.XHR_RESPONSE_TYPE.JSON) {
+            try {
+                this.data = JSON.parse(xhr.responseText);
+                this.isJson = true;
+            }
+            catch (e) {
+                this.abort('Error trying to parse loaded json:', e);
+
+                return;
+            }
+        }
+        // if xml, parse into an xml document or div element
+        else if (this.xhrType === Resource.XHR_RESPONSE_TYPE.DOCUMENT) {
+            try {
+                if (window.DOMParser) {
+                    var domparser = new DOMParser();
+
+                    this.data = domparser.parseFromString(xhr.responseText, 'text/xml');
+                }
+                else {
+                    var div = document.createElement('div');
+
+                    div.innerHTML = xhr.responseText;
+                    this.data = div;
+                }
+                this.isXml = true;
+            }
+            catch (e) {
+                this.abort('Error trying to parse loaded xml:', e);
+
+                return;
+            }
+        }
+        // other types just return the response
+        else {
+            this.data = xhr.response || xhr.responseText;
+        }
+    }
+    else {
+        this.abort('[' + xhr.status + ']' + xhr.statusText + ':' + xhr.responseURL);
+
+        return;
+    }
+
+    this.complete();
+};
+
+/**
+ * Sets the `crossOrigin` property for this resource based on if the url
+ * for this resource is cross-origin. If crossOrigin was manually set, this
+ * function does nothing.
+ *
+ * @private
+ * @param {string} url - The url to test.
+ * @param {object} [loc=window.location] - The location object to test against.
+ * @return {string} The crossOrigin value to use (or empty string for none).
+ */
+Resource.prototype._determineCrossOrigin = function (url, loc) {
+    // data: and javascript: urls are considered same-origin
+    if (url.indexOf('data:') === 0) {
+        return '';
+    }
+
+    // default is window.location
+    loc = loc || window.location;
+
+    if (!tempAnchor) {
+        tempAnchor = document.createElement('a');
+    }
+
+    // let the browser determine the full href for the url of this resource and then
+    // parse with the node url lib, we can't use the properties of the anchor element
+    // because they don't work in IE9 :(
+    tempAnchor.href = url;
+    url = parseUri(tempAnchor.href, { strictMode: true });
+
+    var samePort = (!url.port && loc.port === '') || (url.port === loc.port);
+    var protocol = url.protocol ? url.protocol + ':' : '';
+
+    // if cross origin
+    if (url.host !== loc.hostname || !samePort || protocol !== loc.protocol) {
+        return 'anonymous';
+    }
+
+    return '';
+};
+
+/**
+ * Determines the responseType of an XHR request based on the extension of the
+ * resource being loaded.
+ *
+ * @private
+ * @return {Resource.XHR_RESPONSE_TYPE} The responseType to use.
+ */
+Resource.prototype._determineXhrType = function () {
+    return Resource._xhrTypeMap[this._getExtension()] || Resource.XHR_RESPONSE_TYPE.TEXT;
+};
+
+Resource.prototype._determineLoadType = function () {
+    return Resource._loadTypeMap[this._getExtension()] || Resource.LOAD_TYPE.XHR;
+};
+
+Resource.prototype._getExtension = function () {
+    var url = this.url;
+    var ext = '';
+
+    if (this.isDataUrl) {
+        var slashIndex = url.indexOf('/');
+
+        ext = url.substring(slashIndex + 1, url.indexOf(';', slashIndex));
+    }
+    else {
+        var queryStart = url.indexOf('?');
+
+        if (queryStart !== -1) {
+            url = url.substring(0, queryStart);
+        }
+
+        ext = url.substring(url.lastIndexOf('.') + 1);
+    }
+
+    return ext.toLowerCase();
+};
+
+/**
+ * Determines the mime type of an XHR request based on the responseType of
+ * resource being loaded.
+ *
+ * @private
+ * @param {Resource.XHR_RESPONSE_TYPE} type - The type to get a mime type for.
+ * @return {string} The mime type to use.
+ */
+Resource.prototype._getMimeFromXhrType = function (type) {
+    switch (type) {
+        case Resource.XHR_RESPONSE_TYPE.BUFFER:
+            return 'application/octet-binary';
+
+        case Resource.XHR_RESPONSE_TYPE.BLOB:
+            return 'application/blob';
+
+        case Resource.XHR_RESPONSE_TYPE.DOCUMENT:
+            return 'application/xml';
+
+        case Resource.XHR_RESPONSE_TYPE.JSON:
+            return 'application/json';
+
+        case Resource.XHR_RESPONSE_TYPE.DEFAULT:
+        case Resource.XHR_RESPONSE_TYPE.TEXT:
+            /* falls through */
+        default:
+            return 'text/plain';
+
+    }
+};
+
+/**
+ * Quick helper to get string xhr type.
+ *
+ * @ignore
+ * @param {XMLHttpRequest|XDomainRequest} xhr - The request to check.
+ * @return {string} The type.
+ */
+function reqType(xhr) {
+    return xhr.toString().replace('object ', '');
+}
+
+/**
+ * The types of loading a resource can use.
+ *
+ * @static
+ * @readonly
+ * @enum {number}
+ */
+Resource.LOAD_TYPE = {
+    /** Uses XMLHttpRequest to load the resource. */
+    XHR:    1,
+    /** Uses an `Image` object to load the resource. */
+    IMAGE:  2,
+    /** Uses an `Audio` object to load the resource. */
+    AUDIO:  3,
+    /** Uses a `Video` object to load the resource. */
+    VIDEO:  4
+};
+
+/**
+ * The XHR ready states, used internally.
+ *
+ * @static
+ * @readonly
+ * @enum {string}
+ */
+Resource.XHR_RESPONSE_TYPE = {
+    /** defaults to text */
+    DEFAULT:    'text',
+    /** ArrayBuffer */
+    BUFFER:     'arraybuffer',
+    /** Blob */
+    BLOB:       'blob',
+    /** Document */
+    DOCUMENT:   'document',
+    /** Object */
+    JSON:       'json',
+    /** String */
+    TEXT:       'text'
+};
+
+Resource._loadTypeMap = {
+    gif:      Resource.LOAD_TYPE.IMAGE,
+    png:      Resource.LOAD_TYPE.IMAGE,
+    bmp:      Resource.LOAD_TYPE.IMAGE,
+    jpg:      Resource.LOAD_TYPE.IMAGE,
+    jpeg:     Resource.LOAD_TYPE.IMAGE,
+    tif:      Resource.LOAD_TYPE.IMAGE,
+    tiff:     Resource.LOAD_TYPE.IMAGE,
+    webp:     Resource.LOAD_TYPE.IMAGE,
+    tga:      Resource.LOAD_TYPE.IMAGE,
+    'svg+xml':  Resource.LOAD_TYPE.IMAGE
+};
+
+Resource._xhrTypeMap = {
+    // xml
+    xhtml:    Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+    html:     Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+    htm:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+    xml:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+    tmx:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+    tsx:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+    svg:      Resource.XHR_RESPONSE_TYPE.DOCUMENT,
+
+    // images
+    gif:      Resource.XHR_RESPONSE_TYPE.BLOB,
+    png:      Resource.XHR_RESPONSE_TYPE.BLOB,
+    bmp:      Resource.XHR_RESPONSE_TYPE.BLOB,
+    jpg:      Resource.XHR_RESPONSE_TYPE.BLOB,
+    jpeg:     Resource.XHR_RESPONSE_TYPE.BLOB,
+    tif:      Resource.XHR_RESPONSE_TYPE.BLOB,
+    tiff:     Resource.XHR_RESPONSE_TYPE.BLOB,
+    webp:     Resource.XHR_RESPONSE_TYPE.BLOB,
+    tga:      Resource.XHR_RESPONSE_TYPE.BLOB,
+
+    // json
+    json:     Resource.XHR_RESPONSE_TYPE.JSON,
+
+    // text
+    text:     Resource.XHR_RESPONSE_TYPE.TEXT,
+    txt:      Resource.XHR_RESPONSE_TYPE.TEXT
+};
+
+/**
+ * Sets the load type to be used for a specific extension.
+ *
+ * @static
+ * @param {string} extname - The extension to set the type for, e.g. "png" or "fnt"
+ * @param {Resource.LOAD_TYPE} loadType - The load type to set it to.
+ */
+Resource.setExtensionLoadType = function (extname, loadType) {
+    setExtMap(Resource._loadTypeMap, extname, loadType);
+};
+
+/**
+ * Sets the load type to be used for a specific extension.
+ *
+ * @static
+ * @param {string} extname - The extension to set the type for, e.g. "png" or "fnt"
+ * @param {Resource.XHR_RESPONSE_TYPE} xhrType - The xhr type to set it to.
+ */
+Resource.setExtensionXhrType = function (extname, xhrType) {
+    setExtMap(Resource._xhrTypeMap, extname, xhrType);
+};
+
+function setExtMap(map, extname, val) {
+    if (extname && extname.indexOf('.') === 0) {
+        extname = extname.substring(1);
+    }
+
+    if (!extname) {
+        return;
+    }
+
+    map[extname] = val;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/async.js":
+/*!***************************************************!*\
+  !*** ./node_modules/resource-loader/src/async.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Smaller version of the async library constructs.
+ *
+ */
+
+module.exports = {
+    eachSeries: asyncEachSeries,
+    queue: asyncQueue
+};
+
+function _noop() { /* empty */ }
+
+/**
+ * Iterates an array in series.
+ *
+ * @param {*[]} array - Array to iterate.
+ * @param {function} iterator - Function to call for each element.
+ * @param {function} callback - Function to call when done, or on error.
+ */
+function asyncEachSeries(array, iterator, callback) {
+    var i = 0;
+    var len = array.length;
+
+    (function next(err) {
+        if (err || i === len) {
             if (callback) {
-                loader.once('complete', callback);
-            }
-            loader.load();
-        };
-    };
-
-    module.exports = PixiRenderSystem;
-} ());
-
-},{"../utils.js":159,"lodash":4,"pixi.js":114}],156:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var RoomSystem = function (world) {
-        var rooms = {};
-
-        this.saveRoom = function (roomName, entities) {
-            var componentBatches = _.pluck(entities, 'c');
-            rooms[roomName] = componentBatches;
-        };
-
-        this.loadRoom = function (roomName) {
-            world.clear();
-            world.load(rooms[roomName]);
-        };
-    };
-
-    module.exports = RoomSystem;
-} ());
-
-},{"lodash":4}],157:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-    var Howler = require('howler');
-
-    var SoundSystem = function () {
-        var that = this,
-            sounds = {};
-
-        this.volume = 1; // Between 0 and 1
-
-        this.load = function (path) {
-            sounds[path] = new Howler.Howl({urls: [path]});
-            return sounds[path];
-        };
-
-        this.play = function (path) {
-            if (!_.has(sounds, path)) {
-                that.load(path);
-            }
-            sounds[path]._volume = that.volume;
-            sounds[path].play();
-        };
-    };
-
-    module.exports = SoundSystem;
-} ());
-
-},{"howler":3,"lodash":4}],158:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var utils = require('../utils.js');
-
-    var VelocitySystem = function () {
-
-        this.update = {
-            velocity: function (entity, dt) {
-                entity.c.position.x += utils.delta(entity.c.velocity.xspeed, dt);
-                entity.c.position.y += utils.delta(entity.c.velocity.yspeed, dt);
-            }
-        };
-    };
-
-    module.exports = VelocitySystem;
-} ());
-
-},{"../utils.js":159}],159:[function(require,module,exports){
-(function () {
-    'use strict';
-
-    var _ = require('lodash');
-
-    var Utils = {
-
-        // Transform a speed by our delta time.
-        delta:
-            function (speed, dt) {
-                return speed * (dt / 1000);
-            },
-
-        // Proxy a property, simillar to the proxy in ES6.
-        // Allows us to propagate changes to the target property.
-        proxy:
-            function (originalObj, originalProp, targetObj, targetProp) {
-                Object.defineProperty(
-                    originalObj,
-                    originalProp,
-                    {
-                        get: function () {
-                            return targetObj[targetProp];
-                        },
-                        set: function (newValue) {
-                            targetObj[targetProp] = newValue;
-                        }
-                    }
-                );
-            },
-
-        // A read-only version of proxy, see above.
-        readOnlyProxy:
-            function (originalObj, originalProp, targetObj, targetProp) {
-                Object.defineProperty(
-                    originalObj,
-                    originalProp,
-                    {
-                        get: function () {
-                            return targetObj[targetProp];
-                        },
-                        set: function (newValue) {
-                            console.error(targetProp + ' is read-only.');
-                            throw new Error('ReadOnly');
-                        }
-                    }
-                );
-            },
-
-        // Watches a property, executing a callback when the property changes.
-        look:
-            function (obj, prop, callback, callbackParams) {
-                var value = obj[prop];
-
-                Object.defineProperty(
-                    obj,
-                    prop,
-                    {
-                        get: function () {
-                            return value;
-                        },
-                        set: function (newValue) {
-                            value = newValue;
-                            callback(newValue, callbackParams);
-                        }
-                    }
-                );
+                callback(err);
             }
 
+            return;
+        }
+
+        iterator(array[i++], next);
+    })();
+}
+
+/**
+ * Ensures a function is only called once.
+ *
+ * @param {function} fn - The function to wrap.
+ * @return {function} The wrapping function.
+ */
+function onlyOnce(fn) {
+    return function onceWrapper() {
+        if (fn === null) {
+            throw new Error('Callback was already called.');
+        }
+
+        var callFn = fn;
+
+        fn = null;
+        callFn.apply(this, arguments);
     };
+}
 
-    module.exports = Utils;
-} ());
+/**
+ * Async queue implementation,
+ *
+ * @param {function} worker - The worker function to call for each task.
+ * @param {number} concurrency - How many workers to run in parrallel.
+ * @return {*} The async queue object.
+ */
+function asyncQueue(worker, concurrency) {
+    if (concurrency == null) { // eslint-disable-line no-eq-null,eqeqeq
+        concurrency = 1;
+    }
+    else if (concurrency === 0) {
+        throw new Error('Concurrency must not be zero');
+    }
 
-},{"lodash":4}],160:[function(require,module,exports){
-(function () {
-    'use strict';
+    var workers = 0;
+    var q = {
+        _tasks: [],
+        concurrency: concurrency,
+        saturated: _noop,
+        unsaturated: _noop,
+        buffer: concurrency / 4,
+        empty: _noop,
+        drain: _noop,
+        error: _noop,
+        started: false,
+        paused: false,
+        push: function (data, callback) {
+            _insert(data, false, callback);
+        },
+        kill: function () {
+            q.drain = _noop;
+            q._tasks = [];
+        },
+        unshift: function (data, callback) {
+            _insert(data, true, callback);
+        },
+        process: function () {
+            while (!q.paused && workers < q.concurrency && q._tasks.length) {
+                var task = q._tasks.shift();
 
-    var _ = require('lodash');
-    var Entity = require('./entity.js');
+                if (q._tasks.length === 0) {
+                    q.empty();
+                }
 
-    var World = function () {
+                workers += 1;
 
-        var that = this;
-        var entities = {};
-        var systems = {};
+                if (workers === q.concurrency) {
+                    q.saturated();
+                }
 
-        // Update the game by one tick.
-        this.tick = function (dt) {
-            tickStart(dt);
-            update(dt);
-            tickEnd(dt);
-        };
-
-        // Add an entity to the world.
-        this.add = function (entity) {
-            entity.world = this;
-            entities[entity.uid] = entity;
-
-            build(entity);
-            track(entity);
-
-            return entity;
-        };
-
-        // Remove an entity from the world.
-        this.remove = function (entity) {
-            destroy(entity);
-            untrack(entity);
-
-            delete entities[entity.uid];
-        };
-
-        // Register a system to the world.
-        this.register = function (system) {
-            system.$uid = _.uniqueId();
-            systems[system.$uid] = system;
-
-            setupTracking(system);
-            _.each(entities, that.rebuild);
-
-            return system;
-        };
-
-        // Deregister a system from the world.
-        this.deregister = function (system) {
-            if (_.has(system, 'deregister')) {
-                system.deregister();
+                worker(task.data, onlyOnce(_next(task)));
+            }
+        },
+        length: function () {
+            return q._tasks.length;
+        },
+        running: function () {
+            return workers;
+        },
+        idle: function () {
+            return q._tasks.length + workers === 0;
+        },
+        pause: function () {
+            if (q.paused === true) {
+                return;
             }
 
-            delete systems[system.$uid];
+            q.paused = true;
+        },
+        resume: function () {
+            if (q.paused === false) {
+                return;
+            }
+
+            q.paused = false;
+
+            // Need to call q.process once per concurrent
+            // worker to preserve full concurrency after pause
+            for (var w = 1; w <= q.concurrency; w++) {
+                q.process();
+            }
+        }
+    };
+
+    function _insert(data, insertAtFront, callback) {
+        if (callback != null && typeof callback !== 'function') { // eslint-disable-line no-eq-null,eqeqeq
+            throw new Error('task callback must be a function');
+        }
+
+        q.started = true;
+
+        if (data == null && q.idle()) { // eslint-disable-line no-eq-null,eqeqeq
+            // call drain immediately if there are no tasks
+            setTimeout(function () {
+                q.drain();
+            }, 1);
+
+            return;
+        }
+
+        var item = {
+            data: data,
+            callback: typeof callback === 'function' ? callback : _noop
         };
 
-        // Rebuild an entity with all registered systems.
-        this.rebuild = function (entity, just) {
-            destroy(entity, just);
-            untrack(entity);
+        if (insertAtFront) {
+            q._tasks.unshift(item);
+        }
+        else {
+            q._tasks.push(item);
+        }
 
-            build(entity, just);
-            track(entity);
+        setTimeout(function () {
+            q.process();
+        }, 1);
+    }
+
+    function _next(task) {
+        return function () {
+            workers -= 1;
+
+            task.callback.apply(task, arguments);
+
+            if (arguments[0] != null) { // eslint-disable-line no-eq-null,eqeqeq
+                q.error(arguments[0], task.data);
+            }
+
+            if (workers <= (q.concurrency - q.buffer)) {
+                q.unsaturated();
+            }
+
+            if (q.idle()) {
+                q.drain();
+            }
+
+            q.process();
         };
+    }
 
-        // Clear all entities from the world and systems.
-        this.clear = function () {
-            _.each(
-                entities,
-                function (entity) {
-                    destroy(entity);
-                    untrack(entity);
+    return q;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/b64.js":
+/*!*************************************************!*\
+  !*** ./node_modules/resource-loader/src/b64.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* eslint no-magic-numbers: 0 */
+
+
+module.exports = {
+    // private property
+    _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
+
+    encodeBinary: function (input) {
+        var output = '';
+        var bytebuffer;
+        var encodedCharIndexes = new Array(4);
+        var inx = 0;
+        var jnx = 0;
+        var paddingBytes = 0;
+
+        while (inx < input.length) {
+            // Fill byte buffer array
+            bytebuffer = new Array(3);
+
+            for (jnx = 0; jnx < bytebuffer.length; jnx++) {
+                if (inx < input.length) {
+                    // throw away high-order byte, as documented at:
+                    // https://developer.mozilla.org/En/Using_XMLHttpRequest#Handling_binary_data
+                    bytebuffer[jnx] = input.charCodeAt(inx++) & 0xff;
                 }
-            );
-            entities = {};
-        };
-
-        // Save the world's entities as JSON.
-        this.save = function () {
-            var saved = [];
-
-            _.each(
-                entities,
-                function (entity) {
-                    var copy = {};
-
-                    _.each(
-                        entity.c,
-                        function (component) {
-                            copy[component.$id] = _.clone(component);
-                        }
-                    );
-
-                    saved.push(copy);
+                else {
+                    bytebuffer[jnx] = 0;
                 }
-            );
+            }
 
-            return saved;
-        };
+            // Get each encoded character, 6 bits at a time
+            // index 1: first 6 bits
+            encodedCharIndexes[0] = bytebuffer[0] >> 2;
+            // index 2: second 6 bits (2 least significant bits from input byte 1 + 4 most significant bits from byte 2)
+            encodedCharIndexes[1] = ((bytebuffer[0] & 0x3) << 4) | (bytebuffer[1] >> 4);
+            // index 3: third 6 bits (4 least significant bits from input byte 2 + 2 most significant bits from byte 3)
+            encodedCharIndexes[2] = ((bytebuffer[1] & 0x0f) << 2) | (bytebuffer[2] >> 6);
+            // index 3: forth 6 bits (6 least significant bits from input byte 3)
+            encodedCharIndexes[3] = bytebuffer[2] & 0x3f;
 
-        // Load entities from JSON into the world.
-        this.load = function (componentBatches) {
-            _.each(
-                componentBatches,
-                function (componentBatch) {
-                    var newEntity = new Entity(),
-                        newC = {};
+            // Determine whether padding happened, and adjust accordingly
+            paddingBytes = inx - (input.length - 1);
+            switch (paddingBytes) {
+                case 2:
+                    // Set last 2 characters to padding char
+                    encodedCharIndexes[3] = 64;
+                    encodedCharIndexes[2] = 64;
+                    break;
 
-                    _.each(
-                        componentBatch,
-                        function (component) {
-                            newC[component.$id] = _.clone(component);
-                        }
-                    );
+                case 1:
+                    // Set last character to padding char
+                    encodedCharIndexes[3] = 64;
+                    break;
 
-                    newEntity.c = newC;
+                default:
+                    break; // No padding - proceed
+            }
 
-                    that.add(newEntity);
+            // Now we will grab each appropriate character out of our keystring
+            // based on our index array and append it to the output string
+            for (jnx = 0; jnx < encodedCharIndexes.length; jnx++) {
+                output += this._keyStr.charAt(encodedCharIndexes[jnx]);
+            }
+        }
+
+        return output;
+    }
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/resource-loader/src/index.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* eslint global-require: 0 */
+
+
+module.exports = __webpack_require__(/*! ./Loader */ "./node_modules/resource-loader/src/Loader.js");
+module.exports.Resource = __webpack_require__(/*! ./Resource */ "./node_modules/resource-loader/src/Resource.js");
+module.exports.middleware = {
+    caching: {
+        memory: __webpack_require__(/*! ./middlewares/caching/memory */ "./node_modules/resource-loader/src/middlewares/caching/memory.js")
+    },
+    parsing: {
+        blob: __webpack_require__(/*! ./middlewares/parsing/blob */ "./node_modules/resource-loader/src/middlewares/parsing/blob.js")
+    }
+};
+
+module.exports.async = __webpack_require__(/*! ./async */ "./node_modules/resource-loader/src/async.js");
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/middlewares/caching/memory.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/resource-loader/src/middlewares/caching/memory.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// a simple in-memory cache for resources
+var cache = {};
+
+module.exports = function () {
+    return function (resource, next) {
+        // if cached, then set data and complete the resource
+        if (cache[resource.url]) {
+            resource.data = cache[resource.url];
+            resource.complete(); // marks resource load complete and stops processing before middlewares
+        }
+        // if not cached, wait for complete and store it in the cache.
+        else {
+            resource.once('complete', function () {
+                cache[this.url] = this.data;
+            });
+        }
+
+        next();
+    };
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/resource-loader/src/middlewares/parsing/blob.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/resource-loader/src/middlewares/parsing/blob.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Resource = __webpack_require__(/*! ../../Resource */ "./node_modules/resource-loader/src/Resource.js");
+var b64 = __webpack_require__(/*! ../../b64 */ "./node_modules/resource-loader/src/b64.js");
+
+var Url = window.URL || window.webkitURL;
+
+// a middleware for transforming XHR loaded Blobs into more useful objects
+
+module.exports = function () {
+    return function (resource, next) {
+        if (!resource.data) {
+            next();
+
+            return;
+        }
+
+        // if this was an XHR load of a blob
+        if (resource.xhr && resource.xhrType === Resource.XHR_RESPONSE_TYPE.BLOB) {
+            // if there is no blob support we probably got a binary string back
+            if (!window.Blob || typeof resource.data === 'string') {
+                var type = resource.xhr.getResponseHeader('content-type');
+
+                // this is an image, convert the binary string into a data url
+                if (type && type.indexOf('image') === 0) {
+                    resource.data = new Image();
+                    resource.data.src = 'data:' + type + ';base64,' + b64.encodeBinary(resource.xhr.responseText);
+
+                    resource.isImage = true;
+
+                    // wait until the image loads and then callback
+                    resource.data.onload = function () {
+                        resource.data.onload = null;
+
+                        next();
+                    };
+
+                    // next will be called on load
+                    return;
                 }
-            );
-        };
+            }
+            // if content type says this is an image, then we should transform the blob into an Image object
+            else if (resource.data.type.indexOf('image') === 0) {
+                var src = Url.createObjectURL(resource.data);
 
-        // Call all registered system's tick start function.
-        var tickStart = function (dt) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'tickStart')) {
-                        system.tickStart(dt);
-                    }
+                resource.blob = resource.data;
+                resource.data = new Image();
+                resource.data.src = src;
+
+                resource.isImage = true;
+
+                // cleanup the no longer used blob after the image loads
+                resource.data.onload = function () {
+                    Url.revokeObjectURL(src);
+                    resource.data.onload = null;
+
+                    next();
+                };
+
+                // next will be called on load.
+                return;
+            }
+        }
+
+        next();
+    };
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/setimmediate/setImmediate.js":
+/*!***************************************************!*\
+  !*** ./node_modules/setimmediate/setImmediate.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
                 }
-            );
-        };
+            }
+        }
+    }
 
-        // Call all registered system's update function, passing a timestep.
-        var update = function (dt) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'update')) {
-                        _.each(
-                            entities,
-                            function (entity) {
-                                if (!_.isUndefined(entity)) {
-                                    _.each(system.update, function (func, id) {
-                                        if (entity.has(id)){
-                                            func(entity, dt);
-                                        }
-                                    });
-                                }
-                            }
-                        );
-                    }
-                }
-            );
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
         };
+    }
 
-        // Call all registered system's tick end function.
-        var tickEnd = function (dt) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'tickEnd')) {
-                        system.tickEnd(dt);
-                    }
-                }
-            );
-        };
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
 
-        // Build an entity in all registered systems.
-        // If 'just' is given, just systems that deal with that
-        // component build the entity rather than all.
-        var build = function (entity, just) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'build')) {
-                        _.each(system.build, function (func, id) {
-                            if (entity.has(id)){
-                                // Only build in tracking systems.
-                                if (!_.isUndefined(just)) {
-                                    if (id !== just) {
-                                        return;
-                                    }
-                                }
-                                // Perform build.
-                                func(entity);
-                            }
-                        });
-                    }
-                }
-            );
-        };
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
 
-        // Destroys an entity in all registered systems.
-        // If 'just' is given, just systems that deal with that
-        // component destroy the entity rather than all.
-        var destroy = function (entity, just) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, 'destroy')) {
-                        _.each(system.destroy, function (func, id) {
-                            if (entity.has(id)){
-                                // Only remove from tracking systems.
-                                if (!_.isUndefined(just)) {
-                                    if (id !== just) {
-                                        return;
-                                    }
-                                }
-                                // Perform the remove.
-                                func(entity);
-                            }
-                        });
-                    }
-                }
-            );
-        };
-
-        // Setup tracking on a system.
-        // Creates the appropriate data structure on the $tracked object.
-        var setupTracking = function (system) {
-            if (_.has(system, '$tracking')) {
-                system.$tracked = {};
-                _.each(
-                    system.$tracking,
-                    function (trackingType, id) {
-                        switch (trackingType) {
-                            case 'many':
-                                system.$tracked[id] = {};
-                                break;
-                            case 'single':
-                                system.$tracked[id] = null;
-                                break;
-                            default:
-                                throw new Error('UnknownTrackingType');
-                        }
-                    }
-                );
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
             }
         };
 
-        // Make systems track a given entity.
-        // The entity will be referenced by the $tracked object.
-        var track = function (entity) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, '$tracking')) {
-                        _.each(system.$tracking, function (trackingType, id) {
-                            if (entity.has(id)){
-                                switch (trackingType) {
-                                    case 'many':
-                                        system.$tracked[id][entity.uid] = entity;
-                                        break;
-                                    case 'single':
-                                        if (system.$tracked[id] === null) {
-                                            system.$tracked[id] = entity;
-                                        } else {
-                                            throw new Error('ExpectedSingleEntity');
-                                        }
-                                        break;
-                                    default:
-                                        throw new Error('UnknownTrackingType');
-                                }
-                            }
-                        });
-                    }
-                }
-            );
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
         };
 
-        // Stop systems from tracking a given entity.
-        // The entity will no longer be referenced by the $tracked object
-        // until it is tracked again.
-        var untrack = function (entity) {
-            _.each(
-                systems,
-                function (system) {
-                    if (_.has(system, '$tracking')) {
-                        _.each(system.$tracking, function (trackingType, id) {
-                            if (entity.has(id)){
-                                switch (trackingType) {
-                                    case 'many':
-                                        delete system.$tracked[id][entity.uid];
-                                        break;
-                                    case 'single':
-                                        system.$tracked[id] = null;
-                                        break;
-                                    default:
-                                        throw new Error('UnknownTrackingType');
-                                }
-                            }
-                        });
-                    }
-                }
-            );
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
         };
+    }
 
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
+
+/***/ }),
+
+/***/ "./node_modules/webpack/buildin/global.js":
+/*!***********************************!*\
+  !*** (webpack)/buildin/global.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+
+/***/ "./node_modules/webpack/buildin/module.js":
+/*!***********************************!*\
+  !*** (webpack)/buildin/module.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+
+/***/ "./src/World.js":
+/*!**********************!*\
+  !*** ./src/World.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return World; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./entity.js */ "./src/entity.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var World = /*#__PURE__*/function () {
+  function World() {
+    _classCallCheck(this, World);
+
+    this._entities = {};
+    this._systems = {};
+  } // Update the game by one tick.
+
+
+  _createClass(World, [{
+    key: "tick",
+    value: function tick(dt) {
+      this.tickStart(dt);
+      this.update(dt);
+      this.tickEnd(dt);
+    } // Add an entity to the world.
+
+  }, {
+    key: "add",
+    value: function add(entity) {
+      entity.world = this;
+      this._entities[entity.uid] = entity;
+      this.build(entity);
+      this.track(entity);
+      return entity;
+    } // Remove an entity from the world.
+
+  }, {
+    key: "remove",
+    value: function remove(entity) {
+      this.destroy(entity);
+      this.untrack(entity);
+      delete this._entities[entity.uid];
+    } // Register a system to the world.
+
+  }, {
+    key: "register",
+    value: function register(system) {
+      var _this = this;
+
+      system.$uid = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.uniqueId();
+      this._systems[system.$uid] = system;
+      this.setupTracking(system);
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
+        return _this.rebuild(entity);
+      });
+
+      return system;
+    } // Deregister a system from the world.
+
+  }, {
+    key: "deregister",
+    value: function deregister(system) {
+      if (system.deregister) {
+        system.deregister();
+      }
+
+      delete this._systems[system.$uid];
+    } // Rebuild an entity with all registered systems.
+
+  }, {
+    key: "rebuild",
+    value: function rebuild(entity, just) {
+      this.destroy(entity, just);
+      this.untrack(entity);
+      this.build(entity, just);
+      this.track(entity);
+    } // Clear all entities from the world and systems.
+
+  }, {
+    key: "clear",
+    value: function clear() {
+      var _this2 = this;
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
+        _this2.destroy(entity);
+
+        _this2.untrack(entity);
+      });
+
+      this._entities = {};
+    } // Save the world's entities as JSON.
+
+  }, {
+    key: "save",
+    value: function save() {
+      var saved = [];
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
+        var copy = {};
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(entity.c, function (component) {
+          copy[component.$id] = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.clone(component);
+        });
+
+        saved.push(copy);
+      });
+
+      return saved;
+    } // Load entities from JSON into the world.
+
+  }, {
+    key: "load",
+    value: function load(componentBatches) {
+      var _this3 = this;
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(componentBatches, function (componentBatch) {
+        var newEntity = new _entity_js__WEBPACK_IMPORTED_MODULE_1__["default"]();
+        var newC = {};
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(componentBatch, function (component) {
+          newC[component.$id] = _objectSpread({}, component);
+        });
+
+        newEntity.c = newC;
+
+        _this3.add(newEntity);
+      });
+    } // Call all registered system's tick start function.
+
+  }, {
+    key: "tickStart",
+    value: function tickStart(dt) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.tickStart) {
+          system.tickStart(dt);
+        }
+      });
+    } // Call all registered system's update function, passing a timestep.
+
+  }, {
+    key: "update",
+    value: function update(dt) {
+      var _this4 = this;
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.update) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(_this4._entities, function (entity) {
+            if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(entity)) {
+              lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.update, function (func, id) {
+                if (entity.has(id)) {
+                  func(entity, dt);
+                }
+              });
+            }
+          });
+        }
+      });
+    } // Call all registered system's tick end function.
+
+  }, {
+    key: "tickEnd",
+    value: function tickEnd(dt) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.tickEnd) {
+          system.tickEnd(dt);
+        }
+      });
+    } // Build an entity in all registered systems.
+    // If 'just' is given, just systems that deal with that
+    // component build the entity rather than all.
+
+  }, {
+    key: "build",
+    value: function build(entity, just) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.build) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.build, function (func, id) {
+            if (entity.has(id)) {
+              // Only build in tracking systems.
+              if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(just)) {
+                if (id !== just) {
+                  return;
+                }
+              } // Perform build.
+
+
+              func(entity);
+            }
+          });
+        }
+      });
+    } // Destroys an entity in all registered systems.
+    // If 'just' is given, just systems that deal with that
+    // component destroy the entity rather than all.
+
+  }, {
+    key: "destroy",
+    value: function destroy(entity, just) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.destroy) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.destroy, function (func, id) {
+            if (entity.has(id)) {
+              // Only remove from tracking systems.
+              if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(just)) {
+                if (id !== just) {
+                  return;
+                }
+              } // Perform the remove.
+
+
+              func(entity);
+            }
+          });
+        }
+      });
+    } // Setup tracking on a system.
+    // Creates the appropriate data structure on the $tracked object.
+
+  }, {
+    key: "setupTracking",
+    value: function setupTracking(system) {
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
+        system.$tracked = {};
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
+          switch (trackingType) {
+            case 'many':
+              system.$tracked[id] = {};
+              break;
+
+            case 'single':
+              system.$tracked[id] = null;
+              break;
+
+            default:
+              throw new Error('UnknownTrackingType');
+          }
+        });
+      }
+    } // Make systems track a given entity.
+    // The entity will be referenced by the $tracked object.
+
+  }, {
+    key: "track",
+    value: function track(entity) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
+            if (entity.has(id)) {
+              switch (trackingType) {
+                case 'many':
+                  system.$tracked[id][entity.uid] = entity;
+                  break;
+
+                case 'single':
+                  if (system.$tracked[id] === null) {
+                    system.$tracked[id] = entity;
+                  } else {
+                    throw new Error('ExpectedSingleEntity');
+                  }
+
+                  break;
+
+                default:
+                  throw new Error('UnknownTrackingType');
+              }
+            }
+          });
+        }
+      });
+    } // Stop systems from tracking a given entity.
+    // The entity will no longer be referenced by the $tracked object
+    // until it is tracked again.
+
+  }, {
+    key: "untrack",
+    value: function untrack(entity) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
+            if (entity.has(id)) {
+              switch (trackingType) {
+                case 'many':
+                  delete system.$tracked[id][entity.uid];
+                  break;
+
+                case 'single':
+                  system.$tracked[id] = null;
+                  break;
+
+                default:
+                  throw new Error('UnknownTrackingType');
+              }
+            }
+          });
+        }
+      });
+    }
+  }]);
+
+  return World;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/components/Collision.js":
+/*!*************************************!*\
+  !*** ./src/components/Collision.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Collision; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Collision = // Represents the collision boundaries of an entity.
+function Collision(params) {
+  _classCallCheck(this, Collision);
+
+  this.$id = 'collision';
+  this.$deps = ['position'];
+  params = _objectSpread({
+    anchor: {
+      x: 0.5,
+      y: 0.5
+    }
+  }, params);
+  this.width = params.width;
+  this.height = params.height;
+  this.anchor = params.anchor;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/Position.js":
+/*!************************************!*\
+  !*** ./src/components/Position.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Position; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Position = // Represents an entity's position in 2D space.
+function Position(params) {
+  _classCallCheck(this, Position);
+
+  this.$id = 'position';
+  this.$deps = [];
+  this.x = params.x;
+  this.y = params.y;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/Velocity.js":
+/*!************************************!*\
+  !*** ./src/components/Velocity.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Velocity; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Velocity = // Represents an entity's velocity in 2D space.
+function Velocity(params) {
+  _classCallCheck(this, Velocity);
+
+  this.$id = 'velocity';
+  this.$deps = ['position'];
+  this.xspeed = params.xspeed;
+  this.yspeed = params.yspeed;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/collision.js":
+/*!*************************************!*\
+  !*** ./src/components/collision.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Collision; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Collision = // Represents the collision boundaries of an entity.
+function Collision(params) {
+  _classCallCheck(this, Collision);
+
+  this.$id = 'collision';
+  this.$deps = ['position'];
+  params = _objectSpread({
+    anchor: {
+      x: 0.5,
+      y: 0.5
+    }
+  }, params);
+  this.width = params.width;
+  this.height = params.height;
+  this.anchor = params.anchor;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Circle.js":
+/*!*******************************************!*\
+  !*** ./src/components/graphics/Circle.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Circle; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Circle = function Circle(params) {
+  _classCallCheck(this, Circle);
+
+  this.$id = 'circle';
+  this.$deps = ['graphic'];
+  this.color = params.color;
+  this.radius = params.radius;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Ellipse.js":
+/*!********************************************!*\
+  !*** ./src/components/graphics/Ellipse.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Ellipse; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Ellipse = function Ellipse(params) {
+  _classCallCheck(this, Ellipse);
+
+  this.$id = 'ellipse';
+  this.$deps = ['graphic'];
+  this.color = params.color;
+  this.width = params.width;
+  this.height = params.height;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Graphic.js":
+/*!********************************************!*\
+  !*** ./src/components/graphics/Graphic.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Graphic; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Graphic = function Graphic(params) {
+  _classCallCheck(this, Graphic);
+
+  this.$id = 'graphic';
+  this.$deps = []; // Position dependency added later if relative positioning is true.
+
+  params = _objectSpread({
+    alpha: 1,
+    anchor: {
+      x: 0.5,
+      y: 0.5
+    },
+    relative: true,
+    scale: {
+      x: 1,
+      y: 1
+    },
+    tint: 0xffffff,
+    translate: {
+      x: 0,
+      y: 0
+    },
+    visible: true,
+    z: 0
+  }, params);
+
+  if (params.relative) {
+    this.$deps.push('position');
+  }
+
+  this.alpha = params.alpha;
+  this.anchor = params.anchor;
+  this.relative = params.relative;
+  this.scale = params.scale;
+  this.tint = params.tint;
+  this.translate = params.translate;
+  this.visible = params.visible;
+  this.z = params.z;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Line.js":
+/*!*****************************************!*\
+  !*** ./src/components/graphics/Line.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Line; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Line = function Line(params) {
+  _classCallCheck(this, Line);
+
+  this.$id = 'line';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    thickness: 1
+  }, params);
+  this.thickness = params.thickness;
+  this.x1 = params.x1;
+  this.y1 = params.y1;
+  this.x2 = params.x2;
+  this.y2 = params.y2;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Polygon.js":
+/*!********************************************!*\
+  !*** ./src/components/graphics/Polygon.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Polygon; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Polygon = function Polygon(params) {
+  _classCallCheck(this, Polygon);
+
+  this.$id = 'polygon';
+  this.$deps = ['graphic'];
+  this.color = params.color;
+  this.points = params.points;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Rectangle.js":
+/*!**********************************************!*\
+  !*** ./src/components/graphics/Rectangle.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Rectangle; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Rectangle = function Rectangle(params) {
+  _classCallCheck(this, Rectangle);
+
+  this.$id = 'rectangle';
+  this.$deps = ['graphic'];
+  this.color = params.color;
+  this.width = params.width;
+  this.height = params.height;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Sprite.js":
+/*!*******************************************!*\
+  !*** ./src/components/graphics/Sprite.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Sprite; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Sprite = function Sprite(params) {
+  _classCallCheck(this, Sprite);
+
+  this.$id = 'sprite';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    animationSpeed: 1,
+    currentFrame: 1,
+    loop: true,
+    rotation: 0
+  }, params);
+  this.animationSpeed = params.animationSpeed;
+  this.currentFrame = params.currentFrame;
+  this.loop = params.loop;
+  this.path = params.path;
+  this.rotation = params.rotation;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/StaticSprite.js":
+/*!*************************************************!*\
+  !*** ./src/components/graphics/StaticSprite.js ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return StaticSprite; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var StaticSprite = function StaticSprite(params) {
+  _classCallCheck(this, StaticSprite);
+
+  this.$id = 'staticSprite';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    rotation: 0
+  }, params);
+  this.path = params.path;
+  this.rotation = params.rotation;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/Text.js":
+/*!*****************************************!*\
+  !*** ./src/components/graphics/Text.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Text; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Text = function Text(params) {
+  _classCallCheck(this, Text);
+
+  this.$id = 'text';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    bitmapFont: false,
+    rotation: 0,
+    style: {}
+  }, params);
+  params.style = _objectSpread({
+    font: '32px monospace',
+    fill: 0xffffff
+  }, params.style);
+  this.bitmapFont = params.bitmapFont;
+  this.copy = params.copy;
+  this.rotation = params.rotation;
+  this.style = params.style;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/graphic.js":
+/*!********************************************!*\
+  !*** ./src/components/graphics/graphic.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Graphic; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Graphic = function Graphic(params) {
+  _classCallCheck(this, Graphic);
+
+  this.$id = 'graphic';
+  this.$deps = []; // Position dependency added later if relative positioning is true.
+
+  params = _objectSpread({
+    alpha: 1,
+    anchor: {
+      x: 0.5,
+      y: 0.5
+    },
+    relative: true,
+    scale: {
+      x: 1,
+      y: 1
+    },
+    tint: 0xffffff,
+    translate: {
+      x: 0,
+      y: 0
+    },
+    visible: true,
+    z: 0
+  }, params);
+
+  if (params.relative) {
+    this.$deps.push('position');
+  }
+
+  this.alpha = params.alpha;
+  this.anchor = params.anchor;
+  this.relative = params.relative;
+  this.scale = params.scale;
+  this.tint = params.tint;
+  this.translate = params.translate;
+  this.visible = params.visible;
+  this.z = params.z;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/position.js":
+/*!************************************!*\
+  !*** ./src/components/position.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Position; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Position = // Represents an entity's position in 2D space.
+function Position(params) {
+  _classCallCheck(this, Position);
+
+  this.$id = 'position';
+  this.$deps = [];
+  this.x = params.x;
+  this.y = params.y;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/velocity.js":
+/*!************************************!*\
+  !*** ./src/components/velocity.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Velocity; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Velocity = // Represents an entity's velocity in 2D space.
+function Velocity(params) {
+  _classCallCheck(this, Velocity);
+
+  this.$id = 'velocity';
+  this.$deps = ['position'];
+  this.xspeed = params.xspeed;
+  this.yspeed = params.yspeed;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/entity.js":
+/*!***********************!*\
+  !*** ./src/entity.js ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Entity; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var Entity = /*#__PURE__*/function () {
+  function Entity() {
+    _classCallCheck(this, Entity);
+
+    // Each entity had a unique ID.
+    this.uid = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.uniqueId(); // Each entity has a number of components.
+
+    this.c = {};
+    Object.seal(this.c); // World this entity has been added to.
+
+    this.world = null;
+  } // Attach a component to the entity.
+
+
+  _createClass(Entity, [{
+    key: "attach",
+    value: function attach(component) {
+      var _this = this;
+
+      // Check component's dependencies are met.
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(component.$deps, function (dependencyID) {
+        if (!_this.has(dependencyID)) {
+          console.error("".concat(dependencyID, " component missing."));
+          throw new Error('ComponentDependencyMissing');
+        }
+      }); // Check component is not already attached.
+
+
+      if (this.has(component.$id)) {
+        throw new Error('ComponentAlreadyAttached');
+      } // Attach component.
+
+
+      var newC = _objectSpread({}, this.c);
+
+      newC[component.$id] = component;
+      Object.seal(newC);
+      this.c = newC; // If the entity has already been added to a world, rebuild it.
+
+      if (this.world) {
+        this.world.rebuild(this, component.$id);
+      }
+
+      return this;
+    } // Remove a component from the entity.
+
+  }, {
+    key: "detach",
+    value: function detach(componentID) {
+      // Check that the component was not a dependency.
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this.c, function (component) {
+        var dependencyExists = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.any(component.$deps, function (dep) {
+          return dep === componentId;
+        });
+
+        if (dependencyExists) {
+          console.error("".concat(component.$id, " depends on ").concat(componentId));
+          throw new Error('ComponentDependencyMissing');
+        }
+      }); // Detach the component.
+
+
+      var newC = _objectSpread({}, this.c);
+
+      delete newC[componentID];
+      Object.seal(newC);
+      this.c = newC;
+
+      if (this.world) {
+        this.world.rebuild(this);
+      }
+
+      return this;
+    }
+  }, {
+    key: "has",
+    value: function has(componentID) {
+      return lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(this.c, componentID);
+    }
+  }]);
+
+  return Entity;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/main.js":
+/*!*********************!*\
+  !*** ./src/main.js ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/entity.js");
+/* harmony import */ var _World_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./World.js */ "./src/World.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
+/* harmony import */ var _components_Collision_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/Collision.js */ "./src/components/Collision.js");
+/* harmony import */ var _components_Position_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/Position.js */ "./src/components/Position.js");
+/* harmony import */ var _components_Velocity_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/Velocity.js */ "./src/components/Velocity.js");
+/* harmony import */ var _components_graphics_Circle_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/graphics/Circle.js */ "./src/components/graphics/Circle.js");
+/* harmony import */ var _components_graphics_Ellipse_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/graphics/Ellipse.js */ "./src/components/graphics/Ellipse.js");
+/* harmony import */ var _components_graphics_Graphic_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/graphics/Graphic.js */ "./src/components/graphics/Graphic.js");
+/* harmony import */ var _components_graphics_Line_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/graphics/Line.js */ "./src/components/graphics/Line.js");
+/* harmony import */ var _components_graphics_Polygon_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/graphics/Polygon.js */ "./src/components/graphics/Polygon.js");
+/* harmony import */ var _components_graphics_Rectangle_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/graphics/Rectangle.js */ "./src/components/graphics/Rectangle.js");
+/* harmony import */ var _components_graphics_StaticSprite_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/graphics/StaticSprite.js */ "./src/components/graphics/StaticSprite.js");
+/* harmony import */ var _components_graphics_Sprite_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/graphics/Sprite.js */ "./src/components/graphics/Sprite.js");
+/* harmony import */ var _components_graphics_Text_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/graphics/Text.js */ "./src/components/graphics/Text.js");
+/* harmony import */ var _prefabs_base_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./prefabs/base.js */ "./src/prefabs/base.js");
+/* harmony import */ var _prefabs_body_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./prefabs/body.js */ "./src/prefabs/body.js");
+/* harmony import */ var _prefabs_static_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./prefabs/static.js */ "./src/prefabs/static.js");
+/* harmony import */ var _prefabs_staticBody_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./prefabs/staticBody.js */ "./src/prefabs/staticBody.js");
+/* harmony import */ var _systems_collisionSystem_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./systems/collisionSystem.js */ "./src/systems/collisionSystem.js");
+/* harmony import */ var _systems_controlsSystem_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./systems/controlsSystem.js */ "./src/systems/controlsSystem.js");
+/* harmony import */ var _systems_pixiRenderSystem_js__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./systems/pixiRenderSystem.js */ "./src/systems/pixiRenderSystem.js");
+/* harmony import */ var _systems_roomSystem_js__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./systems/roomSystem.js */ "./src/systems/roomSystem.js");
+/* harmony import */ var _systems_soundSystem_js__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./systems/soundSystem.js */ "./src/systems/soundSystem.js");
+/* harmony import */ var _systems_velocitySystem_js__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./systems/velocitySystem.js */ "./src/systems/velocitySystem.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var hitagi = {
+  Entity: _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"],
+  World: _World_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  utils: _utils_js__WEBPACK_IMPORTED_MODULE_2__,
+  components: {
+    Collision: _components_Collision_js__WEBPACK_IMPORTED_MODULE_3__["default"],
+    Position: _components_Position_js__WEBPACK_IMPORTED_MODULE_4__["default"],
+    Velocity: _components_Velocity_js__WEBPACK_IMPORTED_MODULE_5__["default"],
+    graphics: {
+      Circle: _components_graphics_Circle_js__WEBPACK_IMPORTED_MODULE_6__["default"],
+      Ellipse: _components_graphics_Ellipse_js__WEBPACK_IMPORTED_MODULE_7__["default"],
+      Graphic: _components_graphics_Graphic_js__WEBPACK_IMPORTED_MODULE_8__["default"],
+      Line: _components_graphics_Line_js__WEBPACK_IMPORTED_MODULE_9__["default"],
+      Polygon: _components_graphics_Polygon_js__WEBPACK_IMPORTED_MODULE_10__["default"],
+      Rectangle: _components_graphics_Rectangle_js__WEBPACK_IMPORTED_MODULE_11__["default"],
+      StaticSprite: _components_graphics_StaticSprite_js__WEBPACK_IMPORTED_MODULE_12__["default"],
+      Sprite: _components_graphics_Sprite_js__WEBPACK_IMPORTED_MODULE_13__["default"],
+      Text: _components_graphics_Text_js__WEBPACK_IMPORTED_MODULE_14__["default"]
+    }
+  },
+  prefabs: {
+    Base: _prefabs_base_js__WEBPACK_IMPORTED_MODULE_15__["default"],
+    Body: _prefabs_body_js__WEBPACK_IMPORTED_MODULE_16__["default"],
+    Static: _prefabs_static_js__WEBPACK_IMPORTED_MODULE_17__["default"],
+    StaticBody: _prefabs_staticBody_js__WEBPACK_IMPORTED_MODULE_18__["default"]
+  },
+  systems: {
+    CollisionSystem: _systems_collisionSystem_js__WEBPACK_IMPORTED_MODULE_19__["default"],
+    ControlsSystem: _systems_controlsSystem_js__WEBPACK_IMPORTED_MODULE_20__["default"],
+    PixiRenderSystem: _systems_pixiRenderSystem_js__WEBPACK_IMPORTED_MODULE_21__["default"],
+    RoomSystem: _systems_roomSystem_js__WEBPACK_IMPORTED_MODULE_22__["default"],
+    SoundSystem: _systems_soundSystem_js__WEBPACK_IMPORTED_MODULE_23__["default"],
+    VelocitySystem: _systems_velocitySystem_js__WEBPACK_IMPORTED_MODULE_24__["default"]
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (hitagi);
+
+/***/ }),
+
+/***/ "./src/mainGlobal.js":
+/*!***************************!*\
+  !*** ./src/mainGlobal.js ***!
+  \***************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _main_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main.js */ "./src/main.js");
+
+window.hitagi = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"];
+
+/***/ }),
+
+/***/ "./src/prefabs/base.js":
+/*!*****************************!*\
+  !*** ./src/prefabs/base.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Basic; });
+/* harmony import */ var _static_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./static.js */ "./src/prefabs/static.js");
+/* harmony import */ var _components_velocity_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/velocity.js */ "./src/components/velocity.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function Basic(params) {
+  params = _objectSpread({
+    xspeed: 0,
+    yspeed: 0
+  }, params);
+  return new _static_js__WEBPACK_IMPORTED_MODULE_0__["default"](params).attach(new _components_velocity_js__WEBPACK_IMPORTED_MODULE_1__["default"](params));
+}
+;
+
+/***/ }),
+
+/***/ "./src/prefabs/body.js":
+/*!*****************************!*\
+  !*** ./src/prefabs/body.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Body; });
+/* harmony import */ var _base_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base.js */ "./src/prefabs/base.js");
+/* harmony import */ var _components_collision_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/collision.js */ "./src/components/collision.js");
+
+
+function Body(params) {
+  return new _base_js__WEBPACK_IMPORTED_MODULE_0__["default"](params).attach(new _components_collision_js__WEBPACK_IMPORTED_MODULE_1__["default"](params));
+}
+;
+
+/***/ }),
+
+/***/ "./src/prefabs/static.js":
+/*!*******************************!*\
+  !*** ./src/prefabs/static.js ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Static; });
+/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../entity.js */ "./src/entity.js");
+/* harmony import */ var _components_position_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/position.js */ "./src/components/position.js");
+/* harmony import */ var _components_graphics_graphic_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/graphics/graphic.js */ "./src/components/graphics/graphic.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+
+function Static(params) {
+  params = _objectSpread({
+    x: 0,
+    y: 0
+  }, params);
+  return new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]().attach(new _components_position_js__WEBPACK_IMPORTED_MODULE_1__["default"](params)).attach(new _components_graphics_graphic_js__WEBPACK_IMPORTED_MODULE_2__["default"](params));
+}
+;
+
+/***/ }),
+
+/***/ "./src/prefabs/staticBody.js":
+/*!***********************************!*\
+  !*** ./src/prefabs/staticBody.js ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return StaticBody; });
+/* harmony import */ var _static_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./static.js */ "./src/prefabs/static.js");
+/* harmony import */ var _components_collision_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/collision.js */ "./src/components/collision.js");
+
+
+function StaticBody(params) {
+  return new _static_js__WEBPACK_IMPORTED_MODULE_0__["default"](params).attach(new _components_collision_js__WEBPACK_IMPORTED_MODULE_1__["default"](params));
+}
+;
+
+/***/ }),
+
+/***/ "./src/systems/collisionSystem.js":
+/*!****************************************!*\
+  !*** ./src/systems/collisionSystem.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CollisionSystem; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var CollisionSystem = /*#__PURE__*/function () {
+  function CollisionSystem() {
+    _classCallCheck(this, CollisionSystem);
+
+    this.$tracking = {
+      collision: 'many'
+    };
+  } // Prospective collision test.
+  // Tests for a collision between entity and any
+  // entity with otherComponent.
+
+
+  _createClass(CollisionSystem, [{
+    key: "collide",
+    value: function collide(entity, otherComponent, params) {
+      var _this = this;
+
+      return lodash__WEBPACK_IMPORTED_MODULE_0___default.a.filter(this.$tracked.collision, function (other) {
+        return other.uid !== entity.uid && other.has(otherComponent) && _this.hitTestAABB(entity, other, params);
+      });
+    }
+  }, {
+    key: "resolutionVector",
+    value: function resolutionVector(entity, other, params) {
+      var _this$anchoredPositio = this.anchoredPositions(entity, other, params),
+          x1 = _this$anchoredPositio.x1,
+          y1 = _this$anchoredPositio.y1,
+          x2 = _this$anchoredPositio.x2,
+          y2 = _this$anchoredPositio.y2;
+
+      var dirX, dirY;
+
+      if (x2 - x1 < 0) {
+        dirX = -1;
+      } else {
+        dirX = 1;
+      }
+
+      if (y2 - y1 < 0) {
+        dirY = -1;
+      } else {
+        dirY = 1;
+      }
+
+      var collision = entity.c.collision;
+      var otherCollision = other.c.collision;
+      var minApart = {
+        x: (collision.width + otherCollision.width) / 2,
+        y: (collision.height + otherCollision.height) / 2
+      };
+      var actualDisplacement = {
+        x: Math.abs(x1 - x2),
+        y: Math.abs(y1 - y2)
+      };
+      var overlap = {
+        x: actualDisplacement.x - minApart.x,
+        y: actualDisplacement.y - minApart.y
+      };
+
+      if (overlap.x > overlap.y) {
+        return {
+          x: dirX * overlap.x,
+          y: 0
+        };
+      } else if (overlap.x < overlap.y) {
+        return {
+          x: 0,
+          y: dirY * overlap.y
+        };
+      } else {
+        //if(overlap.x == overlap.y)
+        return {
+          x: dirX * overlap.x,
+          y: dirY * overlap.y
+        };
+      }
+    }
+  }, {
+    key: "hitTestAABB",
+    value: function hitTestAABB(entity, other, params) {
+      var _this$anchoredPositio2 = this.anchoredPositions(entity, other, params),
+          x1 = _this$anchoredPositio2.x1,
+          y1 = _this$anchoredPositio2.y1,
+          x2 = _this$anchoredPositio2.x2,
+          y2 = _this$anchoredPositio2.y2;
+
+      var collision = entity.c.collision;
+      var otherCollision = other.c.collision;
+      var width = (collision.width + otherCollision.width) / 2;
+      var height = (collision.height + otherCollision.height) / 2;
+
+      if (x1 + width > x2) {
+        if (x1 < x2 + width) {
+          if (y1 + height > y2) {
+            if (y1 < y2 + height) {
+              return true;
+            }
+          }
+        }
+      }
+
+      return false;
+    }
+  }, {
+    key: "anchoredPositions",
+    value: function anchoredPositions(entity, other, params) {
+      params = _objectSpread({
+        x: entity.c.position.x,
+        y: entity.c.position.y
+      }, params);
+      var result = {
+        x1: params.x,
+        y1: params.y,
+        x2: other.c.position.x,
+        y2: other.c.position.y
+      };
+      var collision = entity.c.collision;
+      var otherCollision = other.c.collision;
+      result.x1 -= (collision.anchor.x - 0.5) * collision.width;
+      result.y1 -= (collision.anchor.y - 0.5) * collision.height;
+      result.x2 -= (otherCollision.anchor.x - 0.5) * otherCollision.width;
+      result.y2 -= (otherCollision.anchor.y - 0.5) * otherCollision.height;
+      return result;
+    }
+  }]);
+
+  return CollisionSystem;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/systems/controlsSystem.js":
+/*!***************************************!*\
+  !*** ./src/systems/controlsSystem.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ControlsSystem; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var KeyState = /*#__PURE__*/function () {
+  function KeyState() {
+    _classCallCheck(this, KeyState);
+
+    this.active = false;
+    this.held = false;
+  }
+
+  _createClass(KeyState, [{
+    key: "updateHeld",
+    value: function updateHeld() {
+      if (this.active) {
+        this.held = true;
+      }
+    }
+  }, {
+    key: "press",
+    value: function press() {
+      this.active = true;
+    }
+  }, {
+    key: "release",
+    value: function release() {
+      this.active = false;
+      this.held = false;
+    }
+  }]);
+
+  return KeyState;
+}();
+
+;
+
+var ControlsSystem = /*#__PURE__*/function () {
+  function ControlsSystem() {
+    var _this = this;
+
+    _classCallCheck(this, ControlsSystem);
+
+    this._keys = {};
+    this._mousePos = {
+      x: 0,
+      y: 0
+    };
+    this._bindings = {};
+    this._mouseMappings = {
+      1: 'm1',
+      2: 'm2',
+      3: 'm3'
+    }; // Listen for input.
+
+    document.onkeydown = function (e) {
+      var code = e.which;
+
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(_this._keys, code)) {
+        _this._keys[code].press();
+
+        return false; // Prevent default.
+      }
     };
 
-    module.exports = World;
-} ());
+    document.onkeyup = function (e) {
+      var code = e.which;
 
-},{"./entity.js":146,"lodash":4}]},{},[148]);
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(_this._keys, code)) {
+        _this._keys[code].release();
+
+        return false; // Prevent default.
+      }
+    };
+
+    document.onmousedown = function (e) {
+      var code = _this._mouseMappings[e.which];
+
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(_this._keys, code)) {
+        _this._keys[code].press();
+
+        return false; // Prevent default.
+      }
+    };
+
+    document.onmouseup = function (e) {
+      var code = _this._mouseMappings[e.which];
+
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(_this._keys, code)) {
+        _this._keys[code].release();
+
+        return false; // Prevent default.
+      }
+    }; // Update mouse position.
+
+
+    document.onmousemove = function (e) {
+      _this._mousePos.x = e.offsetX;
+      _this._mousePos.y = e.offsetY;
+    }; // Disable context menu, so we can right click.
+
+
+    window.oncontextmenu = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
+  }
+
+  _createClass(ControlsSystem, [{
+    key: "getMousePos",
+    value: function getMousePos() {
+      return this._mousePos;
+    } // Add a binding.
+
+  }, {
+    key: "bind",
+    value: function bind(code, name) {
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(this._bindings, name)) {
+        console.error("".concat(name, " already bound."));
+        throw new Error('ControlAlreadyBound');
+      }
+
+      this._bindings[name] = code;
+      this._keys[code] = new KeyState();
+    } // Remove a binding.
+
+  }, {
+    key: "unbind",
+    value: function unbind() {
+      if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(this._bindings, name)) {
+        console.error("".concat(name, " not bound."));
+        throw new Error('ControlNotBound');
+      }
+
+      var code = this._bindings[name];
+      delete this._bindings[name];
+      delete this._keys[code];
+    } // Check that a key binding has been pressed.
+    // Options: once
+    // If once is true, only check for the press..
+
+  }, {
+    key: "check",
+    value: function check(binding, options) {
+      var keyCode = this._bindings[binding];
+      var key = this._keys[keyCode];
+
+      if (options && options.once) {
+        return key.active && !key.held;
+      }
+
+      return key.active;
+    }
+  }, {
+    key: "tickEnd",
+    value: function tickEnd() {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._keys, function (key) {
+        key.updateHeld();
+      });
+    }
+  }]);
+
+  return ControlsSystem;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/systems/pixiRenderSystem.js":
+/*!*****************************************!*\
+  !*** ./src/systems/pixiRenderSystem.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PixiRenderSystem; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/src/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils.js */ "./src/utils.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+var PixiRenderSystem = /*#__PURE__*/function () {
+  function PixiRenderSystem(params) {
+    var _this = this;
+
+    _classCallCheck(this, PixiRenderSystem);
+
+    params = _objectSpread({
+      width: 600,
+      height: 400
+    }, params);
+    this._stage = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Container();
+    this._stage.interactive = true;
+    this._renderer = pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.autoDetectRenderer(params.width, params.height);
+    this._sprites = {};
+    this._graphics = {};
+    this._offset = {
+      x: 0,
+      y: 0
+    }; // Getter for renderer view.
+
+    Object.defineProperty(this, 'view', {
+      get: function get() {
+        return _this._renderer.view;
+      }
+    }); // Build the system, called by world on every entity.
+
+    this.build = {
+      circle: function circle(entity) {
+        var _entity$c = entity.c,
+            circle = _entity$c.circle,
+            graphic = _entity$c.graphic;
+        var color = circle.color,
+            radius = circle.radius;
+        var anchor = graphic.anchor;
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Graphics();
+
+        _this._graphics[entity.uid].beginFill(color);
+
+        _this._graphics[entity.uid].drawCircle(-radius * anchor.x, -radius * anchor.y, circle.radius); // Look for changes to radius, redrawing if necessary.
+
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(circle, 'radius', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(circle, 'color', _this._graphics[entity.uid], 'color');
+      },
+      ellipse: function ellipse(entity) {
+        var _entity$c2 = entity.c,
+            ellipse = _entity$c2.ellipse,
+            graphic = _entity$c2.graphic;
+        var color = ellipse.color,
+            width = ellipse.width,
+            height = ellipse.height;
+        var anchor = graphic.anchor;
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Graphics();
+
+        _this._graphics[entity.uid].beginFill(color);
+
+        _this._graphics[entity.uid].drawEllipse(-width * anchor.x, -height * anchor.y, width, height); // Look for changes to dimensions, redrawing if necessary.
+
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(ellipse, 'width', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(ellipse, 'height', _this._redraw.bind(_this), entity); // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(graphic, 'anchor', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(ellipse, 'color', _this._graphics[entity.uid], 'color');
+      },
+      line: function line(entity) {
+        var line = entity.c.line;
+        var thickness = line.thickness,
+            color = line.color,
+            x1 = line.x1,
+            y1 = line.y1,
+            x2 = line.x2,
+            y2 = line.y2;
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Graphics();
+
+        _this._graphics[entity.uid].lineStyle(thickness, color, 1);
+
+        _this._graphics[entity.uid].moveTo(x1, y1);
+
+        _this._graphics[entity.uid].lineTo(x2, y2); // Look for changes to params, redrawing if necessary.
+
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(line, 'thickness', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(line, 'x1', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(line, 'y1', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(line, 'x2', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(line, 'y2', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(line, 'color', _this._graphics[entity.uid], 'color');
+      },
+      polygon: function polygon(entity) {
+        var polygon = entity.c.polygon;
+        var color = polygon.color,
+            points = polygon.points;
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Graphics();
+
+        _this._graphics[entity.uid].beginFill(color);
+
+        _this._graphics[entity.uid].drawPolygon(points);
+
+        _this._graphics[entity.uid].endFill(); // Look for changes to params, redrawing if necessary.
+
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(polygon, 'points', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(polygon, 'color', _this._graphics[entity.uid], 'color');
+      },
+      rectangle: function rectangle(entity) {
+        var _entity$c3 = entity.c,
+            graphic = _entity$c3.graphic,
+            rectangle = _entity$c3.rectangle;
+        var anchor = graphic.anchor;
+        var width = rectangle.width,
+            height = rectangle.height;
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Graphics();
+
+        _this._graphics[entity.uid].beginFill(entity.c.rectangle.color);
+
+        _this._graphics[entity.uid].drawRect(-width * anchor.x, -height * anchor.y, width, height); // Look for changes to params, redrawing if necessary.
+
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(rectangle, 'width', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(rectangle, 'height', _this._redraw.bind(_this), entity); // Primitives don't have anchors, so we look at the anchor and redraw when it changes.
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(graphic, 'anchor', _this._redraw.bind(_this), entity);
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(rectangle, 'color', _this._graphics[entity.uid], 'color');
+      },
+      sprite: function sprite(entity) {
+        var _entity$c4 = entity.c,
+            graphic = _entity$c4.graphic,
+            sprite = _entity$c4.sprite;
+        var anchor = graphic.anchor;
+        var animationSpeed = sprite.animationSpeed,
+            currentFrame = sprite.currentFrame,
+            loop = sprite.loop,
+            path = sprite.path,
+            rotation = sprite.rotation;
+        var frames; // If spritesheet.
+
+        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isArray(path)) {
+          frames = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.map(path, function (framePath) {
+            return pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Texture.fromFrame(framePath);
+          });
+        } // If array of frames.
+        else {
+            frames = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.map(path, function (framePath) {
+              return pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Texture.fromImage(framePath);
+            });
+          }
+
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.extras.MovieClip(frames); // Set and proxy framespeed.
+
+        _this._graphics[entity.uid].animationSpeed = animationSpeed;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(sprite, 'animationSpeed', _this._graphics[entity.uid], 'animationSpeed'); // Set and proxy loop.
+
+        _this._graphics[entity.uid].loop = loop;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(entity.c.sprite, 'loop', _this._graphics[entity.uid], 'loop');
+
+        _this._graphics[entity.uid].gotoAndPlay(currentFrame); // Set and proxy rotation.
+
+
+        _this._graphics[entity.uid].rotation = rotation;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(sprite, 'rotation', _this._graphics[entity.uid], 'rotation'); // Redraw on path change.
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(sprite, 'path', _this._redraw.bind(_this), entity); // Change animation frame on frame change.
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(sprite, 'currentFrame', function (currentFrame, entity) {
+          _this._graphics[entity.uid].gotoAndPlay(currentFrame);
+        }, entity); // Read only framecount property.
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["readOnlyProxy"])(sprite, 'frameCount', _this._graphics[entity.uid], 'totalFrames'); // Anchor is a Pixi property on MovieClip, so is proxied here.
+
+        _this._graphics[entity.uid].anchor = anchor;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(graphic, 'anchor', _this._graphics[entity.uid], 'anchor');
+      },
+      staticSprite: function staticSprite(entity) {
+        var _entity$c5 = entity.c,
+            graphic = _entity$c5.graphic,
+            staticSprite = _entity$c5.staticSprite;
+        var anchor = graphic.anchor;
+        var rotation = staticSprite.rotation;
+        var texture = pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Texture.fromImage(staticSprite.path);
+        _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Sprite(texture); // Set and proxy rotation.
+
+        _this._graphics[entity.uid].rotation = rotation;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(staticSprite, 'rotation', _this._graphics[entity.uid], 'rotation'); // Redraw on path change.
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["look"])(staticSprite, 'path', _this._redraw.bind(_this), entity); // Anchor is a Pixi property on Sprite, so is proxied here.
+
+        _this._graphics[entity.uid].anchor = anchor;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(graphic, 'anchor', _this._graphics[entity.uid], 'anchor');
+      },
+      text: function text(entity) {
+        var _entity$c6 = entity.c,
+            graphic = _entity$c6.graphic,
+            text = _entity$c6.text;
+        var anchor = graphic.anchor;
+        var bitmapFont = text.bitmapFont,
+            copy = text.copy,
+            rotation = text.rotation,
+            style = text.style; // Create the appropriate graphic.
+
+        if (bitmapFont) {
+          _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.extras.BitmapText(copy, style);
+        } else {
+          _this._graphics[entity.uid] = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.Text(copy, style);
+        } // Proxy text properties.
+
+
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(text, 'copy', _this._graphics[entity.uid], 'text');
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(text, 'style', _this._graphics[entity.uid], 'style'); // Set and proxy rotation.
+
+        _this._graphics[entity.uid].rotation = rotation;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(text, 'rotation', _this._graphics[entity.uid], 'rotation'); // Anchor is a Pixi property on text, so is proxied here.
+
+        _this._graphics[entity.uid].anchor = anchor;
+        Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(graphic, 'anchor', _this._graphics[entity.uid], 'anchor');
+      },
+      graphic: function graphic(entity) {
+        var graphic = entity.c.graphic; // Proxy graphic properties.
+        // Anchor is handled elsewhere.
+
+        var propertiesToProxy = ['alpha', 'scale', 'tint', 'visible', 'z'];
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(propertiesToProxy, function (property) {
+          _this._graphics[entity.uid][property] = graphic[property];
+          Object(_utils_js__WEBPACK_IMPORTED_MODULE_2__["proxy"])(graphic, property, _this._graphics[entity.uid], property);
+        }); // Add child to stage.
+
+
+        _this._stage.addChild(_this._graphics[entity.uid]); // Sort stage by depth.
+
+
+        _this._stage.children = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.sortBy(_this._stage.children, 'z'); // Refresh screen.
+
+        _this.update.graphic(entity);
+      }
+    }; // Destroy an entity from the system.
+
+    this.destroy = {
+      graphic: function graphic(entity) {
+        var uid = entity.uid;
+
+        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(_this._graphics, uid)) {
+          _this._stage.removeChild(_this._graphics[uid]);
+        }
+
+        delete _this._graphics[uid];
+      }
+    };
+    this.update = {
+      graphic: function graphic(entity) {
+        var _entity$c7 = entity.c,
+            graphic = _entity$c7.graphic,
+            position = _entity$c7.position;
+        var translate = graphic.translate,
+            relative = graphic.relative;
+        var x = translate.x;
+        var y = translate.y;
+
+        if (relative) {
+          x += position.x;
+          y += position.y;
+        }
+
+        _this._graphics[entity.uid].position.x = Math.floor(x);
+        _this._graphics[entity.uid].position.y = Math.floor(y);
+      }
+    };
+  }
+
+  _createClass(PixiRenderSystem, [{
+    key: "_redraw",
+    value: function _redraw(newValue, entity) {
+      // Remove old sprite.
+      this._stage.removeChild(this._graphics[entity.uid]);
+
+      delete this._graphics[entity.uid]; // Add new sprite.
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this.build, function (func, key) {
+        if (key === 'graphic') {
+          return;
+        }
+
+        if (entity.has(key)) {
+          func(entity);
+        }
+      });
+
+      this.build.graphic(entity);
+    } // Render stage to a renderer.
+
+  }, {
+    key: "render",
+    value: function render() {
+      this._renderer.render(this._stage);
+    }
+  }, {
+    key: "load",
+    // Preload assets.
+    value: function load(assets, callback) {
+      var loader = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.loaders.Loader();
+
+      if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isArray(assets)) {
+        assets = [assets];
+      }
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(assets, function (asset) {
+        return loader.add(asset, asset);
+      });
+
+      if (callback) {
+        loader.once('complete', callback);
+      }
+
+      loader.load();
+    }
+  }]);
+
+  return PixiRenderSystem;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/systems/roomSystem.js":
+/*!***********************************!*\
+  !*** ./src/systems/roomSystem.js ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RoomSystem; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var RoomSystem = /*#__PURE__*/function () {
+  function RoomSystem(world) {
+    _classCallCheck(this, RoomSystem);
+
+    this._rooms = {};
+    this._world = world;
+  }
+
+  _createClass(RoomSystem, [{
+    key: "saveRoom",
+    value: function saveRoom(roomName, entities) {
+      var componentBatches = entities.map(function (entity) {
+        return entity.c;
+      });
+      this._rooms[roomName] = componentBatches;
+    }
+  }, {
+    key: "loadRoom",
+    value: function loadRoom(roomName) {
+      this._world.clear();
+
+      this._world.load(this._rooms[roomName]);
+    }
+  }]);
+
+  return RoomSystem;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/systems/soundSystem.js":
+/*!************************************!*\
+  !*** ./src/systems/soundSystem.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SoundSystem; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var howler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! howler */ "./node_modules/howler/howler.js");
+/* harmony import */ var howler__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(howler__WEBPACK_IMPORTED_MODULE_1__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var SoundSystem = /*#__PURE__*/function () {
+  function SoundSystem() {
+    _classCallCheck(this, SoundSystem);
+
+    this._sounds = {};
+    this.volume = 1; // Between 0 and 1.
+  }
+
+  _createClass(SoundSystem, [{
+    key: "load",
+    value: function load(path) {
+      this._sounds[path] = new howler__WEBPACK_IMPORTED_MODULE_1___default.a.Howl({
+        urls: [path]
+      });
+      return this._sounds[path];
+    }
+  }, {
+    key: "play",
+    value: function play(path) {
+      if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(this._sounds, path)) {
+        this.load(path);
+      }
+
+      this._sounds[path]._volume = this.volume;
+
+      this._sounds[path].play();
+    }
+  }]);
+
+  return SoundSystem;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/systems/velocitySystem.js":
+/*!***************************************!*\
+  !*** ./src/systems/velocitySystem.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return VelocitySystem; });
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils.js */ "./src/utils.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+var VelocitySystem = function VelocitySystem() {
+  _classCallCheck(this, VelocitySystem);
+
+  this.update = {
+    velocity: function velocity(entity, dt) {
+      var _entity$c = entity.c,
+          position = _entity$c.position,
+          velocity = _entity$c.velocity;
+      position.x += Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["delta"])(velocity.xspeed, dt);
+      position.y += Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["delta"])(velocity.yspeed, dt);
+    }
+  };
+};
+
+
+
+/***/ }),
+
+/***/ "./src/utils.js":
+/*!**********************!*\
+  !*** ./src/utils.js ***!
+  \**********************/
+/*! exports provided: delta, proxy, readOnlyProxy, look */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "delta", function() { return delta; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "proxy", function() { return proxy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "readOnlyProxy", function() { return readOnlyProxy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "look", function() { return look; });
+function delta(speed, dt) {
+  return speed * (dt / 1000);
+}
+; // Proxy a property, simillar to the proxy in ES6.
+// Allows us to propagate changes to the target property.
+
+function proxy(originalObj, originalProp, targetObj, targetProp) {
+  Object.defineProperty(originalObj, originalProp, {
+    get: function get() {
+      return targetObj[targetProp];
+    },
+    set: function set(newValue) {
+      targetObj[targetProp] = newValue;
+    }
+  });
+}
+; // A read-only version of proxy, see above.
+
+function readOnlyProxy(originalObj, originalProp, targetObj, targetProp) {
+  Object.defineProperty(originalObj, originalProp, {
+    get: function get() {
+      return targetObj[targetProp];
+    },
+    set: function set(newValue) {
+      console.error("".concat(targetProp, " is read-only."));
+      throw new Error('ReadOnly');
+    }
+  });
+}
+; // Watches a property, executing a callback when the property changes.
+
+function look(obj, prop, callback, callbackParams) {
+  var value = obj[prop];
+  Object.defineProperty(obj, prop, {
+    get: function get() {
+      return value;
+    },
+    set: function set(newValue) {
+      value = newValue;
+      callback(newValue, callbackParams);
+    }
+  });
+}
+;
+
+/***/ })
+
+/******/ });
+//# sourceMappingURL=hitagi.js.map

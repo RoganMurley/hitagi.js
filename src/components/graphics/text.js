@@ -1,28 +1,14 @@
-(function () {
-    'use strict';
+export default class Text {
+  constructor(params) {
+    this.$id = 'text';
+    this.$deps = ['graphic'];
 
-    var _ = require('lodash');
+    params = {bitmapFont: false, rotation: 0, style: {}, ...params};
+    params.style = {font: '32px monospace', fill: 0xffffff, ...params.style};
 
-    var Text = function (params) {
-        this.$id = 'text';
-        this.$deps = ['graphic'];
-
-        params = _.extend({
-            bitmapFont: false,
-            rotation: 0,
-            style: {}
-        }, params);
-
-        params.style = _.extend({
-            font: '32px monospace',
-            fill: 0xffffff
-        }, params.style);
-
-        this.bitmapFont = params.bitmapFont;
-        this.copy = params.copy;
-        this.rotation = params.rotation;
-        this.style = params.style;
-    };
-
-    module.exports = Text;
-} ());
+    this.bitmapFont = params.bitmapFont;
+    this.copy = params.copy;
+    this.rotation = params.rotation;
+    this.style = params.style;
+  }
+}

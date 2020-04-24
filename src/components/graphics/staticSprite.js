@@ -1,19 +1,11 @@
-(function () {
-    'use strict';
+export default class StaticSprite {
+  constructor(params) {
+    this.$id = 'staticSprite';
+    this.$deps = ['graphic'];
 
-    var _ = require('lodash');
+    params = {rotation: 0, ...params};
 
-    var StaticSprite = function (params) {
-        this.$id = 'staticSprite';
-        this.$deps = ['graphic'];
-
-        params = _.extend({
-            rotation: 0
-        }, params);
-
-        this.path = params.path;
-        this.rotation = params.rotation;
-    };
-
-    module.exports = StaticSprite;
-} ());
+    this.path = params.path;
+    this.rotation = params.rotation;
+  }
+}
