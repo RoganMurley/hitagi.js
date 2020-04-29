@@ -35,6 +35,7 @@
     "@babel/preset-env": "^7.9.5",
     "babel-loader": "^8.1.0",
     "brfs": "^2.0.2",
+    "eslint": "^6.8.0",
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.8.0",
     "grunt-contrib-jshint": "^0.11.2",

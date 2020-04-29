@@ -43791,7 +43791,7 @@ var Entity = /*#__PURE__*/function () {
 
   }, {
     key: "detach",
-    value: function detach(componentID) {
+    value: function detach(componentId) {
       // Check that the component was not a dependency.
       lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this.c, function (component) {
         var dependencyExists = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.any(component.$deps, function (dep) {
@@ -43807,7 +43807,7 @@ var Entity = /*#__PURE__*/function () {
 
       var newC = _objectSpread({}, this.c);
 
-      delete newC[componentID];
+      delete newC[componentId];
       Object.seal(newC);
       this.c = newC;
 
@@ -43819,8 +43819,8 @@ var Entity = /*#__PURE__*/function () {
     }
   }, {
     key: "has",
-    value: function has(componentID) {
-      return lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(this.c, componentID);
+    value: function has(componentId) {
+      return lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(this.c, componentId);
     }
   }]);
 
@@ -43971,7 +43971,6 @@ function Basic(params) {
   }, params);
   return new _static_js__WEBPACK_IMPORTED_MODULE_0__["default"](params).attach(new _components_velocity_js__WEBPACK_IMPORTED_MODULE_1__["default"](params));
 }
-;
 
 /***/ }),
 
@@ -43992,7 +43991,6 @@ __webpack_require__.r(__webpack_exports__);
 function Body(params) {
   return new _base_js__WEBPACK_IMPORTED_MODULE_0__["default"](params).attach(new _components_collision_js__WEBPACK_IMPORTED_MODULE_1__["default"](params));
 }
-;
 
 /***/ }),
 
@@ -44025,7 +44023,6 @@ function Static(params) {
   }, params);
   return new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]().attach(new _components_position_js__WEBPACK_IMPORTED_MODULE_1__["default"](params)).attach(new _components_graphics_graphic_js__WEBPACK_IMPORTED_MODULE_2__["default"](params));
 }
-;
 
 /***/ }),
 
@@ -44046,7 +44043,6 @@ __webpack_require__.r(__webpack_exports__);
 function StaticBody(params) {
   return new _static_js__WEBPACK_IMPORTED_MODULE_0__["default"](params).attach(new _components_collision_js__WEBPACK_IMPORTED_MODULE_1__["default"](params));
 }
-;
 
 /***/ }),
 
@@ -44259,8 +44255,6 @@ var KeyState = /*#__PURE__*/function () {
 
   return KeyState;
 }();
-
-;
 
 var ControlsSystem = /*#__PURE__*/function () {
   function ControlsSystem() {
@@ -44720,10 +44714,10 @@ var PixiRenderSystem = /*#__PURE__*/function () {
     key: "render",
     value: function render() {
       this._renderer.render(this._stage);
-    }
+    } // Preload assets.
+
   }, {
     key: "load",
-    // Preload assets.
     value: function load(assets, callback) {
       var loader = new pixi_js__WEBPACK_IMPORTED_MODULE_1___default.a.loaders.Loader();
 
@@ -44905,8 +44899,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "look", function() { return look; });
 function delta(speed, dt) {
   return speed * (dt / 1000);
-}
-; // Proxy a property, simillar to the proxy in ES6.
+} // Proxy a property, simillar to the proxy in ES6.
 // Allows us to propagate changes to the target property.
 
 function proxy(originalObj, originalProp, targetObj, targetProp) {
@@ -44918,21 +44911,19 @@ function proxy(originalObj, originalProp, targetObj, targetProp) {
       targetObj[targetProp] = newValue;
     }
   });
-}
-; // A read-only version of proxy, see above.
+} // A read-only version of proxy, see above.
 
 function readOnlyProxy(originalObj, originalProp, targetObj, targetProp) {
   Object.defineProperty(originalObj, originalProp, {
     get: function get() {
       return targetObj[targetProp];
     },
-    set: function set(newValue) {
+    set: function set() {
       console.error("".concat(targetProp, " is read-only."));
       throw new Error('ReadOnly');
     }
   });
-}
-; // Watches a property, executing a callback when the property changes.
+} // Watches a property, executing a callback when the property changes.
 
 function look(obj, prop, callback, callbackParams) {
   var value = obj[prop];
@@ -44946,7 +44937,6 @@ function look(obj, prop, callback, callbackParams) {
     }
   });
 }
-;
 
 /***/ })
 

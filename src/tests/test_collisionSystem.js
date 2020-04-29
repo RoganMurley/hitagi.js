@@ -19,8 +19,8 @@
 
         var CollisionTestPrefab = function (params) {
             return new Entity()
-                        .attach(new Position(params))
-                        .attach(new Collision(params));
+                .attach(new Position(params))
+                .attach(new Collision(params));
         };
 
         beforeEach(function () {
