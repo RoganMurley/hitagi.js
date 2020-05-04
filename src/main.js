@@ -30,38 +30,38 @@ import VelocitySystem from './systems/velocitySystem.js';
 
 
 const hitagi = {
-    Entity,
-    World,
-    utils,
-    components: {
-        Collision,
-        Position,
-        Velocity,
-        graphics: {
-            Circle,
-            Ellipse,
-            Graphic,
-            Line,
-            Polygon,
-            Rectangle,
-            StaticSprite,
-            Sprite,
-            Text,
-        }
-    },
-    prefabs: {
-        Base,
-        Body,
-        Static,
-        StaticBody,
-    },
-    systems: {
-        CollisionSystem,
-        ControlsSystem,
-        PixiRenderSystem,
-        RoomSystem,
-        SoundSystem,
-        VelocitySystem,
-    },
+  Entity,
+  World,
+  utils,
+  components: {
+    Collision,
+    Position,
+    Velocity,
+    graphics: {
+      Circle,
+      Ellipse,
+      Graphic,
+      Line,
+      Polygon,
+      Rectangle,
+      StaticSprite,
+      Sprite,
+      Text,
+    }
+  },
+  prefabs: {
+    Base,
+    Body,
+    Static,
+    StaticBody,
+  },
+  systems: {
+    CollisionSystem,
+    ControlsSystem,
+    PixiRenderSystem,
+    RoomSystem,
+    SoundSystem,
+    VelocitySystem,
+  },
 };
 export default hitagi;
