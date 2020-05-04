@@ -1,14 +1,10 @@
-(function () {
-    'use strict';
+export default class Ellipse {
+  constructor(params) {
+    this.$id = 'ellipse';
+    this.$deps = ['graphic'];
 
-    var Ellipse = function (params) {
-        this.$id = 'ellipse';
-        this.$deps = ['graphic'];
-
-        this.color = params.color;
-        this.width = params.width;
-        this.height = params.height;
-    };
-
-    module.exports = Ellipse;
-} ());
+    this.color = params.color;
+    this.width = params.width;
+    this.height = params.height;
+  }
+}

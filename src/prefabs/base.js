@@ -1,21 +1,9 @@
-(function () {
-    'use strict';
+import Static from './static.js';
+import Velocity from '../components/velocity.js';
 
-    var _ = require('lodash');
 
-    var Static = require('./static.js');
-
-    var Velocity = require('../components/velocity.js');
-
-    var Basic = function (params) {
-        params = _.extend({
-            xspeed: 0,
-            yspeed: 0
-        }, params);
-
-        return new Static(params)
-            .attach(new Velocity(params));
-    };
-
-    module.exports = Basic;
-} ());
+export default function Basic(params) {
+  params = {xspeed: 0, yspeed: 0, ...params};
+  return new Static(params)
+    .attach(new Velocity(params));
+}

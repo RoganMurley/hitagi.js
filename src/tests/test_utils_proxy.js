@@ -1,63 +1,57 @@
-(function () {
-    'use strict';
+import assert from 'assert';
+import {proxy} from '../utils.js';
 
-    var assert = require('assert');
 
-    var proxy = require('../utils.js').proxy;
+describe('proxy', () => {
+  it('should proxy a property of the same name', () => {
+    const person = {name: 'Senjougahara'};
+    const robot = {name: ''};
 
-    describe('proxy', function () {
+    proxy(person, 'name', robot, 'name');
+    person.name = 'Araragi';
 
-        it('should proxy a property of the same name', function () {
-            var person = {name: 'Senjougahara'};
-            var robot = {name: ''};
+    assert.equal(person.name, robot.name);
+  });
 
-            proxy(person, 'name', robot, 'name');
-            person.name = 'Araragi';
+  it('should proxy a property of a different name', () => {
+    const person = {name: 'Senjougahara'};
+    const robot = {serialNumber: ''};
 
-            assert.equal(person.name, robot.name);
-        });
+    proxy(person, 'name', robot, 'serialNumber');
+    person.name = 'Araragi';
 
-        it('should proxy a property of a different name', function () {
-            var person = {name: 'Senjougahara'};
-            var robot = {serialNumber: ''};
+    assert.equal(person.name, robot.serialNumber);
+  });
 
-            proxy(person, 'name', robot, 'serialNumber');
-            person.name = 'Araragi';
+  it('should proxy POJOs', function () {
+    const myPoint = {
+      position: {
+        x: 0,
+        y: 0
+      }
+    };
+    const yourPoint = {
+      position: {
+        x: 0,
+        y: 0
+      }
+    };
 
-            assert.equal(person.name, robot.serialNumber);
-        });
+    proxy(myPoint, 'position', yourPoint, 'position');
 
-        it('should proxy POJOs', function () {
-            var myPoint = {
-                position: {
-                    x: 0,
-                    y: 0
-                }
-            };
-            var yourPoint = {
-                position: {
-                    x: 0,
-                    y: 0
-                }
-            };
+    myPoint.position.x = 1;
+    assert.equal(myPoint.position.x, 1);
+    assert.equal(myPoint.position.y, 0);
 
-            proxy(myPoint, 'position', yourPoint, 'position');
+    myPoint.position.y = 1;
+    assert.equal(myPoint.position.x, 1);
+    assert.equal(myPoint.position.y, 1);
 
-            myPoint.position.x = 1;
-            assert.equal(myPoint.position.x, 1);
-            assert.equal(myPoint.position.y, 0);
-
-            myPoint.position.y = 1;
-            assert.equal(myPoint.position.x, 1);
-            assert.equal(myPoint.position.y, 1);
-
-            myPoint.position = {
-                x: 10,
-                y: 11
-            };
-            assert.equal(myPoint.position.x, 10);
-            assert.equal(myPoint.position.y, 11);
-        });
-    });
-
-} ());
+    myPoint.position = {
+      x: 10,
+      y: 11
+    };
+    assert.equal(myPoint.position.x, 10);
+    assert.equal(myPoint.position.y, 11);
+  });
+});

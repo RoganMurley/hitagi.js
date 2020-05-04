@@ -1,28 +1,23 @@
-(function () {
-    'use strict';
+import _ from 'lodash';
+import Howler from 'howler';
 
-    var _ = require('lodash');
-    var Howler = require('howler');
 
-    var SoundSystem = function () {
-        var that = this,
-            sounds = {};
+export default class SoundSystem {
+  constructor() {
+    this._sounds = {};
+    this.volume = 1; // Between 0 and 1.
+  }
 
-        this.volume = 1; // Between 0 and 1
+  load(path) {
+    this._sounds[path] = new Howler.Howl({urls: [path]});
+    return this._sounds[path];
+  }
 
-        this.load = function (path) {
-            sounds[path] = new Howler.Howl({urls: [path]});
-            return sounds[path];
-        };
-
-        this.play = function (path) {
-            if (!_.has(sounds, path)) {
-                that.load(path);
-            }
-            sounds[path]._volume = that.volume;
-            sounds[path].play();
-        };
-    };
-
-    module.exports = SoundSystem;
-} ());
+  play(path) {
+    if (!_.has(this._sounds, path)) {
+      this.load(path);
+    }
+    this._sounds[path]._volume = this.volume;
+    this._sounds[path].play();
+  }
+}

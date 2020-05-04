@@ -1,13 +1,9 @@
-(function () {
-    'use strict';
+export default class Polygon {
+  constructor(params) {
+    this.$id = 'polygon';
+    this.$deps = ['graphic'];
 
-    var Polygon = function (params) {
-        this.$id = 'polygon';
-        this.$deps = ['graphic'];
-
-        this.color = params.color;
-        this.points = params.points;
-    };
-
-    module.exports = Polygon;
-} ());
+    this.color = params.color;
+    this.points = params.points;
+  }
+}

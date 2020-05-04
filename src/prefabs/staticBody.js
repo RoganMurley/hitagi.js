@@ -1,14 +1,8 @@
-(function () {
-    'use strict';
+import Static from './static.js';
+import Collision from '../components/collision.js';
 
-    var Static = require('./static.js');
 
-    var Collision = require('../components/collision.js');
-
-    var StaticBody = function (params) {
-        return new Static(params)
-            .attach(new Collision(params));
-    };
-
-    module.exports = StaticBody;
-} ());
+export default function StaticBody(params) {
+  return new Static(params)
+    .attach(new Collision(params));
+}

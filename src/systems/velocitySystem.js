@@ -1,17 +1,13 @@
-(function () {
-    'use strict';
+import { delta } from '../utils.js';
 
-    var utils = require('../utils.js');
-
-    var VelocitySystem = function () {
-
-        this.update = {
-            velocity: function (entity, dt) {
-                entity.c.position.x += utils.delta(entity.c.velocity.xspeed, dt);
-                entity.c.position.y += utils.delta(entity.c.velocity.yspeed, dt);
-            }
-        };
+export default class VelocitySystem {
+  constructor() {
+    this.update = {
+      velocity: (entity, dt) => {
+        const {position, velocity} = entity.c;
+        position.x += delta(velocity.xspeed, dt);
+        position.y += delta(velocity.yspeed, dt);
+      }
     };
-
-    module.exports = VelocitySystem;
-} ());
+  }
+}

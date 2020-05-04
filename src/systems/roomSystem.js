@@ -1,21 +1,16 @@
-(function () {
-    'use strict';
+export default class RoomSystem {
+  constructor(world) {
+    this._rooms = {};
+    this._world = world;
+  }
 
-    var _ = require('lodash');
+  saveRoom(roomName, entities) {
+    const componentBatches = entities.map(entity => entity.c);
+    this._rooms[roomName] = componentBatches;
+  }
 
-    var RoomSystem = function (world) {
-        var rooms = {};
-
-        this.saveRoom = function (roomName, entities) {
-            var componentBatches = _.pluck(entities, 'c');
-            rooms[roomName] = componentBatches;
-        };
-
-        this.loadRoom = function (roomName) {
-            world.clear();
-            world.load(rooms[roomName]);
-        };
-    };
-
-    module.exports = RoomSystem;
-} ());
+  loadRoom(roomName) {
+    this._world.clear();
+    this._world.load(this._rooms[roomName]);
+  }
+}

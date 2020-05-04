@@ -1,13 +1,9 @@
-(function () {
-    'use strict';
+export default class Circle {
+  constructor(params) {
+    this.$id = 'circle';
+    this.$deps = ['graphic'];
 
-    var Circle = function (params) {
-        this.$id = 'circle';
-        this.$deps = ['graphic'];
-
-        this.color = params.color;
-        this.radius = params.radius;
-    };
-
-    module.exports = Circle;
-} ());
+    this.color = params.color;
+    this.radius = params.radius;
+  }
+}

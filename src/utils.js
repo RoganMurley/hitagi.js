@@ -1,73 +1,48 @@
-(function () {
-    'use strict';
+export function delta(speed, dt) {
+  return speed * (dt / 1000);
+}
 
-    var _ = require('lodash');
 
-    var Utils = {
+// Proxy a property, simillar to the proxy in ES6.
+// Allows us to propagate changes to the target property.
+export function proxy(originalObj, originalProp, targetObj, targetProp) {
+  Object.defineProperty(
+    originalObj,
+    originalProp,
+    {
+      get: () => targetObj[targetProp],
+      set: (newValue) => {
+        targetObj[targetProp] = newValue;
+      },
+    },
+  );
+}
 
-        // Transform a speed by our delta time.
-        delta:
-            function (speed, dt) {
-                return speed * (dt / 1000);
-            },
 
-        // Proxy a property, simillar to the proxy in ES6.
-        // Allows us to propagate changes to the target property.
-        proxy:
-            function (originalObj, originalProp, targetObj, targetProp) {
-                Object.defineProperty(
-                    originalObj,
-                    originalProp,
-                    {
-                        get: function () {
-                            return targetObj[targetProp];
-                        },
-                        set: function (newValue) {
-                            targetObj[targetProp] = newValue;
-                        }
-                    }
-                );
-            },
+// A read-only version of proxy, see above.
+export function readOnlyProxy(originalObj, originalProp, targetObj, targetProp) {
+  Object.defineProperty(
+    originalObj,
+    originalProp,
+    {
+      get: () => targetObj[targetProp],
+      set: () => {
+        console.error(`${targetProp} is read-only.`);
+        throw new Error('ReadOnly');
+      },
+    },
+  );
+}
 
-        // A read-only version of proxy, see above.
-        readOnlyProxy:
-            function (originalObj, originalProp, targetObj, targetProp) {
-                Object.defineProperty(
-                    originalObj,
-                    originalProp,
-                    {
-                        get: function () {
-                            return targetObj[targetProp];
-                        },
-                        set: function (newValue) {
-                            console.error(targetProp + ' is read-only.');
-                            throw new Error('ReadOnly');
-                        }
-                    }
-                );
-            },
 
-        // Watches a property, executing a callback when the property changes.
-        look:
-            function (obj, prop, callback, callbackParams) {
-                var value = obj[prop];
-
-                Object.defineProperty(
-                    obj,
-                    prop,
-                    {
-                        get: function () {
-                            return value;
-                        },
-                        set: function (newValue) {
-                            value = newValue;
-                            callback(newValue, callbackParams);
-                        }
-                    }
-                );
-            }
-
-    };
-
-    module.exports = Utils;
-} ());
+// Watches a property, executing a callback when the property changes.
+export function look(obj, prop, callback, callbackParams) {
+  let value = obj[prop];
+  Object.defineProperty(obj, prop, {
+    get: () => value,
+    set: (newValue) => {
+      value = newValue;
+      callback(newValue, callbackParams);
+    },
+  });
+}

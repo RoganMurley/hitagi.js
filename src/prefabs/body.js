@@ -1,14 +1,8 @@
-(function () {
-    'use strict';
+import Base from './base.js';
+import Collision from '../components/collision.js';
 
-    var Base = require('./base.js');
 
-    var Collision = require('../components/collision.js');
-
-    var Body = function (params) {
-        return new Base(params)
-            .attach(new Collision(params));
-    };
-
-    module.exports = Body;
-} ());
+export default function Body(params) {
+  return new Base(params)
+    .attach(new Collision(params));
+}
