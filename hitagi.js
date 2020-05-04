@@ -1358,7 +1358,7 @@
 
 }());
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../../node-libs-browser/node_modules/timers-browserify/main.js */ "./node_modules/node-libs-browser/node_modules/timers-browserify/main.js").setImmediate, __webpack_require__(/*! ./../../process/browser.js */ "./node_modules/process/browser.js")))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../../webpack/node_modules/timers-browserify/main.js */ "./node_modules/webpack/node_modules/timers-browserify/main.js").setImmediate, __webpack_require__(/*! ./../../webpack/node_modules/process/browser.js */ "./node_modules/webpack/node_modules/process/browser.js")))
 
 /***/ }),
 
@@ -16069,81 +16069,6 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ "./node_modules/node-libs-browser/node_modules/timers-browserify/main.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/node-libs-browser/node_modules/timers-browserify/main.js ***!
-  \*******************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
-            (typeof self !== "undefined" && self) ||
-            window;
-var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(scope, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(/*! setimmediate */ "./node_modules/setimmediate/setImmediate.js");
-// On some exotic environments, it's not clear which object `setimmediate` was
-// able to install onto.  Search each possibility in the same order as the
-// `setimmediate` library.
-exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
-                       (typeof global !== "undefined" && global.setImmediate) ||
-                       (this && this.setImmediate);
-exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
-                         (typeof global !== "undefined" && global.clearImmediate) ||
-                         (this && this.clearImmediate);
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
-
-/***/ }),
-
 /***/ "./node_modules/object-assign/index.js":
 /*!*********************************************!*\
   !*** ./node_modules/object-assign/index.js ***!
@@ -16285,320 +16210,6 @@ module.exports = function parseURI (str, opts) {
   return uri
 }
 
-
-/***/ }),
-
-/***/ "./node_modules/path-browserify/index.js":
-/*!***********************************************!*\
-  !*** ./node_modules/path-browserify/index.js ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(process) {// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
-// backported and transplited with Babel, with backwards-compat fixes
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function(path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function(path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-
-// path.relative(from, to)
-// posix version
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function (path) {
-  if (typeof path !== 'string') path = path + '';
-  if (path.length === 0) return '.';
-  var code = path.charCodeAt(0);
-  var hasRoot = code === 47 /*/*/;
-  var end = -1;
-  var matchedSlash = true;
-  for (var i = path.length - 1; i >= 1; --i) {
-    code = path.charCodeAt(i);
-    if (code === 47 /*/*/) {
-        if (!matchedSlash) {
-          end = i;
-          break;
-        }
-      } else {
-      // We saw the first non-path separator
-      matchedSlash = false;
-    }
-  }
-
-  if (end === -1) return hasRoot ? '/' : '.';
-  if (hasRoot && end === 1) {
-    // return '//';
-    // Backwards-compat fix:
-    return '/';
-  }
-  return path.slice(0, end);
-};
-
-function basename(path) {
-  if (typeof path !== 'string') path = path + '';
-
-  var start = 0;
-  var end = -1;
-  var matchedSlash = true;
-  var i;
-
-  for (i = path.length - 1; i >= 0; --i) {
-    if (path.charCodeAt(i) === 47 /*/*/) {
-        // If we reached a path separator that was not part of a set of path
-        // separators at the end of the string, stop now
-        if (!matchedSlash) {
-          start = i + 1;
-          break;
-        }
-      } else if (end === -1) {
-      // We saw the first non-path separator, mark this as the end of our
-      // path component
-      matchedSlash = false;
-      end = i + 1;
-    }
-  }
-
-  if (end === -1) return '';
-  return path.slice(start, end);
-}
-
-// Uses a mixed approach for backwards-compatibility, as ext behavior changed
-// in new Node.js versions, so only basename() above is backported here
-exports.basename = function (path, ext) {
-  var f = basename(path);
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-};
-
-exports.extname = function (path) {
-  if (typeof path !== 'string') path = path + '';
-  var startDot = -1;
-  var startPart = 0;
-  var end = -1;
-  var matchedSlash = true;
-  // Track the state of characters (if any) we see before our first dot and
-  // after any path separator we find
-  var preDotState = 0;
-  for (var i = path.length - 1; i >= 0; --i) {
-    var code = path.charCodeAt(i);
-    if (code === 47 /*/*/) {
-        // If we reached a path separator that was not part of a set of path
-        // separators at the end of the string, stop now
-        if (!matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-    if (end === -1) {
-      // We saw the first non-path separator, mark this as the end of our
-      // extension
-      matchedSlash = false;
-      end = i + 1;
-    }
-    if (code === 46 /*.*/) {
-        // If this is our first dot, mark it as the start of our extension
-        if (startDot === -1)
-          startDot = i;
-        else if (preDotState !== 1)
-          preDotState = 1;
-    } else if (startDot !== -1) {
-      // We saw a non-dot and non-path separator before our dot, so we should
-      // have a good chance at having a non-empty extension
-      preDotState = -1;
-    }
-  }
-
-  if (startDot === -1 || end === -1 ||
-      // We saw a non-dot character immediately before the dot
-      preDotState === 0 ||
-      // The (right-most) trimmed path component is exactly '..'
-      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-    return '';
-  }
-  return path.slice(startDot, end);
-};
-
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b'
-    ? function (str, start, len) { return str.substr(start, len) }
-    : function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    }
-;
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
 
 /***/ }),
 
@@ -38491,7 +38102,7 @@ module.exports = interactiveTarget;
 var Resource = __webpack_require__(/*! resource-loader */ "./node_modules/resource-loader/src/index.js").Resource,
     core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
     extras = __webpack_require__(/*! ../extras */ "./node_modules/pixi.js/src/extras/index.js"),
-    path = __webpack_require__(/*! path */ "./node_modules/path-browserify/index.js");
+    path = __webpack_require__(/*! path */ "./node_modules/webpack/node_modules/path-browserify/index.js");
 
 
 function parse(resource, texture) {
@@ -38723,7 +38334,7 @@ Resource.setExtensionXhrType('fnt', Resource.XHR_RESPONSE_TYPE.DOCUMENT);
 /***/ (function(module, exports, __webpack_require__) {
 
 var Resource = __webpack_require__(/*! resource-loader */ "./node_modules/resource-loader/src/index.js").Resource,
-    path = __webpack_require__(/*! path */ "./node_modules/path-browserify/index.js"),
+    path = __webpack_require__(/*! path */ "./node_modules/webpack/node_modules/path-browserify/index.js"),
     core = __webpack_require__(/*! ../core */ "./node_modules/pixi.js/src/core/index.js"),
     async = __webpack_require__(/*! async */ "./node_modules/async/lib/async.js");
 
@@ -40187,201 +39798,6 @@ if (!global.cancelAnimationFrame) {
 }
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
-
-/***/ }),
-
-/***/ "./node_modules/process/browser.js":
-/*!*****************************************!*\
-  !*** ./node_modules/process/browser.js ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
 
 /***/ }),
 
@@ -42567,10 +41983,583 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ "./node_modules/setimmediate/setImmediate.js":
-/*!***************************************************!*\
-  !*** ./node_modules/setimmediate/setImmediate.js ***!
-  \***************************************************/
+/***/ "./node_modules/webpack/buildin/global.js":
+/*!***********************************!*\
+  !*** (webpack)/buildin/global.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+
+/***/ "./node_modules/webpack/buildin/module.js":
+/*!***********************************!*\
+  !*** (webpack)/buildin/module.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/webpack/node_modules/path-browserify/index.js":
+/*!*******************************************************!*\
+  !*** (webpack)/node_modules/path-browserify/index.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
+// backported and transplited with Babel, with backwards-compat fixes
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function(path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+
+// path.relative(from, to)
+// posix version
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  if (path.length === 0) return '.';
+  var code = path.charCodeAt(0);
+  var hasRoot = code === 47 /*/*/;
+  var end = -1;
+  var matchedSlash = true;
+  for (var i = path.length - 1; i >= 1; --i) {
+    code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        if (!matchedSlash) {
+          end = i;
+          break;
+        }
+      } else {
+      // We saw the first non-path separator
+      matchedSlash = false;
+    }
+  }
+
+  if (end === -1) return hasRoot ? '/' : '.';
+  if (hasRoot && end === 1) {
+    // return '//';
+    // Backwards-compat fix:
+    return '/';
+  }
+  return path.slice(0, end);
+};
+
+function basename(path) {
+  if (typeof path !== 'string') path = path + '';
+
+  var start = 0;
+  var end = -1;
+  var matchedSlash = true;
+  var i;
+
+  for (i = path.length - 1; i >= 0; --i) {
+    if (path.charCodeAt(i) === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          start = i + 1;
+          break;
+        }
+      } else if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // path component
+      matchedSlash = false;
+      end = i + 1;
+    }
+  }
+
+  if (end === -1) return '';
+  return path.slice(start, end);
+}
+
+// Uses a mixed approach for backwards-compatibility, as ext behavior changed
+// in new Node.js versions, so only basename() above is backported here
+exports.basename = function (path, ext) {
+  var f = basename(path);
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+exports.extname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  var startDot = -1;
+  var startPart = 0;
+  var end = -1;
+  var matchedSlash = true;
+  // Track the state of characters (if any) we see before our first dot and
+  // after any path separator we find
+  var preDotState = 0;
+  for (var i = path.length - 1; i >= 0; --i) {
+    var code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          startPart = i + 1;
+          break;
+        }
+        continue;
+      }
+    if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // extension
+      matchedSlash = false;
+      end = i + 1;
+    }
+    if (code === 46 /*.*/) {
+        // If this is our first dot, mark it as the start of our extension
+        if (startDot === -1)
+          startDot = i;
+        else if (preDotState !== 1)
+          preDotState = 1;
+    } else if (startDot !== -1) {
+      // We saw a non-dot and non-path separator before our dot, so we should
+      // have a good chance at having a non-empty extension
+      preDotState = -1;
+    }
+  }
+
+  if (startDot === -1 || end === -1 ||
+      // We saw a non-dot character immediately before the dot
+      preDotState === 0 ||
+      // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+    return '';
+  }
+  return path.slice(startDot, end);
+};
+
+function filter (xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b'
+    ? function (str, start, len) { return str.substr(start, len) }
+    : function (str, start, len) {
+        if (start < 0) start = str.length + start;
+        return str.substr(start, len);
+    }
+;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../process/browser.js */ "./node_modules/webpack/node_modules/process/browser.js")))
+
+/***/ }),
+
+/***/ "./node_modules/webpack/node_modules/process/browser.js":
+/*!*************************************************!*\
+  !*** (webpack)/node_modules/process/browser.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+
+/***/ "./node_modules/webpack/node_modules/setimmediate/setImmediate.js":
+/*!***********************************************************!*\
+  !*** (webpack)/node_modules/setimmediate/setImmediate.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -42761,489 +42750,82 @@ module.exports = function () {
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../process/browser.js */ "./node_modules/webpack/node_modules/process/browser.js")))
 
 /***/ }),
 
-/***/ "./node_modules/webpack/buildin/global.js":
-/*!***********************************!*\
-  !*** (webpack)/buildin/global.js ***!
-  \***********************************/
+/***/ "./node_modules/webpack/node_modules/timers-browserify/main.js":
+/*!********************************************************!*\
+  !*** (webpack)/node_modules/timers-browserify/main.js ***!
+  \********************************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-var g;
+/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
+            (typeof self !== "undefined" && self) ||
+            window;
+var apply = Function.prototype.apply;
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
+// DOM APIs, for completeness
 
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
 }
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-
-/***/ "./node_modules/webpack/buildin/module.js":
-/*!***********************************!*\
-  !*** (webpack)/buildin/module.js ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if (!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(scope, this._id);
 };
 
-
-/***/ }),
-
-/***/ "./src/World.js":
-/*!**********************!*\
-  !*** ./src/World.js ***!
-  \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return World; });
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./entity.js */ "./src/entity.js");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-var World = /*#__PURE__*/function () {
-  function World() {
-    _classCallCheck(this, World);
-
-    this._entities = {};
-    this._systems = {};
-  } // Update the game by one tick.
-
-
-  _createClass(World, [{
-    key: "tick",
-    value: function tick(dt) {
-      this.tickStart(dt);
-      this.update(dt);
-      this.tickEnd(dt);
-    } // Add an entity to the world.
-
-  }, {
-    key: "add",
-    value: function add(entity) {
-      entity.world = this;
-      this._entities[entity.uid] = entity;
-      this.build(entity);
-      this.track(entity);
-      return entity;
-    } // Remove an entity from the world.
-
-  }, {
-    key: "remove",
-    value: function remove(entity) {
-      this.destroy(entity);
-      this.untrack(entity);
-      delete this._entities[entity.uid];
-    } // Register a system to the world.
-
-  }, {
-    key: "register",
-    value: function register(system) {
-      var _this = this;
-
-      system.$uid = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.uniqueId();
-      this._systems[system.$uid] = system;
-      this.setupTracking(system);
-
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
-        return _this.rebuild(entity);
-      });
-
-      return system;
-    } // Deregister a system from the world.
-
-  }, {
-    key: "deregister",
-    value: function deregister(system) {
-      if (system.deregister) {
-        system.deregister();
-      }
-
-      delete this._systems[system.$uid];
-    } // Rebuild an entity with all registered systems.
-
-  }, {
-    key: "rebuild",
-    value: function rebuild(entity, just) {
-      this.destroy(entity, just);
-      this.untrack(entity);
-      this.build(entity, just);
-      this.track(entity);
-    } // Clear all entities from the world and systems.
-
-  }, {
-    key: "clear",
-    value: function clear() {
-      var _this2 = this;
-
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
-        _this2.destroy(entity);
-
-        _this2.untrack(entity);
-      });
-
-      this._entities = {};
-    } // Save the world's entities as JSON.
-
-  }, {
-    key: "save",
-    value: function save() {
-      var saved = [];
-
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
-        var copy = {};
-
-        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(entity.c, function (component) {
-          copy[component.$id] = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.clone(component);
-        });
-
-        saved.push(copy);
-      });
-
-      return saved;
-    } // Load entities from JSON into the world.
-
-  }, {
-    key: "load",
-    value: function load(componentBatches) {
-      var _this3 = this;
-
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(componentBatches, function (componentBatch) {
-        var newEntity = new _entity_js__WEBPACK_IMPORTED_MODULE_1__["default"]();
-        var newC = {};
-
-        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(componentBatch, function (component) {
-          newC[component.$id] = _objectSpread({}, component);
-        });
-
-        newEntity.c = newC;
-
-        _this3.add(newEntity);
-      });
-    } // Call all registered system's tick start function.
-
-  }, {
-    key: "tickStart",
-    value: function tickStart(dt) {
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (system.tickStart) {
-          system.tickStart(dt);
-        }
-      });
-    } // Call all registered system's update function, passing a timestep.
-
-  }, {
-    key: "update",
-    value: function update(dt) {
-      var _this4 = this;
-
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (system.update) {
-          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(_this4._entities, function (entity) {
-            if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(entity)) {
-              lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.update, function (func, id) {
-                if (entity.has(id)) {
-                  func(entity, dt);
-                }
-              });
-            }
-          });
-        }
-      });
-    } // Call all registered system's tick end function.
-
-  }, {
-    key: "tickEnd",
-    value: function tickEnd(dt) {
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (system.tickEnd) {
-          system.tickEnd(dt);
-        }
-      });
-    } // Build an entity in all registered systems.
-    // If 'just' is given, just systems that deal with that
-    // component build the entity rather than all.
-
-  }, {
-    key: "build",
-    value: function build(entity, just) {
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (system.build) {
-          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.build, function (func, id) {
-            if (entity.has(id)) {
-              // Only build in tracking systems.
-              if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(just)) {
-                if (id !== just) {
-                  return;
-                }
-              } // Perform build.
-
-
-              func(entity);
-            }
-          });
-        }
-      });
-    } // Destroys an entity in all registered systems.
-    // If 'just' is given, just systems that deal with that
-    // component destroy the entity rather than all.
-
-  }, {
-    key: "destroy",
-    value: function destroy(entity, just) {
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (system.destroy) {
-          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.destroy, function (func, id) {
-            if (entity.has(id)) {
-              // Only remove from tracking systems.
-              if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(just)) {
-                if (id !== just) {
-                  return;
-                }
-              } // Perform the remove.
-
-
-              func(entity);
-            }
-          });
-        }
-      });
-    } // Setup tracking on a system.
-    // Creates the appropriate data structure on the $tracked object.
-
-  }, {
-    key: "setupTracking",
-    value: function setupTracking(system) {
-      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
-        system.$tracked = {};
-
-        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
-          switch (trackingType) {
-            case 'many':
-              system.$tracked[id] = {};
-              break;
-
-            case 'single':
-              system.$tracked[id] = null;
-              break;
-
-            default:
-              throw new Error('UnknownTrackingType');
-          }
-        });
-      }
-    } // Make systems track a given entity.
-    // The entity will be referenced by the $tracked object.
-
-  }, {
-    key: "track",
-    value: function track(entity) {
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
-          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
-            if (entity.has(id)) {
-              switch (trackingType) {
-                case 'many':
-                  system.$tracked[id][entity.uid] = entity;
-                  break;
-
-                case 'single':
-                  if (system.$tracked[id] === null) {
-                    system.$tracked[id] = entity;
-                  } else {
-                    throw new Error('ExpectedSingleEntity');
-                  }
-
-                  break;
-
-                default:
-                  throw new Error('UnknownTrackingType');
-              }
-            }
-          });
-        }
-      });
-    } // Stop systems from tracking a given entity.
-    // The entity will no longer be referenced by the $tracked object
-    // until it is tracked again.
-
-  }, {
-    key: "untrack",
-    value: function untrack(entity) {
-      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
-        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
-          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
-            if (entity.has(id)) {
-              switch (trackingType) {
-                case 'many':
-                  delete system.$tracked[id][entity.uid];
-                  break;
-
-                case 'single':
-                  system.$tracked[id] = null;
-                  break;
-
-                default:
-                  throw new Error('UnknownTrackingType');
-              }
-            }
-          });
-        }
-      });
-    }
-  }]);
-
-  return World;
-}();
-
-
-
-/***/ }),
-
-/***/ "./src/components/Collision.js":
-/*!*************************************!*\
-  !*** ./src/components/Collision.js ***!
-  \*************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Collision; });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Collision = // Represents the collision boundaries of an entity.
-function Collision(params) {
-  _classCallCheck(this, Collision);
-
-  this.$id = 'collision';
-  this.$deps = ['position'];
-  params = _objectSpread({
-    anchor: {
-      x: 0.5,
-      y: 0.5
-    }
-  }, params);
-  this.width = params.width;
-  this.height = params.height;
-  this.anchor = params.anchor;
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
 };
 
-
-
-/***/ }),
-
-/***/ "./src/components/Position.js":
-/*!************************************!*\
-  !*** ./src/components/Position.js ***!
-  \************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Position; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Position = // Represents an entity's position in 2D space.
-function Position(params) {
-  _classCallCheck(this, Position);
-
-  this.$id = 'position';
-  this.$deps = [];
-  this.x = params.x;
-  this.y = params.y;
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
 };
 
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
 
-
-/***/ }),
-
-/***/ "./src/components/Velocity.js":
-/*!************************************!*\
-  !*** ./src/components/Velocity.js ***!
-  \************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Velocity; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Velocity = // Represents an entity's velocity in 2D space.
-function Velocity(params) {
-  _classCallCheck(this, Velocity);
-
-  this.$id = 'velocity';
-  this.$deps = ['position'];
-  this.xspeed = params.xspeed;
-  this.yspeed = params.yspeed;
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
 };
 
+// setimmediate attaches itself to the global object
+__webpack_require__(/*! setimmediate */ "./node_modules/webpack/node_modules/setimmediate/setImmediate.js");
+// On some exotic environments, it's not clear which object `setimmediate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
 
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
@@ -43286,9 +42868,9 @@ function Collision(params) {
 
 /***/ }),
 
-/***/ "./src/components/graphics/Circle.js":
+/***/ "./src/components/graphics/circle.js":
 /*!*******************************************!*\
-  !*** ./src/components/graphics/Circle.js ***!
+  !*** ./src/components/graphics/circle.js ***!
   \*******************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -43311,9 +42893,9 @@ var Circle = function Circle(params) {
 
 /***/ }),
 
-/***/ "./src/components/graphics/Ellipse.js":
+/***/ "./src/components/graphics/ellipse.js":
 /*!********************************************!*\
-  !*** ./src/components/graphics/Ellipse.js ***!
+  !*** ./src/components/graphics/ellipse.js ***!
   \********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -43331,272 +42913,6 @@ var Ellipse = function Ellipse(params) {
   this.color = params.color;
   this.width = params.width;
   this.height = params.height;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/Graphic.js":
-/*!********************************************!*\
-  !*** ./src/components/graphics/Graphic.js ***!
-  \********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Graphic; });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Graphic = function Graphic(params) {
-  _classCallCheck(this, Graphic);
-
-  this.$id = 'graphic';
-  this.$deps = []; // Position dependency added later if relative positioning is true.
-
-  params = _objectSpread({
-    alpha: 1,
-    anchor: {
-      x: 0.5,
-      y: 0.5
-    },
-    relative: true,
-    scale: {
-      x: 1,
-      y: 1
-    },
-    tint: 0xffffff,
-    translate: {
-      x: 0,
-      y: 0
-    },
-    visible: true,
-    z: 0
-  }, params);
-
-  if (params.relative) {
-    this.$deps.push('position');
-  }
-
-  this.alpha = params.alpha;
-  this.anchor = params.anchor;
-  this.relative = params.relative;
-  this.scale = params.scale;
-  this.tint = params.tint;
-  this.translate = params.translate;
-  this.visible = params.visible;
-  this.z = params.z;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/Line.js":
-/*!*****************************************!*\
-  !*** ./src/components/graphics/Line.js ***!
-  \*****************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Line; });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Line = function Line(params) {
-  _classCallCheck(this, Line);
-
-  this.$id = 'line';
-  this.$deps = ['graphic'];
-  params = _objectSpread({
-    thickness: 1
-  }, params);
-  this.thickness = params.thickness;
-  this.x1 = params.x1;
-  this.y1 = params.y1;
-  this.x2 = params.x2;
-  this.y2 = params.y2;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/Polygon.js":
-/*!********************************************!*\
-  !*** ./src/components/graphics/Polygon.js ***!
-  \********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Polygon; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Polygon = function Polygon(params) {
-  _classCallCheck(this, Polygon);
-
-  this.$id = 'polygon';
-  this.$deps = ['graphic'];
-  this.color = params.color;
-  this.points = params.points;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/Rectangle.js":
-/*!**********************************************!*\
-  !*** ./src/components/graphics/Rectangle.js ***!
-  \**********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Rectangle; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Rectangle = function Rectangle(params) {
-  _classCallCheck(this, Rectangle);
-
-  this.$id = 'rectangle';
-  this.$deps = ['graphic'];
-  this.color = params.color;
-  this.width = params.width;
-  this.height = params.height;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/Sprite.js":
-/*!*******************************************!*\
-  !*** ./src/components/graphics/Sprite.js ***!
-  \*******************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Sprite; });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Sprite = function Sprite(params) {
-  _classCallCheck(this, Sprite);
-
-  this.$id = 'sprite';
-  this.$deps = ['graphic'];
-  params = _objectSpread({
-    animationSpeed: 1,
-    currentFrame: 1,
-    loop: true,
-    rotation: 0
-  }, params);
-  this.animationSpeed = params.animationSpeed;
-  this.currentFrame = params.currentFrame;
-  this.loop = params.loop;
-  this.path = params.path;
-  this.rotation = params.rotation;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/StaticSprite.js":
-/*!*************************************************!*\
-  !*** ./src/components/graphics/StaticSprite.js ***!
-  \*************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return StaticSprite; });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var StaticSprite = function StaticSprite(params) {
-  _classCallCheck(this, StaticSprite);
-
-  this.$id = 'staticSprite';
-  this.$deps = ['graphic'];
-  params = _objectSpread({
-    rotation: 0
-  }, params);
-  this.path = params.path;
-  this.rotation = params.rotation;
-};
-
-
-
-/***/ }),
-
-/***/ "./src/components/graphics/Text.js":
-/*!*****************************************!*\
-  !*** ./src/components/graphics/Text.js ***!
-  \*****************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Text; });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Text = function Text(params) {
-  _classCallCheck(this, Text);
-
-  this.$id = 'text';
-  this.$deps = ['graphic'];
-  params = _objectSpread({
-    bitmapFont: false,
-    rotation: 0,
-    style: {}
-  }, params);
-  params.style = _objectSpread({
-    font: '32px monospace',
-    fill: 0xffffff
-  }, params.style);
-  this.bitmapFont = params.bitmapFont;
-  this.copy = params.copy;
-  this.rotation = params.rotation;
-  this.style = params.style;
 };
 
 
@@ -43659,6 +42975,210 @@ var Graphic = function Graphic(params) {
   this.translate = params.translate;
   this.visible = params.visible;
   this.z = params.z;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/line.js":
+/*!*****************************************!*\
+  !*** ./src/components/graphics/line.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Line; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Line = function Line(params) {
+  _classCallCheck(this, Line);
+
+  this.$id = 'line';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    thickness: 1
+  }, params);
+  this.thickness = params.thickness;
+  this.x1 = params.x1;
+  this.y1 = params.y1;
+  this.x2 = params.x2;
+  this.y2 = params.y2;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/polygon.js":
+/*!********************************************!*\
+  !*** ./src/components/graphics/polygon.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Polygon; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Polygon = function Polygon(params) {
+  _classCallCheck(this, Polygon);
+
+  this.$id = 'polygon';
+  this.$deps = ['graphic'];
+  this.color = params.color;
+  this.points = params.points;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/rectangle.js":
+/*!**********************************************!*\
+  !*** ./src/components/graphics/rectangle.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Rectangle; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Rectangle = function Rectangle(params) {
+  _classCallCheck(this, Rectangle);
+
+  this.$id = 'rectangle';
+  this.$deps = ['graphic'];
+  this.color = params.color;
+  this.width = params.width;
+  this.height = params.height;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/sprite.js":
+/*!*******************************************!*\
+  !*** ./src/components/graphics/sprite.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Sprite; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Sprite = function Sprite(params) {
+  _classCallCheck(this, Sprite);
+
+  this.$id = 'sprite';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    animationSpeed: 1,
+    currentFrame: 1,
+    loop: true,
+    rotation: 0
+  }, params);
+  this.animationSpeed = params.animationSpeed;
+  this.currentFrame = params.currentFrame;
+  this.loop = params.loop;
+  this.path = params.path;
+  this.rotation = params.rotation;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/staticSprite.js":
+/*!*************************************************!*\
+  !*** ./src/components/graphics/staticSprite.js ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return StaticSprite; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var StaticSprite = function StaticSprite(params) {
+  _classCallCheck(this, StaticSprite);
+
+  this.$id = 'staticSprite';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    rotation: 0
+  }, params);
+  this.path = params.path;
+  this.rotation = params.rotation;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/components/graphics/text.js":
+/*!*****************************************!*\
+  !*** ./src/components/graphics/text.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Text; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Text = function Text(params) {
+  _classCallCheck(this, Text);
+
+  this.$id = 'text';
+  this.$deps = ['graphic'];
+  params = _objectSpread({
+    bitmapFont: false,
+    rotation: 0,
+    style: {}
+  }, params);
+  params.style = _objectSpread({
+    font: '32px monospace',
+    fill: 0xffffff
+  }, params.style);
+  this.bitmapFont = params.bitmapFont;
+  this.copy = params.copy;
+  this.rotation = params.rotation;
+  this.style = params.style;
 };
 
 
@@ -43841,20 +43361,20 @@ var Entity = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/entity.js");
-/* harmony import */ var _World_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./World.js */ "./src/World.js");
+/* harmony import */ var _world_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./world.js */ "./src/world.js");
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/* harmony import */ var _components_Collision_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/Collision.js */ "./src/components/Collision.js");
-/* harmony import */ var _components_Position_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/Position.js */ "./src/components/Position.js");
-/* harmony import */ var _components_Velocity_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/Velocity.js */ "./src/components/Velocity.js");
-/* harmony import */ var _components_graphics_Circle_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/graphics/Circle.js */ "./src/components/graphics/Circle.js");
-/* harmony import */ var _components_graphics_Ellipse_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/graphics/Ellipse.js */ "./src/components/graphics/Ellipse.js");
-/* harmony import */ var _components_graphics_Graphic_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/graphics/Graphic.js */ "./src/components/graphics/Graphic.js");
-/* harmony import */ var _components_graphics_Line_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/graphics/Line.js */ "./src/components/graphics/Line.js");
-/* harmony import */ var _components_graphics_Polygon_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/graphics/Polygon.js */ "./src/components/graphics/Polygon.js");
-/* harmony import */ var _components_graphics_Rectangle_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/graphics/Rectangle.js */ "./src/components/graphics/Rectangle.js");
-/* harmony import */ var _components_graphics_StaticSprite_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/graphics/StaticSprite.js */ "./src/components/graphics/StaticSprite.js");
-/* harmony import */ var _components_graphics_Sprite_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/graphics/Sprite.js */ "./src/components/graphics/Sprite.js");
-/* harmony import */ var _components_graphics_Text_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/graphics/Text.js */ "./src/components/graphics/Text.js");
+/* harmony import */ var _components_collision_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/collision.js */ "./src/components/collision.js");
+/* harmony import */ var _components_position_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/position.js */ "./src/components/position.js");
+/* harmony import */ var _components_velocity_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/velocity.js */ "./src/components/velocity.js");
+/* harmony import */ var _components_graphics_circle_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/graphics/circle.js */ "./src/components/graphics/circle.js");
+/* harmony import */ var _components_graphics_ellipse_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/graphics/ellipse.js */ "./src/components/graphics/ellipse.js");
+/* harmony import */ var _components_graphics_graphic_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/graphics/graphic.js */ "./src/components/graphics/graphic.js");
+/* harmony import */ var _components_graphics_line_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/graphics/line.js */ "./src/components/graphics/line.js");
+/* harmony import */ var _components_graphics_polygon_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/graphics/polygon.js */ "./src/components/graphics/polygon.js");
+/* harmony import */ var _components_graphics_rectangle_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/graphics/rectangle.js */ "./src/components/graphics/rectangle.js");
+/* harmony import */ var _components_graphics_staticSprite_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/graphics/staticSprite.js */ "./src/components/graphics/staticSprite.js");
+/* harmony import */ var _components_graphics_sprite_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/graphics/sprite.js */ "./src/components/graphics/sprite.js");
+/* harmony import */ var _components_graphics_text_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/graphics/text.js */ "./src/components/graphics/text.js");
 /* harmony import */ var _prefabs_base_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./prefabs/base.js */ "./src/prefabs/base.js");
 /* harmony import */ var _prefabs_body_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./prefabs/body.js */ "./src/prefabs/body.js");
 /* harmony import */ var _prefabs_static_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./prefabs/static.js */ "./src/prefabs/static.js");
@@ -43892,22 +43412,22 @@ __webpack_require__.r(__webpack_exports__);
 
 var hitagi = {
   Entity: _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"],
-  World: _World_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  World: _world_js__WEBPACK_IMPORTED_MODULE_1__["default"],
   utils: _utils_js__WEBPACK_IMPORTED_MODULE_2__,
   components: {
-    Collision: _components_Collision_js__WEBPACK_IMPORTED_MODULE_3__["default"],
-    Position: _components_Position_js__WEBPACK_IMPORTED_MODULE_4__["default"],
-    Velocity: _components_Velocity_js__WEBPACK_IMPORTED_MODULE_5__["default"],
+    Collision: _components_collision_js__WEBPACK_IMPORTED_MODULE_3__["default"],
+    Position: _components_position_js__WEBPACK_IMPORTED_MODULE_4__["default"],
+    Velocity: _components_velocity_js__WEBPACK_IMPORTED_MODULE_5__["default"],
     graphics: {
-      Circle: _components_graphics_Circle_js__WEBPACK_IMPORTED_MODULE_6__["default"],
-      Ellipse: _components_graphics_Ellipse_js__WEBPACK_IMPORTED_MODULE_7__["default"],
-      Graphic: _components_graphics_Graphic_js__WEBPACK_IMPORTED_MODULE_8__["default"],
-      Line: _components_graphics_Line_js__WEBPACK_IMPORTED_MODULE_9__["default"],
-      Polygon: _components_graphics_Polygon_js__WEBPACK_IMPORTED_MODULE_10__["default"],
-      Rectangle: _components_graphics_Rectangle_js__WEBPACK_IMPORTED_MODULE_11__["default"],
-      StaticSprite: _components_graphics_StaticSprite_js__WEBPACK_IMPORTED_MODULE_12__["default"],
-      Sprite: _components_graphics_Sprite_js__WEBPACK_IMPORTED_MODULE_13__["default"],
-      Text: _components_graphics_Text_js__WEBPACK_IMPORTED_MODULE_14__["default"]
+      Circle: _components_graphics_circle_js__WEBPACK_IMPORTED_MODULE_6__["default"],
+      Ellipse: _components_graphics_ellipse_js__WEBPACK_IMPORTED_MODULE_7__["default"],
+      Graphic: _components_graphics_graphic_js__WEBPACK_IMPORTED_MODULE_8__["default"],
+      Line: _components_graphics_line_js__WEBPACK_IMPORTED_MODULE_9__["default"],
+      Polygon: _components_graphics_polygon_js__WEBPACK_IMPORTED_MODULE_10__["default"],
+      Rectangle: _components_graphics_rectangle_js__WEBPACK_IMPORTED_MODULE_11__["default"],
+      StaticSprite: _components_graphics_staticSprite_js__WEBPACK_IMPORTED_MODULE_12__["default"],
+      Sprite: _components_graphics_sprite_js__WEBPACK_IMPORTED_MODULE_13__["default"],
+      Text: _components_graphics_text_js__WEBPACK_IMPORTED_MODULE_14__["default"]
     }
   },
   prefabs: {
@@ -44937,6 +44457,333 @@ function look(obj, prop, callback, callbackParams) {
     }
   });
 }
+
+/***/ }),
+
+/***/ "./src/world.js":
+/*!**********************!*\
+  !*** ./src/world.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return World; });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./entity.js */ "./src/entity.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var World = /*#__PURE__*/function () {
+  function World() {
+    _classCallCheck(this, World);
+
+    this._entities = {};
+    this._systems = {};
+  } // Update the game by one tick.
+
+
+  _createClass(World, [{
+    key: "tick",
+    value: function tick(dt) {
+      this.tickStart(dt);
+      this.update(dt);
+      this.tickEnd(dt);
+    } // Add an entity to the world.
+
+  }, {
+    key: "add",
+    value: function add(entity) {
+      entity.world = this;
+      this._entities[entity.uid] = entity;
+      this.build(entity);
+      this.track(entity);
+      return entity;
+    } // Remove an entity from the world.
+
+  }, {
+    key: "remove",
+    value: function remove(entity) {
+      this.destroy(entity);
+      this.untrack(entity);
+      delete this._entities[entity.uid];
+    } // Register a system to the world.
+
+  }, {
+    key: "register",
+    value: function register(system) {
+      var _this = this;
+
+      system.$uid = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.uniqueId();
+      this._systems[system.$uid] = system;
+      this.setupTracking(system);
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
+        return _this.rebuild(entity);
+      });
+
+      return system;
+    } // Deregister a system from the world.
+
+  }, {
+    key: "deregister",
+    value: function deregister(system) {
+      if (system.deregister) {
+        system.deregister();
+      }
+
+      delete this._systems[system.$uid];
+    } // Rebuild an entity with all registered systems.
+
+  }, {
+    key: "rebuild",
+    value: function rebuild(entity, just) {
+      this.destroy(entity, just);
+      this.untrack(entity);
+      this.build(entity, just);
+      this.track(entity);
+    } // Clear all entities from the world and systems.
+
+  }, {
+    key: "clear",
+    value: function clear() {
+      var _this2 = this;
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
+        _this2.destroy(entity);
+
+        _this2.untrack(entity);
+      });
+
+      this._entities = {};
+    } // Save the world's entities as JSON.
+
+  }, {
+    key: "save",
+    value: function save() {
+      var saved = [];
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._entities, function (entity) {
+        var copy = {};
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(entity.c, function (component) {
+          copy[component.$id] = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.clone(component);
+        });
+
+        saved.push(copy);
+      });
+
+      return saved;
+    } // Load entities from JSON into the world.
+
+  }, {
+    key: "load",
+    value: function load(componentBatches) {
+      var _this3 = this;
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(componentBatches, function (componentBatch) {
+        var newEntity = new _entity_js__WEBPACK_IMPORTED_MODULE_1__["default"]();
+        var newC = {};
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(componentBatch, function (component) {
+          newC[component.$id] = _objectSpread({}, component);
+        });
+
+        newEntity.c = newC;
+
+        _this3.add(newEntity);
+      });
+    } // Call all registered system's tick start function.
+
+  }, {
+    key: "tickStart",
+    value: function tickStart(dt) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.tickStart) {
+          system.tickStart(dt);
+        }
+      });
+    } // Call all registered system's update function, passing a timestep.
+
+  }, {
+    key: "update",
+    value: function update(dt) {
+      var _this4 = this;
+
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.update) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(_this4._entities, function (entity) {
+            if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(entity)) {
+              lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.update, function (func, id) {
+                if (entity.has(id)) {
+                  func(entity, dt);
+                }
+              });
+            }
+          });
+        }
+      });
+    } // Call all registered system's tick end function.
+
+  }, {
+    key: "tickEnd",
+    value: function tickEnd(dt) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.tickEnd) {
+          system.tickEnd(dt);
+        }
+      });
+    } // Build an entity in all registered systems.
+    // If 'just' is given, just systems that deal with that
+    // component build the entity rather than all.
+
+  }, {
+    key: "build",
+    value: function build(entity, just) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.build) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.build, function (func, id) {
+            if (entity.has(id)) {
+              // Only build in tracking systems.
+              if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(just)) {
+                if (id !== just) {
+                  return;
+                }
+              } // Perform build.
+
+
+              func(entity);
+            }
+          });
+        }
+      });
+    } // Destroys an entity in all registered systems.
+    // If 'just' is given, just systems that deal with that
+    // component destroy the entity rather than all.
+
+  }, {
+    key: "destroy",
+    value: function destroy(entity, just) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (system.destroy) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.destroy, function (func, id) {
+            if (entity.has(id)) {
+              // Only remove from tracking systems.
+              if (!lodash__WEBPACK_IMPORTED_MODULE_0___default.a.isUndefined(just)) {
+                if (id !== just) {
+                  return;
+                }
+              } // Perform the remove.
+
+
+              func(entity);
+            }
+          });
+        }
+      });
+    } // Setup tracking on a system.
+    // Creates the appropriate data structure on the $tracked object.
+
+  }, {
+    key: "setupTracking",
+    value: function setupTracking(system) {
+      if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
+        system.$tracked = {};
+
+        lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
+          switch (trackingType) {
+            case 'many':
+              system.$tracked[id] = {};
+              break;
+
+            case 'single':
+              system.$tracked[id] = null;
+              break;
+
+            default:
+              throw new Error('UnknownTrackingType');
+          }
+        });
+      }
+    } // Make systems track a given entity.
+    // The entity will be referenced by the $tracked object.
+
+  }, {
+    key: "track",
+    value: function track(entity) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
+            if (entity.has(id)) {
+              switch (trackingType) {
+                case 'many':
+                  system.$tracked[id][entity.uid] = entity;
+                  break;
+
+                case 'single':
+                  if (system.$tracked[id] === null) {
+                    system.$tracked[id] = entity;
+                  } else {
+                    throw new Error('ExpectedSingleEntity');
+                  }
+
+                  break;
+
+                default:
+                  throw new Error('UnknownTrackingType');
+              }
+            }
+          });
+        }
+      });
+    } // Stop systems from tracking a given entity.
+    // The entity will no longer be referenced by the $tracked object
+    // until it is tracked again.
+
+  }, {
+    key: "untrack",
+    value: function untrack(entity) {
+      lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(this._systems, function (system) {
+        if (lodash__WEBPACK_IMPORTED_MODULE_0___default.a.has(system, '$tracking')) {
+          lodash__WEBPACK_IMPORTED_MODULE_0___default.a.each(system.$tracking, function (trackingType, id) {
+            if (entity.has(id)) {
+              switch (trackingType) {
+                case 'many':
+                  delete system.$tracked[id][entity.uid];
+                  break;
+
+                case 'single':
+                  system.$tracked[id] = null;
+                  break;
+
+                default:
+                  throw new Error('UnknownTrackingType');
+              }
+            }
+          });
+        }
+      });
+    }
+  }]);
+
+  return World;
+}();
+
+
 
 /***/ })
 

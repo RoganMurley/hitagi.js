@@ -1,4 +1,0 @@
-build:
-    files:
-        'hitagi.js':
-            - 'src/mainGlobal.js'

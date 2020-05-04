@@ -1,20 +1,20 @@
 import Entity from './entity.js';
-import World from './World.js';
+import World from './world.js';
 import * as utils from './utils.js';
 
-import Collision from './components/Collision.js';
-import Position from './components/Position.js';
-import Velocity from './components/Velocity.js';
+import Collision from './components/collision.js';
+import Position from './components/position.js';
+import Velocity from './components/velocity.js';
 
-import Circle from './components/graphics/Circle.js';
-import Ellipse from './components/graphics/Ellipse.js';
-import Graphic from './components/graphics/Graphic.js';
-import Line from './components/graphics/Line.js';
-import Polygon from './components/graphics/Polygon.js';
-import Rectangle from './components/graphics/Rectangle.js';
-import StaticSprite from './components/graphics/StaticSprite.js';
-import Sprite from './components/graphics/Sprite.js';
-import Text from './components/graphics/Text.js';
+import Circle from './components/graphics/circle.js';
+import Ellipse from './components/graphics/ellipse.js';
+import Graphic from './components/graphics/graphic.js';
+import Line from './components/graphics/line.js';
+import Polygon from './components/graphics/polygon.js';
+import Rectangle from './components/graphics/rectangle.js';
+import StaticSprite from './components/graphics/staticSprite.js';
+import Sprite from './components/graphics/sprite.js';
+import Text from './components/graphics/text.js';
 
 import Base from './prefabs/base.js';
 import Body from './prefabs/body.js';

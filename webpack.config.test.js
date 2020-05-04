@@ -1,12 +1,12 @@
+const glob = require("glob");
 const path = require( 'path' );
 
 module.exports = {
   context: __dirname,
-  entry: './src/mainGlobal.js',
+  entry: glob.sync(__dirname + "/src/tests/*.js"),
   output: {
-    path: __dirname,
-    filename: 'hitagi.js',
-    globalObject: 'hitagi',
+    path: __dirname + '/test_output/',
+    filename: 'test_main.js',
   },
   devtool: 'sourcemap',
   module: {
@@ -27,5 +27,5 @@ module.exports = {
       }
     ],
   },
-  watch: true,
+  mode: 'development'
 };

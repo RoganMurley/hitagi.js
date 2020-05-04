@@ -29,5 +29,10 @@ module.exports = {
           "error",
           { allow: ["warn", "error"] },
         ],
+    },
+    "globals": {
+      "beforeEach": true,
+      "describe": true,
+      "it": true
     }
 };

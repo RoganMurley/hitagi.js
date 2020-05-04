@@ -1,6 +1,0 @@
-default:
-    files:
-        - '<%= root %>/**/*.js'
-        - 'examples/example*/example*.js'
-    tasks:
-        - 'dev'

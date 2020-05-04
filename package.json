@@ -4,9 +4,9 @@
   "description": "Game development framework",
   "main": "src/lol.js",
   "scripts": {
-    "test": "grunt test",
-    "build": "webpack build --mode production",
-    "serve": "webpack-dev-server --mode development"
+    "build": "webpack --mode production",
+    "test": "webpack --config webpack.config.test.js && mocha test_output/test_main.js",
+    "lint": "eslint src"
   },
   "repository": {
     "type": "git",
@@ -35,13 +35,8 @@
     "@babel/preset-env": "^7.9.5",
     "babel-loader": "^8.1.0",
     "brfs": "^2.0.2",
-    "eslint": "^6.8.0",
-    "grunt": "^0.4.5",
-    "grunt-browserify": "^3.8.0",
-    "grunt-contrib-jshint": "^0.11.2",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-simple-mocha": "^0.4.0",
-    "load-grunt-config": "^0.17.1",
+    "eslint": "^5.7.0",
+    "mocha": "^6.2.3",
     "simple-mock": "^0.2.14",
     "transform-loader": "^0.2.4",
     "webpack": "^4.43.0",
