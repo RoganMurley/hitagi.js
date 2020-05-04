@@ -48,7 +48,7 @@ export default class Entity {
   detach(componentId) {
     // Check that the component was not a dependency.
     _.each(this.c, component => {
-      const dependencyExists = _.any(component.$deps, dep => dep === componentId);
+      const dependencyExists = _.some(component.$deps, dep => dep === componentId);
       if (dependencyExists) {
         console.error(`${component.$id} depends on ${componentId}`);
         throw new Error('ComponentDependencyMissing');

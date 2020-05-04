@@ -27,7 +27,7 @@
   "homepage": "https://github.com/Purpwood/hitagi.js",
   "dependencies": {
     "howler": "^1.1.26",
-    "lodash": "^3.8.0",
+    "lodash": "^4.17.15",
     "pixi.js": "^3.0.7"
   },
   "devDependencies": {
