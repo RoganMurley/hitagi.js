@@ -36,7 +36,7 @@
     "babel-loader": "^8.1.0",
     "brfs": "^2.0.2",
     "eslint": "^5.7.0",
-    "mocha": "^6.2.3",
+    "mocha": "^10.2.0",
     "simple-mock": "^0.2.14",
     "transform-loader": "^0.2.4",
     "webpack": "^4.43.0",
